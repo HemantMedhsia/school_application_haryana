@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const AttendanceSchema = new mongoose.Schema({
+const studentAttendanceSchema = new mongoose.Schema({
     studentId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Student",
@@ -24,19 +24,14 @@ const AttendanceSchema = new mongoose.Schema({
         type: String,
         default: "",
     },
-
     teacherId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Teacher",
         required: false,
-    },
-    duration: {
-        type: Number,
-        default: null,
     },
     
 },{
     timestamps:true,
 });
 
-module.exports = mongoose.model("Attendance", AttendanceSchema);
+export const StudentAttendance = mongoose.model("StudentAttendance", studentAttendanceSchema);

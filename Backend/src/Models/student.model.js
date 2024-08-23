@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { StudentAttendance } from "./studentAttendence.Model";
 
 const studentSchema = new mongoose.Schema({
     admissionNo: {
@@ -81,6 +82,17 @@ const studentSchema = new mongoose.Schema({
         ref: "Parent",
         required: true,
     },
+    StudentAttendance: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "StudentAttendance",
+        },
+    ],
+    complaints: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Complaint',
+    }],
+
 });
 
 studentSchema.pre("save", async function (next) {

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const ComplainSchema = new mongoose.Schema({
+const ComplaintSchema = new mongoose.Schema({
     studentId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Student",
@@ -39,4 +39,4 @@ const ComplainSchema = new mongoose.Schema({
     timestamps : true,
 });
 
-module.exports = mongoose.model("Complain", ComplainSchema);
+module.exports = mongoose.model("Complaint", ComplaintSchema);
