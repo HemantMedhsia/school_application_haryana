@@ -93,6 +93,4 @@ parentSchema.methods.isValidPassword = async function (parentLoginPassword) {
     }
 };
 
-const Parent = mongoose.model("Parent", parentSchema);
-
-module.exports = Parent;
+export const Parent = mongoose.model("Parent", parentSchema);
