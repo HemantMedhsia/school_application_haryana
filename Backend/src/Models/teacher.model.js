@@ -66,6 +66,12 @@ const teacherSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "School",
     },
+    teacherAttendance: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "TeacherAttendance",
+        },
+    ],
 });
 
 teacherSchema.pre("save", async function (next) {
