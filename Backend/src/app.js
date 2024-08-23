@@ -42,16 +42,6 @@ app.use((err, req, res, next) => {
 
 
 
-app.use("/api",noticeRoute);
-app.use("/api",subjectRoute);
-
-
-
-// Global error handling middleware
-app.use((err, req, res, next) => {
-    console.error(err); // Log the error (optional)
-    res.status(500).json({ error: "An internal server error occurred" });
-});
 
 
 export { app };
