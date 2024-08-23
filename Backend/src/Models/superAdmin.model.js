@@ -32,4 +32,4 @@ superAdminSchema.methods.isValidPassword = async function(password) {
     }
 }
 
-const SuperAdmin = mongoose.model("SuperAdmin", superAdminSchema);
+export const SuperAdmin = mongoose.model("SuperAdmin", superAdminSchema);

@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const studentSchema = new mongoose.Schema({
     admissionNo: {
@@ -111,6 +111,4 @@ studentSchema.methods.isValidPassword = async function (studentLoginPassword) {
     }
 };
 
-const Student = mongoose.model("Student", studentSchema);
-
-module.exports = Student;
+export const Student = mongoose.model("Student", studentSchema);

@@ -96,6 +96,4 @@ teacherSchema.methods.isValidPassword = async function (teacherLoginPassword) {
     }
 };
 
-const Teacher = mongoose.model("Teacher", teacherSchema);
-
-module.exports = Teacher;
+export const Teacher = mongoose.model("Teacher", teacherSchema);
