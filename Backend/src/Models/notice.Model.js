@@ -44,4 +44,4 @@ const NoticeSchema = new mongoose.Schema({
     },
 });
 
-export const Notice = mongoose.Model("Notice", NoticeSchema);
+export const Notice = mongoose.model("Notice", NoticeSchema);
