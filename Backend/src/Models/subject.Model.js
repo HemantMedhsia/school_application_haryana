@@ -41,4 +41,10 @@ const SubjectSchema = new mongoose.Schema(
     }
 );
 
-module.exports = mongoose.model("Subject", SubjectSchema);
+// Middleware to update the updatedAt field before saving
+SubjectSchema.pre("save", function (next) {
+    this.updatedAt = Date.now();
+    next();
+});
+
+export const Subject = mongoose.model("Subject", SubjectSchema);
