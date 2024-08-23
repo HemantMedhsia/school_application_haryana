@@ -1,6 +1,4 @@
 import mongoose from 'mongoose';
-import { WorkingStaff } from './workingStaffs.model';
-
 // Define the school schema
 const schoolSchema = new mongoose.Schema({
     name: {
@@ -37,7 +35,7 @@ const schoolSchema = new mongoose.Schema({
     }],
     workingStaffs: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: WorkingStaff,
+        ref: 'WorkingStaff',
     }],
     createdAt: {
         type: Date,
