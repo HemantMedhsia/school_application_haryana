@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { StudentAttendance } from "./studentAttendence.Model";
+import bcrypt from "bcrypt";
 
 const studentSchema = new mongoose.Schema({
     admissionNo: {
