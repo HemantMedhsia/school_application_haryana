@@ -3,7 +3,7 @@ import { createSchool, deleteSchool, getSchool, getSchools } from '../Controller
 
 const router = express.Router();
 
-router.post('/create-school', createSchool);
+router.post('/create-school/', createSchool);
 router.get('/get-schools', getSchools);
 router.get('/get-school/:id', getSchool);
 router.delete('/delete-school/:id', deleteSchool);

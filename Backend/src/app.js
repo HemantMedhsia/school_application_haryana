@@ -6,6 +6,7 @@ import { studentRoute } from "./Routes/student.Route.js";
 import { parentRoute } from "./Routes/parent.Route.js";
 import noticeRoute from "./Routes/notice.Route.js";
 import subjectRoute from "./Routes/subject.Route.js";
+import { adminRoute } from "./Routes/admin.Route.js";
 
 
 const app = express();
@@ -32,6 +33,7 @@ app.use("/api",subjectRoute);
 app.use('/api', schoolRoute);
 app.use('/api', studentRoute);
 app.use('/api', parentRoute);
+app.use('/api', adminRoute)
 
 
 // Global error handling middleware
