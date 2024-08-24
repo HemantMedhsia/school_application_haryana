@@ -4,9 +4,6 @@ import wrapAsync from "../Utils/wrapAsync.js";
 import {adminValidationSchema} from "../Validation/admin.Validation.js";
 
 export const createAdmin = wrapAsync(async (req, res) => {
-    await adminValidationSchema.validateAsync(req.body, {
-        abortEarly: false,
-    });
     const school = await School.findById(req.params.schoolId);
     if (!school) {
         return res.status(404).json({ error: "School not found" });
@@ -14,6 +11,9 @@ export const createAdmin = wrapAsync(async (req, res) => {
 
     // Add schoolId to req.body
     const adminData = { ...req.body, school: req.params.schoolId };
+    await adminValidationSchema.validateAsync(adminData, {
+        abortEarly: false,
+    });
 
     const admin = new Admin(adminData);
     const savedAdmin = await admin.save();
