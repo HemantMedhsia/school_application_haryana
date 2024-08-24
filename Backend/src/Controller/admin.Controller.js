@@ -1,6 +1,7 @@
 import { Admin } from "../Models/admin.Model.js";
 import { School } from "../Models/school.model.js";
 import wrapAsync from "../Utils/wrapAsync.js";
+import {adminValidationSchema} from "../Validation/admin.Validation.js";
 import { ApiError } from "../Utils/errorHandler.js";
 import { ApiResponse } from "../Utils/responseHandler.js";
 import jwt from "jsonwebtoken";
@@ -27,6 +28,9 @@ const generateAccessAndRefreshTokens = async (adminId, next) => {
 };
 
 export const createAdmin = wrapAsync(async (req, res) => {
+    await adminValidationSchema.validateAsync(req.body, {
+        abortEarly: false,
+    });
     const school = await School.findById(req.params.schoolId);
     if (!school) {
         return res.status(404).json({ error: "School not found" });

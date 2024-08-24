@@ -1,8 +1,12 @@
 import { Parent } from "../Models/parents.model.js";
 import { Student } from "../Models/student.model.js";
 import wrapAsync from "../Utils/wrapAsync.js";
+import { parentValidatonSchema } from "../Validation/parent.Validation.js";
 
 export const createParent = wrapAsync(async (req, res) => {
+    await parentValidatonSchema.validateAsync(req.body, {
+        abortEarly: false,
+    });
     const parent = new Parent(req.body);
     const parentData = await parent.save();
 

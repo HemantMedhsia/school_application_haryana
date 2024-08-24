@@ -23,12 +23,7 @@ const teacherAttendanceSchema = new mongoose.Schema({
     notes: {
         type: String,
         default: "",
-    },
-    adminId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Admin",
-        required: false,
-    },
+    }
 },
 {
     timestamps:true,
