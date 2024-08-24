@@ -6,6 +6,7 @@ import {
     getStudentByParent,
     getStudents,
     loginStudent,
+    refreshAccessToken,
     updateStudent,
 } from "../Controller/student.Controller.js";
 
@@ -18,6 +19,7 @@ router.delete("/delete-student/:id", deleteStudent);
 router.patch("/update-student/:id", updateStudent);
 router.get("/get-student-by-parant/:parentId", getStudentByParent);
 
-router.post("/student-login", loginStudent);
+router.post("/login-student", loginStudent);
+router.post("/refresh-token-student", refreshAccessToken);
 
 export { router as studentRoute };

@@ -1,6 +1,30 @@
 import { Admin } from "../Models/admin.Model.js";
 import { School } from "../Models/school.model.js";
 import wrapAsync from "../Utils/wrapAsync.js";
+import { ApiError } from "../Utils/errorHandler.js";
+import { ApiResponse } from "../Utils/responseHandler.js";
+import jwt from "jsonwebtoken";
+
+const generateAccessAndRefreshTokens = async (adminId, next) => {
+    const admin = await Admin.findById(adminId);
+
+    if (!admin) {
+        return next(new ApiError(404, "Admin not found"));
+    }
+
+    const accessToken = admin.generateAccessToken();
+    const refreshToken = admin.generateRefreshToken();
+
+    admin.refershToken = refreshToken;
+
+    await admin.save({ validateBeforeSave: false });
+
+    if (!accessToken || !refreshToken) {
+        return next(new ApiError(500, "Failed to generate tokens"));
+    }
+
+    return { accessToken, refreshToken };
+};
 
 export const createAdmin = wrapAsync(async (req, res) => {
     const school = await School.findById(req.params.schoolId);
@@ -16,6 +40,94 @@ export const createAdmin = wrapAsync(async (req, res) => {
     school.admin = savedAdmin._id;
     await school.save();
     res.status(201).json(savedAdmin);
+});
+
+export const loginAdmin = wrapAsync(async (req, res, next) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        return next(new ApiError(400, "Email and password are required"));
+    }
+
+    const admin = await Admin.findOne({ email });
+
+    if (!admin) {
+        console.log("Admin not found");
+        return next(new ApiError(404, "Admin does not exist"));
+    }
+
+    console.log("Admin found:", admin.email);
+
+    const isPasswordValid = await admin.isValidPassword(password);
+    console.log("Is password valid:", isPasswordValid);
+
+    if (!isPasswordValid) {
+        console.log("Invalid password attempt for admin:", admin.email);
+        return next(new ApiError(401, "Invalid admin credentials"));
+    }
+
+    const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
+        admin._id
+    );
+
+    return res
+        .status(200)
+        .cookie("accessToken", accessToken)
+        .cookie("refreshToken", refreshToken)
+        .json(
+            new ApiResponse(
+                200,
+                {
+                    admin,
+                    accessToken,
+                    refreshToken,
+                },
+                "Admin logged in successfully"
+            )
+        );
+});
+
+export const refreshAccessToken = wrapAsync(async (req, res, next) => {
+    const incomingRefreshToken =
+        req.cookies.refreshToken || req.body.refreshToken;
+
+    if (!incomingRefreshToken) {
+        return next(new ApiError(401, "Unauthorized request"));
+    }
+
+    let decodedToken;
+    try {
+        decodedToken = jwt.verify(
+            incomingRefreshToken,
+            process.env.REFRESH_TOKEN_SECRET
+        );
+    } catch (error) {
+        return next(new ApiError(401, "Invalid refresh token"));
+    }
+
+    const admin = await Admin.findById(decodedToken?._id);
+    if (!admin) {
+        return next(new ApiError(401, "Invalid refresh token"));
+    }
+
+    if (incomingRefreshToken !== admin?.refershToken) {
+        return next(new ApiError(401, "Refresh token is expired or used"));
+    }
+
+    const { accessToken, refreshToken: newRefreshToken } =
+        await generateAccessAndRefreshTokens(admin._id);
+
+    return res
+        .status(200)
+        .cookie("accessToken", accessToken)
+        .cookie("refreshToken", newRefreshToken)
+        .json(
+            new ApiResponse(
+                200,
+                { accessToken, refreshToken: newRefreshToken },
+                "Access token refreshed"
+            )
+        );
 });
 
 export const getAdmins = wrapAsync(async (req, res) => {

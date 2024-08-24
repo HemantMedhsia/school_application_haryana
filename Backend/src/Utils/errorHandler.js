@@ -7,11 +7,10 @@ class ApiError extends Error {
     ) {
         super(message);
         this.statusCode = statusCode;
-        this.data = null;
-        this.message = message;
-        this.success = false;
         this.errors = errors;
+        this.success = false;
 
+        // Check if a custom stack trace is provided, else capture the default stack trace
         if (stack) {
             this.stack = stack;
         } else {

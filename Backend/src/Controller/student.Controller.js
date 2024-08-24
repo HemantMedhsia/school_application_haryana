@@ -6,31 +6,28 @@ import wrapAsync from "../Utils/wrapAsync.js";
 import { studentValidationSchema } from "../Validation/student.Validation.js";
 import jwt from "jsonwebtoken";
 
-const generateAccessAndRefreshTokens = async (studentId) => {
+const generateAccessAndRefreshTokens = wrapAsync(async (studentId, next) => {
     const student = await Student.findById(studentId);
 
     if (!student) {
-        throw new ApiError(404, "Student not found");
+        return next(new ApiError(404, "Student not found"));
     }
 
     const accessToken = student.generateAccessToken();
     const refreshToken = student.generateRefreshToken();
+    console.log("Access", accessToken);
+    console.log("Refresh", refreshToken);
 
-    // Logging for debugging
-    console.log("Generated Access Token:", accessToken);
-    console.log("Generated Refresh Token:", refreshToken);
-
-    // Corrected typo
     student.refershToken = refreshToken;
 
     await student.save({ validateBeforeSave: false });
 
     if (!accessToken || !refreshToken) {
-        throw new ApiError(500, "Failed to generate tokens");
+        return next(ApiError(500, "Failed to generate tokens"));
     }
 
     return { accessToken, refreshToken };
-};
+});
 
 export const createStudent = wrapAsync(async (req, res) => {
     await studentValidationSchema.validateAsync(req.body, {
@@ -61,47 +58,39 @@ export const createStudent = wrapAsync(async (req, res) => {
     }
 });
 
-export const loginStudent = wrapAsync(async (req, res) => {
+export const loginStudent = wrapAsync(async (req, res, next) => {
     const { rollNumber, email, studentLoginPassword } = req.body;
 
-    // Ensure at least one of rollNumber or email is provided
     if (!rollNumber && !email) {
-        throw new ApiError(400, "Roll number or email is required");
+        return next(ApiError(400, "Roll number or email is required"));
     }
 
-    // Find the student by rollNumber or email
     const student = await Student.findOne({
         $or: [{ rollNumber }, { email }],
     });
 
-    // If the student is not found, throw an error
     if (!student) {
         console.log("Student not found");
-        throw new ApiError(404, "Student does not exist");
+        return next(ApiError(404, "Student does not exist"));
     }
 
-    // Log the found student details (excluding sensitive info)
     console.log("Student found:", student.email);
 
-    // Validate the password
     const isPasswordValid = await student.isValidPassword(studentLoginPassword);
     console.log("Is password valid:", isPasswordValid);
 
     if (!isPasswordValid) {
         console.log("Invalid password attempt for student:", student.email);
-        throw new ApiError(401, "Invalid student credentials");
+        return next(new ApiError(401, " Invalid student credentials "));
     }
 
-    // Generate access and refresh tokens
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
         student._id
     );
 
-    // Save refreshToken to the database
-    student.refershToken = refreshToken; // Ensure spelling is consistent
+    student.refershToken = refreshToken;
     await student.save();
 
-    // Select student data excluding password and refreshToken
     const loggedInStudent = await Student.findById(student._id).select(
         "-studentLoginPassword -refershToken"
     );
@@ -115,8 +104,8 @@ export const loginStudent = wrapAsync(async (req, res) => {
     // Send the response with cookies and student data
     return res
         .status(200)
-        .cookie("accessToken", accessToken)   // include option before production.
-        .cookie("refreshToken", refreshToken)  // include option before production.
+        .cookie("accessToken", accessToken) // include option before production.
+        .cookie("refreshToken", refreshToken) // include option before production.
         .json(
             new ApiResponse(
                 200,
@@ -128,6 +117,56 @@ export const loginStudent = wrapAsync(async (req, res) => {
                 "Student logged in successfully"
             )
         );
+});
+
+export const refreshAccessToken = wrapAsync(async (req, res, next) => {
+    const incomingRefreshToken =
+        req.cookies.refreshToken || req.body.refreshToken;
+
+    if (!incomingRefreshToken) {
+        return next(new ApiError(401, "Unauthorized request"));
+    }
+
+    try {
+        const decodedToken = jwt.verify(
+            incomingRefreshToken,
+            process.env.REFRESH_TOKEN_SECRET
+        );
+
+        const student = await Student.findById(decodedToken?._id);
+
+        if (!student) {
+            return next(new ApiError(401, "Invalid refresh token"));
+        }
+
+        if (incomingRefreshToken !== student?.refershToken) {
+            return next(new ApiError(401, "Refresh token is expired or used"));
+        }
+
+        // const options = {
+        //     httpOnly: true,
+        //     secure: process.env.NODE_ENV === "production",
+        // };
+
+        const { accessToken, refreshToken: newRefreshToken } =
+            await generateAccessAndRefreshTokens(student._id);
+        // student.refershToken = newRefreshToken;
+        // await student.save({ validateBeforeSave: false });
+
+        return res
+            .status(200)
+            .cookie("accessToken", accessToken)
+            .cookie("refreshToken", newRefreshToken)
+            .json(
+                new ApiResponse(
+                    200,
+                    { accessToken, refreshToken: newRefreshToken },
+                    "Access token refreshed"
+                )
+            );
+    } catch (error) {
+        throw new ApiError(401, error?.message || "Invalid refresh token");
+    }
 });
 
 export const getStudents = wrapAsync(async (req, res) => {

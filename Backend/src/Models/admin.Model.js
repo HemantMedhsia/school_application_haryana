@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 const adminSchema = new mongoose.Schema({
     name: { type: String, required: true },
@@ -10,30 +11,56 @@ const adminSchema = new mongoose.Schema({
         ref: "School",
         required: true,
     },
+    refershToken: {
+        type: String,
+    },
 });
 
-// Hash the password before saving the admin
 adminSchema.pre("save", async function (next) {
     try {
-        // Generate a salt
+        if (!this.isModified("password")) return next();
+
         const salt = await bcrypt.genSalt(10);
-        // Hash the password with the salt
-        const hashedPassword = await bcrypt.hash(this.password, salt);
-        // Replace the plain password with the hashed password
-        this.password = hashedPassword;
+
+        this.password = await bcrypt.hash(this.password, salt);
         next();
     } catch (error) {
         next(error);
     }
 });
 
-// Method to validate password
 adminSchema.methods.isValidPassword = async function (password) {
     try {
         return await bcrypt.compare(password, this.password);
     } catch (error) {
         throw new Error(error);
     }
+};
+
+adminSchema.methods.generateAccessToken = function () {
+    return jwt.sign(
+        {
+            _id: this._id,
+            email: this.email,
+            name: this.name,
+        },
+        process.env.ACCESS_TOKEN_SECRET,
+        {
+            expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
+        }
+    );
+};
+
+adminSchema.methods.generateRefreshToken = function () {
+    return jwt.sign(
+        {
+            _id: this._id,
+        },
+        process.env.REFRESH_TOKEN_SECRET,
+        {
+            expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
+        }
+    );
 };
 
 export const Admin = mongoose.model("Admin", adminSchema);

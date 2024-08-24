@@ -38,8 +38,8 @@ app.use('/api', adminRoute)
 
 // Global error handling middleware
 app.use((err, req, res, next) => {
-    console.error(err); // Log the error (optional)
-    res.status(500).json({ error: "An internal server error occurred" });
+    let { statusCode, message } = err;
+    res.status(statusCode).json(message);
 });
 
 
