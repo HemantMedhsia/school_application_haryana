@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
-
+import jwt from "jsonwebtoken";
 const studentSchema = new mongoose.Schema({
     admissionNo: {
         type: String,
@@ -8,6 +8,7 @@ const studentSchema = new mongoose.Schema({
     },
     rollNumber: {
         type: String,
+        unique: true
     },
     studentLoginPassword: {
         type: String,
@@ -88,30 +89,62 @@ const studentSchema = new mongoose.Schema({
             ref: "StudentAttendance",
         },
     ],
-    complaints: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Complaint',
-    }],
-
+    complaints: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Complaint",
+        },
+    ],
+    refershToken: {
+        type: String,
+    },
 });
+
+studentSchema.methods.generateAccessToken = function () {
+    return jwt.sign(
+        {
+            _id: this._id,
+            email: this.email,
+            firstName: this.firstName,
+            lastName: this.lastName,
+        },
+        process.env.ACCESS_TOKEN_SECRET,
+        {
+            expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
+        }
+    );
+};
+
+studentSchema.methods.generateRefreshToken = function () {
+    return jwt.sign(
+        {
+            _id: this._id,
+        },
+        process.env.REFRESH_TOKEN_SECRET,
+        {
+            expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
+        }
+    );
+};
 
 studentSchema.pre("save", async function (next) {
     try {
-        // Generate a salt
+        // Hash the password only if it has been modified or is new
+        if (!this.isModified("studentLoginPassword")) return next();
+
+        // Generate a salt and hash the password
         const salt = await bcrypt.genSalt(10);
-        // Hash the password with the salt
-        const hashedPassword = await bcrypt.hash(
+        this.studentLoginPassword = await bcrypt.hash(
             this.studentLoginPassword,
             salt
         );
-        // Replace the plain password with the hashed password
-        this.studentLoginPassword = hashedPassword;
         next();
     } catch (error) {
         next(error);
     }
 });
 
+// Method to validate the password
 studentSchema.methods.isValidPassword = async function (studentLoginPassword) {
     try {
         return await bcrypt.compare(

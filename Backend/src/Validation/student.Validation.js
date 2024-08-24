@@ -2,7 +2,7 @@ import Joi from "joi";
 import mongoose from "mongoose";
 export const studentValidationSchema = Joi.object({
     admissionNo: Joi.string().required(),
-    rollNumber: Joi.string().optional(),
+    rollNumber: Joi.string().required(),
     studentLoginPassword: Joi.string().required(),
     class: Joi.string().required(),
     section: Joi.string().required(),
