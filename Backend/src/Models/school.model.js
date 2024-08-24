@@ -1,47 +1,61 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 // Define the school schema
 const schoolSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: true
+        required: true,
     },
     location: {
         type: String,
-        required: true
+        required: true,
     },
     address: {
         type: String,
-        required: true
+        required: true,
     },
     phone: {
         type: String,
-        required: true
+        required: true,
     },
-    students: [{
+    students: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Student",
+        },
+    ],
+    teachers: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Teacher",
+        },
+    ],
+    notices: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Notice",
+        },
+    ],
+    subjects: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Subject",
+        },
+    ],
+    workingStaffs: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "WorkingStaff",
+        },
+    ],
+    admin: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Student',
-    }],
-    teachers: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Teacher',
-    }],
-    notices: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Notice',
-    }],
-    subjects: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Subject',
-    }],
-    workingStaffs: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'WorkingStaff',
-    }],
+        ref: "Admin",
+    },
     createdAt: {
         type: Date,
-        default: Date.now()
-    }
+        default: Date.now(),
+    },
 });
 
 // Create the school model
-export const School = mongoose.model('School', schoolSchema);
+export const School = mongoose.model("School", schoolSchema);
