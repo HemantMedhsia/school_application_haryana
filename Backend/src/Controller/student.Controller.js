@@ -61,7 +61,7 @@ export const createStudent = wrapAsync(async (req, res) => {
     }
 });
 
-export const loginStudent = wrapAsync(async (req, res) => {
+export const loginStudent = wrapAsync(async (req, res) => { 
     const { rollNumber, email, studentLoginPassword } = req.body;
 
     // Ensure at least one of rollNumber or email is provided

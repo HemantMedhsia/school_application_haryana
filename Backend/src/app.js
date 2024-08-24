@@ -7,7 +7,9 @@ import { parentRoute } from "./Routes/parent.Route.js";
 import noticeRoute from "./Routes/notice.Route.js";
 import subjectRoute from "./Routes/subject.Route.js";
 import { adminRoute } from "./Routes/admin.Route.js";
-
+import { teacherRoute } from "./Routes/teacher.Route.js";
+import { teacherAttendenceRoute } from "./Routes/teacherAttendence.Route.js";
+import bodyParser from "body-parser";
 
 const app = express();
 
@@ -26,24 +28,21 @@ app.use(express.static("public"));
 
 app.use(cookieParser());
 
+app.use(bodyParser.json());
 
-
-app.use("/api",noticeRoute);
-app.use("/api",subjectRoute);
-app.use('/api', schoolRoute);
-app.use('/api', studentRoute);
-app.use('/api', parentRoute);
-app.use('/api', adminRoute)
-
+app.use("/api", noticeRoute);
+app.use("/api", subjectRoute);
+app.use("/api", schoolRoute);
+app.use("/api", studentRoute);
+app.use("/api", parentRoute);
+app.use("/api", adminRoute);
+app.use("/api", teacherRoute);
+app.use("/api", teacherAttendenceRoute);
 
 // Global error handling middleware
 app.use((err, req, res, next) => {
     console.error(err); // Log the error (optional)
     res.status(500).json({ error: "An internal server error occurred" });
 });
-
-
-
-
 
 export { app };
