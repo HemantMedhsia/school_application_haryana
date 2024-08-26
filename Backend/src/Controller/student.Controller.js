@@ -58,7 +58,7 @@ export const createStudent = wrapAsync(async (req, res) => {
     }
 });
 
-export const loginStudent = wrapAsync(async (req, res, next) => { 
+export const loginStudent = wrapAsync(async (req, res, next) => {
     const { rollNumber, email, studentLoginPassword } = req.body;
 
     if (!rollNumber && !email) {
@@ -271,3 +271,4 @@ export const getStudentByParent = wrapAsync(async (req, res) => {
         });
     }
 });
+
