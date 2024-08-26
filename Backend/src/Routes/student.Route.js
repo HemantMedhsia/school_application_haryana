@@ -19,7 +19,7 @@ router.delete("/delete-student/:id", deleteStudent);
 router.patch("/update-student/:id", updateStudent);
 router.get("/get-student-by-parant/:parentId", getStudentByParent);
 
-router.post("/login-student", loginStudent);
-router.post("/refresh-token-student", refreshAccessToken);
+router.post("/login-student", loginStudent); 
+router.post("/refresh-token-student", refreshAccessToken);  // this route is use to refresh the accessToken and refereshToken
 
 export { router as studentRoute };
