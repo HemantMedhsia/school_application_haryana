@@ -148,8 +148,8 @@ export const refreshAccessToken = wrapAsync(async (req, res, next) => {
 
         const { accessToken, refreshToken: newRefreshToken } =
             await generateAccessAndRefreshTokens(student._id);
-        // student.refershToken = newRefreshToken;
-        // await student.save({ validateBeforeSave: false });
+        student.refershToken = newRefreshToken;
+        await student.save({ validateBeforeSave: false });
 
         return res
             .status(200)
