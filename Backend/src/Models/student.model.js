@@ -8,7 +8,7 @@ const studentSchema = new mongoose.Schema({
     },
     rollNumber: {
         type: String,
-        unique: true
+        unique: true,
     },
     studentLoginPassword: {
         type: String,
@@ -95,8 +95,12 @@ const studentSchema = new mongoose.Schema({
             ref: "Complaint",
         },
     ],
-    refershToken: {
+    refreshToken: {
         type: String,
+    },
+    role: {
+        type: String,
+        default: "Student",
     },
 });
 

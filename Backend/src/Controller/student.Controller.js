@@ -1,24 +1,22 @@
 import { School } from "../Models/school.model.js";
 import { Student } from "../Models/student.model.js";
 import { ApiError } from "../Utils/errorHandler.js";
+import { generateAccessToken } from "../Utils/generateAcessToken.js";
+import { generateRefreshToken } from "../Utils/generateRefreshToken.js";
 import { ApiResponse } from "../Utils/responseHandler.js";
 import wrapAsync from "../Utils/wrapAsync.js";
 import { studentValidationSchema } from "../Validation/student.Validation.js";
 import jwt from "jsonwebtoken";
 
 const generateAccessAndRefreshTokens = async (studentId, next) => {
-    const student = await Student.findById(studentId); // Correct model usage
+    const student = await Student.findById(studentId); 
 
     if (!student) {
         return next(new ApiError(404, "Student not found"));
     }
 
-    const accessToken = student.generateAccessToken();
-    const refreshToken = student.generateRefreshToken();
-
-    student.refreshToken = refreshToken; // Typo correction: 'refershToken' should be 'refreshToken'
-
-    await student.save({ validateBeforeSave: false });
+    const accessToken = generateAccessToken(student);
+    const refreshToken = generateRefreshToken(student);
 
     if (!accessToken || !refreshToken) {
         return next(new ApiError(500, "Failed to generate tokens"));
@@ -86,11 +84,11 @@ export const loginStudent = wrapAsync(async (req, res, next) => {
         student._id
     );
 
-    student.refershToken = refreshToken;
+    student.refreshToken = refreshToken;
     await student.save();
 
     const loggedInStudent = await Student.findById(student._id).select(
-        "-studentLoginPassword -refershToken"
+        "-studentLoginPassword -refreshToken"
     );
 
     // Cookie options
@@ -137,7 +135,7 @@ export const refreshAccessToken = wrapAsync(async (req, res, next) => {
             return next(new ApiError(401, "Invalid refresh token"));
         }
 
-        if (incomingRefreshToken !== student?.refershToken) {
+        if (incomingRefreshToken !== student?.refreshToken) {
             return next(new ApiError(401, "Refresh token is expired or used"));
         }
 
@@ -148,7 +146,7 @@ export const refreshAccessToken = wrapAsync(async (req, res, next) => {
 
         const { accessToken, refreshToken: newRefreshToken } =
             await generateAccessAndRefreshTokens(student._id);
-        student.refershToken = newRefreshToken;
+        student.refreshToken = newRefreshToken;
         await student.save({ validateBeforeSave: false });
 
         return res
