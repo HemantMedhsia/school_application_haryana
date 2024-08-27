@@ -6,8 +6,8 @@ import wrapAsync from "../Utils/wrapAsync.js";
 import { studentValidationSchema } from "../Validation/student.Validation.js";
 import jwt from "jsonwebtoken";
 
-const generateAccessAndRefreshTokens = wrapAsync(async (studentId, next) => {
-    const student = await Student.findById(studentId);
+const generateAccessAndRefreshTokens = async (studentId, next) => {
+    const student = await Student.findById(studentId); // Correct model usage
 
     if (!student) {
         return next(new ApiError(404, "Student not found"));
@@ -15,19 +15,17 @@ const generateAccessAndRefreshTokens = wrapAsync(async (studentId, next) => {
 
     const accessToken = student.generateAccessToken();
     const refreshToken = student.generateRefreshToken();
-    console.log("Access", accessToken);
-    console.log("Refresh", refreshToken);
 
-    student.refershToken = refreshToken;
+    student.refreshToken = refreshToken; // Typo correction: 'refershToken' should be 'refreshToken'
 
     await student.save({ validateBeforeSave: false });
 
     if (!accessToken || !refreshToken) {
-        return next(ApiError(500, "Failed to generate tokens"));
+        return next(new ApiError(500, "Failed to generate tokens"));
     }
 
     return { accessToken, refreshToken };
-});
+};
 
 export const createStudent = wrapAsync(async (req, res) => {
     await studentValidationSchema.validateAsync(req.body, {
@@ -58,7 +56,7 @@ export const createStudent = wrapAsync(async (req, res) => {
     }
 });
 
-export const loginStudent = wrapAsync(async (req, res, next) => { 
+export const loginStudent = wrapAsync(async (req, res, next) => {
     const { rollNumber, email, studentLoginPassword } = req.body;
 
     if (!rollNumber && !email) {

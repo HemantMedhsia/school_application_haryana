@@ -64,6 +64,9 @@ const parentSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    refershToken: {
+        type: String,
+    },
 });
 
 parentSchema.pre("save", async function (next) {
