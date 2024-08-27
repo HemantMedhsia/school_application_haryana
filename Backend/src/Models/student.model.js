@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+
 const studentSchema = new mongoose.Schema({
     admissionNo: {
         type: String,
@@ -103,33 +103,6 @@ const studentSchema = new mongoose.Schema({
         default: "Student",
     },
 });
-
-studentSchema.methods.generateAccessToken = function () {
-    return jwt.sign(
-        {
-            _id: this._id,
-            email: this.email,
-            firstName: this.firstName,
-            lastName: this.lastName,
-        },
-        process.env.ACCESS_TOKEN_SECRET,
-        {
-            expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
-        }
-    );
-};
-
-studentSchema.methods.generateRefreshToken = function () {
-    return jwt.sign(
-        {
-            _id: this._id,
-        },
-        process.env.REFRESH_TOKEN_SECRET,
-        {
-            expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
-        }
-    );
-};
 
 studentSchema.pre("save", async function (next) {
     try {

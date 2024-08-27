@@ -11,8 +11,12 @@ const adminSchema = new mongoose.Schema({
         ref: "School",
         required: true,
     },
-    refershToken: {
+    refreshToken: {
         type: String,
+    },
+    role: {
+        type: String,
+        default: "Admin",
     },
 });
 
@@ -35,32 +39,6 @@ adminSchema.methods.isValidPassword = async function (password) {
     } catch (error) {
         throw new Error(error);
     }
-};
-
-adminSchema.methods.generateAccessToken = function () {
-    return jwt.sign(
-        {
-            _id: this._id,
-            email: this.email,
-            name: this.name,
-        },
-        process.env.ACCESS_TOKEN_SECRET,
-        {
-            expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
-        }
-    );
-};
-
-adminSchema.methods.generateRefreshToken = function () {
-    return jwt.sign(
-        {
-            _id: this._id,
-        },
-        process.env.REFRESH_TOKEN_SECRET,
-        {
-            expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
-        }
-    );
 };
 
 export const Admin = mongoose.model("Admin", adminSchema);

@@ -73,25 +73,33 @@ const teacherSchema = new mongoose.Schema({
             ref: "TeacherAttendance",
         },
     ],
+    refreshToken: {
+        type: String,
+    },
+    role: {
+        type: String,
+        default: "Teacher",
+    },
 });
 
 teacherSchema.pre("save", async function (next) {
     try {
-        // Generate a salt
+        // Hash the password only if it has been modified or is new
+        if (!this.isModified("teacherLoginPassword")) return next();
+
+        // Generate a salt and hash the password
         const salt = await bcrypt.genSalt(10);
-        // Hash the password with the salt
-        const hashedPassword = await bcrypt.hash(
+        this.teacherLoginPassword = await bcrypt.hash(
             this.teacherLoginPassword,
             salt
         );
-        // Replace the plain password with the hashed password
-        this.teacherLoginPassword = hashedPassword;
         next();
     } catch (error) {
         next(error);
     }
 });
 
+// Method to validate the password
 teacherSchema.methods.isValidPassword = async function (teacherLoginPassword) {
     try {
         return await bcrypt.compare(
@@ -102,5 +110,4 @@ teacherSchema.methods.isValidPassword = async function (teacherLoginPassword) {
         throw new Error(error);
     }
 };
-
 export const Teacher = mongoose.model("Teacher", teacherSchema);
