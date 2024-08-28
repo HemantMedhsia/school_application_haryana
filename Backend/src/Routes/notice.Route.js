@@ -9,17 +9,16 @@ import {
     getNoticesForSchool,
     updateNotice,
 } from "../Controller/notice.Controller.js";
+import { authenticateToken } from "../Middlewares/authenticateToken.js";
 const router = express.Router();
 
-router.post("/create-notice/:schoolId", createNotice);
+router.post("/create-notice/:schoolId", authenticateToken, createNotice);
 router.get("/all-notice", getAllNotices);
-router.post("/single-notice/:id", getNoticeById);
+router.get("/single-notice/:id", getNoticeById);
 router.put("/notice-update/:id", updateNotice);
 router.delete("/notice-delete/:id", deleteNotice);
 router.get("/notice-audience/:audience", getNoticesByAudience);
 router.get("/notice-category/:category", getNoticesByCategory);
-router.get("/notice-school/:schoolId",getNoticesForSchool);
+router.get("/notice-school/:schoolId", getNoticesForSchool);
 
-export {router as noticeRoute};
-
-
+export { router as noticeRoute };

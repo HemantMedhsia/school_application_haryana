@@ -1,4 +1,4 @@
-import wrapAsync from "../utils/wrapAsync.js";
+import wrapAsync from "../Utils/wrapAsync.js";
 import { Teacher } from "../Models/teacher.model.js";
 import { teacherValidationSchema } from "../Validation/teacher.Validation.js";
 import { School } from "../Models/school.model.js";

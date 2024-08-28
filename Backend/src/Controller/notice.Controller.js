@@ -2,26 +2,31 @@ import { Notice } from "../Models/notice.Model.js";
 import mongoose from "mongoose";
 import { noticeValidationSchema } from "../Validation/notice.Validation.js";
 import wrapAsync from "../Utils/wrapAsync.js";
-import {School} from "../Models/school.model.js"
+import { School } from "../Models/school.model.js";
 
 // create a Notice
 export const createNotice = wrapAsync(async (req, res) => {
-    const school = School.findById(req.params.schoolId);
-    if(!school){
-        return res.status(404).json({error: "School not found"});
+    const school = await School.findById(req.params.schoolId);
+    if (!school) {
+        return res.status(404).json({ error: "School not found" });
     }
+
     const { error } = await noticeValidationSchema.validateAsync(req.body);
     if (error) {
         return res
             .status(400)
             .json({ errors: error.details.map((err) => err.message) });
     }
+
     req.body.schoolId = req.params.schoolId;
-    req.body.createdBy = school.admin;
+    req.body.createdBy = req.user.id; // Accessing the authenticated user's ID
+
     const notice = new Notice(req.body);
     const noticeData = await notice.save();
+
     school.notices.push(noticeData._id);
     await school.save();
+
     res.status(201).json(noticeData);
 });
 
@@ -52,13 +57,6 @@ export const updateNotice = wrapAsync(async (req, res) => {
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({ error: "Invalid notice ID" });
-    }
-
-    const { error } = noticeValidationSchema.validate(req.body);
-    if (error) {
-        return res
-            .status(400)
-            .json({ errors: error.details.map((err) => err.message) });
     }
 
     const updatedNotice = await Notice.findByIdAndUpdate(id, req.body, {

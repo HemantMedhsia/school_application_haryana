@@ -4,7 +4,7 @@ import { ApiError } from "../Utils/errorHandler.js";
 import { generateAccessToken } from "../Utils/generateAcessToken.js";
 import { generateRefreshToken } from "../Utils/generateRefreshToken.js";
 import { ApiResponse } from "../Utils/responseHandler.js";
-import wrapAsync from "../utils/wrapAsync.js";
+import wrapAsync from "../Utils/wrapAsync.js";
 import { studentValidationSchema } from "../Validation/student.Validation.js";
 import jwt from "jsonwebtoken";
 

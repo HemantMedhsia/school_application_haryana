@@ -5,7 +5,7 @@ export const noticeValidationSchema = Joi.object({
     title: Joi.string().required(),
     description: Joi.string().required(),
     date: Joi.date().default(Date.now()),
-    createdBy: Joi.string().required(), // You can validate this as an ObjectId if needed
+    createdBy: Joi.string().optional(), // You can validate this as an ObjectId if needed
     schoolId: Joi.string()
         .custom((value, helpers) => {
             if (!mongoose.Types.ObjectId.isValid(value)) {
@@ -13,7 +13,7 @@ export const noticeValidationSchema = Joi.object({
             }
             return value;
         })
-        .required(),
+        .optional(),
     category: Joi.string()
         .valid("Announcement", "Event", "Holiday", "General")
         .default("General"),

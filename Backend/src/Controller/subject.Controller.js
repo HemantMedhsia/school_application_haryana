@@ -1,5 +1,7 @@
+import { School } from "../Models/school.model.js";
 import { Subject } from "../models/subject.Model.js";
 import wrapAsync from "../Utils/wrapAsync.js";
+import { Admin } from "../Models/admin.Model.js";
 import { subjectSchema } from "../Validation/subject.Validation.js"; // Import the Joi validation schema
 
 // Validate the subject data
@@ -12,10 +14,35 @@ const validateSubject = async (data) => {
 
 // Create a new subject
 export const createSubject = wrapAsync(async (req, res) => {
-    await validateSubject(req.body); // Validate incoming data
-    const subject = new Subject(req.body);
-    await subject.save();
-    res.status(201).json(subject);
+    const { schoolId } = req.params;
+    const adminId = req.user.id;
+
+    const adminExists = await Admin.findById(adminId);
+    if (!adminExists) {
+        return res.status(404).json({ message: "Admin not found" });
+    }
+
+    const schoolExists = await School.findById(schoolId);
+    if (!schoolExists) {
+        return res.status(404).json({ message: "School not found" });
+    }
+
+    await validateSubject(req.body);
+
+    const subject = new Subject({
+        ...req.body,
+        createdBy: adminId,
+    });
+
+    const savedSubject = await subject.save();
+
+    await School.findByIdAndUpdate(
+        schoolId,
+        { $push: { subjects: savedSubject._id } },
+        { new: true }
+    );
+
+    res.status(201).json(savedSubject);
 });
 
 // Get all subjects
@@ -33,7 +60,6 @@ export const getSubjectById = wrapAsync(async (req, res) => {
 
 // Update subject
 export const updateSubject = wrapAsync(async (req, res) => {
-    await validateSubject(req.body); // Validate incoming data
     const subject = await Subject.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
     });

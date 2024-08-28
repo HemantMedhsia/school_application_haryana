@@ -11,9 +11,7 @@ export const subjectSchema = Joi.object({
         "any.required": `"code" is a required field`,
     }),
     description: Joi.string().optional(),
-    createdBy: Joi.string().required().messages({
-        "any.required": `"createdBy" is a required field`,
-    }),
+    createdBy: Joi.string().optional(),
     syllabus: Joi.string().optional(),
     credits: Joi.number().integer().min(0).optional(),
     status: Joi.string().valid("Active", "Inactive").optional(),
