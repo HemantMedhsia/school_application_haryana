@@ -44,7 +44,7 @@ const schoolSchema = new mongoose.Schema({
     workingStaffs: [
         {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "WorkingStaff",
+            ref: "Staff",
         },
     ],
     admin: [
