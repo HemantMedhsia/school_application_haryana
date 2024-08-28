@@ -4,12 +4,12 @@ import cors from "cors";
 import { schoolRoute } from "./Routes/school.Route.js";
 import { studentRoute } from "./Routes/student.Route.js";
 import { parentRoute } from "./Routes/parent.Route.js";
-import noticeRoute from "./Routes/notice.Route.js";
-import subjectRoute from "./Routes/subject.Route.js";
+import { subjectRoute } from "./Routes/subject.Route.js";
 import { adminRoute } from "./Routes/admin.Route.js";
 import { teacherRoute } from "./Routes/teacher.Route.js";
 import { teacherAttendenceRoute } from "./Routes/teacherAttendence.Route.js";
 import bodyParser from "body-parser";
+import { noticeRoute } from "./Routes/notice.Route.js";
 
 const app = express();
 

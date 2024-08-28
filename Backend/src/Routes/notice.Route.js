@@ -20,6 +20,6 @@ router.get("/notice-audience/:audience", getNoticesByAudience);
 router.get("/notice-category/:category", getNoticesByCategory);
 router.get("/notice-school/:schoolId",getNoticesForSchool);
 
-export default router;
+export {router as noticeRoute};
 
 

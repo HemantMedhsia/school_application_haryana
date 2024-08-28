@@ -16,4 +16,4 @@ router.post("/subject-toggle/:id",toggleSubjectStatus);
 
 
 
-export default router;
+export  {router as subjectRoute};
