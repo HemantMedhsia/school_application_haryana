@@ -1,6 +1,6 @@
 import { School } from "../Models/school.model.js";
 import { Subject } from "../models/subject.Model.js";
-import wrapAsync from "../Utils/wrapAsync.js";
+import wrapAsync from "../utils/wrapAsync.js";
 import { Admin } from "../Models/admin.Model.js";
 import { subjectSchema } from "../Validation/subject.Validation.js"; // Import the Joi validation schema
 

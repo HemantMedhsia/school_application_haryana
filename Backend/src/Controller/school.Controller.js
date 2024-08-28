@@ -1,5 +1,5 @@
 import { School } from "../Models/school.model.js";
-import wrapAsync from "../Utils/wrapAsync.js";
+import wrapAsync from "../utils/wrapAsync.js";
 import { schoolValidationSchema } from "../Validation/school.Validation.js";
 
 export const createSchool = wrapAsync(async (req, res) => {

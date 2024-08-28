@@ -4,79 +4,84 @@ import { Teacher } from "../Models/teacher.model.js";
 import wrapAsync from "../utils/wrapAsync.js";
 import { markValidationSchema } from "../Validation/marks.Validation.js";
 
-export const createMark = wrapAsync(async (req, res) => {
+export const createMarks = wrapAsync(async (req, res) => {
     const student = await Student.findById(req.params.studentId);
-    const teacher = await Teacher.findById(req.params.teacherId);
     if (!student) {
         return res.status(404).json({ message: "Student not found" });
     }
+    const teacher = await Teacher.findById(req.user.id);
     if (!teacher) {
         return res.status(404).json({ message: "Teacher not found" });
     }
-    const markData = {
+
+    const marksData = {
         studentId: student._id.toString(),
         teacherId: teacher._id.toString(),
         ...req.body,
     };
-    markData.studentId = markData.studentId.toString();
-    await markValidationSchema.validateAsync(markData);
-    const mark = await Marks.create(markData);
-    student.marks.push(mark._id);
+    await markValidationSchema.validateAsync(marksData);
+    const marks = await Marks.create(marksData);
+    student.marks.push(marks._id);
     await student.save();
-    res.status(201).json({ mark });
+    res.status(201).json({ marks });
 });
 
-export const updateMark = wrapAsync(async (req, res) => {
-    const { studentId } = req.params;
-    const { subjectMarks: newSubjectMarks } = req.body;
+export const getMarks = wrapAsync(async (req, res) => {
+    const marks = await Marks.find();
+    res.status(200).json({ marks });
+});
 
-    // Find the marks document by studentId
-    const mark = await Marks.findOne({ studentId });
-    if (!mark) {
-        return res.status(404).json({ message: "Marks not found for the student" });
+export const getMarksById = wrapAsync(async (req, res) => {
+    const marks = await Marks.findById(req.params.id);
+    if (!marks) {
+        return res.status(404).json({ message: "Marks not found" });
     }
+    res.status(200).json({ marks });
+});
 
-    // Merge new subjects with existing subjects
-    const existingSubjectMarks = mark.subjectMarks;
-    const updatedSubjectMarks = [...existingSubjectMarks, ...newSubjectMarks];
-
-    // Update the subjectMarks
-    mark.subjectMarks = updatedSubjectMarks;
-
-    // Calculate totalObtainedMarks and grandTotal
-    let totalObtainedMarks = 0;
-    let grandTotal = 0;
-    updatedSubjectMarks.forEach(subject => {
-        totalObtainedMarks += subject.marksObtained;
-        grandTotal += subject.maxMarks;
-    });
-
-    // Calculate percentage
-    const percentage = (totalObtainedMarks / grandTotal) * 100;
-
-    // Determine division
-    let division;
-    if (percentage >= 60) {
-        division = "First";
-    } else if (percentage >= 50) {
-        division = "Second";
-    } else if (percentage >= 40) {
-        division = "Third";
-    } else {
-        division = "Fail";
+export const updateMarks = wrapAsync(async (req, res) => {
+    const marks = await Marks.findById(req.params.id);
+    if (!marks) {
+        return res.status(404).json({ message: "Marks not found" });
     }
+    const marksData = {
+        ...req.body,
+    };
+    await markValidationSchema.validateAsync(marksData);
+    Object.assign(marks, marksData);
+    await marks.save();
+    res.status(200).json({ marks });
+});
 
-    // Update the calculated fields
-    mark.totalObtainedMarks = totalObtainedMarks;
-    mark.grandTotal = grandTotal;
-    mark.percentage = percentage;
-    mark.division = division;
+export const deleteMarks = wrapAsync(async (req, res) => {
+    const marks = await Marks.findByIdAndDelete(req.params.id);
+    if (!marks) {
+        return res.status(404).json({ message: "Marks not found" });
+    }
+    res.status(200).json({ message: "Marks deleted successfully" });
+});
 
-    // Validate the updated mark data
-    // await markValidationSchema.validateAsync(mark.toObject());
+export const getMarksByStudentId = wrapAsync(async (req, res) => {
+    const marks = await Marks.find({ studentId: req.params.studentId });
+    res.status(200).json({ marks });
+});
 
-    // Save the updated mark document
-    await mark.save();
+export const getMarksByTeacherId = wrapAsync(async (req, res) => {
+    const marks = await Marks.find({ teacherId: req.params.teacherId });
+    res.status(200).json({ marks });
+});
 
-    res.status(200).json({ mark });
+export const getMarksByExamType = wrapAsync(async (req, res) => {
+    const marks = await Marks.find({ examType: req.params.examType });
+    res.status(200).json({ marks });
+});
+
+export const getMarksByDivision = wrapAsync(async (req, res) => {
+    const marks = await Marks.find({ division: req.params.division });
+    res.status(200).json({ marks });
+});
+
+export const getMarksByRank = wrapAsync(async (req, res) => {
+    const marks = await Marks.find({ rank: req.params.rank });
+    res.status(200).json({ marks });
 });

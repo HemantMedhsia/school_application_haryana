@@ -44,13 +44,15 @@ const schoolSchema = new mongoose.Schema({
     workingStaffs: [
         {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "WorkingStaff",
+            ref: "Staff",
         },
     ],
-    admin: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Admin",
-    },
+    admin: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Admin",
+        },
+    ],
     createdAt: {
         type: Date,
         default: Date.now(),
