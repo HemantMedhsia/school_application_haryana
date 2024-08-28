@@ -4,12 +4,12 @@ import { ApiError } from "../Utils/errorHandler.js";
 import { generateAccessToken } from "../Utils/generateAcessToken.js";
 import { generateRefreshToken } from "../Utils/generateRefreshToken.js";
 import { ApiResponse } from "../Utils/responseHandler.js";
-import wrapAsync from "../Utils/wrapAsync.js";
+import wrapAsync from "../utils/wrapAsync.js";
 import { studentValidationSchema } from "../Validation/student.Validation.js";
 import jwt from "jsonwebtoken";
 
 const generateAccessAndRefreshTokens = async (studentId, next) => {
-    const student = await Student.findById(studentId); 
+    const student = await Student.findById(studentId);
 
     if (!student) {
         return next(new ApiError(404, "Student not found"));
@@ -115,7 +115,7 @@ export const loginStudent = wrapAsync(async (req, res, next) => {
         );
 });
 
-export const refreshAccessToken = wrapAsync(async (req, res, next) => {
+export const refreshAccessTokenStudent = wrapAsync(async (req, res, next) => {
     const incomingRefreshToken =
         req.cookies.refreshToken || req.body.refreshToken;
 
@@ -129,7 +129,7 @@ export const refreshAccessToken = wrapAsync(async (req, res, next) => {
             process.env.REFRESH_TOKEN_SECRET
         );
 
-        const student = await Student.findById(decodedToken?._id);
+        const student = await Student.findById(decodedToken?.id);
 
         if (!student) {
             return next(new ApiError(401, "Invalid refresh token"));
@@ -267,4 +267,3 @@ export const getStudentByParent = wrapAsync(async (req, res) => {
         });
     }
 });
-

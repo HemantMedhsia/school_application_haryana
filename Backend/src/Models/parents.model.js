@@ -64,28 +64,33 @@ const parentSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    refershToken: {
+    refreshToken: {
         type: String,
+    },
+    role: {
+        type: String,
+        default: "Parent",
     },
 });
 
 parentSchema.pre("save", async function (next) {
     try {
-        // Generate a salt
+        // Hash the password only if it has been modified or is new
+        if (!this.isModified("parentLoginPassword")) return next();
+
+        // Generate a salt and hash the password
         const salt = await bcrypt.genSalt(10);
-        // Hash the password with the salt
-        const hashedPassword = await bcrypt.hash(
+        this.parentLoginPassword = await bcrypt.hash(
             this.parentLoginPassword,
             salt
         );
-        // Replace the plain password with the hashed password
-        this.parentLoginPassword = hashedPassword;
         next();
     } catch (error) {
         next(error);
     }
 });
 
+// Method to validate the password
 parentSchema.methods.isValidPassword = async function (parentLoginPassword) {
     try {
         return await bcrypt.compare(

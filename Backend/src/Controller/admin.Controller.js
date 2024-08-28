@@ -1,10 +1,12 @@
 import { Admin } from "../Models/admin.Model.js";
 import { School } from "../Models/school.model.js";
-import wrapAsync from "../Utils/wrapAsync.js";
-import {adminValidationSchema} from "../Validation/admin.Validation.js";
+import wrapAsync from "../utils/wrapAsync.js";
+import { adminValidationSchema } from "../Validation/admin.Validation.js";
 import { ApiError } from "../Utils/errorHandler.js";
 import { ApiResponse } from "../Utils/responseHandler.js";
 import jwt from "jsonwebtoken";
+import { generateAccessToken } from "../Utils/generateAcessToken.js";
+import { generateRefreshToken } from "../Utils/generateRefreshToken.js";
 
 const generateAccessAndRefreshTokens = async (adminId, next) => {
     const admin = await Admin.findById(adminId);
@@ -13,10 +15,10 @@ const generateAccessAndRefreshTokens = async (adminId, next) => {
         return next(new ApiError(404, "Admin not found"));
     }
 
-    const accessToken = admin.generateAccessToken();
-    const refreshToken = admin.generateRefreshToken();
+    const accessToken = generateAccessToken(admin);
+    const refreshToken = generateRefreshToken(admin);
 
-    admin.refershToken = refreshToken;
+    admin.refreshToken = refreshToken;
 
     await admin.save({ validateBeforeSave: false });
 
@@ -91,7 +93,7 @@ export const loginAdmin = wrapAsync(async (req, res, next) => {
         );
 });
 
-export const refreshAccessToken = wrapAsync(async (req, res, next) => {
+export const refreshAccessTokenAdmin = wrapAsync(async (req, res, next) => {
     const incomingRefreshToken =
         req.cookies.refreshToken || req.body.refreshToken;
 
@@ -109,12 +111,12 @@ export const refreshAccessToken = wrapAsync(async (req, res, next) => {
         return next(new ApiError(401, "Invalid refresh token"));
     }
 
-    const admin = await Admin.findById(decodedToken?._id);
+    const admin = await Admin.findById(decodedToken?.id);
     if (!admin) {
         return next(new ApiError(401, "Invalid refresh token"));
     }
 
-    if (incomingRefreshToken !== admin?.refershToken) {
+    if (incomingRefreshToken !== admin?.refreshToken) {
         return next(new ApiError(401, "Refresh token is expired or used"));
     }
 
