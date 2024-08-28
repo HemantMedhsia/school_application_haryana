@@ -10,6 +10,8 @@ import { adminRoute } from "./Routes/admin.Route.js";
 import { teacherRoute } from "./Routes/teacher.Route.js";
 import { teacherAttendenceRoute } from "./Routes/teacherAttendence.Route.js";
 import bodyParser from "body-parser";
+import { complaintRoute } from "./Routes/complaint.Route.js";
+import { marksRoute } from "./Routes/marks.Route.js";
 
 const app = express();
 
@@ -38,6 +40,9 @@ app.use("/api", parentRoute);
 app.use("/api", adminRoute);
 app.use("/api", teacherRoute);
 app.use("/api", teacherAttendenceRoute);
+app.use("/api", complaintRoute);
+app.use("/api", marksRoute);
+
 
 // Global error handling middleware
 app.use((err, req, res, next) => {

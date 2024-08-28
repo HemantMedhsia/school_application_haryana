@@ -2,9 +2,9 @@ import mongoose from "mongoose";
 
 const ComplaintSchema = new mongoose.Schema(
     {
-        teacherId: {
+        createdBy: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "Teacher", // Assuming you have a Teacher model
+            ref: "Teacher",
             required: true,
         },
         category: {
@@ -20,10 +20,6 @@ const ComplaintSchema = new mongoose.Schema(
             type: String,
             enum: ["Pending", "Resolved", "In Progress"],
             default: "Pending",
-        },
-        resolvedBy: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Admin",
         },
         resolutionNotes: {
             type: String,

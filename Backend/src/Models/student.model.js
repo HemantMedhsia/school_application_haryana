@@ -95,6 +95,12 @@ const studentSchema = new mongoose.Schema({
             ref: "Complaint",
         },
     ],
+    marks: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Marks",
+        },
+    ],
     refreshToken: {
         type: String,
     },
