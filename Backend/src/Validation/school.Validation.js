@@ -41,5 +41,12 @@ export const schoolValidationSchema = Joi.object({
             }
         })
     ),
+    admin: Joi.array().items(
+        Joi.string().custom((value, helpers) => {
+            if (!mongoose.Types.ObjectId.isValid(value)) {
+                return helpers.error("Invalid ObjectId");
+            }
+        })
+    ),
     createdAt: Joi.date().default(Date.now),
 });

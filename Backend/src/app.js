@@ -12,6 +12,7 @@ import { teacherAttendenceRoute } from "./Routes/teacherAttendence.Route.js";
 import bodyParser from "body-parser";
 import { complaintRoute } from "./Routes/complaint.Route.js";
 import { marksRoute } from "./Routes/marks.Route.js";
+import { singleSubjectMarkRoute } from "./Routes/singleSubjectMark.Route.js";
 
 const app = express();
 
@@ -42,7 +43,7 @@ app.use("/api", teacherRoute);
 app.use("/api", teacherAttendenceRoute);
 app.use("/api", complaintRoute);
 app.use("/api", marksRoute);
-
+app.use("/api", singleSubjectMarkRoute);
 
 // Global error handling middleware
 app.use((err, req, res, next) => {

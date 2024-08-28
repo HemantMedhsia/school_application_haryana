@@ -43,7 +43,7 @@ export const createAdmin = wrapAsync(async (req, res) => {
 
     const admin = new Admin(adminData);
     const savedAdmin = await admin.save();
-    school.admin = savedAdmin._id;
+    school.admin.push(savedAdmin._id);
     await school.save();
     res.status(201).json(savedAdmin);
 });

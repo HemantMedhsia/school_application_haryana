@@ -24,58 +24,35 @@ const MarksSchema = new mongoose.Schema(
         },
         subjectMarks: [
             {
-                subjectName: {
-                    type: String,
-                    required: true,
-                },
-                maxMarks: {
-                    type: Number,
-                    required: true,
-                },
-                minMarks: {
-                    type: Number,
-                    required: true,
-                },
-                marksObtained: {
-                    type: Number,
-                    required: true,
-                },
-                result: {
-                    type: String,
-                    required: true,
-                    enum: ["Pass", "Fail"],
-                },
-                grade: {
-                    type: String,
-                    enum: ["A++", "A+", "A", "B", "C"],
-                    default: null,
-                },
-                note: {
-                    type: String,
-                    default: "",
-                },
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "SingleSubjectMark",
             },
         ],
         percentage: {
             type: Number,
             required: true,
+            default: 0,
         },
         rank: {
             type: Number,
             required: true,
+            default: 0,
         },
         division: {
             type: String,
             enum: ["First", "Second", "Third", "Fail"],
             required: true,
+            default: "Fail",
         },
         grandTotal: {
             type: Number,
             required: true,
+            default: 0,
         },
         totalObtainedMarks: {
             type: Number,
             required: true,
+            default: 0,
         },
     },
     {

@@ -1,5 +1,5 @@
 import { Subject } from "../models/subject.Model.js";
-import wrapAsync from "../Utils/wrapAsync.js";
+import wrapAsync from "../utils/wrapAsync.js";
 import { subjectSchema } from "../Validation/subject.Validation.js"; // Import the Joi validation schema
 
 // Validate the subject data
