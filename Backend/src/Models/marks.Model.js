@@ -2,6 +2,16 @@ import mongoose from "mongoose";
 
 const MarksSchema = new mongoose.Schema(
     {
+        studentId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Student",
+            required: true,
+        },
+        teacherId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Teacher",
+            required: true,
+        },
         examType: {
             type: String,
             required: true,
@@ -12,7 +22,7 @@ const MarksSchema = new mongoose.Schema(
                 "Internal Assessments Test",
             ],
         },
-        subjects: [
+        subjectMarks: [
             {
                 subjectName: {
                     type: String,

@@ -10,18 +10,25 @@ export const createTeacherAttendance = wrapAsync(async (req, res) => {
     }
     const teacherAttendanceData = {
         teacherId: teacher._id,
-        ...req.body
+        ...req.body,
     };
-    teacherAttendanceData.teacherId = teacherAttendanceData.teacherId.toString();
-    await teacherAttendanceValidationSchema.validateAsync(teacherAttendanceData);
-    const teacherAttendance = await TeacherAttendance.create(teacherAttendanceData);
+    teacherAttendanceData.teacherId =
+        teacherAttendanceData.teacherId.toString();
+    await teacherAttendanceValidationSchema.validateAsync(
+        teacherAttendanceData
+    );
+    const teacherAttendance = await TeacherAttendance.create(
+        teacherAttendanceData
+    );
     teacher.teacherAttendance.push(teacherAttendance._id);
     await teacher.save();
     res.status(201).json({ teacherAttendance });
 });
 
 export const getTeacherAttendance = wrapAsync(async (req, res) => {
-    const teacher = await Teacher.findById(req.params.teacherId).populate("teacherAttendance");
+    const teacher = await Teacher.findById(req.params.teacherId).populate(
+        "teacherAttendance"
+    );
     if (!teacher) {
         return res.status(404).json({ message: "Teacher not found" });
     }
@@ -29,18 +36,29 @@ export const getTeacherAttendance = wrapAsync(async (req, res) => {
 });
 
 export const updateTeacherAttendance = wrapAsync(async (req, res) => {
-    const teacherAttendance = await TeacherAttendance.findByIdAndUpdate(req.params.attendanceId, req.body, { new: true });
+    const teacherAttendance = await TeacherAttendance.findByIdAndUpdate(
+        req.params.attendanceId,
+        req.body,
+        { new: true }
+    );
     if (!teacherAttendance) {
-        return res.status(404).json({ message: "Teacher attendance not found" });
+        return res
+            .status(404)
+            .json({ message: "Teacher attendance not found" });
     }
     res.status(200).json({ teacherAttendance });
 });
 
 export const deleteTeacherAttendance = wrapAsync(async (req, res) => {
-    const teacherAttendance = await TeacherAttendance.findByIdAndDelete(req.params.attendanceId);
+    const teacherAttendance = await TeacherAttendance.findByIdAndDelete(
+        req.params.attendanceId
+    );
     if (!teacherAttendance) {
-        return res.status(404).json({ message: "Teacher attendance not found" });
+        return res
+            .status(404)
+            .json({ message: "Teacher attendance not found" });
     }
-    res.status(200).json({ message: "Teacher attendance deleted successfully" });
+    res.status(200).json({
+        message: "Teacher attendance deleted successfully",
+    });
 });
-
