@@ -1,6 +1,6 @@
 import { Teacher } from "../Models/teacher.model.js";
 import { TeacherAttendance } from "../Models/teacherAttendence.model.js";
-import wrapAsync from "../Utils/wrapAsync.js";
+import wrapAsync from "../utils/wrapAsync.js";
 import { teacherAttendanceValidationSchema } from "../Validation/teacherAttendence.Validation.js";
 
 export const createTeacherAttendance = wrapAsync(async (req, res) => {

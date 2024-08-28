@@ -1,7 +1,7 @@
 import Marks from "../Models/marks.Model.js";
 import { Student } from "../Models/student.model.js";
 import { Teacher } from "../Models/teacher.model.js";
-import wrapAsync from "../Utils/wrapAsync.js";
+import wrapAsync from "../utils/wrapAsync.js";
 import { markValidationSchema } from "../Validation/marks.Validation.js";
 
 export const createMark = wrapAsync(async (req, res) => {
