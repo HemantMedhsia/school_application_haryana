@@ -1,5 +1,5 @@
 import { Section } from "../Models/section.Model.js";
-import wrapAsync from "../Utils/wrapAsync.js";
+import wrapAsync from "../utils/wrapAsync.js";
 import { validateSection } from "../Validation/section.Validation.js";
 
 export const createSection = wrapAsync(async (req, res) => {

@@ -13,9 +13,9 @@ const studentHistorySchema = new mongoose.Schema({
     },
     classSection: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'ClassSection',
+        ref: 'Section',
         required: true,
     } 
 });
 
-const StudentHistory = mongoose.model('StudentHistory', studentHistorySchema);
+export const StudentHistory = mongoose.model('StudentHistory', studentHistorySchema);

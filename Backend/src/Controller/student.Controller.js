@@ -6,9 +6,10 @@ import { generateRefreshToken } from "../Utils/generateRefreshToken.js";
 import { ApiResponse } from "../Utils/responseHandler.js";
 import wrapAsync from "../Utils/wrapAsync.js";
 import { studentValidationSchema } from "../Validation/student.Validation.js";
+import { StudentHistory } from "../Models/studentHistory.Model.js";
 import jwt from "jsonwebtoken";
 
-const generateAccessAndRefreshTokens = async (studentId, next) => {
+ const generateAccessAndRefreshTokens = async (studentId, next) => {
     const student = await Student.findById(studentId);
 
     if (!student) {
@@ -38,6 +39,17 @@ export const createStudent = wrapAsync(async (req, res) => {
             });
         }
         const student = new Student(req.body);
+        const { currentClass, currentSection, currentSession } = req.body;
+        const studentHistory = {
+            session: currentSession,
+            class: currentClass,
+            classSection: currentSection,
+        };
+
+        const studentHistoryData = await StudentHistory.create(studentHistory);
+
+        student.studentHistory.push(studentHistoryData._id);
+
         const studentData = await student.save();
         school.students.push(studentData._id);
         await school.save();
@@ -182,7 +194,16 @@ export const getStudents = wrapAsync(async (req, res) => {
 
 export const getStudent = wrapAsync(async (req, res) => {
     try {
-        const student = await Student.findById(req.params.id);
+        const student = await Student.findById(req.params.id)
+            .populate({
+                path: "studentHistory",
+                populate: {
+                    path: "session class classSection",
+                    select: "-__v",
+                },
+            })
+            .populate("currentClass currentSection currentSession")
+            .setOptions({ strictPopulate: false });
         if (!student) {
             return res.status(404).json({
                 success: false,
