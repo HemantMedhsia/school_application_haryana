@@ -46,8 +46,7 @@ export const loginTeacher = wrapAsync(async (req, res, next) => {
     if (!email) {
         return next(new ApiError(400, "email is required"));
     }
-
-    // Use findOne to get a single document
+    
     const teacher = await Teacher.findOne({ email });
 
     if (!teacher) {
@@ -146,7 +145,7 @@ export const refreshAccessTokenTeacher = wrapAsync(async (req, res, next) => {
                 )
             );
     } catch (error) {
-        throw new ApiError(401, error?.message || "Invalid refresh token");
+        return next ( new ApiError(401, error?.message || "Invalid refresh token"));
     }
 });
 

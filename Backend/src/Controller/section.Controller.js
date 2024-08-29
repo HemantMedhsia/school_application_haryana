@@ -4,10 +4,16 @@ import { validateSection } from "../Validation/section.Validation.js";
 
 export const createSection = wrapAsync(async (req, res) => {
     const { error } = validateSection(req.body);
-    if (error)
+    if (error) {
         return res.status(400).json({ message: error.details[0].message });
+    }
 
     const { name } = req.body;
+    const existingSection = await Section.findOne({ name });
+    if (existingSection) {
+        return res.status(400).json({ message: "Section already exists" });
+    }
+
     const newSection = new Section({ name });
     await newSection.save();
     res.status(201).json({
@@ -19,10 +25,27 @@ export const createSection = wrapAsync(async (req, res) => {
 export const createManySections = wrapAsync(async (req, res) => {
     const { sections } = req.body;
     if (!Array.isArray(sections) || sections.length === 0) {
-        return res.status(400).json({ message: "Invalid or empty sections array" });
+        return res
+            .status(400)
+            .json({ message: "Invalid or empty sections array" });
+    }
+    
+    const existingSections = await Section.find({
+        name: { $in: sections.map((section) => section.name) },
+    });
+    const existingSectionNames = existingSections.map(
+        (section) => section.name
+    );
+
+    const newSectionsToCreate = sections.filter(
+        (section) => !existingSectionNames.includes(section.name)
+    );
+
+    if (newSectionsToCreate.length === 0) {
+        return res.status(400).json({ message: "All sections already exist" });
     }
 
-    const newSections = await Section.insertMany(sections);
+    const newSections = await Section.insertMany(newSectionsToCreate);
     res.status(201).json({
         message: "Sections created successfully",
         sections: newSections,
@@ -37,6 +60,7 @@ export const getAllSections = wrapAsync(async (req, res) => {
 export const getSectionById = wrapAsync(async (req, res) => {
     const { sectionId } = req.params;
     const section = await Section.findById(sectionId);
+
     if (!section) {
         return res.status(404).json({ message: "Section not found" });
     }
@@ -88,5 +112,3 @@ export const deleteManySections = wrapAsync(async (req, res) => {
         sections,
     });
 });
-
-

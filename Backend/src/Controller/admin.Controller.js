@@ -1,6 +1,6 @@
 import { Admin } from "../Models/admin.Model.js";
 import { School } from "../Models/school.model.js";
-import wrapAsync from "../utils/wrapAsync.js";
+import wrapAsync from "../Utils/wrapAsync.js";
 import { adminValidationSchema } from "../Validation/admin.Validation.js";
 import { ApiError } from "../Utils/errorHandler.js";
 import { ApiResponse } from "../Utils/responseHandler.js";

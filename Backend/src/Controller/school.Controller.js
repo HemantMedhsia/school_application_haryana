@@ -1,5 +1,5 @@
 import { School } from "../Models/school.model.js";
-import wrapAsync from "../utils/wrapAsync.js";
+import wrapAsync from "../Utils/wrapAsync.js";
 import { schoolValidationSchema } from "../Validation/school.Validation.js";
 
 export const createSchool = wrapAsync(async (req, res) => {
@@ -17,11 +17,13 @@ export const createSchool = wrapAsync(async (req, res) => {
             message: error.message,
         });
     }
-})
+});
 
 export const getSchools = wrapAsync(async (req, res) => {
     try {
-        const schools = await School.find();
+        const schools = await School.find().populate(
+            "students teachers subjects workingStaffs notices"
+        );
         res.status(200).json({
             success: true,
             data: schools,
@@ -36,7 +38,9 @@ export const getSchools = wrapAsync(async (req, res) => {
 
 export const getSchool = wrapAsync(async (req, res) => {
     try {
-        const school = await School.findById(req.params.id);
+        const school = await School.findById(req.params.id).populate(
+            "students teachers subjects workingStaffs notices"
+        );
         if (!school) {
             return res.status(404).json({
                 success: false,

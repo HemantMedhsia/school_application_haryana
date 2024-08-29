@@ -4,7 +4,7 @@ import { ApiError } from "../Utils/errorHandler.js";
 import { generateAccessToken } from "../Utils/generateAcessToken.js";
 import { generateRefreshToken } from "../Utils/generateRefreshToken.js";
 import { ApiResponse } from "../Utils/responseHandler.js";
-import wrapAsync from "../utils/wrapAsync.js";
+import wrapAsync from "../Utils/wrapAsync.js";
 import jwt from "jsonwebtoken";
 
 const generateAccessAndRefreshTokens = async (staffId, next) => {
@@ -41,8 +41,7 @@ export const loginStaff = wrapAsync(async (req, res, next) => {
     if (!email) {
         return next(new ApiError(400, "email is required"));
     }
-
-    // Use findOne to get a single document
+   
     const staff = await Staff.findOne({ email });
 
     if (!staff) {

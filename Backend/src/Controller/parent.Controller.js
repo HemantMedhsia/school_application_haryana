@@ -4,7 +4,7 @@ import { ApiError } from "../Utils/errorHandler.js";
 import { generateAccessToken } from "../Utils/generateAcessToken.js";
 import { generateRefreshToken } from "../Utils/generateRefreshToken.js";
 import { ApiResponse } from "../Utils/responseHandler.js";
-import wrapAsync from "../utils/wrapAsync.js";
+import wrapAsync from "../Utils/wrapAsync.js";
 import { parentValidatonSchema } from "../Validation/parent.Validation.js";
 import jwt from "jsonwebtoken";
 
@@ -55,8 +55,7 @@ export const loginParent = wrapAsync(async (req, res, next) => {
     if (!guardianEmail) {
         return next(new ApiError(400, "email is required"));
     }
-
-    // Use findOne to get a single document
+    
     const parent = await Parent.findOne({ guardianEmail });
 
     if (!parent) {
@@ -155,7 +154,7 @@ export const refreshAccessTokenParent = wrapAsync(async (req, res, next) => {
                 )
             );
     } catch (error) {
-        throw new ApiError(401, error?.message || "Invalid refresh token");
+        return next (new ApiError(401, error?.message || "Invalid refresh token"));
     }
 });
 
