@@ -1,7 +1,9 @@
 import { Session } from "../Models/session.Model.js";
 import wrapAsync from "../utils/wrapAsync.js";
+import { sessionValidationSchema } from "../Validation/session.Validation.js";
 
 export const createSession = wrapAsync(async (req, res) => {
+    await sessionValidationSchema.validateAsync(req.body);
     const session = await Session.create(req.body);
     res.status(201).json({ session });
 });
