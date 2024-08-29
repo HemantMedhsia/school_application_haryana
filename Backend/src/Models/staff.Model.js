@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import bcrypt from "bcrypt";
 const staffSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -48,12 +49,15 @@ const staffSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
+    refreshToken: {
+        type: String,
+    },
 });
 
 staffSchema.pre("save", async function (next) {
     try {
         // Hash the password only if it has been modified or is new
-        if (!this.isModified("parentLoginPassword")) return next();
+        if (!this.isModified("staffLoginPassword")) return next();
 
         // Generate a salt and hash the password
         const salt = await bcrypt.genSalt(10);

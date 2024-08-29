@@ -1,21 +1,29 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const { Schema } = mongoose;
 
 const staffAttendanceSchema = new Schema({
     staffId: {
         type: Schema.Types.ObjectId,
-        ref: 'Staff',
-        required: true
+        ref: "Staff",
+        required: true,
     },
     date: {
         type: Date,
-        required: true
+        default: Date.now(),
     },
-    isPresent: {
-        type: Boolean,
-        default: false
-    }
+    status: {
+        type: String,
+        enum: ["Present", "Absent", "Late", "Holiday"],
+        required: true,
+    },
+    reason: {
+        type: String,
+        default: "",
+    },
 });
 
-export const StaffAttendance =  mongoose.model('StaffAttendance', staffAttendanceSchema);
+export const StaffAttendance = mongoose.model(
+    "StaffAttendance",
+    staffAttendanceSchema
+);

@@ -6,14 +6,14 @@ const classSchema = new mongoose.Schema(
             type: String,
             required: true,
             trim: true,
-        }, // e.g., "Class 1"
+        }, 
 
         sections: [
             {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "Section",
             },
-        ], // List of sections belonging to this class
+        ],
 
         subjects: [
             {

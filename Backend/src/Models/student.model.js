@@ -14,12 +14,19 @@ const studentSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    class: {
-        type: String,
+    currentClass: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Class",
         required: true,
     },
-    section: {
-        type: String,
+    currentSection: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Section",
+        required: true,
+    },
+    currentSession: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Session",
         required: true,
     },
     firstName: {
