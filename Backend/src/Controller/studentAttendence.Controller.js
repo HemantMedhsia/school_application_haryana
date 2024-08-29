@@ -16,7 +16,7 @@ export const createStudentAttendence = wrapAsync(async (req, res) => {
     const teacher = await Teacher.findById(teacherId);
 
     if (!teacher) {
-        res.status(404).json({ message: "Teacher not found" });
+        return res.status(404).json({ message: "Teacher not found" });
     }
 
     const student = await Student.findById(studentId);

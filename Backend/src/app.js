@@ -16,6 +16,8 @@ import { staffRoute } from "./Routes/staff.Route.js";
 import { noticeRoute } from "./Routes/notice.Route.js";
 import { studentAttendenceRoute } from "./Routes/studentAttendence.Route.js";
 import { staffAttendanceRoute } from "./Routes/staffAttendance.route.js";
+import { classRoute } from "./Routes/class.Route.js";
+import { sectionRoute } from "./Routes/section.Route.js";
 
 
 const app = express();
@@ -50,7 +52,8 @@ app.use("/api", marksRoute);
 app.use("/api", singleSubjectMarkRoute);
 app.use("/api", staffRoute);app.use("/api",studentAttendenceRoute);
 app.use("/api",staffAttendanceRoute);
-
+app.use("/api",classRoute);
+app.use("/api",sectionRoute);
 
 
 // Global error handling middleware
