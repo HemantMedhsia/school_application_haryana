@@ -4,23 +4,9 @@ const classSchema = new mongoose.Schema(
     {
         name: {
             type: String,
+            enum: ["Nursery", "LKG", "UKG", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
             required: true,
-            trim: true,
-        }, // e.g., "Class 1"
-
-        sections: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "Section",
-            },
-        ], // List of sections belonging to this class
-
-        subjects: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "Subject", // Reference to the Subject model
-            },
-        ], // List of subjects assigned to this class
+        }
     },
     {
         timestamps: true,

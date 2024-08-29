@@ -4,15 +4,10 @@ const sectionSchema = new mongoose.Schema(
     {
         name: {
             type: String,
+            enum: ["A", "B", "C", "D"],
             required: true,
-            trim: true, // Trims whitespace from the string
-        }, // e.g., "A", "B", "C", "D"
-
-        class: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Class", // Reference to the Class model
-            required: true,
-        }, // Reference to the class this section belongs to
+            trim: true,
+        },
     },
     { timestamps: true }
 );

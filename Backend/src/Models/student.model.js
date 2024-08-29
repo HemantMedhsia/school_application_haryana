@@ -95,6 +95,12 @@ const studentSchema = new mongoose.Schema({
             ref: "Complaint",
         },
     ],
+    studentHistory: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "StudentHistory",
+        },
+    ],
     marks: [
         {
             type: mongoose.Schema.Types.ObjectId,
