@@ -4,15 +4,10 @@ const sectionSchema = new mongoose.Schema(
     {
         name: {
             type: String,
+            enum: ["A", "B", "C", "D"],
             required: true,
-            trim: true, 
-        }, 
-
-        class: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Class", 
-            required: true,
-        }, 
+            trim: true,
+        },
     },
     { timestamps: true }
 );
