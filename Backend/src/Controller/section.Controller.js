@@ -1,5 +1,5 @@
 import { Section } from "../Models/section.Model.js";
-import { wrapAsync } from "../Utils/wrapAsync.js";
+import wrapAsync from "../Utils/wrapAsync.js";
 import { validateSection } from "../Validation/section.Validation.js";
 
 export const createSection = wrapAsync(async (req, res) => {
@@ -13,6 +13,19 @@ export const createSection = wrapAsync(async (req, res) => {
     res.status(201).json({
         message: "Section created successfully",
         section: newSection,
+    });
+});
+
+export const createManySections = wrapAsync(async (req, res) => {
+    const { sections } = req.body;
+    if (!Array.isArray(sections) || sections.length === 0) {
+        return res.status(400).json({ message: "Invalid or empty sections array" });
+    }
+
+    const newSections = await Section.insertMany(sections);
+    res.status(201).json({
+        message: "Sections created successfully",
+        sections: newSections,
     });
 });
 
@@ -58,3 +71,22 @@ export const deleteSection = wrapAsync(async (req, res) => {
     }
     res.status(200).json({ message: "Section deleted successfully" });
 });
+
+export const deleteManySections = wrapAsync(async (req, res) => {
+    const { ids } = req.body;
+    if (!Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ message: "Invalid or empty IDs array" });
+    }
+
+    const sections = await Section.deleteMany({ _id: { $in: ids } });
+    if (sections.deletedCount === 0) {
+        return res.status(404).json({ message: "No sections found to delete" });
+    }
+
+    res.status(200).json({
+        message: "Sections deleted successfully",
+        sections,
+    });
+});
+
+
