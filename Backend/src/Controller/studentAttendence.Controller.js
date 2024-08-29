@@ -16,7 +16,7 @@ export const createStudentAttendence = wrapAsync(async (req, res) => {
     const teacher = await Teacher.findById(teacherId);
 
     if (!teacher) {
-        res.status(404).json({ message: "Teacher not found" });
+        return res.status(404).json({ message: "Teacher not found" });
     }
 
     const student = await Student.findById(studentId);
@@ -104,8 +104,13 @@ export const getAttendanceSummary = wrapAsync(async (req, res) => {
     const student = await Student.findById(studentId).populate(
         "StudentAttendance"
     );
+    
+    if (!student) {
+        return res.status(404).json({ message: "Student not found." });
+    }
 
     const attendanceRecords = student.StudentAttendance;
+    
 
     if (!attendanceRecords || attendanceRecords.length === 0) {
         return res
@@ -153,5 +158,3 @@ export const getAttendanceByDateRange = wrapAsync(async (req, res) => {
 
     res.status(200).json({ success: true, data: attendanceRecords });
 });
-
-

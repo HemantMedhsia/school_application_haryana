@@ -6,12 +6,15 @@ const sessionSchema = new mongoose.Schema({
         required: true
     },
     sessionStartDate: {
-        type: Date,
-        required: true
+        type: String,
+        required: true,
+        default: "April"
+
     },
     sessionEndDate: {
-        type: Date,
-        required: true
+        type: String,
+        required: true,
+        default: "March"
     },
 });
 

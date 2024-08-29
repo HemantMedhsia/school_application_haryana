@@ -1,11 +1,22 @@
-import Joi from "joi";
-import mongoose from "mongoose";
-export const studentValidationSchema = Joi.object({
+import Joi from 'joi';
+import mongoose from 'mongoose';
+
+// Custom validation for ObjectId
+const objectId = (value, helpers) => {
+    if (!mongoose.Types.ObjectId.isValid(value)) {
+        return helpers.error("any.invalid");
+    }
+    return value;
+};
+
+// Define the Joi validation schema
+const studentValidationSchema = Joi.object({
     admissionNo: Joi.string().required(),
-    rollNumber: Joi.string().required(),
+    rollNumber: Joi.string().optional(),
     studentLoginPassword: Joi.string().required(),
-    class: Joi.string().required(),
-    section: Joi.string().required(),
+    currentClass: Joi.string().custom(objectId).required(),
+    currentSection: Joi.string().custom(objectId).required(),
+    currentSession: Joi.string().custom(objectId).required(),
     firstName: Joi.string().required(),
     lastName: Joi.string().optional(),
     gender: Joi.string().required(),
@@ -23,27 +34,13 @@ export const studentValidationSchema = Joi.object({
     weight: Joi.number().optional(),
     measurementDate: Joi.date().optional(),
     medicalHistory: Joi.string().optional(),
-    parent: Joi.string().custom((value, helpers) => {
-        if (!mongoose.Types.ObjectId.isValid(value)) {
-            return helpers.error("Invalid ObjectId");
-        }
-    }),
-    StudentAttendance: Joi.array()
-        .items(
-            Joi.string().custom((value, helpers) => {
-                if (!mongoose.Types.ObjectId.isValid(value)) {
-                    return helpers.error("Invalid ObjectId");
-                }
-            })
-        )
-        .optional(),
-    complaints: Joi.array()
-        .items(
-            Joi.string().custom((value, helpers) => {
-                if (!mongoose.Types.ObjectId.isValid(value)) {
-                    return helpers.error("Invalid ObjectId");
-                }
-            })
-        )
-        .optional(),
+    parent: Joi.string().custom(objectId).required(),
+    StudentAttendance: Joi.array().items(Joi.string().custom(objectId)).optional(),
+    complaints: Joi.array().items(Joi.string().custom(objectId)).optional(),
+    studentHistory: Joi.array().items(Joi.string().custom(objectId)).optional(),
+    marks: Joi.array().items(Joi.string().custom(objectId)).optional(),
+    refreshToken: Joi.string().optional(),
+    role: Joi.string().default("Student").optional(),
 });
+
+export {studentValidationSchema};
