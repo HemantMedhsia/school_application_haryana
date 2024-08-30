@@ -1,7 +1,7 @@
 import Marks from "../Models/marks.Model.js";
 import { SingleSubjectMark } from "../Models/singleSubjectMark.Model.js";
 import { ApiResponse } from "../Utils/responseHandler.js";
-import wrapAsync from "../utils/wrapAsync.js";
+import wrapAsync from "../Utils/wrapAsync.js";
 
 export const createSingleSubjectMark = wrapAsync(async (req, res) => {
     const marks = await Marks.findById(req.params.marksId);

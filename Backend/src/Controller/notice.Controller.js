@@ -1,7 +1,7 @@
 import { Notice } from "../Models/notice.Model.js";
 import mongoose from "mongoose";
 import { noticeValidationSchema } from "../Validation/notice.Validation.js";
-import wrapAsync from "../utils/wrapAsync.js";
+import wrapAsync from "../Utils/wrapAsync.js";
 import { School } from "../Models/school.model.js";
 import { ApiResponse } from "../Utils/responseHandler.js";
 

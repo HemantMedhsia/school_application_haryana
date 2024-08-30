@@ -1,6 +1,6 @@
 import { Session } from "../Models/session.Model.js";
 import { ApiResponse } from "../Utils/responseHandler.js";
-import wrapAsync from "../utils/wrapAsync.js";
+import wrapAsync from "../Utils/wrapAsync.js";
 import { sessionValidationSchema } from "../Validation/session.Validation.js";
 
 export const createSession = wrapAsync(async (req, res) => {

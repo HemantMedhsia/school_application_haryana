@@ -1,7 +1,7 @@
 import { Staff } from "../Models/staff.Model.js";
 import { StaffAttendance } from "../Models/staffAttendence.Model.js";
 import { ApiResponse } from "../Utils/responseHandler.js";
-import wrapAsync from "../utils/wrapAsync.js";
+import wrapAsync from "../Utils/wrapAsync.js";
 import { staffAttendanceValidationSchema } from "../Validation/staffAttendance.Validation.js";
 
 export const createStaffAttendance = wrapAsync(async (req, res) => {
