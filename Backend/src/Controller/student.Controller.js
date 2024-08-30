@@ -52,6 +52,8 @@ export const createStudent = wrapAsync(async (req, res) => {
     const studentData = await student.save();
     school.students.push(studentData._id);
     await school.save();
+
+        await StudentHistory.findByIdAndUpdate(studentHistoryData._id, {studentId: studentData._id}, {new: true});
     return res
         .status(201)
         .json(new ApiResponse(201, student, "Student Created Successfully"));
@@ -231,4 +233,3 @@ export const getStudentByParent = wrapAsync(async (req, res) => {
     }
     return res.status(200).json(new ApiResponse(200, student));
 });
-
