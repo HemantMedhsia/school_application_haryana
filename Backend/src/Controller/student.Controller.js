@@ -9,7 +9,7 @@ import { studentValidationSchema } from "../Validation/student.Validation.js";
 import { StudentHistory } from "../Models/studentHistory.Model.js";
 import jwt from "jsonwebtoken";
 
- const generateAccessAndRefreshTokens = async (studentId, next) => {
+const generateAccessAndRefreshTokens = async (studentId, next) => {
     const student = await Student.findById(studentId);
 
     if (!student) {
@@ -30,47 +30,38 @@ export const createStudent = wrapAsync(async (req, res) => {
     await studentValidationSchema.validateAsync(req.body, {
         abortEarly: false,
     });
-    try {
-        const school = await School.findById(req.params.schoolId);
-        if (!school) {
-            return res.status(404).json({
-                success: false,
-                message: "School not found",
-            });
-        }
-        const student = new Student(req.body);
-        const { currentClass, currentSection, currentSession } = req.body;
-        const studentHistory = {
-            session: currentSession,
-            class: currentClass,
-            classSection: currentSection,
-        };
-
-        const studentHistoryData = await StudentHistory.create(studentHistory);
-
-        student.studentHistory.push(studentHistoryData._id);
-
-        const studentData = await student.save();
-        school.students.push(studentData._id);
-        await school.save();
-
-        res.status(201).json({
-            success: true,
-            data: student,
-        });
-    } catch (error) {
-        res.status(400).json({
+    const school = await School.findById(req.params.schoolId);
+    if (!school) {
+        return res.status(404).json({
             success: false,
-            message: error.message,
+            message: "School not found",
         });
     }
+    const student = new Student(req.body);
+    const { currentClass, currentSection, currentSession } = req.body;
+    const studentHistory = {
+        session: currentSession,
+        class: currentClass,
+        classSection: currentSection,
+    };
+
+    const studentHistoryData = await StudentHistory.create(studentHistory);
+
+    student.studentHistory.push(studentHistoryData._id);
+
+    const studentData = await student.save();
+    school.students.push(studentData._id);
+    await school.save();
+    return res
+        .status(201)
+        .json(new ApiResponse(201, student, "Student Created Successfully"));
 });
 
 export const loginStudent = wrapAsync(async (req, res, next) => {
     const { rollNumber, email, studentLoginPassword } = req.body;
 
     if (!rollNumber && !email) {
-        return next(ApiError(400, "Roll number or email is required"));
+        return next(new ApiError(400, "Roll number or email is required"));
     }
 
     const student = await Student.findOne({
@@ -79,7 +70,7 @@ export const loginStudent = wrapAsync(async (req, res, next) => {
 
     if (!student) {
         console.log("Student not found");
-        return next(ApiError(404, "Student does not exist"));
+        return next(new ApiError(404, "Student does not exist"));
     }
 
     console.log("Student found:", student.email);
@@ -178,113 +169,66 @@ export const refreshAccessTokenStudent = wrapAsync(async (req, res, next) => {
 });
 
 export const getStudents = wrapAsync(async (req, res) => {
-    try {
-        const students = await Student.find();
-        res.status(200).json({
-            success: true,
-            data: students,
-        });
-    } catch (error) {
-        res.status(400).json({
-            success: false,
-            message: error.message,
-        });
-    }
+    const students = await Student.find();
+    return res.status(200).json(new ApiResponse(200, students));
 });
 
 export const getStudent = wrapAsync(async (req, res) => {
-    try {
-        const student = await Student.findById(req.params.id)
-            .populate({
-                path: "studentHistory",
-                populate: {
-                    path: "session class classSection",
-                    select: "-__v",
-                },
-            })
-            .populate("currentClass currentSection currentSession")
-            .setOptions({ strictPopulate: false });
-        if (!student) {
-            return res.status(404).json({
-                success: false,
-                message: "Student not found",
-            });
-        }
-        res.status(200).json({
-            success: true,
-            data: student,
-        });
-    } catch (error) {
-        res.status(400).json({
+    const student = await Student.findById(req.params.id)
+        .populate({
+            path: "studentHistory",
+            populate: {
+                path: "session class classSection",
+                select: "-__v",
+            },
+        })
+        .populate("currentClass currentSection currentSession")
+        .setOptions({ strictPopulate: false });
+    if (!student) {
+        return res.status(404).json({
             success: false,
-            message: error.message,
+            message: "Student not found",
         });
     }
+    return res.status(200).json(new ApiResponse(200, student));
 });
 
 export const updateStudent = wrapAsync(async (req, res) => {
-    try {
-        const student = await Student.findByIdAndUpdate(
-            req.params.id,
-            req.body,
-            { new: true }
-        );
-        if (!student) {
-            return res.status(404).json({
-                success: false,
-                message: "Student not found",
-            });
-        }
-        res.status(200).json({
-            success: true,
-            data: student,
-        });
-    } catch (error) {
-        res.status(400).json({
+    const student = await Student.findByIdAndUpdate(req.params.id, req.body, {
+        new: true,
+    });
+    if (!student) {
+        return res.status(404).json({
             success: false,
-            message: error.message,
+            message: "Student not found",
         });
     }
+    return res
+        .status(200)
+        .json(new ApiResponse(200, student, "Update Successfully"));
 });
 
 export const deleteStudent = wrapAsync(async (req, res) => {
-    try {
-        const student = await Student.findByIdAndDelete(req.params.id);
-        if (!student) {
-            return res.status(404).json({
-                success: false,
-                message: "Student not found",
-            });
-        }
-        res.status(200).json({
-            success: true,
-            data: student,
-        });
-    } catch (error) {
-        res.status(400).json({
+    const student = await Student.findByIdAndDelete(req.params.id);
+    if (!student) {
+        return res.status(404).json({
             success: false,
-            message: error.message,
+            message: "Student not found",
         });
     }
+    return res
+        .status(200)
+        .json(new ApiResponse(200, student, "Delete Successfully"));
 });
 
 export const getStudentByParent = wrapAsync(async (req, res) => {
-    try {
-        const student = await Student.find({ parent: req.params.parentId });
-        if (!student) {
-            return res.status(404).json({
-                success: false,
-                message: "Student not found",
-            });
-        }
-        res.status(200).json({
-            success: true,
-            data: student,
-        });
-    } catch (error) {
-        res.status(400).json({
+    const student = await Student.find({ parent: req.params.parentId });
+    if (!student) {
+        return res.status(404).json({
             success: false,
-            message: error.message,
+            message: "Student not found",
         });
     }
+    return res.status(200).json(new ApiResponse(200, student));
 });
+

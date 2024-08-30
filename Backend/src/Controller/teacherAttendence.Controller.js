@@ -1,5 +1,6 @@
 import { Teacher } from "../Models/teacher.model.js";
 import { TeacherAttendance } from "../Models/teacherAttendence.model.js";
+import { ApiResponse } from "../Utils/responseHandler.js";
 import wrapAsync from "../utils/wrapAsync.js";
 import { teacherAttendanceValidationSchema } from "../Validation/teacherAttendence.Validation.js";
 
@@ -22,7 +23,7 @@ export const createTeacherAttendance = wrapAsync(async (req, res) => {
     );
     teacher.teacherAttendance.push(teacherAttendance._id);
     await teacher.save();
-    res.status(201).json({ teacherAttendance });
+    return res.status(201).json(new ApiResponse(201, teacherAttendance));
 });
 
 export const getTeacherAttendance = wrapAsync(async (req, res) => {
@@ -33,6 +34,7 @@ export const getTeacherAttendance = wrapAsync(async (req, res) => {
         return res.status(404).json({ message: "Teacher not found" });
     }
     res.status(200).json({ teacherAttendance: teacher.teacherAttendance });
+    return res.status(200).json(new ApiResponse(200, teacher));
 });
 
 export const updateTeacherAttendance = wrapAsync(async (req, res) => {
@@ -46,7 +48,9 @@ export const updateTeacherAttendance = wrapAsync(async (req, res) => {
             .status(404)
             .json({ message: "Teacher attendance not found" });
     }
-    res.status(200).json({ teacherAttendance });
+    return res
+        .status(200)
+        .json(new ApiResponse(200, teacherAttendance, "Update Successfully"));
 });
 
 export const deleteTeacherAttendance = wrapAsync(async (req, res) => {
@@ -58,7 +62,13 @@ export const deleteTeacherAttendance = wrapAsync(async (req, res) => {
             .status(404)
             .json({ message: "Teacher attendance not found" });
     }
-    res.status(200).json({
-        message: "Teacher attendance deleted successfully",
-    });
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                teacherAttendance,
+                "Teacher attendance deleted successfully"
+            )
+        );
 });

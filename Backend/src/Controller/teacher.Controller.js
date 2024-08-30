@@ -37,7 +37,9 @@ export const createTeacher = wrapAsync(async (req, res) => {
     const teacher = await Teacher.create(req.body);
     school.teachers.push(teacher._id);
     await school.save();
-    res.status(201).json({ teacher });
+    return res
+        .status(201)
+        .json(new ApiResponse(201, teacher, "Teacher Created Successfully"));
 });
 
 export const loginTeacher = wrapAsync(async (req, res, next) => {
@@ -46,7 +48,7 @@ export const loginTeacher = wrapAsync(async (req, res, next) => {
     if (!email) {
         return next(new ApiError(400, "email is required"));
     }
-    
+
     const teacher = await Teacher.findOne({ email });
 
     if (!teacher) {
@@ -145,13 +147,15 @@ export const refreshAccessTokenTeacher = wrapAsync(async (req, res, next) => {
                 )
             );
     } catch (error) {
-        return next ( new ApiError(401, error?.message || "Invalid refresh token"));
+        return next(
+            new ApiError(401, error?.message || "Invalid refresh token")
+        );
     }
 });
 
 export const getTeachers = wrapAsync(async (req, res) => {
     const teachers = await Teacher.find();
-    res.status(200).json({ teachers });
+    return res.status(200).json(new ApiResponse(200, teachers));
 });
 
 export const getTeacher = wrapAsync(async (req, res) => {
@@ -159,7 +163,7 @@ export const getTeacher = wrapAsync(async (req, res) => {
     if (!teacher) {
         return res.status(404).json({ message: "Teacher not found" });
     }
-    res.status(200).json({ teacher });
+    return res.status(200).json(new ApiResponse(200, teacher));
 });
 
 export const updateTeacher = wrapAsync(async (req, res) => {
@@ -173,7 +177,9 @@ export const updateTeacher = wrapAsync(async (req, res) => {
     if (!teacher) {
         return res.status(404).json({ message: "Teacher not found" });
     }
-    res.status(200).json({ teacher });
+    return res
+        .status(200)
+        .json(new ApiResponse(200, teacher, "Update detail Successfully"));
 });
 
 export const deleteTeacher = wrapAsync(async (req, res) => {
@@ -181,10 +187,9 @@ export const deleteTeacher = wrapAsync(async (req, res) => {
     if (!teacher) {
         return res.status(404).json({ message: "Teacher not found" });
     }
-    res.status(200).json({
-        message: "Teacher deleted successfully",
-        data: teacher,
-    });
+    return res
+        .status(200)
+        .json(new ApiResponse(200, teacher, "Teacher deleted successfully"));
 });
 
 export const getTeacherAttendance = wrapAsync(async (req, res) => {
@@ -194,5 +199,8 @@ export const getTeacherAttendance = wrapAsync(async (req, res) => {
     if (!teacher) {
         return res.status(404).json({ message: "Teacher not found" });
     }
-    res.status(200).json({ teacherAttendance: teacher.teacherAttendance });
+    // res.status(200).json({ teacherAttendance: teacher.teacherAttendance });
+    return res
+        .status(200)
+        .json(new ApiResponse(200, teacher.teacherAttendance));
 });

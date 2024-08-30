@@ -22,11 +22,15 @@ export const createComplaint = wrapAsync(async (req, res) => {
     const complaint = await Complaint.create(complaintData);
     student.complaints.push(complaint._id);
     await student.save();
-    res.status(201).json({ complaint });
+    return res.status(201).json(new ApiResponse(201, complaint));
 });
 
 export const updateComplaint = wrapAsync(async (req, res) => {
-    const complaint = await Complaint.findByIdAndUpdate(req.params.complaintId, req.body, { new: true });
+    const complaint = await Complaint.findByIdAndUpdate(
+        req.params.complaintId,
+        req.body,
+        { new: true }
+    );
     if (!complaint) {
         return res.status(404).json({ message: "Complaint not found" });
     }
@@ -81,4 +85,3 @@ export const getComplaintsByTeacherAndStatus = wrapAsync(async (req, res) => {
     });
     res.status(200).json({ complaints });
 });
-
