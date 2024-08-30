@@ -41,6 +41,10 @@ app.use(cookieParser());
 
 app.use(bodyParser.json());
 
+app.get("/",(req,res)=>{
+    res.send("Welcome to our School. Deployment is complete");
+});
+
 app.use("/api", noticeRoute);
 app.use("/api", subjectRoute);
 app.use("/api", schoolRoute);

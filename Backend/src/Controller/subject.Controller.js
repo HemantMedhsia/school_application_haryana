@@ -3,8 +3,8 @@ import { Subject } from "../models/subject.Model.js";
 import wrapAsync from "../utils/wrapAsync.js";
 import { Admin } from "../Models/admin.Model.js";
 import { subjectSchema } from "../Validation/subject.Validation.js"; // Import the Joi validation schema
+import { ApiResponse } from "../Utils/responseHandler.js";
 
-// Validate the subject data
 const validateSubject = async (data) => {
     const { error } = await subjectSchema.validateAsync(data);
     if (error) {
@@ -41,21 +41,24 @@ export const createSubject = wrapAsync(async (req, res) => {
         { $push: { subjects: savedSubject._id } },
         { new: true }
     );
-
-    res.status(201).json(savedSubject);
+    return res
+        .status(201)
+        .json(
+            new ApiResponse(201, savedSubject, "Subject Created Successfully")
+        );
 });
 
 // Get all subjects
 export const getAllSubjects = wrapAsync(async (req, res) => {
     const subjects = await Subject.find();
-    res.status(200).json(subjects);
+    return res.status(200).json(new ApiResponse(200, subjects));
 });
 
 // Get subject by ID
 export const getSubjectById = wrapAsync(async (req, res) => {
     const subject = await Subject.findById(req.params.id);
     if (!subject) return res.status(404).json({ message: "Subject not found" });
-    res.status(200).json(subject);
+    return res.status(200).json(new ApiResponse(200, subject));
 });
 
 // Update subject
@@ -64,14 +67,18 @@ export const updateSubject = wrapAsync(async (req, res) => {
         new: true,
     });
     if (!subject) return res.status(404).json({ message: "Subject not found" });
-    res.status(200).json(subject);
+    return res
+        .status(200)
+        .json(new ApiResponse(200, subject, "Subject Update Successfully"));
 });
 
 // Delete subject
 export const deleteSubject = wrapAsync(async (req, res) => {
     const subject = await Subject.findByIdAndDelete(req.params.id);
     if (!subject) return res.status(404).json({ message: "Subject not found" });
-    res.status(204).json({ message: "Subject Delete Sucessfully" });
+    return res
+        .status(200)
+        .json(new ApiResponse(200, subject, "Subject Deleted Successfully"));
 });
 
 // Get subjects by status
@@ -81,15 +88,14 @@ export const getSubjectsByStatus = wrapAsync(async (req, res) => {
     const subjects = await Subject.find({
         status: { $regex: new RegExp(`^${status}$`, "i") }, // Case-insensitive regex
     });
-
-    res.status(200).json(subjects);
+    return res.status(200).json(new ApiResponse(200, subjects));
 });
 
 // count Total subject
 
 export const getSubjectCount = wrapAsync(async (req, res) => {
     const count = await Subject.countDocuments();
-    res.status(200).json({ count });
+    return res.status(200).json(new ApiResponse(200, count));
 });
 
 // Subject Active/Inactive by id
@@ -99,6 +105,5 @@ export const toggleSubjectStatus = wrapAsync(async (req, res) => {
 
     subject.status = subject.status === "Active" ? "Inactive" : "Active"; // Toggle logic
     await subject.save();
-
-    res.status(200).json(subject);
+    return res.status(200).json(new ApiResponse(200, subject));
 });

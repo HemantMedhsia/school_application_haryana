@@ -1,5 +1,6 @@
 import Marks from "../Models/marks.Model.js";
 import { SingleSubjectMark } from "../Models/singleSubjectMark.Model.js";
+import { ApiResponse } from "../Utils/responseHandler.js";
 import wrapAsync from "../utils/wrapAsync.js";
 
 export const createSingleSubjectMark = wrapAsync(async (req, res) => {
@@ -11,17 +12,16 @@ export const createSingleSubjectMark = wrapAsync(async (req, res) => {
     await singleSubjectMark.save();
     marks.subjectMarks.push(singleSubjectMark._id);
     await marks.save();
-    res.status(201).json({
-        success: true,
-        data: singleSubjectMark,
-    });
+    return res
+        .status(201)
+        .json(new ApiResponse(201, singleSubjectMark, "Mark add Successfully"));
 });
 
 export const getSingleSubjectMarks = wrapAsync(async (req, res) => {
     const singleSubjectMarks = await SingleSubjectMark.find({
         subjectName: req.params.subjectName,
     });
-    res.status(200).json({ singleSubjectMarks });
+    return res.status(200).json(new ApiResponse(200, singleSubjectMarks));
 });
 
 export const getSingleSubjectMarksById = wrapAsync(async (req, res) => {
@@ -29,7 +29,7 @@ export const getSingleSubjectMarksById = wrapAsync(async (req, res) => {
     if (!singleSubjectMark) {
         return res.status(404).json({ message: "SingleSubjectMark not found" });
     }
-    res.status(200).json({ singleSubjectMark });
+    return res.status(200).json(new ApiResponse(200, singleSubjectMark));
 });
 
 export const updateSingleSubjectMark = wrapAsync(async (req, res) => {
@@ -41,7 +41,15 @@ export const updateSingleSubjectMark = wrapAsync(async (req, res) => {
     if (!singleSubjectMark) {
         return res.status(404).json({ message: "SingleSubjectMark not found" });
     }
-    res.status(200).json({ singleSubjectMark });
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                singleSubjectMark,
+                "Marks Updated Successfully"
+            )
+        );
 });
 
 export const deleteSingleSubjectMark = wrapAsync(async (req, res) => {
@@ -51,8 +59,13 @@ export const deleteSingleSubjectMark = wrapAsync(async (req, res) => {
     if (!singleSubjectMark) {
         return res.status(404).json({ message: "Marks not found" });
     }
-    res.status(200).json({
-        message: "Marks Deleted Sucessfully",
-        Deleted_data: singleSubjectMark,
-    });
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                singleSubjectMark,
+                "Marks Deleted Successfully"
+            )
+        );
 });

@@ -32,21 +32,18 @@ export const createParent = wrapAsync(async (req, res) => {
     const parent = new Parent(req.body);
     const parentData = await parent.save();
 
-    // Find the student by student id
     const studentId = req.params.studentId;
     const student = await Student.findById(studentId);
     if (!student) {
         throw new NotFoundError(`Student with id ${studentId} not found`);
     }
 
-    // Assign parent id to the student schema
     student.parent = parentData._id;
     await student.save();
 
-    res.status(201).json({
-        success: true,
-        data: parent,
-    });
+    return res
+        .status(201)
+        .json(new ApiResponse(201, parent, "Parent created successfully"));
 });
 
 export const loginParent = wrapAsync(async (req, res, next) => {
@@ -55,7 +52,7 @@ export const loginParent = wrapAsync(async (req, res, next) => {
     if (!guardianEmail) {
         return next(new ApiError(400, "email is required"));
     }
-    
+
     const parent = await Parent.findOne({ guardianEmail });
 
     if (!parent) {
@@ -154,28 +151,27 @@ export const refreshAccessTokenParent = wrapAsync(async (req, res, next) => {
                 )
             );
     } catch (error) {
-        return next (new ApiError(401, error?.message || "Invalid refresh token"));
+        return next(
+            new ApiError(401, error?.message || "Invalid refresh token")
+        );
     }
 });
 
 export const getParents = wrapAsync(async (req, res) => {
     const parents = await Parent.find();
-    res.status(200).json({
-        success: true,
-        data: parents,
-    });
+    return res.status(200).json(new ApiResponse(200, parents));
 });
 
 export const getParent = wrapAsync(async (req, res) => {
     const { id } = req.params;
     const parent = await Parent.findById(id);
     if (!parent) {
-        throw new NotFoundError(`Parent with id ${id} not found`);
+        return res
+            .status(404)
+            .json(new ApiResponse(404, null, "Parent Not Found"));
     }
-    res.status(200).json({
-        success: true,
-        data: parent,
-    });
+
+    return res.status(200).json(new ApiResponse(200, parent));
 });
 
 export const updateParent = wrapAsync(async (req, res) => {
@@ -185,22 +181,24 @@ export const updateParent = wrapAsync(async (req, res) => {
         runValidators: true,
     });
     if (!parent) {
-        throw new NotFoundError(`Parent with id ${id} not found`);
+        return res
+            .status(404)
+            .json(new ApiResponse(404, null, "Parent Not Found"));
     }
-    res.status(200).json({
-        success: true,
-        data: parent,
-    });
+    return res
+        .status(200)
+        .json(new ApiResponse(200, parent, "Parent Update Successfully"));
 });
 
 export const deleteParent = wrapAsync(async (req, res) => {
     const { id } = req.params;
     const parent = await Parent.findByIdAndDelete(id);
     if (!parent) {
-        throw new NotFoundError(`Parent with id ${id} not found`);
+        return res
+            .status(404)
+            .json(new ApiResponse(404, null, "Parent Not Found"));
     }
-    res.status(200).json({
-        success: true,
-        data: {},
-    });
+    return res
+        .status(200)
+        .json(new ApiResponse(200, parent, "Parent Deleted Successfully"));
 });

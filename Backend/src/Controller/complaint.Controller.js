@@ -1,7 +1,8 @@
 import { Complaint } from "../Models/complaint.Model.js";
 import { Student } from "../Models/student.model.js";
 import { Teacher } from "../Models/teacher.model.js";
-import wrapAsync from "../utils/wrapAsync.js";
+import { ApiResponse } from "../Utils/responseHandler.js";
+import wrapAsync from "../Utils/wrapAsync.js";
 import { complaintValidationSchema } from "../Validation/complaint.Validation.js";
 
 export const createComplaint = wrapAsync(async (req, res) => {
@@ -34,7 +35,8 @@ export const updateComplaint = wrapAsync(async (req, res) => {
     if (!complaint) {
         return res.status(404).json({ message: "Complaint not found" });
     }
-    res.status(200).json({ complaint });
+
+    return res.status(200).json(new ApiResponse(200, complaint));
 });
 
 export const deleteComplaint = wrapAsync(async (req, res) => {
@@ -42,7 +44,9 @@ export const deleteComplaint = wrapAsync(async (req, res) => {
     if (!complaint) {
         return res.status(404).json({ message: "Complaint not found" });
     }
-    res.status(200).json({ complaint });
+    return res
+        .status(200)
+        .json(new ApiResponse(200, complaint, "Complaint Delete Successfully"));
 });
 
 export const getComplaintById = wrapAsync(async (req, res) => {
@@ -50,12 +54,12 @@ export const getComplaintById = wrapAsync(async (req, res) => {
     if (!complaint) {
         return res.status(404).json({ message: "Complaint not found" });
     }
-    res.status(200).json({ complaint });
+    return res.status(200).json(new ApiResponse(200, complaint));
 });
 
 export const getComplaints = wrapAsync(async (req, res) => {
     const complaints = await Complaint.find();
-    res.status(200).json({ complaints });
+    return res.status(200).json(new ApiResponse(200, complaints));
 });
 
 export const getComplaintsByStudent = wrapAsync(async (req, res) => {
@@ -65,17 +69,17 @@ export const getComplaintsByStudent = wrapAsync(async (req, res) => {
     if (!student) {
         return res.status(404).json({ message: "Student not found" });
     }
-    res.status(200).json({ complaints: student.complaints });
+    return res.status(200).json(new ApiResponse(200, student.complaints));
 });
 
 export const getComplaintsByStatus = wrapAsync(async (req, res) => {
     const complaints = await Complaint.find({ status: req.params.status });
-    res.status(200).json({ complaints });
+    return res.status(200).json(new ApiResponse(200, complaints));
 });
 
 export const getComplaintsByCategory = wrapAsync(async (req, res) => {
     const complaints = await Complaint.find({ category: req.params.category });
-    res.status(200).json({ complaints });
+    return res.status(200).json(new ApiResponse(200, complaints));
 });
 
 export const getComplaintsByTeacherAndStatus = wrapAsync(async (req, res) => {
@@ -83,5 +87,5 @@ export const getComplaintsByTeacherAndStatus = wrapAsync(async (req, res) => {
         createdBy: req.params.teacherId,
         status: req.params.status,
     });
-    res.status(200).json({ complaints });
+    return res.status(200).json(new ApiResponse(200, complaints));
 });

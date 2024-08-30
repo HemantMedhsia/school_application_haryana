@@ -1,5 +1,6 @@
 import { Staff } from "../Models/staff.Model.js";
 import { StaffAttendance } from "../Models/staffAttendence.Model.js";
+import { ApiResponse } from "../Utils/responseHandler.js";
 import wrapAsync from "../utils/wrapAsync.js";
 import { staffAttendanceValidationSchema } from "../Validation/staffAttendance.Validation.js";
 
@@ -17,7 +18,15 @@ export const createStaffAttendance = wrapAsync(async (req, res) => {
     const staffAttendance = await StaffAttendance.create(staffAttendanceData);
     staff.staffAttendance.push(staffAttendance._id);
     await staff.save();
-    res.status(201).json({ staffAttendance });
+    return res
+        .status(201)
+        .json(
+            new ApiResponse(
+                201,
+                staffAttendance,
+                "Staff Attendance Added Successfully"
+            )
+        );
 });
 
 export const getStaffAttendance = wrapAsync(async (req, res) => {
@@ -27,7 +36,7 @@ export const getStaffAttendance = wrapAsync(async (req, res) => {
     if (!staff) {
         return res.status(404).json({ message: "Staff not found" });
     }
-    res.status(200).json({ staffAttendance: staff.staffAttendance });
+    return res.status(200).json(new ApiResponse(200, staff.staffAttendance));
 });
 
 export const updateStaffAttendance = wrapAsync(async (req, res) => {
@@ -39,7 +48,15 @@ export const updateStaffAttendance = wrapAsync(async (req, res) => {
     if (!staffAttendance) {
         return res.status(404).json({ message: "Staff attendance not found" });
     }
-    res.status(200).json({ staffAttendance });
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                staffAttendance,
+                "Staff attendance Updated Successfully"
+            )
+        );
 });
 
 export const deleteStaffAttendance = wrapAsync(async (req, res) => {
@@ -47,9 +64,11 @@ export const deleteStaffAttendance = wrapAsync(async (req, res) => {
         req.params.attendanceId
     );
     if (!staffAttendance) {
-        return res.status(404).json({ message: "Staff attendance not found" });
+        return res.status(404).json({ message: "Staff Attendance not found" });
     }
-    res.status(200).json({
-        message: "Staff attendance deleted successfully",
-    });
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200, staffAttendance, "Staff Attendance Deleted Successfully")
+        );
 });
