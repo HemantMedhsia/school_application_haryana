@@ -1,4 +1,4 @@
-import wrapAsync from "../utils/wrapAsync.js";
+import wrapAsync from "../Utils/wrapAsync.js";
 import { Student } from "../Models/student.model.js";
 import { Teacher } from "../Models/teacher.model.js";
 import { StudentAttendance } from "../Models/studentAttendence.Model.js";

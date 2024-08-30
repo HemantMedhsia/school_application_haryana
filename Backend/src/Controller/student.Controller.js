@@ -54,6 +54,8 @@ export const createStudent = wrapAsync(async (req, res) => {
         school.students.push(studentData._id);
         await school.save();
 
+        await StudentHistory.findByIdAndUpdate(studentHistoryData._id, {studentId: studentData._id}, {new: true});
+
         res.status(201).json({
             success: true,
             data: student,

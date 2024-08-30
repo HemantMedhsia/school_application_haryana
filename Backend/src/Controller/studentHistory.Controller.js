@@ -33,7 +33,7 @@ export const addStudentHistory = wrapAsync(async (req, res) => {
 
 export const getSingleStudentHistory = wrapAsync(async (req, res) => {
     try {
-        const studentHistory = await StudentHistory.findById(req.params.id).populate("session class classSection");
+        const studentHistory = await StudentHistory.find({studentId:req.params.studentId}).populate("session class classSection");
         if (!studentHistory) {
             return res.status(404).json({
                 success: false,
@@ -55,7 +55,7 @@ export const getSingleStudentHistory = wrapAsync(async (req, res) => {
 export const updateStudentHistory = wrapAsync(async (req, res) => {
     try {
         const studentHistory = await StudentHistory.findByIdAndUpdate(
-            req.params.id,
+            req.params.studentId,
             req.body,
             { new: true }
         );
@@ -79,7 +79,7 @@ export const updateStudentHistory = wrapAsync(async (req, res) => {
 
 export const deleteStudentHistory = wrapAsync(async (req, res) => {
     try {
-        const studentHistory = await StudentHistory.findByIdAndDelete(req.params.id);
+        const studentHistory = await StudentHistory.findByIdAndDelete(req.params.studentHistoryId);
         if (!studentHistory) {
             return res.status(404).json({
                 success: false,
@@ -95,6 +95,5 @@ export const deleteStudentHistory = wrapAsync(async (req, res) => {
             success: false,
             message: error.message,
         });
-    }
+    } 
 });
-
