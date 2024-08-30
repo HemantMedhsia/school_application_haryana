@@ -1,8 +1,11 @@
 import React from 'react'
+import LoginPage from './pages/LoginPage'
 
 const App = () => {
   return (
-    <div className='bg-gray-900 h-screen'>App</div>
+    <div className=' h-screen'>
+      <LoginPage/>
+    </div>
   
   )
 }
