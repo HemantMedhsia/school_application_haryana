@@ -1,6 +1,6 @@
 import { Admin } from "../Models/admin.Model.js";
 import { School } from "../Models/school.model.js";
-import wrapAsync from "../utils/wrapAsync.js";
+import wrapAsync from "../Utils/wrapAsync.js";
 import { adminValidationSchema } from "../Validation/admin.Validation.js";
 import { ApiError } from "../Utils/errorHandler.js";
 import { ApiResponse } from "../Utils/responseHandler.js";
@@ -35,7 +35,6 @@ export const createAdmin = wrapAsync(async (req, res) => {
         return res.status(404).json({ error: "School not found" });
     }
 
-    // Add schoolId to req.body
     const adminData = { ...req.body, school: req.params.schoolId };
     await adminValidationSchema.validateAsync(adminData, {
         abortEarly: false,
@@ -45,7 +44,11 @@ export const createAdmin = wrapAsync(async (req, res) => {
     const savedAdmin = await admin.save();
     school.admin.push(savedAdmin._id);
     await school.save();
-    res.status(201).json(savedAdmin);
+    return res
+        .status(201)
+        .json(
+            new ApiResponse(201, savedAdmin, "Admin registered Successfully")
+        );
 });
 
 export const loginAdmin = wrapAsync(async (req, res, next) => {
@@ -138,7 +141,7 @@ export const refreshAccessTokenAdmin = wrapAsync(async (req, res, next) => {
 
 export const getAdmins = wrapAsync(async (req, res) => {
     const admins = await Admin.find();
-    res.status(200).json(admins);
+    return res.status(200).json(new ApiResponse(200, admins));
 });
 
 export const getAdminById = wrapAsync(async (req, res) => {
@@ -148,7 +151,7 @@ export const getAdminById = wrapAsync(async (req, res) => {
     if (!admin) {
         return res.status(404).json({ error: "Admin not found" });
     }
-    res.status(200).json(admin);
+    return res.status(200).json(new ApiResponse(200, admin));
 });
 
 export const updateAdmin = wrapAsync(async (req, res) => {
@@ -158,7 +161,9 @@ export const updateAdmin = wrapAsync(async (req, res) => {
     if (!admin) {
         return res.status(404).json({ error: "Admin not found" });
     }
-    res.status(200).json(admin);
+    return res
+        .status(200)
+        .json(new ApiResponse(200, admin, "Admin update successfully "));
 });
 
 export const deleteAdmin = wrapAsync(async (req, res) => {
@@ -168,8 +173,8 @@ export const deleteAdmin = wrapAsync(async (req, res) => {
     if (!admin) {
         return res.status(404).json({ error: "Admin not found" });
     }
-    res.status(200).json({
-        message: "Admin deleted successfully",
-        data: admin,
-    });
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, admin, "Admin deleted successfully"));
 });

@@ -9,6 +9,11 @@ export const createSection = wrapAsync(async (req, res) => {
         return res.status(400).json(new ApiResponse(400, null, error.details[0].message, false));
 
     const { name } = req.body;
+    const existingSection = await Section.findOne({ name });
+    if (existingSection) {
+        return res.status(400).json({ message: "Section already exists" });
+    }
+
     const newSection = new Section({ name });
     await newSection.save();
     res.status(201).json(new ApiResponse(201, newSection, "Section created", true));
@@ -17,10 +22,27 @@ export const createSection = wrapAsync(async (req, res) => {
 export const createManySections = wrapAsync(async (req, res) => {
     const { sections } = req.body;
     if (!Array.isArray(sections) || sections.length === 0) {
-        return res.status(400).json(new ApiResponse(400, null, "Invalid or empty sections array", false));
+        return res
+            .status(400)
+            .json(new ApiResponse(400, null, "Invalid or empty sections array", false));
+    }
+    
+    const existingSections = await Section.find({
+        name: { $in: sections.map((section) => section.name) },
+    });
+    const existingSectionNames = existingSections.map(
+        (section) => section.name
+    );
+
+    const newSectionsToCreate = sections.filter(
+        (section) => !existingSectionNames.includes(section.name)
+    );
+
+    if (newSectionsToCreate.length === 0) {
+        return res.status(400).json({ message: "All sections already exist" });
     }
 
-    const newSections = await Section.insertMany(sections);
+    const newSections = await Section.insertMany(newSectionsToCreate);
     res.status(201).json(new ApiResponse(201, newSections, "Sections created", true));
 });
 
@@ -32,6 +54,7 @@ export const getAllSections = wrapAsync(async (req, res) => {
 export const getSectionById = wrapAsync(async (req, res) => {
     const { sectionId } = req.params;
     const section = await Section.findById(sectionId);
+
     if (!section) {
         return res.status(404).json(new ApiResponse(404, null, "Section not found", false));
     }
@@ -77,5 +100,3 @@ export const deleteManySections = wrapAsync(async (req, res) => {
 
     res.status(200).json(new ApiResponse(200, null, "Sections deleted", true));
 });
-
-

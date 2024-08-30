@@ -8,7 +8,7 @@ router.post("/create-many-sections", createManySections);
 router.get("/get-all-sections", getAllSections);
 router.get("/get-section-by-id/:sectionId", getSectionById);
 router.put("/update-section/:sectionId", updateSection);
-router.delete("/delete-section/:sectionId", deleteSection);
-router.post("/delete-many-sections", deleteManySections);
+router.delete("/delete-single-section/:sectionId", deleteSection);
+router.post("/delete-many-section", deleteManySections);
 
 export {router as sectionRoute};
