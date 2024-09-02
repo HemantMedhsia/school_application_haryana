@@ -78,16 +78,16 @@ export const loginTeacher = wrapAsync(async (req, res, next) => {
     );
 
     // Cookie options
-    // const options = {
-    //     httpOnly: true,
-    //     secure: process.env.NODE_ENV === "production", // Set secure to true in production
-    // };
+    const options = {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production", // Set secure to true in production
+    };
 
     // Send the response with cookies and teacher data
     return res
         .status(200)
-        .cookie("accessToken", accessToken) // include option before production.
-        .cookie("refreshToken", refreshToken) // include option before production.
+        .cookie("accessToken", accessToken, options) // include option before production.
+        .cookie("refreshToken", refreshToken, options) // include option before production.
         .json(
             new ApiResponse(
                 200,
