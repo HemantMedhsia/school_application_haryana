@@ -1,4 +1,5 @@
 import { Class } from "../Models/class.Model.js";
+import { ApiResponse } from "../Utils/responseHandler.js";
 import wrapAsync from "../Utils/wrapAsync.js";
 import { classValidationSchema } from "../Validation/class.Validation.js";
 
@@ -18,12 +19,14 @@ export const createClass = wrapAsync(async (req, res) => {
 
     const newClass = new Class({ name });
     await newClass.save();
-    res.status(201).json(newClass);
+    return res
+        .status(201)
+        .json(new ApiResponse(201, newClass, "Class Add Successfully"));
 });
 
 export const getAllClasses = wrapAsync(async (req, res) => {
     const classes = await Class.find();
-    res.status(200).json(classes);
+    return res.status(200).json(new ApiResponse(200, classes));
 });
 
 export const getClassById = wrapAsync(async (req, res) => {
@@ -33,8 +36,7 @@ export const getClassById = wrapAsync(async (req, res) => {
     if (!classData) {
         return res.status(404).json({ message: "Class not found." });
     }
-
-    res.status(200).json(classData);
+    return res.status(200).json(new ApiResponse(200, classData));
 });
 
 export const updateClass = wrapAsync(async (req, res) => {
@@ -56,8 +58,9 @@ export const updateClass = wrapAsync(async (req, res) => {
     if (!updatedClass) {
         return res.status(404).json({ message: "Class not found." });
     }
-
-    res.status(200).json(updatedClass);
+    return res
+        .status(200)
+        .json(new ApiResponse(200, updatedClass, "Class Updated Successfully"));
 });
 
 export const deleteClass = wrapAsync(async (req, res) => {
@@ -68,8 +71,9 @@ export const deleteClass = wrapAsync(async (req, res) => {
     if (!deletedClass) {
         return res.status(404).json({ message: "Class not found." });
     }
-
-    res.status(200).json({ message: "Class deleted successfully." });
+    return res
+        .status(200)
+        .json(new ApiResponse(200, deletedClass, "Class deleted successfully."));
 });
 
 export const bulkCreateClasses = wrapAsync(async (req, res) => {
@@ -103,5 +107,7 @@ export const bulkCreateClasses = wrapAsync(async (req, res) => {
     }
 
     const createdClasses = await Class.insertMany(newClasses);
-    res.status(201).json(createdClasses);
+    return res
+        .status(201)
+        .json(new ApiResponse(201, createdClasses, "Class Created successfully."));
 });

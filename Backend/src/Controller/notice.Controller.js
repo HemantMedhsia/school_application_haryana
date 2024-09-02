@@ -1,8 +1,9 @@
 import { Notice } from "../Models/notice.Model.js";
 import mongoose from "mongoose";
 import { noticeValidationSchema } from "../Validation/notice.Validation.js";
-import wrapAsync from "../utils/wrapAsync.js";
-import { School } from "../Models/school.model.js";;
+import wrapAsync from "../Utils/wrapAsync.js";
+import { School } from "../Models/school.model.js";
+import { ApiResponse } from "../Utils/responseHandler.js";
 
 // create a Notice
 export const createNotice = wrapAsync(async (req, res) => {
@@ -26,14 +27,15 @@ export const createNotice = wrapAsync(async (req, res) => {
 
     school.notices.push(noticeData._id);
     await school.save();
-
-    res.status(201).json(noticeData);
+    return res
+        .status(201)
+        .json(new ApiResponse(201, noticeData, "Notice Created Successfully"));
 });
 
 // Get All Notices
 export const getAllNotices = wrapAsync(async (req, res) => {
     const notices = await Notice.find();
-    res.status(200).json(notices);
+    return res.status(200).json(new ApiResponse(200, notices));
 });
 
 // Get a Single Notice
@@ -48,7 +50,7 @@ export const getNoticeById = wrapAsync(async (req, res) => {
     if (!notice) {
         return res.status(404).json({ error: "Notice not found" });
     }
-    res.status(200).json(notice);
+    return res.status(200).json(new ApiResponse(200, notice));
 });
 
 // Update a Notice
@@ -66,7 +68,9 @@ export const updateNotice = wrapAsync(async (req, res) => {
     if (!updatedNotice) {
         return res.status(404).json({ error: "Notice not found" });
     }
-    res.status(200).json(updatedNotice);
+    return res
+        .status(200)
+        .json(new ApiResponse(200, updatedNotice, "Updated Notice Successfully"));
 });
 
 // Delete a Notice
@@ -81,7 +85,11 @@ export const deleteNotice = wrapAsync(async (req, res) => {
     if (!deletedNotice) {
         return res.status(404).json({ error: "Notice not found" });
     }
-    res.status(204).send({ message: "Notice is Deleted Sucessfully" }); // No content
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200, deleteNotice, "Notice is Deleted Sucessfully")
+        );
 });
 
 // Get Notices by Audience
@@ -90,7 +98,7 @@ export const getNoticesByAudience = wrapAsync(async (req, res) => {
     const notices = await Notice.find({
         audience: { $regex: new RegExp(`^${audience}$`, "i") },
     });
-    res.status(200).json(notices);
+    return res.status(200).json(new ApiResponse(200, notices));
 });
 
 // Get Notices by Category
@@ -99,12 +107,12 @@ export const getNoticesByCategory = wrapAsync(async (req, res) => {
     const notices = await Notice.find({
         category: { $regex: new RegExp(`^${category}$`, "i") },
     });
-    res.status(200).json(notices);
+    return res.status(200).json(new ApiResponse(200, notices));
 });
 
 // Get Notices for a Specific School
 export const getNoticesForSchool = wrapAsync(async (req, res) => {
     const { schoolId } = req.params;
     const notices = await Notice.find({ schoolId });
-    res.status(200).json(notices);
+    return res.status(200).json(new ApiResponse(200, notices));
 });

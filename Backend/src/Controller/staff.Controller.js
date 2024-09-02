@@ -32,7 +32,9 @@ export const createStaff = wrapAsync(async (req, res) => {
     const staff = await Staff.create(req.body);
     school.workingStaffs.push(staff._id);
     await school.save();
-    res.status(201).json({ staff });
+    return res
+        .status(201)
+        .json(new ApiResponse(201, staff, "Staff Created Successfully"));
 });
 
 export const loginStaff = wrapAsync(async (req, res, next) => {
@@ -41,7 +43,7 @@ export const loginStaff = wrapAsync(async (req, res, next) => {
     if (!email) {
         return next(new ApiError(400, "email is required"));
     }
-   
+
     const staff = await Staff.findOne({ email });
 
     if (!staff) {
@@ -139,13 +141,15 @@ export const refreshAccessTokenStaff = wrapAsync(async (req, res, next) => {
                 )
             );
     } catch (error) {
-        return next( new ApiError(401, error?.message || "Invalid refresh token"));
+        return next(
+            new ApiError(401, error?.message || "Invalid refresh token")
+        );
     }
 });
 
 export const getAllStaffs = wrapAsync(async (req, res) => {
     const staff = await Staff.find();
-    res.status(200).json({ staff });
+    return res.status(200).json(new ApiResponse(200, staff));
 });
 
 export const getStaffById = wrapAsync(async (req, res) => {
@@ -153,7 +157,7 @@ export const getStaffById = wrapAsync(async (req, res) => {
     if (!staff) {
         return res.status(404).json({ message: "Staff not found" });
     }
-    res.status(200).json({ staff });
+    return res.status(200).json(new ApiResponse(200, staff));
 });
 
 export const updateStaff = wrapAsync(async (req, res) => {
@@ -164,7 +168,9 @@ export const updateStaff = wrapAsync(async (req, res) => {
     if (!staff) {
         return res.status(404).json({ message: "Staff not found" });
     }
-    res.status(200).json({ staff });
+    return res
+        .status(200)
+        .json(new ApiResponse(200, staff, "Staff Updated Successfully"));
 });
 
 export const deleteStaff = wrapAsync(async (req, res) => {
@@ -172,5 +178,7 @@ export const deleteStaff = wrapAsync(async (req, res) => {
     if (!staff) {
         return res.status(404).json({ message: "Staff not found" });
     }
-    res.status(200).json({ message: "Staff deleted successfully" });
+    return res
+        .status(200)
+        .json(new ApiResponse(200, staff, "Staff Deleted Successfully"));
 });

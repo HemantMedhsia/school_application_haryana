@@ -1,21 +1,32 @@
 import { Session } from "../Models/session.Model.js";
-import wrapAsync from "../utils/wrapAsync.js";
+import { ApiResponse } from "../Utils/responseHandler.js";
+import wrapAsync from "../Utils/wrapAsync.js";
 import { sessionValidationSchema } from "../Validation/session.Validation.js";
 
 export const createSession = wrapAsync(async (req, res) => {
     await sessionValidationSchema.validateAsync(req.body);
     const session = await Session.create(req.body);
-    res.status(201).json({ session });
+    return res
+        .status(201)
+        .json(new ApiResponse(201, session, "Session Add Successfully"));
 });
 
 export const createManySessions = wrapAsync(async (req, res) => {
     const sessions = await Session.insertMany(req.body);
-    res.status(201).json({ sessions });
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                sessions,
+                "Multiple Session Created Successfully"
+            )
+        );
 });
 
 export const getSessions = wrapAsync(async (req, res) => {
     const sessions = await Session.find();
-    res.status(200).json({ sessions });
+    return res.status(200).json(new ApiResponse(200, sessions));
 });
 
 export const getSessionById = wrapAsync(async (req, res) => {
@@ -23,7 +34,7 @@ export const getSessionById = wrapAsync(async (req, res) => {
     if (!session) {
         return res.status(404).json({ message: "Session not found" });
     }
-    res.status(200).json({ session });
+    return res.status(200).json(new ApiResponse(200, session));
 });
 
 export const updateSession = wrapAsync(async (req, res) => {
@@ -33,7 +44,9 @@ export const updateSession = wrapAsync(async (req, res) => {
     if (!session) {
         return res.status(404).json({ message: "Session not found" });
     }
-    res.status(200).json({ session });
+    return res
+        .status(200)
+        .json(new ApiResponse(200, session, "Session Updated Sucessfully"));
 });
 
 export const deleteSession = wrapAsync(async (req, res) => {
@@ -41,33 +54,28 @@ export const deleteSession = wrapAsync(async (req, res) => {
     if (!session) {
         return res.status(404).json({ message: "Session not found" });
     }
-    res.status(200).json({ message: "Session deleted successfully" });
+    return res
+        .status(200)
+        .json(new ApiResponse(200, session, "Session Deleted Successfully"));
 });
 
 export const deleteManySessions = wrapAsync(async (req, res) => {
-    try {
-        const { ids } = req.body;
-        if (!Array.isArray(ids) || ids.length === 0) {
-            return res.status(400).json({ message: "Invalid or empty IDs array" });
-        }
-
-        const sessions = await Session.deleteMany({ _id: { $in: ids } });
-        if (sessions.deletedCount === 0) {
-            return res.status(404).json({ message: "No sessions found to delete" });
-        }
-
-        res.status(200).json({
-            message: "Sessions deleted successfully",
-            sessions,
-        });
-    } catch (error) {
-        console.error("Error deleting sessions:", error);
-        res.status(500).json({ message: "Internal server error" });
+    const { ids } = req.body;
+    if (!Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ message: "Invalid or empty IDs array" });
     }
+
+    const sessions = await Session.deleteMany({ _id: { $in: ids } });
+    if (sessions.deletedCount === 0) {
+        return res.status(404).json({ message: "No sessions found to delete" });
+    }
+    return res
+        .status(200)
+        .json(new ApiResponse(200, sessions, "Sessions Deleted Successfully"));
 });
 
 export const getSessionByYear = wrapAsync(async (req, res) => {
     const { year } = req.params;
     const sessions = await Session.find({ sessionYear: year });
-    res.status(200).json({ sessions });
+    return res.status(200).json(new ApiResponse(200, sessions));
 });
