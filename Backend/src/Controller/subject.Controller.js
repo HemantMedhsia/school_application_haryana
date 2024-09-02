@@ -48,6 +48,7 @@ export const createSubject = wrapAsync(async (req, res) => {
         );
 });
 
+
 // Get all subjects
 export const getAllSubjects = wrapAsync(async (req, res) => {
     const subjects = await Subject.find();
