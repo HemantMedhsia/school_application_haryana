@@ -1,12 +1,9 @@
-import React from 'react'
+import React from "react";
 
 const LeftNavbar = () => {
   return (
-    <div>
     <h1>I am LeftNavbar</h1>
-      
-    </div>
-  )
-}
+  );
+};
 
-export default LeftNavbar
+export default LeftNavbar;

@@ -1,11 +1,9 @@
-import React from 'react'
+import React from "react";
 
 const TopNavbar = () => {
   return (
-    <div>
-      <h1>I am top TopNavbar</h1>
-    </div>
-  )
-}
+   <h1>I am TopNavbar</h1>
+  );
+};
 
-export default TopNavbar
+export default TopNavbar;
