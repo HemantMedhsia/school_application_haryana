@@ -79,7 +79,7 @@ export const loginTeacher = wrapAsync(async (req, res, next) => {
 
     // Cookie options
     const options = {
-        httpOnly: true,
+        httpOnly: false,
         secure: process.env.NODE_ENV === "production",
         path: "/",
         maxAge: 24 * 60 * 60 * 1000,
