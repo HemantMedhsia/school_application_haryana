@@ -3,6 +3,7 @@ import Cookies from "js-cookie";
 export const getHeaders = (requestHeaders) => {
     // Retrieve the token from cookies
     const token = Cookies.get("accessToken");
+    console.log('Access token:', token);
 
     // Initialize headers object
     const headers = {};
