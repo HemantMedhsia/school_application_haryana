@@ -126,11 +126,11 @@ export const refreshAccessTokenTeacher = wrapAsync(async (req, res, next) => {
         }
 
         const options = {
-            // httpOnly: true,
+            httpOnly: true,
             secure: false,
             path: "/",
             maxAge: 24 * 60 * 60 * 1000,
-            SameSite: "None",
+            sameSite: "Strict",
         };
 
         const { accessToken, refreshToken: newRefreshToken } =
