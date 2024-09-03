@@ -130,6 +130,7 @@ export const refreshAccessTokenTeacher = wrapAsync(async (req, res, next) => {
             secure: process.env.NODE_ENV === "production",
             path: "/",
             maxAge: 24 * 60 * 60 * 1000,
+            sameSite: "none",
         };
 
         const { accessToken, refreshToken: newRefreshToken } =
