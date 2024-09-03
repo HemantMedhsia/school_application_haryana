@@ -108,7 +108,7 @@ export const refreshAccessTokenTeacher = wrapAsync(async (req, res, next) => {
     const incomingRefreshToken =
         req.cookies.refreshToken || req.body.refreshToken;
 
-        console.log( req.cookies.refreshToken);
+        console.log(req.cookies.refreshToken);
 
     if (!incomingRefreshToken) {
         return next(new ApiError(401, "Unauthorized request"));
