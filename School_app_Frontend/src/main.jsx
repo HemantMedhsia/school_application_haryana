@@ -7,24 +7,37 @@ import {
   createRoutesFromElements,
 } from "react-router-dom";
 import "./index.css";
-import App from "./App.jsx";
 import Layout from "./layouts/Layout.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import Testing from "./pages/Testing.jsx";
+import Dashboard from "./layouts/Navbar/Dashboard.jsx";
+import RoleBasedAccess from "./pages/RoleBase/RoleBasedAccess.jsx";
+import { AuthProvider } from "./context/AuthProvider.jsx";
 
-// Define the routes
+
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route path="/" element={<Layout />}>
-      <Route path="login" element={<LoginPage />} />
+    <>
+      <Route path="/" element={<LoginPage />} />
+      <Route path="/school" element={<Layout />}>
+        <Route
+          path="dashboard"
+          element={
+            // <RoleBasedAccess allowedRoles={["admin", "student"]}>
+            <Dashboard />
+              // </RoleBasedAccess>
+          }
+        />
       <Route path="testing" element={<Testing />} />
-    </Route>
+      </Route>
+    </>
   )
 );
 
-// Render the application
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   </React.StrictMode>
 );
