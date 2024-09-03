@@ -83,7 +83,7 @@ export const loginTeacher = wrapAsync(async (req, res, next) => {
         secure: false,
         path: "/",
         maxAge: 24 * 60 * 60 * 1000,
-        sameSite: "None",
+        sameSite: "Lax",
     };
 
     // Send the response with cookies and teacher data
