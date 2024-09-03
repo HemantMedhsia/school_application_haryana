@@ -79,7 +79,7 @@ export const loginTeacher = wrapAsync(async (req, res, next) => {
 
     // Cookie options
     const options = {
-        httpOnly: true,
+        httpOnly: false,
         secure: process.env.NODE_ENV === "production",
         path: "/",
         maxAge: 24 * 60 * 60 * 1000,
@@ -107,6 +107,8 @@ export const loginTeacher = wrapAsync(async (req, res, next) => {
 export const refreshAccessTokenTeacher = wrapAsync(async (req, res, next) => {
     const incomingRefreshToken =
         req.cookies.refreshToken || req.body.refreshToken;
+
+        console.log( req.cookies.refreshToken);
 
     if (!incomingRefreshToken) {
         return next(new ApiError(401, "Unauthorized request"));
