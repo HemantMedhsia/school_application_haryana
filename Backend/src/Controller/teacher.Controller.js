@@ -80,7 +80,10 @@ export const loginTeacher = wrapAsync(async (req, res, next) => {
     // Cookie options
     const options = {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production", // Set secure to true in production
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        maxAge: 24 * 60 * 60 * 1000,
+        sameSite: "None",
     };
 
     // Send the response with cookies and teacher data
@@ -125,10 +128,13 @@ export const refreshAccessTokenTeacher = wrapAsync(async (req, res, next) => {
             return next(new ApiError(401, "Refresh token is expired or used"));
         }
 
-        // const options = {
-        //     httpOnly: true,
-        //     secure: process.env.NODE_ENV === "production",
-        // };
+        const options = {
+            httpOnly: true,
+            secure: false,
+            path: "/",
+            maxAge: 24 * 60 * 60 * 1000,
+            sameSite: "Strict",
+        };
 
         const { accessToken, refreshToken: newRefreshToken } =
             await generateAccessAndRefreshTokens(teacher._id);
@@ -137,8 +143,8 @@ export const refreshAccessTokenTeacher = wrapAsync(async (req, res, next) => {
 
         return res
             .status(200)
-            .cookie("accessToken", accessToken)
-            .cookie("refreshToken", newRefreshToken)
+            .cookie("accessToken", accessToken, options)
+            .cookie("refreshToken", newRefreshToken, options)
             .json(
                 new ApiResponse(
                     200,

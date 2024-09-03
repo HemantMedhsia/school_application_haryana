@@ -9,6 +9,7 @@ import {
 import "./index.css";
 import Layout from "./layouts/Layout.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
+import Testing from "./pages/Testing.jsx";
 import Dashboard from "./layouts/Navbar/Dashboard.jsx";
 import RoleBasedAccess from "./pages/RoleBase/RoleBasedAccess.jsx";
 import { AuthProvider } from "./context/AuthProvider.jsx";
@@ -27,6 +28,7 @@ const router = createBrowserRouter(
               // </RoleBasedAccess>
           }
         />
+      <Route path="testing" element={<Testing />} />
       </Route>
     </>
   )
