@@ -10,12 +10,14 @@ import "./index.css";
 import App from "./App.jsx";
 import Layout from "./layouts/Layout.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
+import Testing from "./pages/Testing.jsx";
 
 // Define the routes
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<Layout />}>
       <Route path="login" element={<LoginPage />} />
+      <Route path="testing" element={<Testing />} />
     </Route>
   )
 );

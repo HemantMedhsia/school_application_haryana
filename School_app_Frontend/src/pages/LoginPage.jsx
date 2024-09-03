@@ -1,7 +1,57 @@
-import React from "react";
+import React, { useState } from "react";
+import axios from "axios";
 import LoginForm from "../components/LoginPage/LoginForm";
 
 const LoginPage = () => {
+  const [email, setEmail] = useState("");
+  const [teacherLoginPassword, setTeacherLoginPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    console.log("Attempting to log in with:", { email, teacherLoginPassword });
+    try {
+      const response = await axios.post(
+        "https://school-application-three.vercel.app/api/login-teacher",
+        {
+          email,
+          teacherLoginPassword,
+        },
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      // Handle successful login, e.g., store token, redirect, etc.
+      console.log("Login successful:", response.data);
+    } catch (err) {
+      if (err.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.error("Error response data:", err.response.data);
+        console.error("Error response status:", err.response.status);
+        console.error("Error response headers:", err.response.headers);
+        setError(
+          err.response.data.message ||
+            "Login failed. Please check your credentials and try again."
+        );
+      } else if (err.request) {
+        // The request was made but no response was received
+        console.error("Error request data:", err.request);
+        setError(
+          "No response received from the server. Please try again later."
+        );
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.error("Error message:", err.message);
+        setError("An error occurred. Please try again.");
+      }
+      console.error("Error config:", err.config);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 text-gray-900 flex justify-center">
       <div className="max-w-screen-xl m-0 sm:m-10 bg-white shadow sm:rounded-lg flex justify-center flex-1">
@@ -47,16 +97,20 @@ const LoginPage = () => {
                 </div>
               </div>
 
-              <div className="mx-auto max-w-xs">
+              <form className="mx-auto max-w-xs" onSubmit={handleLogin}>
                 <input
                   className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                   type="email"
                   placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
                 <input
                   className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
                   type="password"
                   placeholder="Password"
+                  value={teacherLoginPassword}
+                  onChange={(e) => setTeacherLoginPassword(e.target.value)}
                 />
                 <button className="mt-5 tracking-wide font-semibold bg-green-400 text-white w-full py-4 rounded-lg hover:bg-green-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none">
                   <svg
@@ -74,6 +128,7 @@ const LoginPage = () => {
                   </svg>
                   <span className="ml-2">Sign In</span>
                 </button>
+                {error && <p className="mt-6 text-xs text-red-600 text-center">{error}</p>}
                 <p className="mt-6 text-xs text-gray-600 text-center">
                   I agree to abide by Cartesian Kinetics
                   <a href="#" className="border-b border-gray-500 border-dotted">
@@ -84,7 +139,7 @@ const LoginPage = () => {
                     Privacy Policy
                   </a>
                 </p>
-              </div>
+              </form>
             </div>
           </div>
         </div>
