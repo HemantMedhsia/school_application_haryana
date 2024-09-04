@@ -29,7 +29,7 @@ const router = createBrowserRouter(
           }
         />
         <Route path="testing" element={<Testing />} />
-        <Route path="student-addmission" element={<StudentAdd/>}/>
+        <Route path="student-admission" element={<StudentAdd/>}/>
         <Route path="student-information" element={<StudnetInfo/>}/>
       </Route>
     </>

@@ -1,12 +1,19 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-const Input = ({ labelName, ...props }) => {
+const Input = ({ labelName, type = "text", ...props }) => {
+  const borderStyle =
+    type === "file"
+      ? "border-2 border-dashed border-gray-300"
+      : "border-[#D5E8EF]";
   return (
     <span className="mx-2 mb-4 flex flex-col">
       <label className="text-sm font-medium leading-none">{labelName}</label>
       <input
-        className="bg-blue-50 mt-3 text-sm w-[220px]  h-9 rounded-[5px] flex items-center p-2.5 gap-3.5 text-[#000000] border-[#D5E8EF]"
+        type={type}
+        className={`bg-blue-50 mt-3 text-sm w-[220px] h-9 rounded-[5px] flex items-center p-2.5 gap-3.5 text-[#000000] border-2 border-gray-300 ${
+          type === "file" ? "file:border-0" : "border-[#D5E8EF]"
+        }`}
         {...props}
       />
     </span>
@@ -264,7 +271,16 @@ const StudentAdd = () => {
           value={formData.admissionDate}
           onChange={handleChange}
         />
+      </div>
 
+      <div className="flex gap-4 flex-wrap mb-4">
+        <Input
+          labelName="Student Photo"
+          name="studentPhoto"
+          type="file"
+          value={formData.studentPhoto}
+          onChange={handleChange}
+        />
       </div>
 
       {/* Submit Button */}

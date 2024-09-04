@@ -32,7 +32,7 @@ const navigation = [
         to: "/school/student-information",
         icon: FaUser,
       },
-      { name: "Student Admission", to: "/student-admission", icon: FaUser },
+      { name: "Student Admission", to: "/school/student-admission", icon: FaUser },
       { name: "Grades", to: "/grades", icon: FaBook },
       { name: "Attendance", to: "/attendance", icon: FaCheckCircle },
     ],
