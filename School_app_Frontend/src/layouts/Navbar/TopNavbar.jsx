@@ -12,11 +12,10 @@ function classNames(...classes) {
 
 const TopNavbar = () => {
   return (
-    <Disclosure as="nav" className="bg-[#283046] rounded-md">
-      <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+    <Disclosure as="nav" className="fixed w-[78.46%] rounded-md top-3 left-[20.25%] inset-x-0 bg-[#283046] shadow-md z-50">
+      <div className="mx-auto w-full px-2 sm:px-6 lg:px-8">
         <div className="relative flex h-16 items-center justify-between">
           <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
-            {/* Mobile menu button */}
             <Disclosure.Button className="inline-flex items-center justify-center p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
               <span className="sr-only">Open main menu</span>
               <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
@@ -59,8 +58,6 @@ const TopNavbar = () => {
               <span className="sr-only">View notifications</span>
               <BellIcon className="h-6 w-6" aria-hidden="true" />
             </button>
-
-            {/* Profile dropdown */}
             <Menu as="div" className="relative ml-3">
               <Menu.Button className="flex rounded-full bg-[#283046] text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                 <span className="sr-only">Open user menu</span>

@@ -1,6 +1,41 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
+const Input = ({ labelName, ...props }) => {
+  return (
+    <span className="mx-2 mb-4 flex flex-col">
+      <label className="text-sm font-medium leading-none">{labelName}</label>
+      <input
+        className="bg-blue-50 mt-3 text-sm w-[220px]  h-9 rounded-[5px] flex items-center p-2.5 gap-3.5 text-[#000000] border-[#D5E8EF]"
+        {...props}
+      />
+    </span>
+  );
+};
+
+const Select = ({ labelName, name, value, onChange, options }) => {
+  return (
+    <span className="mx-2 mb-4 flex flex-col">
+      <label className="text-sm font-medium leading-none">{labelName}</label>
+      <select
+        name={name}
+        value={value}
+        onChange={onChange}
+        className="bg-blue-50 text-xs w-[220px] mt-3 h-9 rounded-[5px] p-2.5 border border-[#D5E8EF]"
+      >
+        <option value="" disabled>
+          Select {labelName}
+        </option>
+        {options.map((option) => (
+          <option key={option.id} value={option.id}>
+            {option.name}
+          </option>
+        ))}
+      </select>
+    </span>
+  );
+};
+
 const StudentAdd = () => {
   const [sessions, setSessions] = useState([]);
   const [classes, setClasses] = useState([]);
@@ -31,11 +66,31 @@ const StudentAdd = () => {
     medicalHistory: "",
   });
 
+  // Fetch data from API
+  const fetchData = async () => {
+    try {
+      const [sessionsResponse, classesResponse, sectionsResponse] =
+        await Promise.all([
+          axios.get("/api/sessions"),
+          axios.get("/api/classes"),
+          axios.get("/api/sections"),
+        ]);
+      setSessions(
+        Array.isArray(sessionsResponse.data) ? sessionsResponse.data : []
+      );
+      setClasses(
+        Array.isArray(classesResponse.data) ? classesResponse.data : []
+      );
+      setSections(
+        Array.isArray(sectionsResponse.data) ? sectionsResponse.data : []
+      );
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
   useEffect(() => {
-    // Fetch data from API
-    axios.get("/api/sessions").then((response) => setSessions(response.data));
-    axios.get("/api/classes").then((response) => setClasses(response.data));
-    axios.get("/api/sections").then((response) => setSections(response.data));
+    fetchData();
   }, []);
 
   const handleChange = (e) => {
@@ -44,192 +99,183 @@ const StudentAdd = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Submit the form data to the server
     console.log(formData);
+    // Submit the form data to the server
   };
 
   return (
-    <form className="max-w-4xl mx-auto" onSubmit={handleSubmit}>
-      {/* First Row */}
-      <div className="flex flex-wrap -mx-2 mb-4">
-        <div className="w-full md:w-1/3 px-2 mb-4 md:mb-0">
-          <label
-            htmlFor="admissionNo"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Admission No
-          </label>
-          <input
-            type="text"
-            name="admissionNo"
-            id="admissionNo"
-            value={formData.admissionNo}
-            onChange={handleChange}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-            required
-          />
-        </div>
-        <div className="w-full md:w-1/3 px-2 mb-4 md:mb-0">
-          <label
-            htmlFor="rollNumber"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Roll Number
-          </label>
-          <input
-            type="text"
-            name="rollNumber"
-            id="rollNumber"
-            value={formData.rollNumber}
-            onChange={handleChange}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-            required
-          />
-        </div>
-        <div className="w-full md:w-1/3 px-2 mb-4 md:mb-0">
-          <label
-            htmlFor="studentLoginPassword"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Login Password
-          </label>
-          <input
-            type="password"
-            name="studentLoginPassword"
-            id="studentLoginPassword"
-            value={formData.studentLoginPassword}
-            onChange={handleChange}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-            required
-          />
-        </div>
+    <form
+      className="max-w-full mx-auto p-6 bg-[#283046] rounded-lg shadow-md"
+      onSubmit={handleSubmit}
+    >
+      <h2 className="text-2xl font-bold mb-6 text-gray-800">Add Student</h2>
+
+      {/* Admission No, Roll Number, and Login Password */}
+      <div className="flex gap-4 flex-wrap mb-4">
+        <Input
+          labelName="Admission No"
+          name="admissionNo"
+          value={formData.admissionNo}
+          onChange={handleChange}
+        />
+        <Input
+          labelName="Roll Number"
+          name="rollNumber"
+          value={formData.rollNumber}
+          onChange={handleChange}
+        />
+        <Input
+          labelName="Login Password"
+          type="password"
+          name="studentLoginPassword"
+          value={formData.studentLoginPassword}
+          onChange={handleChange}
+        />
+        <Input
+          labelName="First Name"
+          name="firstName"
+          value={formData.firstName}
+          onChange={handleChange}
+        />
       </div>
 
-      {/* Second Row */}
-      <div className="flex flex-wrap -mx-2 mb-4">
-        <div className="w-full md:w-1/3 px-2 mb-4 md:mb-0">
-          <label
-            htmlFor="firstName"
-            className="block text-sm font-medium text-gray-700"
-          >
-            First Name
-          </label>
-          <input
-            type="text"
-            name="firstName"
-            id="firstName"
-            value={formData.firstName}
-            onChange={handleChange}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-            required
-          />
-        </div>
-        <div className="w-full md:w-1/3 px-2 mb-4 md:mb-0">
-          <label
-            htmlFor="lastName"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Last Name
-          </label>
-          <input
-            type="text"
-            name="lastName"
-            id="lastName"
-            value={formData.lastName}
-            onChange={handleChange}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-            required
-          />
-        </div>
-        <div className="w-full md:w-1/3 px-2 mb-4 md:mb-0">
-          <label
-            htmlFor="gender"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Gender
-          </label>
-          <select
-            name="gender"
-            id="gender"
-            value={formData.gender}
-            onChange={handleChange}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-            required
-          >
-            <option value="" disabled>
-              Select Gender
-            </option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Other">Other</option>
-          </select>
-        </div>
+      {/* First Name, Last Name, and Gender */}
+      <div className="flex gap-4 flex-wrap mb-4">
+        <Input
+          labelName="Last Name"
+          name="lastName"
+          value={formData.lastName}
+          onChange={handleChange}
+        />
+        <Select
+          labelName="Gender"
+          name="gender"
+          value={formData.gender}
+          onChange={handleChange}
+          options={[
+            { id: "Male", name: "Male" },
+            { id: "Female", name: "Female" },
+            { id: "Other", name: "Other" },
+          ]}
+        />
+        <Input
+          labelName={"Date of Birth"}
+          name="dateOfBirth"
+          type="date"
+          value={formData.dateOfBirth}
+          onChange={handleChange}
+        />
+        <Input
+          labelName="Religion"
+          name="religion"
+          value={formData.religion}
+          onChange={handleChange}
+        />
       </div>
 
-      {/* Third Row */}
-      <div className="flex flex-wrap -mx-2 mb-4">
-        <div className="w-full md:w-1/3 px-2 mb-4 md:mb-0">
-          <label
-            htmlFor="dateOfBirth"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Date of Birth
-          </label>
-          <input
-            type="date"
-            name="dateOfBirth"
-            id="dateOfBirth"
-            value={formData.dateOfBirth}
-            onChange={handleChange}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-            required
-          />
-        </div>
-        <div className="w-full md:w-1/3 px-2 mb-4 md:mb-0">
-          <label
-            htmlFor="category"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Category
-          </label>
-          <input
-            type="text"
-            name="category"
-            id="category"
-            value={formData.category}
-            onChange={handleChange}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-            required
-          />
-        </div>
-        <div className="w-full md:w-1/3 px-2 mb-4 md:mb-0">
-          <label
-            htmlFor="religion"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Religion
-          </label>
-          <input
-            type="text"
-            name="religion"
-            id="religion"
-            value={formData.religion}
-            onChange={handleChange}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-            required
-          />
-        </div>
+      <div className="flex gap-4 flex-wrap mb-4">
+        <Select
+          labelName="Category"
+          name="category"
+          value={formData.category}
+          onChange={handleChange}
+          options={[
+            { id: "General", name: "General" },
+            { id: "Obc", name: "Obc" },
+            { id: "Sc", name: "St" },
+            { id: "St", name: "St" },
+          ]}
+        />
+        <Input
+          labelName="Mobile Number"
+          name="mobileNumber"
+          value={formData.mobileNumber}
+          onChange={handleChange}
+        />
+        <Input
+          labelName="Email"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+        />
+        <Input
+          labelName="Blood Group"
+          name="bloodGroup"
+          value={formData.bloodGroup}
+          onChange={handleChange}
+        />
       </div>
 
-      {/* Additional Rows */}
-      {/* Add more fields in the same structure as above */}
+      {/* House , Height ,Weight */}
+      <div className="flex flex-wrap gap-4 mb-4">
+        <Input
+          labelName="House"
+          name="house"
+          value={formData.house}
+          onChange={handleChange}
+        />
+        <Input
+          labelName="Height"
+          name="height"
+          value={formData.height}
+          onChange={handleChange}
+        />
+        <Input
+          labelName="Weight"
+          name="weight"
+          value={formData.weight}
+          onChange={handleChange}
+        />
+        <Input
+          labelName="Medical History"
+          name="medicalHistory"
+          value={formData.medicalHistory}
+          onChange={handleChange}
+        />
+      </div>
 
-      <button
-        type="submit"
-        className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-      >
-        Submit
-      </button>
+      {/* Dropdowns for Session, Class, and Section */}
+      <div className="flex gap-4 flex-wrap mb-4">
+        <Select
+          labelName="Current Session"
+          name="currentSession"
+          value={formData.currentSession}
+          onChange={handleChange}
+          options={sessions}
+        />
+        <Select
+          labelName="Current Class"
+          name="currentClass"
+          value={formData.currentClass}
+          onChange={handleChange}
+          options={classes}
+        />
+        <Select
+          labelName="Current Section"
+          name="currentSection"
+          value={formData.currentSection}
+          onChange={handleChange}
+          options={sections}
+        />
+        <Input
+          labelName={"Admission Date"}
+          name="admissionDate"
+          type="date"
+          value={formData.admissionDate}
+          onChange={handleChange}
+        />
+
+      </div>
+
+      {/* Submit Button */}
+      <div className="flex justify-end">
+        <button
+          type="submit"
+          className="bg-blue-500 text-white font-semibold py-2 px-6 rounded-md hover:bg-blue-600 transition duration-200 ease-in-out"
+        >
+          Add Student
+        </button>
+      </div>
     </form>
   );
 };

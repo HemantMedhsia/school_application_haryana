@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+.body {
+  overflow: hidden;
+}
 .custom-select {
     appearance: none;
     -webkit-appearance: none;
