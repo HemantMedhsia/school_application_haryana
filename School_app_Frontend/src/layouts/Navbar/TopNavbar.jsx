@@ -12,7 +12,7 @@ function classNames(...classes) {
 
 const TopNavbar = () => {
   return (
-    <Disclosure as="nav" className="fixed w-[78.46%] rounded-md top-3 left-[20.25%] inset-x-0 bg-[#283046] shadow-md z-50">
+    <Disclosure as="nav" className="fixed w-[1230px] left-[17%] top-3 rounded-md mx-3 inset-x-0 bg-[#283046] shadow-md z-50">
       <div className="mx-auto w-full px-2 sm:px-6 lg:px-8">
         <div className="relative flex h-16 items-center justify-between">
           <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">

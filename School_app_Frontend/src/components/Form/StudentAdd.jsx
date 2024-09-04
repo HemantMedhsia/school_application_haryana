@@ -206,6 +206,39 @@ const StudentAdd = () => {
         />
       </div>
 
+      <div className="flex gap-4 flex-wrap mb-4">
+        <Select
+          labelName="Category"
+          name="category"
+          value={formData.category}
+          onChange={handleChange}
+          options={[
+            { id: "General", name: "General" },
+            { id: "Obc", name: "Obc" },
+            { id: "Sc", name: "St" },
+            { id: "St", name: "St" },
+          ]}
+        />
+        <Input
+          labelName="Mobile Number"
+          name="mobileNumber"
+          value={formData.mobileNumber}
+          onChange={handleChange}
+        />
+        <Input
+          labelName="Email"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+        />
+        <Input
+          labelName="Blood Group"
+          name="bloodGroup"
+          value={formData.bloodGroup}
+          onChange={handleChange}
+        />
+      </div>
+
       {/* House , Height ,Weight */}
       <div className="flex flex-wrap gap-4 mb-4">
         <Input
@@ -266,6 +299,7 @@ const StudentAdd = () => {
         />
 
       </div>
+      
 
       {/* Submit Button */}
       <div className="flex justify-end">
