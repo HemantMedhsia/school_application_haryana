@@ -20,3 +20,40 @@
 .custom-option:hover {
     background-color: #f0f0f0;
 }
+
+.pagination {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  justify-content: center;
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+.page-item {
+  margin: 0 5px;
+}
+
+.page-link {
+  padding: 8px 8px;
+  border: 1px solid #ccc;
+  color: #007bff;
+  text-decoration: none;
+  border-radius: 50%; /* Make the border radius 50% for a round shape */
+  transition: background-color 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px; /* Set a fixed width */
+  height: 30px; /* Set a fixed height */
+}
+
+.page-link:hover {
+  background-color: #e9ecef;
+}
+
+.page-item.active .page-link {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}

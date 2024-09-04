@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom"; // Import Link from react-router-dom
 import {
   FaHome,
   FaUsers,
@@ -19,35 +20,40 @@ import {
 import aradhyaTechLogo from "../../assets/pngegg.png";
 
 const navigation = [
-  { name: "Dashboard", href: "#", icon: FaHome, current: true },
+  { name: "Dashboard", to: "/", icon: FaHome, current: true },
   {
     name: "Student",
-    href: "#",
+    to: "#",
     icon: FaUsers,
     current: false,
     children: [
-      { name: "Student Information", href: "#profile", icon: FaUser },
-      { name: "Grades", href: "#grades", icon: FaBook },
-      { name: "Attendance", href: "#attendance", icon: FaCheckCircle },
+      {
+        name: "Student Information",
+        to: "/school/student-information",
+        icon: FaUser,
+      },
+      { name: "Student Admission", to: "/student-admission", icon: FaUser },
+      { name: "Grades", to: "/grades", icon: FaBook },
+      { name: "Attendance", to: "/attendance", icon: FaCheckCircle },
     ],
   },
   {
     name: "Teacher",
-    href: "#",
+    to: "#",
     icon: FaProjectDiagram,
     current: false,
     children: [
-      { name: "Profile", href: "#profile", icon: FaUser },
-      { name: "Grades", href: "#grades", icon: FaBook },
-      { name: "Attendance", href: "#attendance", icon: FaCheckCircle },
+      { name: "Profile", to: "/teacher-profile", icon: FaUser },
+      { name: "Grades", to: "/teacher-grades", icon: FaBook },
+      { name: "Attendance", to: "/teacher-attendance", icon: FaCheckCircle },
     ],
   },
-  { name: "Parents", href: "#", icon: FaUserFriends, current: false },
-  { name: "Staff", href: "#", icon: FaUserTie, current: false },
-  { name: "Time Table", href: "#", icon: FaClock, current: false },
-  { name: "Exams", href: "#", icon: FaPen, current: false },
-  { name: "Marks", href: "#", icon: FaChartLine, current: false },
-  { name: "Notice", href: "#", icon: FaBell, current: false },
+  { name: "Parents", to: "/parents", icon: FaUserFriends, current: false },
+  { name: "Staff", to: "/staff", icon: FaUserTie, current: false },
+  { name: "Time Table", to: "/time-table", icon: FaClock, current: false },
+  { name: "Exams", to: "/exams", icon: FaPen, current: false },
+  { name: "Marks", to: "/marks", icon: FaChartLine, current: false },
+  { name: "Notice", to: "/notice", icon: FaBell, current: false },
 ];
 
 function classNames(...classes) {
@@ -73,8 +79,8 @@ const LeftNavbar = () => {
         <nav className="flex flex-col flex-grow p-4 space-y-2">
           {navigation.map((item) => (
             <div key={item.name}>
-              <a
-                href={item.href}
+              <Link
+                to={item.to}
                 className={classNames(
                   item.current
                     ? "bg-gray-900 text-white"
@@ -96,18 +102,18 @@ const LeftNavbar = () => {
                     )}
                   </span>
                 )}
-              </a>
+              </Link>
               {item.children && dropdownOpen[item.name] && (
                 <div className="ml-6 mt-2 space-y-1 transition-all duration-300 ease-in-out">
                   {item.children.map((child) => (
-                    <a
+                    <Link
                       key={child.name}
-                      href={child.href}
+                      to={child.to}
                       className="text-gray-300 hover:bg-gray-700 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md"
                     >
                       <child.icon className="mr-3 h-5 w-5" aria-hidden="true" />
                       {child.name}
-                    </a>
+                    </Link>
                   ))}
                 </div>
               )}
