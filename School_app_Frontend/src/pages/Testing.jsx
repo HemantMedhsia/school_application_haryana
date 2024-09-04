@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { fetchGetAPI } from "../utility/api/apiCall";
+// import { fetchGetAPI } from "../utility/api/apiCall";
 import TrafficChart from "../common/Charts/TrafficChart";
 import BarChart from "../common/Charts/BarChart";
 import DataTable from "../common/Datatables/Datatable";
+import {getAPI} from "../utility/api/apiCall.js";
 
 const Testing = () => {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    fetchGetAPI("getAllTeachers", {}, setData);
+    getAPI("getAllTeachers", {}, setData);
   }, []);
 
   const trafficChartData = {

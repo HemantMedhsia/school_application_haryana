@@ -1,54 +1,49 @@
-import axios from 'axios';
-import Cookies from 'js-cookie';
-import { getHeaders } from '.';
-import { getApiConfig } from './config';
+import axios from "axios";
+import { getApiConfig } from "./config.js";
+// import getHeaders from "./index.js"
 
-// Fetch Get API function
-export const fetchGetAPI = async (apiName, params = {}, setData) => {
+const getHeaders = (requestHeaders) => {
+    const headers = {};
+    const token = localStorage.getItem("accessToken");
+    requestHeaders.forEach((header) => {
+        switch (header) {
+            case "access-token":
+                if (token) {
+                    headers["Authorization"] = `Bearer ${token}`;
+                } else {
+                    console.warn("Access token not found in localStorage.");
+                }
+                break;
+            case "typeApplication":
+                headers["Content-Type"] = "application/json";
+                break;
+            default:
+                console.warn(`Unrecognized header type: ${header}`);
+                break;
+        }
+    });
+    return headers;
+}
+
+export async function getAPI(apiName, params={}, setData) {
+    const BASE_URL = "https://school-application-three.vercel.app/api";
     try {
-        // Validate and retrieve headers
-        const requestHeaders = ["access-token"];
-        const headers = getHeaders(requestHeaders);
-
-        console.log('Request Headers:', headers); // Debugging: Log headers
-
-        // Ensure params is an object
-        if (typeof params !== 'object' || params === null) {
-            params = {};
-        }
-
-        // Ensure apiName is a string
-        if (typeof apiName !== 'string') {
-            throw new TypeError('apiName must be a string');
-        }
-
-        // Construct the URL
-        const baseUrl = 'https://school-application-three.vercel.app/api';
-        const apiConfig = getApiConfig[apiName];
-        if (!apiConfig || !apiConfig.url) {
-            throw new Error(`Invalid API configuration for apiName: ${apiName}`);
-        }
-        const url = `${baseUrl}${apiConfig.url}`;
-        console.log('Request URL:', url); // Debugging: Log the URL
-
-        // Axios configuration
         const config = {
-            method: 'get',
-            url: url,
-            headers: headers,
-            params: params,
-            withCredentials: true, // Required to include cookies in requests
+            method: getApiConfig[apiName].method,
+            headers: getHeaders(["access-token"]),
+            url: BASE_URL + getApiConfig[apiName].url,
+            params: params
         };
-
-        // Make the API request
         const response = await axios(config);
-        console.log('API response:', response);
-
-        // Set data if provided
-        if (setData) {
-            setData(response.data);
-        }
-    } catch (error) {
-        console.error('Error making API call:', error.response ? error.response.data : error.message);
+        console.log("API call successful:", response.data);
+        setData(response.data.data);
+        return response?.data;
+        
     }
-};
+    catch (error) {
+        console.error("API call failed:", error.response.data, error.response.status);
+        setData(error.response.data.message);
+
+        return error;
+    }
+}

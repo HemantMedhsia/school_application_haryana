@@ -13,6 +13,7 @@ import Testing from "./pages/Testing.jsx";
 import Dashboard from "./layouts/Navbar/Dashboard.jsx";
 import RoleBasedAccess from "./pages/RoleBase/RoleBasedAccess.jsx";
 import { AuthProvider } from "./context/AuthProvider.jsx";
+import StudentAdd from "./components/Form/StudentAdd.jsx";
 import StudnetInfo from "./pages/StudnetInfo.jsx";
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -28,6 +29,7 @@ const router = createBrowserRouter(
           }
         />
         <Route path="testing" element={<Testing />} />
+        <Route path="student-addmission" element={<StudentAdd/>}/>
         <Route path="student-information" element={<StudnetInfo/>}/>
       </Route>
     </>
