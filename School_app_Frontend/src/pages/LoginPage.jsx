@@ -24,8 +24,15 @@ const LoginPage = () => {
           },
         }
       );
-      // Handle successful login, e.g., store token, redirect, etc.
+
       console.log("Login successful:", response.data);
+
+      const { accessToken, refreshToken } = response.data.data;
+      console.log("Access token:", accessToken);
+      console.log("Refresh token:", refreshToken);
+
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("refreshToken", refreshToken);
     } catch (err) {
       if (err.response) {
         // The request was made and the server responded with a status code
@@ -128,14 +135,24 @@ const LoginPage = () => {
                   </svg>
                   <span className="ml-2">Sign In</span>
                 </button>
-                {error && <p className="mt-6 text-xs text-red-600 text-center">{error}</p>}
+                {error && (
+                  <p className="mt-6 text-xs text-red-600 text-center">
+                    {error}
+                  </p>
+                )}
                 <p className="mt-6 text-xs text-gray-600 text-center">
                   I agree to abide by Cartesian Kinetics
-                  <a href="#" className="border-b border-gray-500 border-dotted">
+                  <a
+                    href="#"
+                    className="border-b border-gray-500 border-dotted"
+                  >
                     Terms of Service
                   </a>
                   and its
-                  <a href="#" className="border-b border-gray-500 border-dotted">
+                  <a
+                    href="#"
+                    className="border-b border-gray-500 border-dotted"
+                  >
                     Privacy Policy
                   </a>
                 </p>
