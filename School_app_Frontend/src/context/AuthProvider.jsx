@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import Cookies from "js-cookie";
-import { jwtDecode } from "jwt-decode";
-
+import {jwtDecode} from "jwt-decode";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -33,7 +32,7 @@ export const AuthProvider = ({ children }) => {
     setAuthToken(token);
     const decodedToken = jwtDecode(token);
     setUserRole(decodedToken.role);
-    Cookies.set("accessToken", token, { expires: 30 / 1440 });
+    Cookies.set("accessToken", token, { expires: 1 });
   };
 
   const logout = () => {

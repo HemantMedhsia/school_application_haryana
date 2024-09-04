@@ -1,15 +1,22 @@
 import Cookies from "js-cookie";
 
 export const getHeaders = async (requestHeaders) => {
-  // Retrieve the token from cookies
-  const token = Cookies.get("accessToken"); // No need for await here
-  console.log("Access token:", token); // Debugging log to verify token
-  // Initialize headers object
+  const token = Cookies.get("accessToken");
+  if (!token) {
+    console.warn("Access token not found in cookies.");
+  } else {
+    console.log("Access token:", token);
+  }
+
   const headers = {};
 
-  Cookies.set("accessToken2", "example-token", { expires: 7, path: "/" , sameSite: "None", secure: true}); // Set cookie
+  Cookies.set("accessToken2", "example-token", {
+    expires: 7,
+    path: "/",
+    sameSite: "None",
+    secure: true,
+  });
 
-  // Get cookie
   const token2 = Cookies.get("accessToken2");
   console.log("Access token2:", token2);
 
@@ -18,7 +25,7 @@ export const getHeaders = async (requestHeaders) => {
     switch (header) {
       case "access-token":
         if (token) {
-          headers["Authorization"] = `Bearer ${token}`; // Use token from cookies
+          headers["Authorization"] = `Bearer ${token}`;
         } else {
           console.warn("Access token not found in cookies.");
         }
@@ -27,12 +34,12 @@ export const getHeaders = async (requestHeaders) => {
         headers["Content-Type"] = "application/json";
         break;
       default:
-        console.warn(`Unrecognized header type: ${header}`); // Added logging for unexpected headers
+        console.warn(`Unrecognized header type: ${header}`);
         break;
     }
   });
 
-  console.log("Constructed headers:", headers); // Debugging log to verify headers
+  console.log("Constructed headers:", headers);
 
   return headers;
 };

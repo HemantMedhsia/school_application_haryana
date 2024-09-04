@@ -13,7 +13,6 @@ import Testing from "./pages/Testing.jsx";
 import Dashboard from "./layouts/Navbar/Dashboard.jsx";
 import RoleBasedAccess from "./pages/RoleBase/RoleBasedAccess.jsx";
 import { AuthProvider } from "./context/AuthProvider.jsx";
-import Footer from "./layouts/Footer/Footer.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -24,8 +23,8 @@ const router = createBrowserRouter(
           path="dashboard"
           element={
             // <RoleBasedAccess allowedRoles={["admin", "student"]}>
-            <Dashboard  />
-            // </RoleBasedAccess>
+            <Dashboard />
+              // </RoleBasedAccess>
           }
         />
         <Route path="testing" element={<Testing />} />
