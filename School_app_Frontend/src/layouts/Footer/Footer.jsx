@@ -2,7 +2,9 @@ import React from "react";
 
 const Footer = () => {
   return (
-  <h1>I am footer</h1>
+    <footer className="bg-[#283046] text-white text-center p-4">
+      © {new Date().getFullYear()} Your Company. All rights reserved.
+    </footer>
   );
 };
 
