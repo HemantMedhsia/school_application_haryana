@@ -1,91 +1,107 @@
 import React from "react";
 
-const LoginForm = () => {
+const LoginForm = ({
+  email,
+  setEmail,
+  teacherLoginPassword,
+  setTeacherLoginPassword,
+  handleLogin,
+  error,
+  role,
+  setRole,
+}) => {
   return (
-    <form autoComplete="off">
-      <p className="text-red-500"></p>
-      <div className="space-y-2">
+    <div className="max-w-screen-xl m-0 sm:m-10 bg-white shadow sm:rounded-lg flex justify-center flex-1">
+      <div className="lg:w-1/2 xl:w-5/12 p-6 sm:p-12">
         <div>
-          <label htmlFor="email" className="text-gray-600 mb-2 block">
-            Email address
-          </label>
-          <input
-            type="email"
-            name="email"
-            id="email"
-            className="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-teal-500 placeholder-gray-400"
-            placeholder="youremail.@domain.com"
+          <img
+            src="https://drive.google.com/uc?export=view&id=1MFiKAExRFF0-2YNpAZzIu1Sh52J8r16v"
+            className="mx-auto"
+            alt="Logo"
           />
         </div>
-      </div>
-      <div className="space-y-2">
-        <div>
-          <label htmlFor="password" className="text-gray-600 mb-2 block">
-            Password
-          </label>
-          <div className="relative">
-            <input
-              type="password"
-              name="password"
-              id="password"
-              className="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-teal-500 placeholder-gray-400"
-              placeholder="***********"
-            />
-            <div className="cursor-pointer absolute inset-y-0 right-0 flex items-center px-8 text-gray-600 border-l border-gray-300">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="1.5"
-                stroke="currentColor"
-                className="w-5 h-5"
-              >
-                <path
+        <div className="mt-12 flex flex-col items-center">
+          <div className="w-full flex-1 mt-8">
+            <form className="mx-auto max-w-xs" onSubmit={handleLogin}>
+              <input
+                className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <input
+                className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                type="password"
+                placeholder="Password"
+                value={teacherLoginPassword}
+                onChange={(e) => setTeacherLoginPassword(e.target.value)}
+              />
+
+              {/* Role Selection */}
+              <div className="mt-5">
+                <select
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
+                >
+                  <option value="Teacher">Teacher</option>
+                  <option value="Student">Student</option>
+                  <option value="Admin">Admin</option>
+                </select>
+              </div>
+
+              <button className="mt-5 tracking-wide font-semibold bg-green-400 text-white w-full py-4 rounded-lg hover:bg-green-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none">
+                <svg
+                  className="w-6 h-6 -ml-2"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-              </svg>
-            </div>
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                  <circle cx="8.5" cy="7" r="4" />
+                  <path d="M20 8v6M23 11h-6" />
+                </svg>
+                <span className="ml-2">Sign In</span>
+              </button>
+              {error && (
+                <p className="mt-6 text-xs text-red-600 text-center">
+                  {error}
+                </p>
+              )}
+              <p className="mt-6 text-xs text-gray-600 text-center">
+                I agree to abide by Cartesian Kinetics
+                <a
+                  href="#"
+                  className="border-b border-gray-500 border-dotted"
+                >
+                  Terms of Service
+                </a>
+                and its
+                <a
+                  href="#"
+                  className="border-b border-gray-500 border-dotted"
+                >
+                  Privacy Policy
+                </a>
+              </p>
+            </form>
           </div>
         </div>
       </div>
-      <div className="space-y-2">
-        <div>
-          <label htmlFor="password" className="text-gray-600 mb-2 block">
-            Login as
-          </label>
-          <div>
-            <select className="custom-select custom-option block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-teal-500">
-              <option value="student">Student</option>
-              <option value="teacher">Teacher</option>
-              <option value="admin">Admin</option>
-              <option value="parent">Parent</option>
-              <option value="staff">Working Staff</option>
-            </select>
-          </div>
-        </div>
+      <div className="flex-1 bg-green-100 text-center hidden lg:flex">
+        <div
+          className="m-12 xl:m-16 w-full bg-contain bg-center bg-no-repeat"
+          style={{
+            backgroundImage:
+              "url('https://drive.google.com/uc?export=view&id=1KZ_Ub_2lZ0dHbKV0fAIhxVhiQA183RCz')",
+          }}
+        ></div>
       </div>
-      <div className="mt-4">
-        <button
-          type="submit"
-          className="block w-full py-2 text-center text-white bg-teal-500 border border-teal-500 rounded hover:bg-transparent hover:text-teal-500 transition uppercase font-roboto font-medium"
-        >
-          Login
-        </button>
-        <div className="flex gap-2 pt-5">
-          <p className="text-gray-600 text-sm">Don't have an account?</p>
-          <a className="text-gray-600 text-sm underline" href="/register">
-            Register here
-          </a>
-        </div>
-      </div>
-    </form>
+    </div>
   );
 };
 
