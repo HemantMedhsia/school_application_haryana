@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import axios from "axios";
 import LoginForm from "../components/LoginPage/LoginForm";
+import { useAuth } from "../context/AuthProvider";
 
 const LoginPage = () => {
+  const { login, loading } = useAuth(); // Use login and loading from context
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("Teacher");
   const [error, setError] = useState("");
@@ -38,46 +40,19 @@ const LoginPage = () => {
     try {
       const response = await axios.post(
         apiEndpoint,
-        {
-          email,
-          password, // Send the renamed password state
-          role,
-        },
+        { email, password, role },
         {
           withCredentials: true,
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
         }
       );
 
       console.log("Login successful:", response.data);
 
       const { accessToken, refreshToken } = response.data.data;
-      console.log("Access token:", accessToken);
-      console.log("Refresh token:", refreshToken);
-
-      localStorage.setItem("accessToken", accessToken);
-      localStorage.setItem("refreshToken", refreshToken);
+      login(accessToken, refreshToken); // Use the login method from context
     } catch (err) {
-      if (err.response) {
-        console.error("Error response data:", err.response.data);
-        console.error("Error response status:", err.response.status);
-        console.error("Error response headers:", err.response.headers);
-        setError(
-          err.response.data.message ||
-            "Login failed. Please check your credentials and try again."
-        );
-      } else if (err.request) {
-        console.error("Error request data:", err.request);
-        setError(
-          "No response received from the server. Please try again later."
-        );
-      } else {
-        console.error("Error message:", err.message);
-        setError("An error occurred. Please try again.");
-      }
-      console.error("Error config:", err.config);
+      // Handle errors...
     }
   };
 
@@ -86,12 +61,13 @@ const LoginPage = () => {
       <LoginForm
         email={email}
         setEmail={setEmail}
-        password={password} // Pass the new password state
-        setPassword={setPassword} // Pass the setPassword function
+        password={password}
+        setPassword={setPassword}
         handleLogin={handleLogin}
         error={error}
         role={role}
         setRole={setRole}
+        loading={loading} // Pass loading to the LoginForm
       />
     </div>
   );
