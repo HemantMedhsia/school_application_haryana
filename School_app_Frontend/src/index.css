@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+  font-family: 'Poppins', sans-serif;
+}
+
 .custom-select {
     appearance: none;
     -webkit-appearance: none;
@@ -69,4 +73,16 @@
 /* Hide scrollbar for Chrome, Safari, and Opera */
 *::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera */
+}
+
+/* For inputs */
+input::placeholder {
+  color: #40475a; /* Adjust this color as needed */
+  opacity: 1; /* Ensure the placeholder is fully opaque */
+}
+
+/* For selects (not directly applicable, but if you style it, use this) */
+select::placeholder {
+  color: #40475a; /* Adjust this color as needed */
+  opacity: 1; /* Ensure the placeholder is fully opaque */
 }

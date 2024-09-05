@@ -1,5 +1,6 @@
 import React from "react";
 import Datatable from "../common/Datatables/Datatable";
+import SearchBar from "../common/SearchBar/SearchBar";
 
 const StudentInfo = () => {
   // Sample student data with additional fields
@@ -124,6 +125,7 @@ const StudentInfo = () => {
 
   return (
     <div className="">
+      <SearchBar/>
       <Datatable data={studentData} columns={columns} />
     </div>
   );
