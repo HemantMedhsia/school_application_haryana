@@ -71,7 +71,9 @@ const LeftNavbar = () => {
   };
 
   return (
-    <div className="fixed top-0 left-0 w-64 h-screen bg-[#283046]"> {/* h-[calc(100vh-4rem)] for full height minus TopNavbar height */}
+    <div className="fixed top-0 left-0 w-64 h-full bg-[#283046]">
+      {" "}
+      {/* Adjust to full height */}
       <div className="flex flex-col h-full bg-[#283046] text-white">
         <div className="flex items-center justify-center h-16 bg-[#283046]">
           <img src={aradhyaTechLogo} alt="Logo" className="h-16 w-auto mt-2" />
