@@ -15,4 +15,20 @@ export const getApiConfig = {
         url: "/get-all-teachers", // Corrected URL to start with '/'
         method: "GET"
     },
+    getAllSubjects: {
+        url: "/all-subject",
+        method: "GET"
+    },
+    getAllClasses: {    
+        url: "/all-class",
+        method: "GET"
+    },
+    getAllSections: {
+        url: "/get-all-sections",
+        method: "GET"
+    },
+    getAllSessions: {
+        url: "/get-all-sessions",
+        method: "GET"
+    },
 };

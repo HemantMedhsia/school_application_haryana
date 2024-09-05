@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { getAPI } from "../../utility/api/apiCall";
 
 const Input = ({ labelName, type = "text", ...props }) => {
   const borderStyle =
@@ -78,10 +78,16 @@ const StudentAdd = () => {
     try {
       const [sessionsResponse, classesResponse, sectionsResponse] =
         await Promise.all([
-          axios.get("/api/sessions"),
-          axios.get("/api/classes"),
-          axios.get("/api/sections"),
+          //   axios.get("/api/sessions"),
+          //   axios.get("/api/classes"),
+          //   axios.get("/api/sections"),
+          getAPI("getAllSessions", {}, setSessions),
+          getAPI("getAllClasses", {}, setClasses),
+          getAPI("getAllSections", {}, setSections),
         ]);
+      console.log("Sessions:", sessionsResponse.data);
+      console.log("Classes:", classesResponse.data);
+      console.log("Sections:", sectionsResponse.data);
       setSessions(
         Array.isArray(sessionsResponse.data) ? sessionsResponse.data : []
       );
@@ -107,7 +113,6 @@ const StudentAdd = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log(formData);
-    // Submit the form data to the server
   };
 
   return (
@@ -118,7 +123,7 @@ const StudentAdd = () => {
       <h2 className="text-2xl font-bold mb-6 text-gray-800">Add Student</h2>
 
       {/* Admission No, Roll Number, and Login Password */}
-      <div className="flex gap-4 flex-wrap mb-4">
+      <div className="flex gap-8 flex-wrap mb-4">
         <Input
           labelName="Admission No"
           name="admissionNo"
@@ -147,7 +152,7 @@ const StudentAdd = () => {
       </div>
 
       {/* First Name, Last Name, and Gender */}
-      <div className="flex gap-4 flex-wrap mb-4">
+      <div className="flex gap-8 flex-wrap mb-4">
         <Input
           labelName="Last Name"
           name="lastName"
@@ -180,7 +185,7 @@ const StudentAdd = () => {
         />
       </div>
 
-      <div className="flex gap-4 flex-wrap mb-4">
+      <div className="flex gap-8 flex-wrap mb-4">
         <Select
           labelName="Category"
           name="category"
@@ -213,7 +218,7 @@ const StudentAdd = () => {
         />
       </div>
 
-      <div className="flex gap-4 flex-wrap mb-4">
+      <div className="flex gap-8 flex-wrap mb-4">
         <Select
           labelName="Category"
           name="category"
@@ -222,7 +227,7 @@ const StudentAdd = () => {
           options={[
             { id: "General", name: "General" },
             { id: "Obc", name: "Obc" },
-            { id: "Sc", name: "St" },
+            { id: "Sc", name: "Sc" },
             { id: "St", name: "St" },
           ]}
         />
@@ -247,7 +252,7 @@ const StudentAdd = () => {
       </div>
 
       {/* House , Height ,Weight */}
-      <div className="flex flex-wrap gap-4 mb-4">
+      <div className="flex flex-wrap gap-8 mb-4">
         <Input
           labelName="House"
           name="house"
@@ -275,28 +280,38 @@ const StudentAdd = () => {
       </div>
 
       {/* Dropdowns for Session, Class, and Section */}
-      <div className="flex gap-4 flex-wrap mb-4">
+      <div className="flex gap-8 flex-wrap mb-4">
         <Select
           labelName="Current Session"
           name="currentSession"
           value={formData.currentSession}
           onChange={handleChange}
-          options={sessions}
+          options={sessions.map((session) => ({
+            id: session._id, // ensure you're using the correct field for ID
+            name: session.sessionYear, // or session.name, depending on the API response
+          }))}
         />
         <Select
           labelName="Current Class"
           name="currentClass"
           value={formData.currentClass}
           onChange={handleChange}
-          options={classes}
+          options={classes.map((classItem) => ({
+            id: classItem._id, // ensure you're using the correct field for ID
+            name: classItem.name, // or classItem.name, depending on the API response
+          }))}
         />
         <Select
           labelName="Current Section"
           name="currentSection"
           value={formData.currentSection}
           onChange={handleChange}
-          options={sections}
+          options={sections.map((sectionItem) => ({
+            id: sectionItem._id, // ensure you're using the correct field for ID
+            name: sectionItem.name, // or sectionItem.name, depending on the API response
+          }))}
         />
+
         <Input
           labelName={"Admission Date"}
           name="admissionDate"
@@ -306,7 +321,7 @@ const StudentAdd = () => {
         />
       </div>
 
-      <div className="flex gap-4 flex-wrap mb-4">
+      {/* <div className="flex gap-4 flex-wrap mb-4">
         <Input
           labelName="Student Photo"
           name="studentPhoto"
@@ -314,8 +329,7 @@ const StudentAdd = () => {
           value={formData.studentPhoto}
           onChange={handleChange}
         />
-      </div>
-      
+      </div> */}
 
       {/* Submit Button */}
       <div className="flex justify-end">
