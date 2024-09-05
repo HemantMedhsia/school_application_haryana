@@ -38,9 +38,9 @@ export const createStaff = wrapAsync(async (req, res) => {
 });
 
 export const loginStaff = wrapAsync(async (req, res, next) => {
-    const { email, staffLoginPassword, role } = req.body;
+    const { email, password, role } = req.body;
 
-    if (!email || !staffLoginPassword || !role) {
+    if (!email || !password || !role) {
         return next(
             new ApiError(400, "Email, password, and role are required")
         );
@@ -55,7 +55,7 @@ export const loginStaff = wrapAsync(async (req, res, next) => {
 
     console.log("staff found:", staff.email);
 
-    const isPasswordValid = await staff.isValidPassword(staffLoginPassword);
+    const isPasswordValid = await staff.isValidPassword(password);
     console.log("Is password valid:", isPasswordValid);
 
     if (!isPasswordValid) {
@@ -75,7 +75,7 @@ export const loginStaff = wrapAsync(async (req, res, next) => {
     await staff.save();
 
     const loggedInstaff = await Staff.findById(staff._id).select(
-        "-staffLoginPassword -refreshToken"
+        "-password -refreshToken"
     );
 
     // Cookie options

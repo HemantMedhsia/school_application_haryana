@@ -64,9 +64,9 @@ export const createStudent = wrapAsync(async (req, res) => {
 });
 
 export const loginStudent = wrapAsync(async (req, res, next) => {
-    const { rollNumber, email, studentLoginPassword, role } = req.body;
+    const { rollNumber, email, password, role } = req.body;
 
-    if (!studentLoginPassword || (!rollNumber && !email) || !role) {
+    if (!password || (!rollNumber && !email) || !role) {
         return next(
             new ApiError(
                 400,
@@ -86,7 +86,7 @@ export const loginStudent = wrapAsync(async (req, res, next) => {
 
     console.log("Student found:", student.email);
 
-    const isPasswordValid = await student.isValidPassword(studentLoginPassword);
+    const isPasswordValid = await student.isValidPassword(password);
     console.log("Is password valid:", isPasswordValid);
 
     if (!isPasswordValid) {
@@ -105,7 +105,7 @@ export const loginStudent = wrapAsync(async (req, res, next) => {
     await student.save();
 
     const loggedInStudent = await Student.findById(student._id).select(
-        "-studentLoginPassword -refreshToken"
+        "-password -refreshToken"
     );
 
     // Cookie options

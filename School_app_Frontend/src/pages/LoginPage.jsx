@@ -4,20 +4,44 @@ import LoginForm from "../components/LoginPage/LoginForm";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
-  const [teacherLoginPassword, setTeacherLoginPassword] = useState("");
-  const [role, setRole] = useState("Teacher"); // Default role
+  const [role, setRole] = useState("Teacher");
   const [error, setError] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    console.log("Attempting to log in with:", { email, teacherLoginPassword, role });
+    console.log("Attempting to log in with:", { email, password, role });
+
+    let apiEndpoint;
+    switch (role) {
+      case "Teacher":
+        apiEndpoint =
+          "https://school-application-three.vercel.app/api/login-teacher";
+        break;
+      case "Student":
+        apiEndpoint =
+          "https://school-application-three.vercel.app/api/login-student";
+        break;
+      case "Admin":
+        apiEndpoint =
+          "https://school-application-three.vercel.app/api/login-admin";
+        break;
+      case "Staff":
+        apiEndpoint =
+          "https://school-application-three.vercel.app/api/login-staff";
+        break;
+      default:
+        setError("Invalid role selected.");
+        return;
+    }
+
     try {
       const response = await axios.post(
-        "https://school-application-three.vercel.app/api/login-teacher",
+        apiEndpoint,
         {
           email,
-          teacherLoginPassword,
-          role, // Include role in the login request
+          password, // Send the renamed password state
+          role,
         },
         {
           withCredentials: true,
@@ -46,7 +70,9 @@ const LoginPage = () => {
         );
       } else if (err.request) {
         console.error("Error request data:", err.request);
-        setError("No response received from the server. Please try again later.");
+        setError(
+          "No response received from the server. Please try again later."
+        );
       } else {
         console.error("Error message:", err.message);
         setError("An error occurred. Please try again.");
@@ -60,12 +86,12 @@ const LoginPage = () => {
       <LoginForm
         email={email}
         setEmail={setEmail}
-        teacherLoginPassword={teacherLoginPassword}
-        setTeacherLoginPassword={setTeacherLoginPassword}
+        password={password} // Pass the new password state
+        setPassword={setPassword} // Pass the setPassword function
         handleLogin={handleLogin}
         error={error}
-        role={role} // Pass the role to LoginForm
-        setRole={setRole} // Pass the setRole function to LoginForm
+        role={role}
+        setRole={setRole}
       />
     </div>
   );

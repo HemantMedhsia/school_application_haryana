@@ -43,9 +43,9 @@ export const createTeacher = wrapAsync(async (req, res) => {
 });
 
 export const loginTeacher = wrapAsync(async (req, res, next) => {
-    const { email, teacherLoginPassword, role } = req.body;
+    const { email, password, role } = req.body;
 
-    if (!email || !teacherLoginPassword || !role) {
+    if (!email || !password || !role) {
         return next(
             new ApiError(400, "Email, password, and role are required")
         );
@@ -60,7 +60,7 @@ export const loginTeacher = wrapAsync(async (req, res, next) => {
 
     console.log("teacher found:", teacher.email);
 
-    const isPasswordValid = await teacher.isValidPassword(teacherLoginPassword);
+    const isPasswordValid = await teacher.isValidPassword(password);
     console.log("Is password valid:", isPasswordValid);
 
     if (!isPasswordValid) {
@@ -79,7 +79,7 @@ export const loginTeacher = wrapAsync(async (req, res, next) => {
     await teacher.save();
 
     const loggedInTeacher = await Teacher.findById(teacher._id).select(
-        "-teacherLoginPassword -refreshToken"
+        "-password -refreshToken"
     );
 
     // Cookie options

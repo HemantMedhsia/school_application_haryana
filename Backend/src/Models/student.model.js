@@ -10,7 +10,7 @@ const studentSchema = new mongoose.Schema({
         type: String,
         unique: true,
     },
-    studentLoginPassword: {
+    password: {
         type: String,
         required: true,
     },
@@ -126,12 +126,12 @@ const studentSchema = new mongoose.Schema({
 studentSchema.pre("save", async function (next) {
     try {
         // Hash the password only if it has been modified or is new
-        if (!this.isModified("studentLoginPassword")) return next();
+        if (!this.isModified("password")) return next();
 
         // Generate a salt and hash the password
         const salt = await bcrypt.genSalt(10);
-        this.studentLoginPassword = await bcrypt.hash(
-            this.studentLoginPassword,
+        this.password = await bcrypt.hash(
+            this.password,
             salt
         );
         next();
@@ -141,11 +141,11 @@ studentSchema.pre("save", async function (next) {
 });
 
 // Method to validate the password
-studentSchema.methods.isValidPassword = async function (studentLoginPassword) {
+studentSchema.methods.isValidPassword = async function (password) {
     try {
         return await bcrypt.compare(
-            studentLoginPassword,
-            this.studentLoginPassword
+            password,
+            this.password
         );
     } catch (error) {
         throw new Error(error);
