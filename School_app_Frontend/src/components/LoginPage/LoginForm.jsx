@@ -1,9 +1,18 @@
 import React from "react";
 
-const LoginForm = () => {
+const LoginForm = ({
+  email,
+  setEmail,
+  teacherLoginPassword,
+  setTeacherLoginPassword,
+  error,
+  role,
+  setRole,
+  handleLogin,
+}) => {
   return (
-    <form autoComplete="off">
-      <p className="text-red-500"></p>
+    <form className="w-1/3" autoComplete="off" onSubmit={handleLogin}>
+      {error && <p className="text-red-500">{error}</p>}
       <div className="space-y-2">
         <div>
           <label htmlFor="email" className="text-gray-600 mb-2 block">
@@ -13,6 +22,8 @@ const LoginForm = () => {
             type="email"
             name="email"
             id="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-teal-500 placeholder-gray-400"
             placeholder="youremail.@domain.com"
           />
@@ -28,6 +39,8 @@ const LoginForm = () => {
               type="password"
               name="password"
               id="password"
+              value={teacherLoginPassword}
+              onChange={(e) => setTeacherLoginPassword(e.target.value)}
               className="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-teal-500 placeholder-gray-400"
               placeholder="***********"
             />
@@ -57,11 +70,15 @@ const LoginForm = () => {
       </div>
       <div className="space-y-2">
         <div>
-          <label htmlFor="password" className="text-gray-600 mb-2 block">
+          <label htmlFor="role" className="text-gray-600 mb-2 block">
             Login as
           </label>
           <div>
-            <select className="custom-select custom-option block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-teal-500">
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              className="custom-select custom-option block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-teal-500"
+            >
               <option value="student">Student</option>
               <option value="teacher">Teacher</option>
               <option value="admin">Admin</option>

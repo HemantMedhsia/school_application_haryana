@@ -1,40 +1,37 @@
 import React, { useState, useEffect } from "react";
 import { getAPI } from "../../utility/api/apiCall";
 
-const Input = ({ labelName, type = "text", ...props }) => {
-  const borderStyle =
-    type === "file"
-      ? "border-2 border-dashed border-gray-300"
-      : "border-[#D5E8EF]";
+const Input = ({ labelName, type = "text", placeholder = "", ...props }) => {
   return (
-    <span className="mx-2 mb-4 flex flex-col">
-      <label className="text-sm font-medium leading-none">{labelName}</label>
+    <span className="flex flex-col w-full md:w-1/3 px-2 mb-4">
+      <label className="text-sm font-medium leading-none text-gray-300">
+        {labelName}
+      </label>
       <input
         type={type}
-        className={`bg-blue-50 mt-3 text-sm w-[220px] h-9 rounded-[5px] flex items-center p-2.5 gap-3.5 text-[#000000] border-2 border-gray-300 ${
-          type === "file" ? "file:border-0" : "border-[#D5E8EF]"
-        }`}
+        placeholder={placeholder}
+        className="bg-[#283046] mt-2 text-sm w-full h-9 rounded-[5px] p-2.5 text-[#FFFFFF] border-2 border-gray-600 focus:border-[#6B46C1] outline-none"
         {...props}
       />
     </span>
   );
 };
 
-const Select = ({ labelName, name, value, onChange, options }) => {
+const Select = ({ labelName, name, value, onChange, options, placeholder = "Select" }) => {
   return (
-    <span className="mx-2 mb-4 flex flex-col">
-      <label className="text-sm font-medium leading-none">{labelName}</label>
+    <span className="flex flex-col w-full md:w-1/3 px-2 mb-4">
+      <label className="text-sm font-medium leading-none text-gray-400">{labelName}</label>
       <select
         name={name}
         value={value}
         onChange={onChange}
-        className="bg-blue-50 text-xs w-[220px] mt-3 h-9 rounded-[5px] p-2.5 border border-[#D5E8EF]"
+        className="bg-[#283046] text-sm text-[#FFFFFF] mt-2 w-full h-9 rounded-[5px] border-2 border-[#39424E] focus:border-[#6B46C1] outline-none"
       >
-        <option value="" disabled>
-          Select {labelName}
+        <option value="" disabled className="text-gray-500">
+          {placeholder} {labelName}
         </option>
         {options.map((option) => (
-          <option key={option.id} value={option.id}>
+          <option key={option.id} value={option.id} className="text-[#FFFFFF]">
             {option.name}
           </option>
         ))}
@@ -78,16 +75,11 @@ const StudentAdd = () => {
     try {
       const [sessionsResponse, classesResponse, sectionsResponse] =
         await Promise.all([
-          //   axios.get("/api/sessions"),
-          //   axios.get("/api/classes"),
-          //   axios.get("/api/sections"),
           getAPI("getAllSessions", {}, setSessions),
           getAPI("getAllClasses", {}, setClasses),
           getAPI("getAllSections", {}, setSections),
         ]);
-      console.log("Sessions:", sessionsResponse.data);
-      console.log("Classes:", classesResponse.data);
-      console.log("Sections:", sectionsResponse.data);
+
       setSessions(
         Array.isArray(sessionsResponse.data) ? sessionsResponse.data : []
       );
@@ -117,24 +109,26 @@ const StudentAdd = () => {
 
   return (
     <form
-      className="max-w-full mx-auto p-6 bg-[#283046] rounded-lg shadow-md"
+      className="max-w-full mx-auto p-6 bg-[#283046] rounded-lg shadow-lg text-[#E0E0E0]"
       onSubmit={handleSubmit}
     >
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">Add Student</h2>
+      <h2 className="text-2xl font-bold mb-6 text-[#7367F0]">Add Student</h2>
 
-      {/* Admission No, Roll Number, and Login Password */}
-      <div className="flex gap-8 flex-wrap mb-4">
+      {/* Form Fields */}
+      <div className="flex flex-wrap -mx-2">
         <Input
           labelName="Admission No"
           name="admissionNo"
           value={formData.admissionNo}
           onChange={handleChange}
+          placeholder="Enter Admission No"
         />
         <Input
           labelName="Roll Number"
           name="rollNumber"
           value={formData.rollNumber}
           onChange={handleChange}
+          placeholder="Enter Roll Number"
         />
         <Input
           labelName="Login Password"
@@ -142,22 +136,21 @@ const StudentAdd = () => {
           name="studentLoginPassword"
           value={formData.studentLoginPassword}
           onChange={handleChange}
+          placeholder="Enter Login Password"
         />
         <Input
           labelName="First Name"
           name="firstName"
           value={formData.firstName}
           onChange={handleChange}
+          placeholder="Enter First Name"
         />
-      </div>
-
-      {/* First Name, Last Name, and Gender */}
-      <div className="flex gap-8 flex-wrap mb-4">
         <Input
           labelName="Last Name"
           name="lastName"
           value={formData.lastName}
           onChange={handleChange}
+          placeholder="Enter Last Name"
         />
         <Select
           labelName="Gender"
@@ -169,56 +162,23 @@ const StudentAdd = () => {
             { id: "Female", name: "Female" },
             { id: "Other", name: "Other" },
           ]}
+          placeholder="Select"
         />
         <Input
-          labelName={"Date of Birth"}
+          labelName="Date of Birth"
           name="dateOfBirth"
           type="date"
           value={formData.dateOfBirth}
           onChange={handleChange}
+          placeholder="Enter Date of Birth"
         />
         <Input
           labelName="Religion"
           name="religion"
           value={formData.religion}
           onChange={handleChange}
+          placeholder="Enter Religion"
         />
-      </div>
-
-      <div className="flex gap-8 flex-wrap mb-4">
-        <Select
-          labelName="Category"
-          name="category"
-          value={formData.category}
-          onChange={handleChange}
-          options={[
-            { id: "General", name: "General" },
-            { id: "Obc", name: "Obc" },
-            { id: "Sc", name: "St" },
-            { id: "St", name: "St" },
-          ]}
-        />
-        <Input
-          labelName="Mobile Number"
-          name="mobileNumber"
-          value={formData.mobileNumber}
-          onChange={handleChange}
-        />
-        <Input
-          labelName="Email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-        />
-        <Input
-          labelName="Blood Group"
-          name="bloodGroup"
-          value={formData.bloodGroup}
-          onChange={handleChange}
-        />
-      </div>
-
-      <div className="flex gap-8 flex-wrap mb-4">
         <Select
           labelName="Category"
           name="category"
@@ -230,66 +190,67 @@ const StudentAdd = () => {
             { id: "Sc", name: "Sc" },
             { id: "St", name: "St" },
           ]}
+          placeholder="Select"
         />
         <Input
           labelName="Mobile Number"
           name="mobileNumber"
           value={formData.mobileNumber}
           onChange={handleChange}
+          placeholder="Enter Mobile Number"
         />
         <Input
           labelName="Email"
           name="email"
           value={formData.email}
           onChange={handleChange}
+          placeholder="Enter Email"
         />
         <Input
           labelName="Blood Group"
           name="bloodGroup"
           value={formData.bloodGroup}
           onChange={handleChange}
+          placeholder="Enter Blood Group"
         />
-      </div>
-
-      {/* House , Height ,Weight */}
-      <div className="flex flex-wrap gap-8 mb-4">
         <Input
           labelName="House"
           name="house"
           value={formData.house}
           onChange={handleChange}
+          placeholder="Enter House"
         />
         <Input
           labelName="Height"
           name="height"
           value={formData.height}
           onChange={handleChange}
+          placeholder="Enter Height"
         />
         <Input
           labelName="Weight"
           name="weight"
           value={formData.weight}
           onChange={handleChange}
+          placeholder="Enter Weight"
         />
         <Input
           labelName="Medical History"
           name="medicalHistory"
           value={formData.medicalHistory}
           onChange={handleChange}
+          placeholder="Enter Medical History"
         />
-      </div>
-
-      {/* Dropdowns for Session, Class, and Section */}
-      <div className="flex gap-8 flex-wrap mb-4">
         <Select
           labelName="Current Session"
           name="currentSession"
           value={formData.currentSession}
           onChange={handleChange}
           options={sessions.map((session) => ({
-            id: session._id, // ensure you're using the correct field for ID
-            name: session.sessionYear, // or session.name, depending on the API response
+            id: session._id,
+            name: session.sessionYear,
           }))}
+          placeholder="Select"
         />
         <Select
           labelName="Current Class"
@@ -297,9 +258,10 @@ const StudentAdd = () => {
           value={formData.currentClass}
           onChange={handleChange}
           options={classes.map((classItem) => ({
-            id: classItem._id, // ensure you're using the correct field for ID
-            name: classItem.name, // or classItem.name, depending on the API response
+            id: classItem._id,
+            name: classItem.name,
           }))}
+          placeholder="Select"
         />
         <Select
           labelName="Current Section"
@@ -307,35 +269,26 @@ const StudentAdd = () => {
           value={formData.currentSection}
           onChange={handleChange}
           options={sections.map((sectionItem) => ({
-            id: sectionItem._id, // ensure you're using the correct field for ID
-            name: sectionItem.name, // or sectionItem.name, depending on the API response
+            id: sectionItem._id,
+            name: sectionItem.name,
           }))}
+          placeholder="Select"
         />
-
         <Input
-          labelName={"Admission Date"}
+          labelName="Admission Date"
           name="admissionDate"
           type="date"
           value={formData.admissionDate}
           onChange={handleChange}
+          placeholder="Enter Admission Date"
         />
       </div>
 
-      {/* <div className="flex gap-4 flex-wrap mb-4">
-        <Input
-          labelName="Student Photo"
-          name="studentPhoto"
-          type="file"
-          value={formData.studentPhoto}
-          onChange={handleChange}
-        />
-      </div> */}
-
       {/* Submit Button */}
-      <div className="flex justify-end">
+      <div className="flex justify-end mt-6">
         <button
           type="submit"
-          className="bg-blue-500 text-white font-semibold py-2 px-6 rounded-md hover:bg-blue-600 transition duration-200 ease-in-out"
+          className="bg-[#7367F0] text-white font-semibold py-2 px-6 rounded-md hover:bg-[#4C51BF] transition duration-200 ease-in-out shadow-md"
         >
           Add Student
         </button>
