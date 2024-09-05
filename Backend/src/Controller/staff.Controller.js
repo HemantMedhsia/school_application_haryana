@@ -38,10 +38,12 @@ export const createStaff = wrapAsync(async (req, res) => {
 });
 
 export const loginStaff = wrapAsync(async (req, res, next) => {
-    const { email, staffLoginPassword } = req.body;
+    const { email, staffLoginPassword, role } = req.body;
 
-    if (!email) {
-        return next(new ApiError(400, "email is required"));
+    if (!email || !staffLoginPassword || !role) {
+        return next(
+            new ApiError(400, "Email, password, and role are required")
+        );
     }
 
     const staff = await Staff.findOne({ email });
@@ -59,6 +61,10 @@ export const loginStaff = wrapAsync(async (req, res, next) => {
     if (!isPasswordValid) {
         console.log("Invalid password attempt for staff:", staff.email);
         return next(new ApiError(401, " Invalid staff credentials "));
+    }
+
+    if (staff.role !== role) {
+        return next(new ApiError(403, "Unauthorized role"));
     }
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(

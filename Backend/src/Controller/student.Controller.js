@@ -53,17 +53,26 @@ export const createStudent = wrapAsync(async (req, res) => {
     school.students.push(studentData._id);
     await school.save();
 
-        await StudentHistory.findByIdAndUpdate(studentHistoryData._id, {studentId: studentData._id}, {new: true});
+    await StudentHistory.findByIdAndUpdate(
+        studentHistoryData._id,
+        { studentId: studentData._id },
+        { new: true }
+    );
     return res
         .status(201)
         .json(new ApiResponse(201, student, "Student Created Successfully"));
 });
 
 export const loginStudent = wrapAsync(async (req, res, next) => {
-    const { rollNumber, email, studentLoginPassword } = req.body;
+    const { rollNumber, email, studentLoginPassword, role } = req.body;
 
-    if (!rollNumber && !email) {
-        return next(new ApiError(400, "Roll number or email is required"));
+    if (!studentLoginPassword || (!rollNumber && !email) || !role) {
+        return next(
+            new ApiError(
+                400,
+                "Roll number or email, password, and role are required"
+            )
+        );
     }
 
     const student = await Student.findOne({
@@ -83,6 +92,9 @@ export const loginStudent = wrapAsync(async (req, res, next) => {
     if (!isPasswordValid) {
         console.log("Invalid password attempt for student:", student.email);
         return next(new ApiError(401, " Invalid student credentials "));
+    }
+    if (student.role !== role) {
+        return next(new ApiError(403, "Unauthorized role"));
     }
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
