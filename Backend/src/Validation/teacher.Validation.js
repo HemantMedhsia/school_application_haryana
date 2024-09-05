@@ -6,7 +6,7 @@ export const teacherValidationSchema = Joi.object({
     gender: Joi.string().required(),
     subject: Joi.string().required(),
     email: Joi.string().email().required(),
-    teacherLoginPassword: Joi.string().required(),
+    password: Joi.string().required(),
     contact: Joi.number().required(),
     profile: Joi.string().required(),
     profileImage: Joi.string().required(),
