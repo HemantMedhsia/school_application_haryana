@@ -2,9 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-.body {
-  overflow: hidden;
-}
 .custom-select {
     appearance: none;
     -webkit-appearance: none;
@@ -59,4 +56,17 @@
   background-color: #007bff;
   color: white;
   border-color: #007bff;
+}
+
+/* index.css */
+
+/* Hide scrollbar for all browsers */
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+/* Hide scrollbar for Chrome, Safari, and Opera */
+*::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }

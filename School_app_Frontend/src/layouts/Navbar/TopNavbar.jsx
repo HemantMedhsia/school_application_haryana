@@ -1,19 +1,24 @@
-import React from 'react';
-import { Disclosure, Menu } from '@headlessui/react';
-import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import React from "react";
+import { Disclosure, Menu } from "@headlessui/react";
+import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
 
 const navigation = [
   { name: "Happy Model English School", href: "#", current: false },
 ];
 
 function classNames(...classes) {
-  return classes.filter(Boolean).join(' ');
+  return classes.filter(Boolean).join(" ");
 }
 
 const TopNavbar = () => {
   return (
-    <Disclosure as="nav" className="fixed w-[1230px] left-[17%] top-3 rounded-md mx-3 inset-x-0 bg-[#283046] shadow-md z-50">
-      <div className="mx-auto w-full px-2 sm:px-6 lg:px-8">
+    <Disclosure
+      as="nav"
+      className="fixed top-0 left-64 mx-6 my-2 mt-4 rounded-md right-0 h-14 bg-[#283046] shadow-md z-50"
+    >
+      {" "}
+      {/* Adjust for fixed positioning */}
+      <div className="flex h-full items-center justify-between px-4">
         <div className="relative flex h-16 items-center justify-between">
           <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
             <Disclosure.Button className="inline-flex items-center justify-center p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
@@ -38,11 +43,11 @@ const TopNavbar = () => {
                     href={item.href}
                     className={classNames(
                       item.current
-                        ? 'bg-gray-900 text-white'
-                        : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                      'rounded-md px-3 py-2 text-xl font-medium'
+                        ? "bg-gray-900 text-white"
+                        : "text-gray-300 hover:bg-gray-700 hover:text-white",
+                      "rounded-md px-3 py-2 text-xl font-medium"
                     )}
-                    aria-current={item.current ? 'page' : undefined}
+                    aria-current={item.current ? "page" : undefined}
                   >
                     {item.name}
                   </a>
@@ -73,8 +78,8 @@ const TopNavbar = () => {
                     <a
                       href="#"
                       className={classNames(
-                        active ? 'bg-gray-100' : '',
-                        'block px-4 py-2 text-sm text-gray-700'
+                        active ? "bg-gray-100" : "",
+                        "block px-4 py-2 text-sm text-gray-700"
                       )}
                     >
                       Your Profile
@@ -86,8 +91,8 @@ const TopNavbar = () => {
                     <a
                       href="#"
                       className={classNames(
-                        active ? 'bg-gray-100' : '',
-                        'block px-4 py-2 text-sm text-gray-700'
+                        active ? "bg-gray-100" : "",
+                        "block px-4 py-2 text-sm text-gray-700"
                       )}
                     >
                       Settings
@@ -99,8 +104,8 @@ const TopNavbar = () => {
                     <a
                       href="#"
                       className={classNames(
-                        active ? 'bg-gray-100' : '',
-                        'block px-4 py-2 text-sm text-gray-700'
+                        active ? "bg-gray-100" : "",
+                        "block px-4 py-2 text-sm text-gray-700"
                       )}
                     >
                       Sign out
@@ -115,5 +120,4 @@ const TopNavbar = () => {
     </Disclosure>
   );
 };
-
 export default TopNavbar;
