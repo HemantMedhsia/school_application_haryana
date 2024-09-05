@@ -27,7 +27,7 @@ const staffSchema = new mongoose.Schema({
         required: true,
         unique: true,
     },
-    staffLoginPassword: {
+    password: {
         type: String,
         required: true,
     },
@@ -57,12 +57,12 @@ const staffSchema = new mongoose.Schema({
 staffSchema.pre("save", async function (next) {
     try {
         // Hash the password only if it has been modified or is new
-        if (!this.isModified("staffLoginPassword")) return next();
+        if (!this.isModified("password")) return next();
 
         // Generate a salt and hash the password
         const salt = await bcrypt.genSalt(10);
-        this.staffLoginPassword = await bcrypt.hash(
-            this.staffLoginPassword,
+        this.password = await bcrypt.hash(
+            this.password,
             salt
         );
         next();
@@ -75,8 +75,8 @@ staffSchema.pre("save", async function (next) {
 staffSchema.methods.isValidPassword = async function (staffLoginPassword) {
     try {
         return await bcrypt.compare(
-            staffLoginPassword,
-            this.staffLoginPassword
+            password,
+            this.password
         );
     } catch (error) {
         throw new Error(error);

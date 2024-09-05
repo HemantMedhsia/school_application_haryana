@@ -16,7 +16,7 @@ export const staffValidationSchema = Joi.object({
         .required(),
     age: Joi.number().required(),
     email: Joi.string().email().required(),
-    staffLoginPassword: Joi.string().required(),
+    password: Joi.string().required(),
     phoneNumber: Joi.string().required(),
     address: Joi.string().required(),
     staffAttendance: Joi.array().items(

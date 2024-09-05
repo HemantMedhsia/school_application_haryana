@@ -4,8 +4,9 @@ import LoginForm from "../components/LoginPage/LoginForm";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
-  const [teacherLoginPassword, setTeacherLoginPassword] = useState("");
+  const [role, setRole] = useState("Teacher");
   const [error, setError] = useState("");
+  const [password, setPassword] = useState("");
   const [role, setRole] = useState("teacher");
   const [schoolName, setSchoolName] = useState("Demo School");
 
@@ -23,18 +24,38 @@ const LoginPage = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    console.log("Attempting to log in with:", {
-      email,
-      teacherLoginPassword,
-      role,
-      schoolName,
-    });
+    console.log("Attempting to log in with:", { email, password, role });
+
+    let apiEndpoint;
+    switch (role) {
+      case "Teacher":
+        apiEndpoint =
+          "https://school-application-three.vercel.app/api/login-teacher";
+        break;
+      case "Student":
+        apiEndpoint =
+          "https://school-application-three.vercel.app/api/login-student";
+        break;
+      case "Admin":
+        apiEndpoint =
+          "https://school-application-three.vercel.app/api/login-admin";
+        break;
+      case "Staff":
+        apiEndpoint =
+          "https://school-application-three.vercel.app/api/login-staff";
+        break;
+      default:
+        setError("Invalid role selected.");
+        return;
+    }
+
     try {
       const response = await axios.post(
-        "https://school-application-three.vercel.app/api/login-teacher",
+        apiEndpoint,
         {
           email,
-          teacherLoginPassword,
+          password, // Send the renamed password state
+          role,
           role,
           schoolName, // Pass the school name from subdomain
         },
@@ -75,17 +96,16 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="flex flex-col w-screen h-screen justify-center items-center">
-      <div className="m-12 text-5xl">{schoolName}</div>
+    <div className="min-h-screen bg-gray-100 text-gray-900 flex justify-center">
       <LoginForm
         email={email}
         setEmail={setEmail}
-        teacherLoginPassword={teacherLoginPassword}
-        setTeacherLoginPassword={setTeacherLoginPassword}
+        password={password} // Pass the new password state
+        setPassword={setPassword} // Pass the setPassword function
+        handleLogin={handleLogin}
         error={error}
         role={role}
         setRole={setRole}
-        handleLogin={handleLogin}
       />
     </div>
   );

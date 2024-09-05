@@ -43,10 +43,12 @@ export const createTeacher = wrapAsync(async (req, res) => {
 });
 
 export const loginTeacher = wrapAsync(async (req, res, next) => {
-    const { email, teacherLoginPassword } = req.body;
+    const { email, password, role } = req.body;
 
-    if (!email) {
-        return next(new ApiError(400, "email is required"));
+    if (!email || !password || !role) {
+        return next(
+            new ApiError(400, "Email, password, and role are required")
+        );
     }
 
     const teacher = await Teacher.findOne({ email });
@@ -58,12 +60,15 @@ export const loginTeacher = wrapAsync(async (req, res, next) => {
 
     console.log("teacher found:", teacher.email);
 
-    const isPasswordValid = await teacher.isValidPassword(teacherLoginPassword);
+    const isPasswordValid = await teacher.isValidPassword(password);
     console.log("Is password valid:", isPasswordValid);
 
     if (!isPasswordValid) {
         console.log("Invalid password attempt for teacher:", teacher.email);
         return next(new ApiError(401, " Invalid teacher credentials "));
+    }
+    if (teacher.role !== role) {
+        return next(new ApiError(403, "Unauthorized role"));
     }
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
@@ -74,7 +79,7 @@ export const loginTeacher = wrapAsync(async (req, res, next) => {
     await teacher.save();
 
     const loggedInTeacher = await Teacher.findById(teacher._id).select(
-        "-teacherLoginPassword -refreshToken"
+        "-password -refreshToken"
     );
 
     // Cookie options
@@ -108,7 +113,7 @@ export const refreshAccessTokenTeacher = wrapAsync(async (req, res, next) => {
     const incomingRefreshToken =
         req.cookies.refreshToken || req.body.refreshToken;
 
-        console.log(req.cookies.refreshToken);
+    console.log(req.cookies.refreshToken);
 
     if (!incomingRefreshToken) {
         return next(new ApiError(401, "Unauthorized request"));

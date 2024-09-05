@@ -38,10 +38,12 @@ export const createStaff = wrapAsync(async (req, res) => {
 });
 
 export const loginStaff = wrapAsync(async (req, res, next) => {
-    const { email, staffLoginPassword } = req.body;
+    const { email, password, role } = req.body;
 
-    if (!email) {
-        return next(new ApiError(400, "email is required"));
+    if (!email || !password || !role) {
+        return next(
+            new ApiError(400, "Email, password, and role are required")
+        );
     }
 
     const staff = await Staff.findOne({ email });
@@ -53,12 +55,16 @@ export const loginStaff = wrapAsync(async (req, res, next) => {
 
     console.log("staff found:", staff.email);
 
-    const isPasswordValid = await staff.isValidPassword(staffLoginPassword);
+    const isPasswordValid = await staff.isValidPassword(password);
     console.log("Is password valid:", isPasswordValid);
 
     if (!isPasswordValid) {
         console.log("Invalid password attempt for staff:", staff.email);
         return next(new ApiError(401, " Invalid staff credentials "));
+    }
+
+    if (staff.role !== role) {
+        return next(new ApiError(403, "Unauthorized role"));
     }
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
@@ -69,7 +75,7 @@ export const loginStaff = wrapAsync(async (req, res, next) => {
     await staff.save();
 
     const loggedInstaff = await Staff.findById(staff._id).select(
-        "-staffLoginPassword -refreshToken"
+        "-password -refreshToken"
     );
 
     // Cookie options

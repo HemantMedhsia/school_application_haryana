@@ -52,10 +52,12 @@ export const createAdmin = wrapAsync(async (req, res) => {
 });
 
 export const loginAdmin = wrapAsync(async (req, res, next) => {
-    const { email, password } = req.body;
+    const { email, password, role } = req.body;
 
-    if (!email || !password) {
-        return next(new ApiError(400, "Email and password are required"));
+    if (!email || !password || !role) {
+        return next(
+            new ApiError(400, "Email , password and role are required")
+        );
     }
 
     const admin = await Admin.findOne({ email });
@@ -73,6 +75,10 @@ export const loginAdmin = wrapAsync(async (req, res, next) => {
     if (!isPasswordValid) {
         console.log("Invalid password attempt for admin:", admin.email);
         return next(new ApiError(401, "Invalid admin credentials"));
+    }
+
+    if (admin.role !== role) {
+        return next(new ApiError(403, "Unauthorized role"));
     }
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
