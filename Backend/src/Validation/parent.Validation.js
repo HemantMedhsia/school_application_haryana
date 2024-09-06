@@ -17,5 +17,5 @@
     guardianEmail: Joi.string().email().optional(),
     guardianPhoto: Joi.string().optional(),
     guardianAddress: Joi.string().optional(),
-    parentLoginPassword: Joi.string().required(),
+    password: Joi.string().required(),
 });
