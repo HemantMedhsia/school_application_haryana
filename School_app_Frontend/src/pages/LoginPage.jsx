@@ -61,7 +61,7 @@ const LoginPage = () => {
       } else if (role === "Student") {
         navigate("/school/dashboard");
       } else {
-        navigate("/school");
+        navigate("/");
       }
     } catch (err) {
       console.error("Login failed:", err);

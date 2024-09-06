@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode"; // Fix import
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
 
@@ -20,6 +21,7 @@ const getRefreshEndpoint = (role) => {
 };
 
 export const AuthProvider = ({ children }) => {
+  //  const navigate = useNavigate();
   const [authToken, setAuthToken] = useState(() =>
     localStorage.getItem("authToken")
   );
@@ -30,7 +32,7 @@ export const AuthProvider = ({ children }) => {
     const token = localStorage.getItem("authToken");
     return token ? jwtDecode(token).role : null;
   });
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const handleTokenRefresh = async () => {
@@ -38,16 +40,16 @@ export const AuthProvider = ({ children }) => {
         const decodedToken = jwtDecode(authToken);
         const currentTime = Date.now() / 1000;
 
-        if (decodedToken.exp < currentTime && refreshToken) {
+        // Refresh the token if it's about to expire in the next 1 minute
+        if (decodedToken.exp < currentTime + 60 && refreshToken) {
           await refreshAuthToken(refreshToken, decodedToken.role);
         }
       }
-      setLoading(false); 
+      setLoading(false);
     };
     handleTokenRefresh();
   }, [authToken, refreshToken]);
 
-  // Function to refresh access token
   const refreshAuthToken = async (token, role) => {
     try {
       const endpoint = getRefreshEndpoint(role);
@@ -65,6 +67,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("authToken", newAuthToken);
     } catch (error) {
       console.error("Token refresh failed:", error);
+      alert("Session expired, please login again.");
       logout();
     }
   };
@@ -86,13 +89,14 @@ export const AuthProvider = ({ children }) => {
     setUserRole(null);
     localStorage.removeItem("authToken");
     localStorage.removeItem("refreshToken");
+    navigate("/");
   };
 
   return (
     <AuthContext.Provider
       value={{ authToken, refreshToken, userRole, login, logout, loading }}
     >
-      {children}
+      {!loading ? children : <div>Loading...</div>}
     </AuthContext.Provider>
   );
 };

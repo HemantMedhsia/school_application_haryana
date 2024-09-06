@@ -3,6 +3,7 @@ import { Disclosure, Menu } from "@headlessui/react";
 import { IoCalendarOutline } from "react-icons/io5";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom";
+import { useAuth } from "../../context/AuthProvider";
 
 const navigation = [
   { name: "Happy Model English School", href: "#", current: false },
@@ -13,6 +14,8 @@ function classNames(...classes) {
 }
 
 const TopNavbar = () => {
+  const {logout} = useAuth();
+  console.log(logout);
   return (
     <Disclosure
       as="nav"
@@ -95,15 +98,15 @@ const TopNavbar = () => {
                   </Menu.Item>
                   <Menu.Item>
                     {({ active }) => (
-                      <a
-                        href="#"
+                      <button
+                        onClick={logout}
                         className={classNames(
                           active ? "bg-gray-100" : "",
                           "block px-4 py-2 text-sm text-gray-700"
                         )}
                       >
                         Settings
-                      </a>
+                      </button>
                     )}
                   </Menu.Item>
                   <Menu.Item>
