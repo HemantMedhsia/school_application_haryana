@@ -54,15 +54,7 @@ const LoginPage = () => {
       const { accessToken, refreshToken } = response.data.data;
       login(accessToken, refreshToken);
 
-      if (role === "Admin") {
-        navigate("/school/dashboard");
-      } else if (role === "Teacher") {
-        navigate("/school/dashboard");
-      } else if (role === "Student") {
-        navigate("/school/dashboard");
-      } else {
-        navigate("/");
-      }
+      navigate("/school/dashboard");
     } catch (err) {
       console.error("Login failed:", err);
       setError("Login failed. Please try again.");
