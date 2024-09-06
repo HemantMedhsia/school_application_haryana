@@ -1,44 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { getAPI } from "../../utility/api/apiCall";
-
-const Input = ({ labelName, type = "text", placeholder = "", ...props }) => {
-  return (
-    <span className="flex flex-col w-full md:w-1/3 px-2 mb-4">
-      <label className="text-sm font-medium leading-none text-gray-300">
-        {labelName}
-      </label>
-      <input
-        type={type}
-        placeholder={placeholder}
-        className="bg-[#283046] mt-2 text-sm w-full h-9 rounded-[5px] p-2.5 text-[#FFFFFF] border-2 border-gray-600 focus:border-[#6B46C1] outline-none"
-        {...props}
-      />
-    </span>
-  );
-};
-
-const Select = ({ labelName, name, value, onChange, options, placeholder = "Select" }) => {
-  return (
-    <span className="flex flex-col w-full md:w-1/3 px-2 mb-4">
-      <label className="text-sm font-medium leading-none text-gray-400">{labelName}</label>
-      <select
-        name={name}
-        value={value}
-        onChange={onChange}
-        className="bg-[#283046] text-sm text-[#FFFFFF] mt-2 w-full h-9 rounded-[5px] border-2 border-[#39424E] focus:border-[#6B46C1] outline-none"
-      >
-        <option value="" disabled className="text-gray-500">
-          {placeholder} {labelName}
-        </option>
-        {options.map((option) => (
-          <option key={option.id} value={option.id} className="text-[#FFFFFF]">
-            {option.name}
-          </option>
-        ))}
-      </select>
-    </span>
-  );
-};
+import { getAPI } from "../utility/api/apiCall";
+import Input from "../components/Form/Input";
+import Select from "../components/Form/Select";
+import FormSection from "../components/Form/FormSection";
 
 const StudentAdd = () => {
   const [sessions, setSessions] = useState([]);
@@ -79,6 +43,7 @@ const StudentAdd = () => {
           getAPI("getAllClasses", {}, setClasses),
           getAPI("getAllSections", {}, setSections),
         ]);
+        console.log("session",sessionsResponse, "class", classesResponse, "section",sectionsResponse);
 
       setSessions(
         Array.isArray(sessionsResponse.data) ? sessionsResponse.data : []
@@ -114,30 +79,8 @@ const StudentAdd = () => {
     >
       <h2 className="text-2xl font-bold mb-6 text-[#7367F0]">Add Student</h2>
 
-      {/* Form Fields */}
-      <div className="flex flex-wrap -mx-2">
-        <Input
-          labelName="Admission No"
-          name="admissionNo"
-          value={formData.admissionNo}
-          onChange={handleChange}
-          placeholder="Enter Admission No"
-        />
-        <Input
-          labelName="Roll Number"
-          name="rollNumber"
-          value={formData.rollNumber}
-          onChange={handleChange}
-          placeholder="Enter Roll Number"
-        />
-        <Input
-          labelName="Login Password"
-          type="password"
-          name="studentLoginPassword"
-          value={formData.studentLoginPassword}
-          onChange={handleChange}
-          placeholder="Enter Login Password"
-        />
+      {/* Personal Details Section */}
+      <FormSection title="Personal Details">
         <Input
           labelName="First Name"
           name="firstName"
@@ -172,13 +115,6 @@ const StudentAdd = () => {
           onChange={handleChange}
           placeholder="Enter Date of Birth"
         />
-        <Input
-          labelName="Religion"
-          name="religion"
-          value={formData.religion}
-          onChange={handleChange}
-          placeholder="Enter Religion"
-        />
         <Select
           labelName="Category"
           name="category"
@@ -186,12 +122,43 @@ const StudentAdd = () => {
           onChange={handleChange}
           options={[
             { id: "General", name: "General" },
-            { id: "Obc", name: "Obc" },
-            { id: "Sc", name: "Sc" },
-            { id: "St", name: "St" },
+            { id: "OBC", name: "OBC" },
+            { id: "SC", name: "SC" },
+            { id: "ST", name: "ST" },
           ]}
           placeholder="Select"
         />
+        <Input
+          labelName="Religion"
+          name="religion"
+          value={formData.religion}
+          onChange={handleChange}
+          placeholder="Enter Religion"
+        />
+        <Input
+          labelName="Height"
+          name={"height"}
+          value={formData.height}
+          onChange={handleChange}
+          placeholder={"Enter Height"}
+        />
+        <Input
+          labelName="Weight"
+          name={"weight"}
+          value={formData.weight}
+          onChange={handleChange}
+          placeholder={"Enter Weight"}
+        />
+        <Input
+          labelName="Blood Group"
+          name="bloodGroup"
+          value={formData.bloodGroup}
+          onChange={handleChange}
+          placeholder="Enter Blood Group"
+        />
+      </FormSection>
+
+      <FormSection title="Address & Contact Details">
         <Input
           labelName="Mobile Number"
           name="mobileNumber"
@@ -207,11 +174,45 @@ const StudentAdd = () => {
           placeholder="Enter Email"
         />
         <Input
-          labelName="Blood Group"
-          name="bloodGroup"
-          value={formData.bloodGroup}
+          labelName="Address"
+          name="address"
+          value={formData.address}
           onChange={handleChange}
-          placeholder="Enter Blood Group"
+          placeholder="Enter Address"
+        />
+      </FormSection>
+
+      {/* Admission Details Section */}
+      <FormSection title="Admission Details">
+        <Input
+          labelName="Admission No"
+          name="admissionNo"
+          value={formData.admissionNo}
+          onChange={handleChange}
+          placeholder="Enter Admission No"
+        />
+        <Input
+          labelName="Roll Number"
+          name="rollNumber"
+          value={formData.rollNumber}
+          onChange={handleChange}
+          placeholder="Enter Roll Number"
+        />
+        <Input
+          labelName="Login Password"
+          type="password"
+          name="studentLoginPassword"
+          value={formData.studentLoginPassword}
+          onChange={handleChange}
+          placeholder="Enter Login Password"
+        />
+        <Input
+          labelName="Admission Date"
+          name="admissionDate"
+          type="date"
+          value={formData.admissionDate}
+          onChange={handleChange}
+          placeholder="Enter Admission Date"
         />
         <Input
           labelName="House"
@@ -220,27 +221,10 @@ const StudentAdd = () => {
           onChange={handleChange}
           placeholder="Enter House"
         />
-        <Input
-          labelName="Height"
-          name="height"
-          value={formData.height}
-          onChange={handleChange}
-          placeholder="Enter Height"
-        />
-        <Input
-          labelName="Weight"
-          name="weight"
-          value={formData.weight}
-          onChange={handleChange}
-          placeholder="Enter Weight"
-        />
-        <Input
-          labelName="Medical History"
-          name="medicalHistory"
-          value={formData.medicalHistory}
-          onChange={handleChange}
-          placeholder="Enter Medical History"
-        />
+      </FormSection>
+
+      {/* Academic Details Section */}
+      <FormSection title="Academic Details">
         <Select
           labelName="Current Session"
           name="currentSession"
@@ -274,15 +258,7 @@ const StudentAdd = () => {
           }))}
           placeholder="Select"
         />
-        <Input
-          labelName="Admission Date"
-          name="admissionDate"
-          type="date"
-          value={formData.admissionDate}
-          onChange={handleChange}
-          placeholder="Enter Admission Date"
-        />
-      </div>
+      </FormSection>
 
       {/* Submit Button */}
       <div className="flex justify-end mt-6">

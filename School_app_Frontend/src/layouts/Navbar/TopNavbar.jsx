@@ -1,7 +1,9 @@
 import React from "react";
 import { Disclosure, Menu } from "@headlessui/react";
-import { IoCalendarOutline } from "react-icons/io5";
+import { IoCalendarOutline, IoLocationSharp } from "react-icons/io5";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { MdOutlineMarkEmailUnread } from "react-icons/md";
+import { BiSupport } from "react-icons/bi";
 import { Link } from "react-router-dom";
 
 const navigation = [
@@ -50,10 +52,21 @@ const TopNavbar = () => {
                     ))}
                   </div>
                 </div>
-                <div className="flex px-3 py-2 hover:bg-gray-700 rounded-md font-bold cursor-pointer text-[#65FA9E] text-2xl items-center">
-                  <Link to="/school/calendar">
-                    <IoCalendarOutline />
-                  </Link>
+                <div className="flex">
+                  <div className="flex px-3 py-2 hover:bg-gray-700 rounded-md font-bold cursor-pointer text-[#65FA9E] text-2xl items-center">
+                    <Link to="/school/calendar">
+                      <IoCalendarOutline />
+                    </Link>
+                  </div>
+                  <div className="flex px-3 py-2 hover:bg-gray-700 rounded-md font-bold cursor-pointer text-[#65FA9E] text-2xl items-center">
+                    <MdOutlineMarkEmailUnread />
+                  </div>
+                  <div className="flex px-3 py-2 hover:bg-gray-700 rounded-md font-bold cursor-pointer text-[#65FA9E] text-2xl items-center">
+                    <BiSupport />
+                  </div>
+                  <div className="flex px-3 py-2 hover:bg-gray-700 rounded-md font-bold cursor-pointer text-[#65FA9E] text-2xl items-center">
+                    <IoLocationSharp />
+                  </div>
                 </div>
               </div>
 
@@ -69,12 +82,20 @@ const TopNavbar = () => {
                 </Disclosure.Button>
               </div>
             </div>
-            <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+            <div className="absolute w-full inset-y-0 right-0 flex justify-end items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+              <div className="flex flex-col justify-end items-center mx-1">
+                <div className="w-full text-sm text-gray-400">
+                  Hemant Kumar Gupta
+                </div>
+                <div className="text-right w-full text-xs font-semibold text-[#65FA9E]">
+                  Admin
+                </div>
+              </div>
               <Menu as="div" className="relative ml-3">
                 <Menu.Button className="flex rounded-full bg-[#283046] text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                   <span className="sr-only">Open user menu</span>
                   <img
-                    className="h-8 w-8 rounded-full"
+                    className="h-10 w-10 rounded-full"
                     src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
                     alt="User"
                   />
