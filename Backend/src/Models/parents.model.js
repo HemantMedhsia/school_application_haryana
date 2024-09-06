@@ -51,7 +51,7 @@ const parentSchema = new mongoose.Schema({
     guardianOccupation: {
         type: String,
     },
-    guardianEmail: {
+    email: {
         type: String,
     },
     guardianPhoto: {
@@ -60,7 +60,7 @@ const parentSchema = new mongoose.Schema({
     guardianAddress: {
         type: String,
     },
-    parentLoginPassword: {
+    password: {
         type: String,
         required: true,
     },
@@ -76,12 +76,12 @@ const parentSchema = new mongoose.Schema({
 parentSchema.pre("save", async function (next) {
     try {
         // Hash the password only if it has been modified or is new
-        if (!this.isModified("parentLoginPassword")) return next();
+        if (!this.isModified("password")) return next();
 
         // Generate a salt and hash the password
         const salt = await bcrypt.genSalt(10);
-        this.parentLoginPassword = await bcrypt.hash(
-            this.parentLoginPassword,
+        this.password = await bcrypt.hash(
+            this.password,
             salt
         );
         next();
@@ -91,11 +91,11 @@ parentSchema.pre("save", async function (next) {
 });
 
 // Method to validate the password
-parentSchema.methods.isValidPassword = async function (parentLoginPassword) {
+parentSchema.methods.isValidPassword = async function (password) {
     try {
         return await bcrypt.compare(
-            parentLoginPassword,
-            this.parentLoginPassword
+            password,
+            this.password
         );
     } catch (error) {
         throw new Error(error);
