@@ -1,45 +1,13 @@
 import React from "react";
-import ReactDOM from "react-dom"; // Corrected casing from ReactDom to ReactDOM
-import {
-  Route,
-  RouterProvider,
-  createBrowserRouter,
-  createRoutesFromElements,
-} from "react-router-dom";
+import ReactDOM from "react-dom/client";
+import { AuthProvider } from "./context/AuthProvider.jsx"; 
+import App from "./App"; 
 import "./index.css";
-import Layout from "./layouts/Layout.jsx";
-import LoginPage from "./pages/LoginPage.jsx";
-import Testing from "./pages/Testing.jsx";
-import Dashboard from "./layouts/Navbar/Dashboard.jsx";
-import RoleBasedAccess from "./pages/RoleBase/RoleBasedAccess.jsx";
-import { AuthProvider } from "./context/AuthProvider.jsx";
-import StudentAdd from "./components/Form/StudentAdd.jsx";
-import StudnetInfo from "./pages/StudnetInfo.jsx";
-const router = createBrowserRouter(
-  createRoutesFromElements(
-    <>
-      <Route path="/" element={<LoginPage />} />
-      <Route path="/school" element={<Layout />}>
-        <Route
-          path="dashboard"
-          element={
-            // <RoleBasedAccess allowedRoles={["admin", "student"]}>
-            <Dashboard />
-              // </RoleBasedAccess>
-          }
-        />
-        <Route path="testing" element={<Testing />} />
-        <Route path="student-admission" element={<StudentAdd/>}/>
-        <Route path="student-information" element={<StudnetInfo/>}/>
-      </Route>
-    </>
-  )
-);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <AuthProvider>
-      <RouterProvider router={router} />
+      <App /> 
     </AuthProvider>
   </React.StrictMode>
 );

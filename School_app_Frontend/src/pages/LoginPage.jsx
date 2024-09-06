@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import LoginForm from "../components/LoginPage/LoginForm";
 import { useAuth } from "../context/AuthProvider";
+import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
   const { login, loading } = useAuth(); // Use login and loading from context
@@ -9,6 +10,7 @@ const LoginPage = () => {
   const [role, setRole] = useState("Teacher");
   const [error, setError] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -50,9 +52,20 @@ const LoginPage = () => {
       console.log("Login successful:", response.data);
 
       const { accessToken, refreshToken } = response.data.data;
-      login(accessToken, refreshToken); // Use the login method from context
+      login(accessToken, refreshToken);
+
+      if (role === "Admin") {
+        navigate("/school/dashboard");
+      } else if (role === "Teacher") {
+        navigate("/school/dashboard");
+      } else if (role === "Student") {
+        navigate("/school/dashboard");
+      } else {
+        navigate("/school");
+      }
     } catch (err) {
-      // Handle errors...
+      console.error("Login failed:", err);
+      setError("Login failed. Please try again.");
     }
   };
 
