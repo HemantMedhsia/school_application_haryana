@@ -12,8 +12,9 @@ import Testing from "./pages/Testing.jsx";
 import Dashboard from "./layouts/Navbar/Dashboard.jsx";
 import RoleBasedAccess from "./pages/RoleBase/RoleBasedAccess.jsx";
 import { useAuth } from "./context/AuthProvider.jsx";
-import StudentAdd from "./components/Form/StudentAdd.jsx";
+import StudentAdd from "./pages/StudentAdd.jsx";
 import StudnetInfo from "./pages/StudnetInfo.jsx";
+import EventCalendar from "./pages/Dashboard/EventCalendar.jsx";
 
 const App = () => {
   const { userRole, authToken } = useAuth();
@@ -47,6 +48,7 @@ const App = () => {
             }
           />
           <Route path="student-information" element={<StudnetInfo />} />
+          <Route path="calendar" element={<EventCalendar />} />
         </Route>
       </>
     )

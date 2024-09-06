@@ -1,20 +1,21 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Datatable from "../common/Datatables/Datatable";
 import SearchBar from "../common/SearchBar/SearchBar";
+import { getAPI } from "../utility/api/apiCall";
 
 const StudentInfo = () => {
+  const [allStudentData, setAllStudentData] = useState([]);
   // Sample student data with additional fields
   const studentData = [
     {
       name: "John Doe",
       rollNumber: "101",
       age: 16,
+      fatherName: "Mr. Doe",
       class: "10th",
       section: "A",
-      percentage: 85,
       attendance: "95%",
       grade: "A",
-      remarks: "Excellent performance",
       color: "#3b82f6",
     },
     {
@@ -23,10 +24,8 @@ const StudentInfo = () => {
       age: 15,
       class: "10th",
       section: "B",
-      percentage: 78,
       attendance: "89%",
       grade: "B",
-      remarks: "Good effort",
       color: "#a855f7",
     },
     {
@@ -35,10 +34,8 @@ const StudentInfo = () => {
       age: 17,
       class: "12th",
       section: "A",
-      percentage: 92,
       attendance: "97%",
       grade: "A+",
-      remarks: "Outstanding",
       color: "#f97316",
     },
     {
@@ -47,10 +44,8 @@ const StudentInfo = () => {
       age: 16,
       class: "11th",
       section: "C",
-      percentage: 66,
       attendance: "85%",
       grade: "C",
-      remarks: "Needs improvement",
       color: "#ec4899",
     },
     {
@@ -59,10 +54,8 @@ const StudentInfo = () => {
       age: 15,
       class: "9th",
       section: "D",
-      percentage: 74,
       attendance: "91%",
       grade: "B",
-      remarks: "Good but can do better",
       color: "#ff5b2e",
     },
   ];
@@ -82,6 +75,10 @@ const StudentInfo = () => {
       accessor: "age",
     },
     {
+      header: "Father Name",
+      accessor: "fatherName",
+    },
+    {
       header: "Class",
       accessor: "class",
     },
@@ -90,42 +87,52 @@ const StudentInfo = () => {
       accessor: "section",
     },
     {
-      header: "Percentage",
-      accessor: "percentage",
-      render: (value, item) => (
-        <div className="flex items-center">
-          <span className="mr-2">{value}%</span>
-          <div className="relative w-full">
-            <div className="overflow-hidden h-2 text-xs flex rounded bg-gray-600">
-              <div
-                style={{
-                  width: `${value}%`,
-                  backgroundColor: item.color,
-                }}
-                className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center"
-              ></div>
-            </div>
-          </div>
-        </div>
-      ),
-    },
-    {
       header: "Attendance",
       accessor: "attendance",
+      render: (value, item) => {
+        const attendanceValue = parseFloat(value);
+        return (
+          <div className="flex items-center">
+            <span className="mr-2">{value}</span>
+            <div className="relative w-full">
+              <div className="overflow-hidden h-2 text-xs flex rounded bg-gray-600">
+                <div
+                  style={{
+                    width: `${attendanceValue}%`,
+                    backgroundColor: item.color,
+                  }}
+                  className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center"
+                ></div>
+              </div>
+            </div>
+          </div>
+        );
+      },
     },
     {
       header: "Grade",
       accessor: "grade",
     },
-    {
-      header: "Remarks",
-      accessor: "remarks",
-    },
   ];
+
+  const fetchData = async () => {
+    try {
+      const [AllStudentResponse] = await Promise.all([
+        getAPI("getAllStudents", {}, setAllStudentData),
+      ]);
+      console.log(AllStudentResponse);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   return (
     <div className="">
-      <SearchBar/>
+      <SearchBar />
       <Datatable data={studentData} columns={columns} />
     </div>
   );

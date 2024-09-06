@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
 import { IoChevronForwardOutline, IoChevronBackOutline } from "react-icons/io5";
 
@@ -14,6 +14,8 @@ const Datatable = ({ data = [], columns = [] }) => { // Added default values
   const handlePageClick = ({ selected }) => {
     setCurrentPage(selected);
   };
+
+  
 
   return (
     <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded bg-[#283046] pb-6">
@@ -41,7 +43,7 @@ const Datatable = ({ data = [], columns = [] }) => { // Added default values
                 {columns.map((column, colIndex) => (
                   <td
                     key={colIndex}
-                    className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left"
+                    className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-nowrap p-4 text-left"
                   >
                     {column.render ? column.render(item[column.accessor], item) : item[column.accessor]}
                   </td>

@@ -31,4 +31,8 @@ export const getApiConfig = {
         url: "/get-all-sessions",
         method: "GET"
     },
+    getAllStudents: {
+        url: "/get-all-students",
+        method: "GET"
+    },
 };
