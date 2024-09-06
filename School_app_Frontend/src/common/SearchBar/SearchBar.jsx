@@ -6,7 +6,7 @@ import Button from "./Button";
 
 const SearchBar = () => {
   return (
-    <div className="flex justify-evenly items-center mb-4 px-4 space-x-6 bg-[#283046] rounded-md shadow-lg hover:shadow-xl transform transition duration-500 relative z-10">
+    <div className="flex flex-wrap justify-between items-center mb-4 px-4 space-y-4 space-x-0 md:space-y-0 md:space-x-4 bg-[#283046] rounded-md shadow-lg hover:shadow-xl transition duration-500 relative z-10">
       <IconInput
         icon={
           <path
@@ -19,9 +19,9 @@ const SearchBar = () => {
         placeholder="Article name or keyword..."
       />
 
-      <Dropdown label="All Class" items={["Class 1", "Class 2", " Class 3"]} />
+      <Dropdown label="All Class" items={["Class 1", "Class 2", "Class 3"]} />
 
-      <Dropdown label="Section" items={["Section A", "Section B", "Section C","Section D"]} />
+      <Dropdown label="Section" items={["Section A", "Section B", "Section C", "Section D"]} />
 
       <Dropdown label="Session" items={["2024-2025", "2025-2026", "2026-2027"]} />
 

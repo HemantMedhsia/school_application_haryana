@@ -15,6 +15,7 @@ import RoleBasedAccess from "./pages/RoleBase/RoleBasedAccess.jsx";
 import { AuthProvider } from "./context/AuthProvider.jsx";
 import StudentAdd from "./components/Form/StudentAdd.jsx";
 import StudnetInfo from "./pages/StudnetInfo.jsx";
+import EventCalendar from "./pages/Dashboard/EventCalendar.jsx";
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -31,6 +32,7 @@ const router = createBrowserRouter(
         <Route path="testing" element={<Testing />} />
         <Route path="student-admission" element={<StudentAdd/>}/>
         <Route path="student-information" element={<StudnetInfo/>}/>
+        <Route path="calendar" element={<EventCalendar/>}/>
       </Route>
     </>
   )

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"; // Import Link from react-router-dom
 import {
   FaHome,
   FaUsers,
-  FaProjectDiagram,
+  FaChalkboardTeacher,
   FaCalendarAlt,
   FaChevronDown,
   FaChevronUp,
@@ -12,19 +12,20 @@ import {
   FaCheckCircle,
   FaUserFriends,
   FaUserTie,
-  FaClock,
   FaPen,
   FaChartLine,
   FaBell,
 } from "react-icons/fa";
+import { PiStudentFill } from "react-icons/pi";
 import aradhyaTechLogo from "../../assets/pngegg.png";
+import { CiMemoPad } from "react-icons/ci";
 
 const navigation = [
   { name: "Dashboard", to: "/", icon: FaHome, current: true },
   {
     name: "Student",
     to: "#",
-    icon: FaUsers,
+    icon: PiStudentFill,
     current: false,
     children: [
       {
@@ -40,7 +41,7 @@ const navigation = [
   {
     name: "Teacher",
     to: "#",
-    icon: FaProjectDiagram,
+    icon: FaChalkboardTeacher,
     current: false,
     children: [
       { name: "Profile", to: "/teacher-profile", icon: FaUser },
@@ -50,7 +51,7 @@ const navigation = [
   },
   { name: "Parents", to: "/parents", icon: FaUserFriends, current: false },
   { name: "Staff", to: "/staff", icon: FaUserTie, current: false },
-  { name: "Time Table", to: "/time-table", icon: FaClock, current: false },
+  { name: "Time Table", to: "/time-table", icon: CiMemoPad, current: false },
   { name: "Exams", to: "/exams", icon: FaPen, current: false },
   { name: "Marks", to: "/marks", icon: FaChartLine, current: false },
   { name: "Notice", to: "/notice", icon: FaBell, current: false },

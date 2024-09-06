@@ -41,7 +41,7 @@ const Datatable = ({ data = [], columns = [] }) => { // Added default values
                 {columns.map((column, colIndex) => (
                   <td
                     key={colIndex}
-                    className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-s whitespace-nowrap p-4 text-left"
+                    className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left"
                   >
                     {column.render ? column.render(item[column.accessor], item) : item[column.accessor]}
                   </td>
