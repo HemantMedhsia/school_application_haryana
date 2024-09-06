@@ -14,7 +14,7 @@
     guardianRelation: Joi.string().optional(),
     guardianPhone: Joi.string().required(),
     guardianOccupation: Joi.string().optional(),
-    guardianEmail: Joi.string().email().optional(),
+    email: Joi.string().email().optional(),
     guardianPhoto: Joi.string().optional(),
     guardianAddress: Joi.string().optional(),
     password: Joi.string().required(),
