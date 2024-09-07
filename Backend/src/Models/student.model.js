@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
-import { required } from "joi";
+
 
 const studentSchema = new mongoose.Schema({
     admissionNo: {

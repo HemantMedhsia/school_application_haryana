@@ -13,6 +13,8 @@ const objectId = (value, helpers) => {
 const studentValidationSchema = Joi.object({
     admissionNo: Joi.string().required(),
     rollNumber: Joi.string().required(),
+    age: Joi.string().required(),
+    address: Joi.string().optional(),
     password: Joi.string().required(),
     currentClass: Joi.string().custom(objectId).required(),
     currentSection: Joi.string().custom(objectId).required(),
