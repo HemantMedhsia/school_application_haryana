@@ -36,7 +36,7 @@ const studentValidationSchema = Joi.object({
     weight: Joi.number().optional(),
     measurementDate: Joi.date().optional(),
     medicalHistory: Joi.string().optional(),
-    parent: Joi.string().custom(objectId).required(),
+    parent: Joi.string().custom(objectId).optional(),
     StudentAttendance: Joi.array().items(Joi.string().custom(objectId)).optional(),
     complaints: Joi.array().items(Joi.string().custom(objectId)).optional(),
     studentHistory: Joi.array().items(Joi.string().custom(objectId)).optional(),

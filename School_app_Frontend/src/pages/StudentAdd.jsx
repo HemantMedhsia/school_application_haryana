@@ -28,13 +28,13 @@ const StudentAdd = () => {
     mobileNumber: "",
     email: "",
     admissionDate: "",
-    studentPhoto: "",
+    // studentPhoto: "",
     bloodGroup: "",
     house: "",
     height: "",
     weight: "",
-    measurementDate: "",
-    medicalHistory: "",
+    // measurementDate: "",
+    // medicalHistory: "",
   });
 
   // Fetch data from API
