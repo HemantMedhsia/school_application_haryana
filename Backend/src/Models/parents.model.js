@@ -53,6 +53,7 @@ const parentSchema = new mongoose.Schema({
     },
     email: {
         type: String,
+        index: true,
     },
     guardianPhoto: {
         type: String,
@@ -80,10 +81,7 @@ parentSchema.pre("save", async function (next) {
 
         // Generate a salt and hash the password
         const salt = await bcrypt.genSalt(10);
-        this.password = await bcrypt.hash(
-            this.password,
-            salt
-        );
+        this.password = await bcrypt.hash(this.password, salt);
         next();
     } catch (error) {
         next(error);
@@ -93,10 +91,7 @@ parentSchema.pre("save", async function (next) {
 // Method to validate the password
 parentSchema.methods.isValidPassword = async function (password) {
     try {
-        return await bcrypt.compare(
-            password,
-            this.password
-        );
+        return await bcrypt.compare(password, this.password);
     } catch (error) {
         throw new Error(error);
     }

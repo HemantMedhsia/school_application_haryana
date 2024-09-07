@@ -13,6 +13,7 @@ const StudentAdd = () => {
     rollNumber: "",
     studentLoginPassword: "",
     currentClass: "",
+    age: "",
     currentSection: "",
     currentSession: "",
     firstName: "",
@@ -43,7 +44,14 @@ const StudentAdd = () => {
           getAPI("getAllClasses", {}, setClasses),
           getAPI("getAllSections", {}, setSections),
         ]);
-        console.log("session",sessionsResponse, "class", classesResponse, "section",sectionsResponse);
+      console.log(
+        "session",
+        sessionsResponse,
+        "class",
+        classesResponse,
+        "section",
+        sectionsResponse
+      );
 
       setSessions(
         Array.isArray(sessionsResponse.data) ? sessionsResponse.data : []
@@ -155,6 +163,13 @@ const StudentAdd = () => {
           value={formData.bloodGroup}
           onChange={handleChange}
           placeholder="Enter Blood Group"
+        />
+        <Input
+          labelName="Age"
+          name="age"
+          value={formData.age}
+          onChange={handleChange}
+          placeholder="Enter Age"
         />
       </FormSection>
 

@@ -8,13 +8,13 @@ const AuthContext = createContext();
 const getRefreshEndpoint = (role) => {
   switch (role) {
     case "Student":
-      return "https://school-application-three.vercel.app/api/student-refresh-token-student";
+      return `${import.meta.env.VITE_BACKEND_URL}/api/refresh-token-student`;
     case "Admin":
-      return "https://school-application-three.vercel.app/api/admin-refresh-token-admin";
+      return `${import.meta.env.VITE_BACKEND_URL}/api/refresh-token-admin`;
     case "Teacher":
-      return "https://school-application-three.vercel.app/api/teacher-refresh-token-teacher";
+      return `${import.meta.env.VITE_BACKEND_URL}/api/refresh-token-teacher`;
     case "Staff":
-      return "https://school-application-three.vercel.app/api/staff-refresh-token-staff";
+      return `${import.meta.env.VITE_BACKEND_URL}/api/refresh-token-staff`;
     default:
       return "https://school-application-three.vercel.app/api/refresh-token";
   }

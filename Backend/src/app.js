@@ -20,7 +20,7 @@ import { classRoute } from "./Routes/class.Route.js";
 import { sectionRoute } from "./Routes/section.Route.js";
 import { sessionRoute } from "./Routes/session.Route.js";
 import { studentHistoryRoute } from "./Routes/studentHistory.Route.js";
-
+import { loginUserRouter } from "./Routes/loginUser.Route.js";
 
 const app = express();
 
@@ -41,7 +41,7 @@ app.use(cookieParser());
 
 app.use(bodyParser.json());
 
-app.get("/",(req,res)=>{
+app.get("/", (req, res) => {
     res.send("Welcome to our School. Deployment is complete");
 });
 
@@ -56,15 +56,15 @@ app.use("/api", teacherAttendenceRoute);
 app.use("/api", complaintRoute);
 app.use("/api", marksRoute);
 app.use("/api", singleSubjectMarkRoute);
-app.use("/api", staffRoute);app.use("/api",studentAttendenceRoute);
-app.use("/api",staffAttendanceRoute);
-app.use("/api",classRoute);
-app.use("/api",sectionRoute);app.use("/api",sessionRoute);
-app.use("/api",sectionRoute);app.use("/api",studentHistoryRoute);
-
-
-
-
+app.use("/api", staffRoute);
+app.use("/api", studentAttendenceRoute);
+app.use("/api", staffAttendanceRoute);
+app.use("/api", classRoute);
+app.use("/api", sectionRoute);
+app.use("/api", sessionRoute);
+app.use("/api", sectionRoute);
+app.use("/api", studentHistoryRoute);
+app.use("/api", loginUserRouter);
 
 // Global error handling middleware
 app.use((err, req, res, next) => {

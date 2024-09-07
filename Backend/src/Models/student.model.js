@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
+import { required } from "joi";
 
 const studentSchema = new mongoose.Schema({
     admissionNo: {
@@ -53,12 +54,21 @@ const studentSchema = new mongoose.Schema({
     caste: {
         type: String,
     },
+    age: {
+        type: String,
+        required: true,
+    },
+    address: {
+        type: String,
+        required: true,
+    },
     mobileNumber: {
         type: String,
         required: true,
     },
     email: {
         type: String,
+        index: true,
     },
     admissionDate: {
         type: Date,
@@ -130,10 +140,7 @@ studentSchema.pre("save", async function (next) {
 
         // Generate a salt and hash the password
         const salt = await bcrypt.genSalt(10);
-        this.password = await bcrypt.hash(
-            this.password,
-            salt
-        );
+        this.password = await bcrypt.hash(this.password, salt);
         next();
     } catch (error) {
         next(error);
@@ -143,10 +150,7 @@ studentSchema.pre("save", async function (next) {
 // Method to validate the password
 studentSchema.methods.isValidPassword = async function (password) {
     try {
-        return await bcrypt.compare(
-            password,
-            this.password
-        );
+        return await bcrypt.compare(password, this.password);
     } catch (error) {
         throw new Error(error);
     }
