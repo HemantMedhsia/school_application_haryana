@@ -29,7 +29,7 @@ const studentValidationSchema = Joi.object({
     mobileNumber: Joi.string().required(),
     email: Joi.string().email().optional(),
     admissionDate: Joi.date().optional(),
-    studentPhoto: Joi.string().required(),
+    studentPhoto: Joi.string().optional(),
     bloodGroup: Joi.string().optional(),
     house: Joi.string().optional(),
     height: Joi.number().optional(),
