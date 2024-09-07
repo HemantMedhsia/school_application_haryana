@@ -21,16 +21,16 @@ const LoginPage = () => {
     let apiEndpoint;
     switch (role) {
       case "Teacher":
-        apiEndpoint = "https://school-application-three.vercel.app/api/login-teacher";
+        apiEndpoint = `${import.meta.env.VITE_BACKEND_URL}/api/login-teacher`;
         break;
       case "Student":
-        apiEndpoint = "https://school-application-three.vercel.app/api/login-student";
+        apiEndpoint = `${import.meta.env.VITE_BACKEND_URL}/api/login-student`;
         break;
       case "Admin":
-        apiEndpoint = "https://school-application-three.vercel.app/api/login-admin";
+        apiEndpoint = `${import.meta.env.VITE_BACKEND_URL}/api/login-admin`;
         break;
       case "Staff":
-        apiEndpoint = "https://school-application-three.vercel.app/api/login-staff";
+        apiEndpoint = `${import.meta.env.VITE_BACKEND_URL}/api/login-staff`;
         break;
       default:
         setError("Invalid role selected.");
@@ -53,12 +53,7 @@ const LoginPage = () => {
       const { accessToken, refreshToken } = response.data.data;
       login(accessToken, refreshToken);
 
-      // Navigate based on role
-      if (role === "Admin" || role === "Teacher" || role === "Student") {
-        navigate("/school/dashboard");
-      } else {
-        navigate("/");
-      }
+      navigate("/school/dashboard");
     } catch (err) {
       console.error("Login failed:", err);
       setError("Login failed. Please try again.");

@@ -16,8 +16,6 @@ function classNames(...classes) {
 }
 
 const TopNavbar = () => {
-  const {logout} = useAuth();
-  console.log(logout);
   return (
     <Disclosure
       as="nav"
