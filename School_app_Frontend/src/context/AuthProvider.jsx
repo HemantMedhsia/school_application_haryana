@@ -100,7 +100,7 @@ export const AuthProvider = ({ children }) => {
       {!loading ? (
         children
       ) : (
-        <PyramidLoader/>
+        <PyramidLoader desc={""}/>
       )}
     </AuthContext.Provider>
   );

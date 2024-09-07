@@ -3,11 +3,12 @@ import TopNavbar from "./Navbar/TopNavbar";
 import LeftNavbar from "./Navbar/LeftNavbar";
 import { Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthProvider";
+import PyramidLoader from "../common/Loader/PyramidLoader";
 
 function Layout() {
   const { userRole, loading } = useAuth();
   if (loading) {
-    return <div>Loading...</div>;
+    return <div><PyramidLoader/></div>;
   }
   return (
     <div className="flex h-screen bg-gray-900">

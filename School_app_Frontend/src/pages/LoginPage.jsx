@@ -64,7 +64,7 @@ const LoginPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 text-gray-900 flex justify-center items-center">
-      {loader && <PyramidLoader />} {/* Loader will be displayed while loader is true */}
+      {loader && <PyramidLoader desc={"Loading Data..."}/>} {/* Loader will be displayed while loader is true */}
       <LoginForm
         email={email}
         setEmail={setEmail}
