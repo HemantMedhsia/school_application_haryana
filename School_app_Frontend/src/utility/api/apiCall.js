@@ -2,9 +2,9 @@ import axios from "axios";
 import { getApiConfig } from "./config.js";
 // import getHeaders from "./index.js"
 
-const getHeaders = (requestHeaders) => {
+const getHeaders = async (requestHeaders) => {
     const headers = {};
-    const token = localStorage.getItem("accessToken");
+    const token = localStorage.getItem("authToken");
     requestHeaders.forEach((header) => {
         switch (header) {
             case "access-token":
@@ -30,12 +30,12 @@ export async function getAPI(apiName, params={}, setData) {
     try {
         const config = {
             method: getApiConfig[apiName].method,
-            headers: getHeaders(["access-token"]),
+            headers: await getHeaders(["access-token"]),
             url: BASE_URL + getApiConfig[apiName].url,
             params: params
         };
         const response = await axios(config);
-        console.log("API call successful:", response.data);
+        // console.log("API call successful:", response.data);
         setData(response.data.data);
         return response?.data;
         

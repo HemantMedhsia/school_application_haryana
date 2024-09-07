@@ -15,6 +15,7 @@ import { useAuth } from "./context/AuthProvider.jsx";
 import StudentAdd from "./pages/StudentAdd.jsx";
 import StudnetInfo from "./pages/StudnetInfo.jsx";
 import EventCalendar from "./pages/Dashboard/EventCalendar.jsx";
+import Notice from "./pages/Notice.jsx";
 
 const App = () => {
   const { userRole, authToken } = useAuth();
@@ -41,7 +42,7 @@ const App = () => {
           <Route
             path="student-admission"
             element={
-              <RoleBasedAccess allowedRoles={["Admin"]}>
+              <RoleBasedAccess allowedRoles={["Admin","Student"]}>
                 {" "}
                 <StudentAdd />
               </RoleBasedAccess>
@@ -49,6 +50,7 @@ const App = () => {
           />
           <Route path="student-information" element={<StudnetInfo />} />
           <Route path="calendar" element={<EventCalendar />} />
+          <Route path="create-notice" element={<Notice />} />
         </Route>
       </>
     )
