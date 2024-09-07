@@ -78,6 +78,7 @@ const StudentAdd = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log(formData);
+    
   };
 
   return (

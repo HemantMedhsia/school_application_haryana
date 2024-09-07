@@ -129,11 +129,31 @@ const StudentInfo = () => {
   useEffect(() => {
     fetchData();
   }, []);
+  const handleView = (parentData) => {
+    console.log("Viewing parent data:", parentData);
+  };
+
+  const handleEdit = (parentData) => {
+    console.log("Editing parent data:", parentData);
+  };
+
+  const handleDelete = (parentData) => {
+    console.log("Deleting parent data:", parentData);
+    // Add logic to delete the parent data from the server or state
+  };
 
   return (
     <div className="">
       <SearchBar />
-      <Datatable data={studentData} columns={columns} />
+      <Datatable
+        data={studentData}
+        columns={columns}
+        actions={{
+          onView: handleView,
+          onEdit: handleEdit,
+          onDelete: handleDelete,
+        }}
+      />
     </div>
   );
 };

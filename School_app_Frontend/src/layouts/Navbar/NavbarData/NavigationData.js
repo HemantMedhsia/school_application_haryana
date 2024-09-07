@@ -105,12 +105,21 @@ export const navigation = [
     ],
   },
   {
-    name: "Parents",
-    to: "/parents",
+    name: "Parent",
+    to: "#",
     icon: FaUserFriends,
     current: false,
-    roles: ["Admin"],
+    roles: ["Admin", "Teacher"],
+    children: [
+      {
+        name: "Parent Information",
+        to: "/school/parent-information",
+        icon: FaUser,
+        roles: ["Admin", "Teacher"],
+      },
+    ],
   },
+
   {
     name: "Staff",
     to: "/staff",

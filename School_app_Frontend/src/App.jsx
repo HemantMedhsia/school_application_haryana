@@ -15,6 +15,8 @@ import { useAuth } from "./context/AuthProvider.jsx";
 import StudentAdd from "./pages/StudentAdd.jsx";
 import StudnetInfo from "./pages/StudnetInfo.jsx";
 import EventCalendar from "./pages/Dashboard/EventCalendar.jsx";
+import ParentAdd from "./pages/ParentAdd.jsx";
+import ParentInfo from "./pages/ParentInfo.jsx";
 
 const App = () => {
   const { userRole, authToken } = useAuth();
@@ -47,7 +49,9 @@ const App = () => {
               </RoleBasedAccess>
             }
           />
+          <Route path="parent-add" element={<ParentAdd />} />
           <Route path="student-information" element={<StudnetInfo />} />
+          <Route path="parent-information" element={<ParentInfo />} />
           <Route path="calendar" element={<EventCalendar />} />
         </Route>
       </>
