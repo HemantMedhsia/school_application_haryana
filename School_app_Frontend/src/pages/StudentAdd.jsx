@@ -24,7 +24,7 @@ const StudentAdd = () => {
     dateOfBirth: "",
     category: "",
     religion: "",
-    caste: "",
+    // caste: "",
     mobileNumber: "",
     email: "",
     admissionDate: "",
