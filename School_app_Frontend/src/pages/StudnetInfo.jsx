@@ -5,66 +5,16 @@ import { getAPI } from "../utility/api/apiCall";
 
 const StudentInfo = () => {
   const [allStudentData, setAllStudentData] = useState([]);
-  // Sample student data with additional fields
-  const studentData = [
-    {
-      name: "John Doe",
-      rollNumber: "101",
-      age: 16,
-      fatherName: "Mr. Doe",
-      class: "10th",
-      section: "A",
-      attendance: "95%",
-      grade: "A",
-      color: "#3b82f6",
-    },
-    {
-      name: "Jane Smith",
-      rollNumber: "102",
-      age: 15,
-      class: "10th",
-      section: "B",
-      attendance: "89%",
-      grade: "B",
-      color: "#a855f7",
-    },
-    {
-      name: "Michael Johnson",
-      rollNumber: "103",
-      age: 17,
-      class: "12th",
-      section: "A",
-      attendance: "97%",
-      grade: "A+",
-      color: "#f97316",
-    },
-    {
-      name: "Emily Davis",
-      rollNumber: "104",
-      age: 16,
-      class: "11th",
-      section: "C",
-      attendance: "85%",
-      grade: "C",
-      color: "#ec4899",
-    },
-    {
-      name: "David Brown",
-      rollNumber: "105",
-      age: 15,
-      class: "9th",
-      section: "D",
-      attendance: "91%",
-      grade: "B",
-      color: "#ff5b2e",
-    },
-  ];
 
   // Define columns for the student table with additional fields
   const columns = [
     {
-      header: "Name",
-      accessor: "name",
+      header: "Frist Name",
+      accessor: "firstName",
+    },
+    {
+      header: "Last Name",
+      accessor: "lastName",
     },
     {
       header: "Roll Number",
@@ -76,7 +26,7 @@ const StudentInfo = () => {
     },
     {
       header: "Father Name",
-      accessor: "fatherName",
+      accessor: "",
     },
     {
       header: "Class",
@@ -117,10 +67,17 @@ const StudentInfo = () => {
 
   const fetchData = async () => {
     try {
-      const [AllStudentResponse] = await Promise.all([
-        getAPI("getAllStudents", {}, setAllStudentData),
-      ]);
-      console.log(AllStudentResponse);
+      const response = await getAPI("getAllStudents", {}, setAllStudentData);
+      if (response && Array.isArray(response)) {
+        setAllStudentData(response);
+        
+      } else if (response && typeof response === "object") {
+        setAllStudentData(response.data || []);
+      } else {
+        console.error("Unexpected response format:", response);
+      }
+
+      console.log("Data fetched successfully:",await allStudentData[2].parent.fatherName);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -145,15 +102,7 @@ const StudentInfo = () => {
   return (
     <div className="">
       <SearchBar />
-      <Datatable
-        data={studentData}
-        columns={columns}
-        actions={{
-          onView: handleView,
-          onEdit: handleEdit,
-          onDelete: handleDelete,
-        }}
-      />
+      <Datatable data={allStudentData} columns={columns} />
     </div>
   );
 };

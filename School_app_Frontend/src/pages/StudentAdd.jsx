@@ -3,6 +3,7 @@ import { getAPI } from "../utility/api/apiCall";
 import Input from "../components/Form/Input";
 import Select from "../components/Form/Select";
 import FormSection from "../components/Form/FormSection";
+import FormButton from "../components/Form/FormButton";
 
 const StudentAdd = () => {
   const [sessions, setSessions] = useState([]);
@@ -277,14 +278,7 @@ const StudentAdd = () => {
       </FormSection>
 
       {/* Submit Button */}
-      <div className="flex justify-end mt-6">
-        <button
-          type="submit"
-          className="bg-[#7367F0] text-white font-semibold py-2 px-6 rounded-md hover:bg-[#4C51BF] transition duration-200 ease-in-out shadow-md"
-        >
-          Add Student
-        </button>
-      </div>
+      <FormButton name="Add Student" />
     </form>
   );
 };

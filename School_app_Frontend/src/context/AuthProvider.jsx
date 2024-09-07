@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode"; // Fix import
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import PyramidLoader from "../common/Loader/PyramidLoader";
 
 const AuthContext = createContext();
 
@@ -96,7 +97,11 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider
       value={{ authToken, refreshToken, userRole, login, logout, loading }}
     >
-      {!loading ? children : <div>Loading...</div>}
+      {!loading ? (
+        children
+      ) : (
+        <PyramidLoader/>
+      )}
     </AuthContext.Provider>
   );
 };

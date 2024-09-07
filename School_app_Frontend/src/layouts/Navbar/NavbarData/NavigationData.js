@@ -33,19 +33,19 @@ export const navigation = [
     to: "#",
     icon: FaUsers,
     current: false,
-    roles: ["Admin", "Teacher"],
+    roles: ["Admin", "Teacher","Student"],
     children: [
       {
         name: "Student Information",
         to: "/school/student-information",
         icon: FaUser,
-        roles: ["Admin", "Teacher"],
+        roles: ["Admin", "Teacher","Student"],
       },
       {
         name: "Student Admission",
         to: "/school/student-admission",
         icon: FaUser,
-        roles: ["Admin", "Teacher"],
+        roles: ["Admin", "Teacher","Student"],
       },
       {
         name: "Grades",
@@ -242,5 +242,19 @@ export const navigation = [
     icon: FaBell,
     current: false,
     roles: ["Admin", "Teacher", "Student"],
+    children: [
+      {
+        name: "Create Notice",
+        to: "/school/create-notice",
+        icon: FaUser,
+        roles: ["Student", "Teacher", "Admin"],
+      },
+      {
+        name: "View All Notices",
+        to: "/view-all-notices",
+        icon: FaBook,
+        roles: ["Student", "Teacher", "Admin"],
+      },
+    ]
   },
 ];
