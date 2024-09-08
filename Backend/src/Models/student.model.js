@@ -75,7 +75,7 @@ const studentSchema = new mongoose.Schema({
     },
     studentPhoto: {
         type: String,
-        required: true,
+        
     },
     bloodGroup: {
         type: String,
@@ -98,7 +98,6 @@ const studentSchema = new mongoose.Schema({
     parent: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Parent",
-        required: true,
     },
     StudentAttendance: [
         {

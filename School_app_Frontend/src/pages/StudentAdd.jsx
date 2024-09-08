@@ -24,11 +24,11 @@ const StudentAdd = () => {
     dateOfBirth: "",
     category: "",
     religion: "",
-    caste: "",
+    // caste: "",
     mobileNumber: "",
     email: "",
     admissionDate: "",
-    // studentPhoto: "",
+    // studentPhoto: "", it is use when photo is upload
     bloodGroup: "",
     house: "",
     height: "",
