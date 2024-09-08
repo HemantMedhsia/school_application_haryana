@@ -7,7 +7,6 @@ import ParentDashboard from '../../pages/Dashboard/ParentDashboard';
 const Dashboard = ({ role }) => {
   return (
     <div>
-      <h1>I am Dashboard</h1>
       {role === 'Student' && <StudentDashboard />}
       {role === 'Teacher' && <TeacherDashboard />}
       {role === 'Admin' && <AdminDashboard />}

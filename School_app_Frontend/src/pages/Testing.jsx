@@ -3,6 +3,7 @@ import TrafficChart from "../common/Charts/TrafficChart";
 import BarChart from "../common/Charts/BarChart";
 import DataTable from "../common/Datatables/Datatable";
 import PyramidLoader from "../common/Loader/PyramidLoader";
+import RadialBarChart from "../common/Charts/RadialBarChart";
 
 const Testing = () => {
   const trafficChartData = {
@@ -55,7 +56,9 @@ const Testing = () => {
       <div className="bg-[#1a202c] min-h-screen p-4">
         <DataTable data={trafficData} />
       </div> */}
-      <PyramidLoader/>
+      {/* <PyramidLoader/> */}
+
+      <RadialBarChart />
     </div>
   );
 };
