@@ -28,7 +28,7 @@ const StudentAdd = () => {
     mobileNumber: "",
     email: "",
     admissionDate: "",
-    // studentPhoto: "",
+    // studentPhoto: "", it is use when photo is upload
     bloodGroup: "",
     house: "",
     height: "",
