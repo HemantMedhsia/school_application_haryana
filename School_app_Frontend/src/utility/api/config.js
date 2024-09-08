@@ -35,4 +35,12 @@ export const getApiConfig = {
         url: "/get-all-students",
         method: "GET"
     },
+    getAllParents: {
+        url: "/get-all-parents",
+        method: "GET"
+    },
+    addStudent: {
+        url: "/create-student/:schoolId", 
+        method: "POST"
+    },
 };

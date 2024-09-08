@@ -26,11 +26,11 @@ const StudentInfo = () => {
     },
     {
       header: "Father Name",
-      accessor: "",
+      accessor: (rowData) => rowData?.parent?.fatherName || "N/A"
     },
     {
       header: "Class",
-      accessor: "class",
+      accessor: "currentClass.name",
     },
     {
       header: "Section",
@@ -70,14 +70,17 @@ const StudentInfo = () => {
       const response = await getAPI("getAllStudents", {}, setAllStudentData);
       if (response && Array.isArray(response)) {
         setAllStudentData(response);
-        
       } else if (response && typeof response === "object") {
         setAllStudentData(response.data || []);
       } else {
         console.error("Unexpected response format:", response);
       }
+      console.log("Data fetched successfully:", response);
 
-      console.log("Data fetched successfully:",await allStudentData[2].parent.fatherName);
+      console.log(
+        "Data fetched successfully:",
+        await allStudentData[2].parent.fatherName
+      );
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -86,11 +89,31 @@ const StudentInfo = () => {
   useEffect(() => {
     fetchData();
   }, []);
+  const handleView = (studentData) => {
+    console.log("Viewing parent data:", studentData);
+  };
+
+  const handleEdit = (studentData) => {
+    console.log("Editing parent data:", studentData);
+  };
+
+  const handleDelete = (studentData) => {
+    console.log("Deleting parent data:", studentData);
+    // Add logic to delete the parent data from the server or state
+  };
 
   return (
     <div className="">
       <SearchBar />
-      <Datatable data={allStudentData} columns={columns} />
+      <Datatable
+        data={allStudentData}
+        columns={columns}
+        actions={{
+          onView: handleView,
+          onEdit: handleEdit,
+          onDelete: handleDelete,
+        }}
+      />
     </div>
   );
 };

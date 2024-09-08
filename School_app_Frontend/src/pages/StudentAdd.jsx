@@ -4,6 +4,7 @@ import Input from "../components/Form/Input";
 import Select from "../components/Form/Select";
 import FormSection from "../components/Form/FormSection";
 import FormButton from "../components/Form/FormButton";
+import axios from "axios";
 
 const StudentAdd = () => {
   const [sessions, setSessions] = useState([]);
@@ -12,7 +13,7 @@ const StudentAdd = () => {
   const [formData, setFormData] = useState({
     admissionNo: "",
     rollNumber: "",
-    studentLoginPassword: "",
+    password: "",
     currentClass: "",
     age: "",
     currentSection: "",
@@ -27,13 +28,13 @@ const StudentAdd = () => {
     mobileNumber: "",
     email: "",
     admissionDate: "",
-    studentPhoto: "",
+    // studentPhoto: "",
     bloodGroup: "",
     house: "",
     height: "",
     weight: "",
-    measurementDate: "",
-    medicalHistory: "",
+    // measurementDate: "",
+    // medicalHistory: "",
   });
 
   // Fetch data from API
@@ -76,9 +77,37 @@ const StudentAdd = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
+    const schoolId = "66d1c1175fb4969242d7f896";
+
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/create-student/${schoolId}`, 
+        formData, 
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`, 
+          },
+        }
+      );
+
+      console.log("Student added successfully:", response.data);
+
+      // Resetting the form fields
+      setFormData({
+        firstName: "",
+        lastName: "",
+        // Reset any other fields if necessary
+      });
+    } catch (error) {
+      console.error(
+        "Error adding student:",
+        error.response ? error.response.data : error.message
+      );
+      // Optionally, display an error message to the user
+    }
   };
 
   return (
@@ -217,8 +246,8 @@ const StudentAdd = () => {
         <Input
           labelName="Login Password"
           type="password"
-          name="studentLoginPassword"
-          value={formData.studentLoginPassword}
+          name="password"
+          value={formData.password}
           onChange={handleChange}
           placeholder="Enter Login Password"
         />
