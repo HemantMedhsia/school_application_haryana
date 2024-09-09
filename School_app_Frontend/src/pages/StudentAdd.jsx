@@ -26,7 +26,7 @@ const StudentAdd = () => {
     religion: "",
     // caste: "",
     mobileNumber: "",
-    email: "",
+    email: "",  
     admissionDate: "",
     // studentPhoto: "", it is use when photo is upload
     bloodGroup: "",
