@@ -23,7 +23,7 @@ export const navigation = [
   },
   {
     name: "My Profile",
-    to: "/My-Profile",
+    to: "/school/profile",
     icon: FaUserFriends,
     current: false,
     roles: ["Student", "Teacher"],

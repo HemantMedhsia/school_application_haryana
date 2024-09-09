@@ -16,6 +16,7 @@ import StudentAdd from "./pages/StudentAdd.jsx";
 import StudnetInfo from "./pages/StudnetInfo.jsx";
 import EventCalendar from "./pages/Dashboard/EventCalendar.jsx";
 import Notice from "./pages/Notice.jsx";
+import Profile from "./pages/Profile.jsx";
 import ParentAdd from "./pages/ParentAdd.jsx";
 import ParentInfo from "./pages/ParentInfo.jsx";
 
@@ -44,7 +45,7 @@ const App = () => {
           <Route
             path="student-admission"
             element={
-              <RoleBasedAccess allowedRoles={["Admin","Student"]}>
+              <RoleBasedAccess allowedRoles={["Admin", "Student"]}>
                 {" "}
                 <StudentAdd />
               </RoleBasedAccess>
@@ -52,9 +53,12 @@ const App = () => {
           />
           <Route path="parent-add" element={<ParentAdd />} />
           <Route path="student-information" element={<StudnetInfo />} />
+      
+
           <Route path="parent-information" element={<ParentInfo />} />
           <Route path="calendar" element={<EventCalendar />} />
           <Route path="create-notice" element={<Notice />} />
+          <Route path="profile" element={<Profile />} />
         </Route>
       </>
     )

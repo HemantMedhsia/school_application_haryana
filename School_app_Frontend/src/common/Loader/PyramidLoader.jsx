@@ -1,6 +1,6 @@
 import React from "react";
 
-const PyramidLoader = () => {
+const PyramidLoader = ({desc}) => {
   return (
       <div className="fixed inset-0 bg-gray-900 bg-opacity-80 flex items-center justify-center z-50">
         <div class="pyramid-loader">
@@ -11,7 +11,7 @@ const PyramidLoader = () => {
             <span class="side side4"></span>
             <span class="shadow"></span>
           </div>
-          <h1 class="loaderText">Loading Data...</h1>
+          <h1 class="loaderText">{desc}</h1>
         </div>
       </div>
   );
