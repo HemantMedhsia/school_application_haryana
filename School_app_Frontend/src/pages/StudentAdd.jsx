@@ -4,12 +4,17 @@ import Input from "../components/Form/Input";
 import Select from "../components/Form/Select";
 import FormSection from "../components/Form/FormSection";
 import FormButton from "../components/Form/FormButton";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const StudentAdd = () => {
   const [sessions, setSessions] = useState([]);
   const [classes, setClasses] = useState([]);
   const [sections, setSections] = useState([]);
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     admissionNo: "",
     rollNumber: "",
@@ -26,7 +31,7 @@ const StudentAdd = () => {
     religion: "",
     // caste: "",
     mobileNumber: "",
-    email: "",  
+    email: "",
     admissionDate: "",
     // studentPhoto: "", it is use when photo is upload
     bloodGroup: "",
@@ -83,17 +88,18 @@ const StudentAdd = () => {
 
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/create-student/${schoolId}`, 
-        formData, 
+        `${import.meta.env.VITE_BACKEND_URL}/api/create-student/${schoolId}`,
+        formData,
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`, 
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         }
       );
 
       console.log("Student added successfully:", response.data);
+      toast.success("Student added successfully!");
 
       // Resetting the form fields
       setFormData({
@@ -101,12 +107,15 @@ const StudentAdd = () => {
         lastName: "",
         // Reset any other fields if necessary
       });
+
+      const studentId = response.data.data._id;
+      navigate(`/school/parent-add/${studentId}`);
     } catch (error) {
-      console.error(
-        "Error adding student:",
-        error.response ? error.response.data : error.message
+      const errorMessage = error.response ? error.response.data : error.message;
+      console.error("Error adding student:", errorMessage);
+      toast.error(
+        "Error adding student: " + errorMessage.message.split(".")[0]
       );
-      // Optionally, display an error message to the user
     }
   };
 
@@ -307,6 +316,7 @@ const StudentAdd = () => {
 
       {/* Submit Button */}
       <FormButton name="Add Student" />
+      <ToastContainer />
     </form>
   );
 };

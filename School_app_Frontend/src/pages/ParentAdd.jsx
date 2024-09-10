@@ -2,32 +2,36 @@ import React, { useState, useEffect } from "react";
 import { getAPI } from "../utility/api/apiCall";
 import Input from "../components/Form/Input";
 import FormSection from "../components/Form/FormSection";
+import axios from "axios";
+import { useParams } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const ParentAdd = () => {
+  const { studentId } = useParams();
+  console.log(studentId);
+
   const [formData, setFormData] = useState({
     fatherName: "",
     fatherPhone: "",
     fatherOccupation: "",
-    fatherPhoto: "",
+    // fatherPhoto: "",
     motherName: "",
     motherPhone: "",
     motherOccupation: "",
-    motherPhoto: "",
+    // motherPhoto: "",
     guardianIs: "",
     guardianName: "",
     guardianRelation: "",
     guardianPhone: "",
     guardianOccupation: "",
     email: "",
-    guardianPhoto: "",
+    // guardianPhoto: "",
     guardianAddress: "",
     password: "",
   });
 
-  
-  const fetchData = async () => {
-    
-  };
+  const fetchData = async () => {};
 
   useEffect(() => {
     fetchData();
@@ -37,10 +41,36 @@ const ParentAdd = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
-    
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/create-parent/${studentId}`,
+        formData
+      );
+      console.log("Parent added successfully:", response.data);
+      toast.success("Parent added successfully!");
+
+      setFormData({
+        fatherName: "",
+        fatherPhone: "",
+        fatherOccupation: "",
+        motherName: "",
+        motherPhone: "",
+        motherOccupation: "",
+        guardianIs: "",
+        guardianName: "",
+        guardianRelation: "",
+        guardianPhone: "",
+        guardianOccupation: "",
+        email: "",
+        guardianAddress: "",
+        password: "",
+      });
+    } catch (error) {
+      console.error("Error adding parent:", error.response.data);
+      toast.error("Error adding parent: " + error.response.data.message);
+    }
   };
 
   return (
@@ -172,6 +202,7 @@ const ParentAdd = () => {
           Add Parent
         </button>
       </div>
+      <ToastContainer />
     </form>
   );
 };
