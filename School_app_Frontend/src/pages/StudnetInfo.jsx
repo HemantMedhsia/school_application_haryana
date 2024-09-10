@@ -57,11 +57,11 @@ const StudentInfo = () => {
     },
     {
       header: "Class",
-      accessor: "currentClass.name",
+      accessor: (rowData) => rowData?.currentClass?.name || "N/A",
     },
     {
       header: "Section",
-      accessor: "section",
+      accessor: (rowData) => rowData?.currentSection?.name || "N/A",
     },
     {
       header: "Attendance",
