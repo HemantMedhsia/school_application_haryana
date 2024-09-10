@@ -1,15 +1,42 @@
 import React, { useEffect, useState } from "react";
 import Datatable from "../common/Datatables/Datatable";
 import SearchBar from "../common/SearchBar/SearchBar";
-import { getAPI } from "../utility/api/apiCall";
+import { deleteAPI, getAPI } from "../utility/api/apiCall";
+
+const ConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-[#65FA9E] bg-opacity-20 flex items-center justify-center z-50">
+      <div className="bg-[#a49fdd] p-6 rounded-md shadow-lg">
+        <h2 className="text-lg text-grey-400 mb-4">Are you sure you want to delete this student?</h2>
+        <div className="flex justify-end">
+          <button
+            className="bg-red-500 hover:bg-red-300 text-white px-4 py-2 rounded mr-2"
+            onClick={onConfirm}
+          >
+            Yes
+          </button>
+          <button
+            className="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded"
+            onClick={onClose}
+          >
+            No
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const StudentInfo = () => {
   const [allStudentData, setAllStudentData] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [studentToDelete, setStudentToDelete] = useState(null);
 
-  // Define columns for the student table with additional fields
   const columns = [
     {
-      header: "Frist Name",
+      header: "First Name",
       accessor: "firstName",
     },
     {
@@ -26,7 +53,7 @@ const StudentInfo = () => {
     },
     {
       header: "Father Name",
-      accessor: (rowData) => rowData?.parent?.fatherName || "N/A"
+      accessor: (rowData) => rowData?.parent?.fatherName || "N/A",
     },
     {
       header: "Class",
@@ -75,12 +102,6 @@ const StudentInfo = () => {
       } else {
         console.error("Unexpected response format:", response);
       }
-      console.log("Data fetched successfully:", response);
-
-      console.log(
-        "Data fetched successfully:",
-        await allStudentData[2].parent.fatherName
-      );
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -89,6 +110,7 @@ const StudentInfo = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
   const handleView = (studentData) => {
     console.log("Viewing parent data:", studentData);
   };
@@ -97,9 +119,30 @@ const StudentInfo = () => {
     console.log("Editing parent data:", studentData);
   };
 
-  const handleDelete = (studentData) => {
-    console.log("Deleting parent data:", studentData);
-    // Add logic to delete the parent data from the server or state
+  const handleDelete = async () => {
+    if (!studentToDelete) return;
+
+    try {
+      console.log("Deleting student data:", studentToDelete._id);
+      const res = await deleteAPI(`delete-student/${studentToDelete._id}`);
+      setAllStudentData((prevData) =>
+        prevData.filter((data) => data._id !== studentToDelete._id)
+      );
+      console.log(res);
+      closeModal(); // Close modal after deletion
+    } catch (error) {
+      console.error("Error deleting data:", error);
+    }
+  };
+
+  const openModal = (studentData) => {
+    setStudentToDelete(studentData);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setStudentToDelete(null);
+    setIsModalOpen(false);
   };
 
   return (
@@ -111,8 +154,13 @@ const StudentInfo = () => {
         actions={{
           onView: handleView,
           onEdit: handleEdit,
-          onDelete: handleDelete,
+          onDelete: openModal, // Open modal instead of directly deleting
         }}
+      />
+      <ConfirmationModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        onConfirm={handleDelete}
       />
     </div>
   );

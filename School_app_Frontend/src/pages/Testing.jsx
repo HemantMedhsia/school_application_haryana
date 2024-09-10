@@ -4,6 +4,7 @@ import BarChart from "../common/Charts/BarChart";
 import DataTable from "../common/Datatables/Datatable";
 import PyramidLoader from "../common/Loader/PyramidLoader";
 import RadialBarChart from "../common/Charts/RadialBarChart";
+import SmalldataBlock from "../common/DataBlock/SmalldataBlock";
 
 const Testing = () => {
   const trafficChartData = {
@@ -31,11 +32,31 @@ const Testing = () => {
   const barChartColors = ["#FF4560", "#00E396"];
 
   const trafficData = [
-    { referral: "Facebook", visitors: "1,480", percentage: 60, color: "#ff5b2e" },
-    { referral: "Facebook", visitors: "5,480", percentage: 50, color: "#a855f7" },
+    {
+      referral: "Facebook",
+      visitors: "1,480",
+      percentage: 60,
+      color: "#ff5b2e",
+    },
+    {
+      referral: "Facebook",
+      visitors: "5,480",
+      percentage: 50,
+      color: "#a855f7",
+    },
     { referral: "Google", visitors: "4,807", percentage: 60, color: "#ec4899" },
-    { referral: "Instagram", visitors: "3,678", percentage: 85, color: "#3b82f6" },
-    { referral: "Twitter", visitors: "2,645", percentage: 60, color: "#f97316" },
+    {
+      referral: "Instagram",
+      visitors: "3,678",
+      percentage: 85,
+      color: "#3b82f6",
+    },
+    {
+      referral: "Twitter",
+      visitors: "2,645",
+      percentage: 60,
+      color: "#f97316",
+    },
   ];
 
   return (
@@ -59,6 +80,31 @@ const Testing = () => {
       {/* <PyramidLoader/> */}
 
       <RadialBarChart />
+      <div className="flex gap-4">
+        <SmalldataBlock
+          title="Total Students"
+          description="Number of students enrolled"
+          iconUrl="https://img.icons8.com/ios/50/000000/graduation-cap--v1.png"
+          bgColor="bg-[#FF4560]"
+          value={200}
+        />
+        <SmalldataBlock
+          title="Total Teachers"
+          description="Number of teachers"
+          iconUrl="https://img.icons8.com/ios/50/000000/teacher.png"
+          bgColor="bg-[#00E396]"
+          value={50}
+        />
+        <SmalldataBlock
+          title="Classes Today"
+          description="Number of classes scheduled"
+          iconUrl="https://img.icons8.com/ios/50/000000/classroom.png"
+          bgColor="bg-[#008FFB]"
+          value={30}
+        />
+        {/* Add more blocks as needed */}
+      </div>
+
     </div>
   );
 };
