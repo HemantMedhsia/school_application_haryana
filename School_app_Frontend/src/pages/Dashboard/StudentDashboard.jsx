@@ -1,11 +1,32 @@
-import React from 'react'
+import React from "react";
+import SmalldataBlock from "../../common/DataBlock/SmalldataBlock";
 
 const StudentDashboard = () => {
   return (
-    <div>
-      <h1>I am Student Dashboard</h1>
+    <div className="flex gap-4">
+      <SmalldataBlock
+        title="Total Classes"
+        description="Total number of classes"
+        iconUrl="https://img.icons8.com/ios/50/000000/graduation-cap--v1.png"
+        bgColor="bg-[#FF4560]"
+        value={200}
+      />
+      <SmalldataBlock
+        title="Total Classes"
+        description="Total number of classes"
+        iconUrl="https://img.icons8.com/ios/50/000000/graduation-cap--v1.png"
+        bgColor="bg-[#FF4560]"
+        value={200}
+      />
+      <SmalldataBlock
+        title="Total Classes"
+        description="Total number of classes"
+        iconUrl="https://img.icons8.com/ios/50/000000/graduation-cap--v1.png"
+        bgColor="bg-[#FF4560]"
+        value={200}
+      />
     </div>
-  )
-}
+  );
+};
 
-export default StudentDashboard
+export default StudentDashboard;

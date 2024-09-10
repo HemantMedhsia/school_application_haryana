@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import ReactPaginate from "react-paginate";
 import {
   IoChevronForwardOutline,
@@ -9,7 +9,6 @@ import {
 } from "react-icons/io5";
 
 const Datatable = ({ data = [], columns = [], actions = {} }) => {
-  // Added default values
   const [currentPage, setCurrentPage] = useState(0);
   const itemsPerPage = 8; // Number of rows per page
 
@@ -56,14 +55,14 @@ const Datatable = ({ data = [], columns = [], actions = {} }) => {
                     key={colIndex}
                     className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-nowrap p-4 text-left"
                   >
-                    {column.render
-                      ? column.render(item[column.accessor], item)
-                      : item[column.accessor]}
+                    {typeof column.accessor === 'function'
+                      ? column.accessor(item) // Call accessor function if it's a function
+                      : item[column.accessor] || "N/A"}
                   </td>
                 ))}
                 {/* Action buttons */}
                 {Object.keys(actions).length > 0 && (
-                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xl  whitespace-nowrap p-4 text-left">
+                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xl whitespace-nowrap p-4 text-left">
                     <div className="flex space-x-2 gap-2">
                       {actions.onView && (
                         <button onClick={() => actions.onView(item)}>
@@ -91,7 +90,7 @@ const Datatable = ({ data = [], columns = [], actions = {} }) => {
 
       {/* Pagination */}
       <div className="flex justify-end mr-5">
-        <ReactPaginate
+      <ReactPaginate
           previousLabel={<IoChevronBackOutline />}
           nextLabel={<IoChevronForwardOutline />}
           breakLabel={"..."}
