@@ -62,7 +62,7 @@ const Testing = () => {
 
   return (
     <div className="app-container flex flex-col">
-      {/* <div className="flex">
+      <div className="flex">
         <TrafficChart {...trafficChartData} />
 
         <div className=" ml-4 h-[100%] w-full bg-[#283046] rounded-lg shadow p-4 md:p-6">
@@ -77,7 +77,7 @@ const Testing = () => {
 
       <div className="bg-[#1a202c] min-h-screen p-4">
         <DataTable data={trafficData} />
-      </div> */}
+      </div>
       {/* <PyramidLoader/> */}
 
       <RadialBarChart />

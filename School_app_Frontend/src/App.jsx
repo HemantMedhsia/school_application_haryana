@@ -19,6 +19,7 @@ import Notice from "./pages/Notice.jsx";
 import Profile from "./pages/Profile.jsx";
 import ParentAdd from "./pages/ParentAdd.jsx";
 import ParentInfo from "./pages/ParentInfo.jsx";
+import Attendence from "./pages/Attendence.jsx";
 
 const App = () => {
   const { userRole, authToken } = useAuth();
@@ -59,6 +60,7 @@ const App = () => {
           <Route path="calendar" element={<EventCalendar />} />
           <Route path="create-notice" element={<Notice />} />
           <Route path="profile/:studentId" element={<Profile />} />
+          <Route path="attendance" element={<Attendence />} />
         </Route>
       </>
     )

@@ -10,12 +10,12 @@ const SmalldataBlock = ({ title, description, iconUrl, bgColor, value }) => {
       >
         <MdCoPresent />
       </div>
-      <div className="flex-1 w-full text-center sm:text-left">
+      <div className="flex-1 mx-2 w-full text-center sm:text-left">
         <h2 className="text-lg font-semibold text-[#7367F0]">{title}</h2>
         <p className="text-sm text-gray-500">{description}</p>
       </div>
       <div className="mt-2 h-full sm:mt-0 sm:ml-auto text-center sm:text-right">
-        <h2 className="text-3xl font-bold text-[#65FA9E]">{value}</h2>
+        <h2 className="text-2xl border-2 border-gray-900 shadow-[#65FA9E] rounded-3xl px-2 py-1 bg-gray-900 font-semibold font-serif text-[#65FA9E]">{value}</h2>
       </div>
     </div>
   );

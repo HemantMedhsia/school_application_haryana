@@ -7,6 +7,7 @@ import {
   IoTrashOutline,
   IoPencilOutline,
 } from "react-icons/io5";
+import { BsPersonFillCheck, BsPersonFillSlash } from "react-icons/bs";
 
 const Datatable = ({ data = [], columns = [], actions = {} }) => {
   const [currentPage, setCurrentPage] = useState(0);
@@ -55,9 +56,7 @@ const Datatable = ({ data = [], columns = [], actions = {} }) => {
                     key={colIndex}
                     className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-nowrap p-4 text-left"
                   >
-                    {typeof column.accessor === 'function'
-                      ? column.accessor(item) // Call accessor function if it's a function
-                      : item[column.accessor] || "N/A"}
+                    {column.render ? column.render(item[column.accessor], item) : item[column.accessor] || "N/A"}
                   </td>
                 ))}
                 {/* Action buttons */}
@@ -79,6 +78,17 @@ const Datatable = ({ data = [], columns = [], actions = {} }) => {
                           <IoTrashOutline className="text-red-500 hover:text-red-700" />
                         </button>
                       )}
+                      {actions.onPresent && (
+                        <button className="flex hover:bg-gray-800 hover:-translate-y-1 duration-200 gap-2 border px-2 shadow-sm shadow-[#65FA9E] py-1 rounded-lg bg-gray-900 border-gray-900 text-md font-mono justify-center items-center" onClick={() => actions.onPresent(item)}>
+                          <BsPersonFillCheck className="text-[#65FA9E] hover:text-[#65FA9E]" /><div className="text-sm">Present</div>
+                        </button>
+                      )}
+                      {actions.onAbsent && (
+                        <button className="flex gap-2 hover:bg-gray-800 hover:-translate-y-1 duration-200 border px-2 py-1 shadow-sm shadow-[#F87171] rounded-lg bg-gray-900 border-gray-900 justify-center font-mono items-center" onClick={() => actions.onAbsent(item)}>
+                          <BsPersonFillSlash className="text-[#F87171] hover:text-[#F87171]" />
+                          <div className="text-sm">Absent</div>
+                        </button>
+                      )}
                     </div>
                   </td>
                 )}
@@ -90,7 +100,7 @@ const Datatable = ({ data = [], columns = [], actions = {} }) => {
 
       {/* Pagination */}
       <div className="flex justify-end mr-5">
-      <ReactPaginate
+        <ReactPaginate
           previousLabel={<IoChevronBackOutline />}
           nextLabel={<IoChevronForwardOutline />}
           breakLabel={"..."}

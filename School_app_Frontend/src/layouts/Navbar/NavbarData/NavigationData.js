@@ -16,7 +16,7 @@ import {
 export const navigation = [
   {
     name: "Dashboard",
-    to: "/school/testing",
+    to: "/school/dashboard",
     icon: FaHome,
     current: true,
     roles: ["Admin", "Teacher", "Student"],
@@ -58,7 +58,7 @@ export const navigation = [
     children: [
       {
         name: "Student Attendance",
-        to: "/teacher-profile",
+        to: "/school/attendance",
         icon: FaUser,
         roles: ["Teacher", "Admin"],
       },
