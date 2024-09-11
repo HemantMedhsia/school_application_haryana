@@ -9,7 +9,7 @@ const RadialBarChart = ({
   startAngle = -135,
   endAngle = 225,
   hollowSize = '70%',
-  hollowBackground = '#fff',
+  hollowBackground = '#283046',
   dropShadow = true,
   dropShadowOptions = {
     top: 3,
@@ -17,7 +17,8 @@ const RadialBarChart = ({
     blur: 4,
     opacity: 0.24,
   },
-  trackBackground = '#fff',
+
+  trackBackground = '#283046',
   trackStrokeWidth = '67%',
   gradientFromColor = '#ABE5A1',
   gradientToColor = '#ABE5A1',
@@ -25,10 +26,11 @@ const RadialBarChart = ({
   gradientType = 'horizontal',
   gradientShadeIntensity = 0.5,
   gradientStops = [0, 100],
-  dataLabelNameColor = '#888',
-  dataLabelNameFontSize = '17px',
-  dataLabelValueColor = '#111',
+  dataLabelNameColor = '#7367F0',
+  dataLabelNameFontSize = '20px',
+  dataLabelValueColor = '#65FA9E',
   dataLabelValueFontSize = '36px',
+  chartBackground = '#283046', // Modify the background color here
 }) => {
   const options = {
     series,
@@ -38,6 +40,7 @@ const RadialBarChart = ({
       toolbar: {
         show: true,
       },
+      background: chartBackground, // Set the background color here
     },
     plotOptions: {
       radialBar: {

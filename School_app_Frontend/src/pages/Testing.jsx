@@ -5,6 +5,7 @@ import DataTable from "../common/Datatables/Datatable";
 import PyramidLoader from "../common/Loader/PyramidLoader";
 import RadialBarChart from "../common/Charts/RadialBarChart";
 import SmalldataBlock from "../common/DataBlock/SmalldataBlock";
+import DisplayingStudentHomework from "../common/DataBlock/DisplayingStudentHomework";
 
 const Testing = () => {
   const trafficChartData = {
@@ -104,7 +105,7 @@ const Testing = () => {
         />
         {/* Add more blocks as needed */}
       </div>
-
+      <DisplayingStudentHomework/>
     </div>
   );
 };
