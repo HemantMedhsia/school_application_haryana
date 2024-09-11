@@ -5,8 +5,9 @@ import NavbarDropdown from "./NavbarData/NavbarDropdown.jsx";
 import NavbarItem from "./NavbarData/NavbarItem.jsx";
 import { navigation } from "./NavbarData/NavigationData.js";
 
-const LeftNavbar = ({ role }) => {
+const LeftNavbar = ({ role, onToggle }) => {
   const [dropdownOpen, setDropdownOpen] = useState({});
+  const [isCollapsed, setIsCollapsed] = useState(false); // State to handle collapse
   const location = useLocation();
 
   const handleDropdownClick = (name) => {
@@ -21,11 +22,20 @@ const LeftNavbar = ({ role }) => {
     item.roles.includes(role)
   );
 
+  // Toggle collapse state
+  const handleToggleCollapse = () => {
+    setIsCollapsed(!isCollapsed);
+    onToggle(); // Call parent function to adjust layout
+  };
+
   return (
-    <div className="fixed top-0 left-0 w-64 h-full bg-[#283046]">
-      <div className="flex flex-col h-full bg-[#283046] text-white">
-        <div className="flex items-center justify-center h-16 bg-[#283046]">
-          <img src={aradhyaTechLogo} alt="Logo" className="h-16 w-auto mt-2" />
+    <div className={`fixed top-0 left-0 h-full bg-[#283046] transition-width duration-300 ${isCollapsed ? "w-20" : "w-64"}`}>
+      <div className="flex flex-col h-full text-white">
+        <div className="flex items-center justify-between h-16 p-2 bg-[#283046]">
+          <img src={aradhyaTechLogo} alt="Logo" className={`h-16 mt-2 transition-all duration-300 ${isCollapsed ? "hidden" : "block"}`} />
+          <button onClick={handleToggleCollapse} className="text-white focus:outline-none">
+            {isCollapsed ? "➔" : "←"} {/* Collapse toggle icon */}
+          </button>
         </div>
         <nav className="flex flex-col flex-grow p-4 space-y-2 overflow-y-auto">
           {filteredNavigation.map((item) => (
@@ -36,12 +46,14 @@ const LeftNavbar = ({ role }) => {
                   isOpen={dropdownOpen[item.name]}
                   role={role}
                   onClick={() => handleDropdownClick(item.name)}
+                  isCollapsed={isCollapsed} // Pass collapse state to child
                 />
               ) : (
                 <NavbarItem
                   item={item}
                   isActive={location.pathname === item.to}
                   onClick={null}
+                  isCollapsed={isCollapsed} // Pass collapse state to child
                 />
               )}
             </div>

@@ -15,6 +15,10 @@ module.exports = {
         center: true,
         padding: '2rem',             // Center the container with padding
       },
+      transitionProperty: {
+        'width': 'width',
+        'spacing': 'margin, padding',
+      },
     },
   },
   variants: {

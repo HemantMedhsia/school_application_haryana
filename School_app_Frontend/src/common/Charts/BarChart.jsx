@@ -1,11 +1,21 @@
-import React, { lazy, useEffect } from "react";
+import React from "react";
 import ReactApexChart from "react-apexcharts";
 
-const BarChart = ({ series, colors, height }) => {
+const BarChart = ({ series, colors, height, width, label }) => {
   const options = {
     chart: {
       type: 'bar',
       height,
+      width,
+      responsive: [{
+        breakpoint: 1000,
+        options: {
+          chart: {
+            width: "90%",
+            height: "90%",
+          }
+        }
+      }]
     },
     colors,
     plotOptions: {
@@ -33,9 +43,9 @@ const BarChart = ({ series, colors, height }) => {
       },
       labels: {
         style: {
-          colors: ['#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF'], // Array of colors for each day
-          fontSize: '12px', // Optional: set the font size
-          fontFamily: 'Inter, sans-serif', // Optional: set the font family
+          colors: ['#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF'],
+          fontSize: '12px',
+          fontFamily: 'Inter, sans-serif',
         },
       },
     },
@@ -54,7 +64,12 @@ const BarChart = ({ series, colors, height }) => {
     }
   };
 
-  return <ReactApexChart options={options} series={series} type="bar" height={height} width={"900px"} />;
+  return (
+    <div className="w-2/3 rounded-md shadow p-4 md:p-6">
+      <h1 className="text-white text-lg font-semibold">{label}</h1>
+      <ReactApexChart options={options} series={series} type="bar" height={height} width={width} />
+    </div>
+  );
 };
 
 export default BarChart;

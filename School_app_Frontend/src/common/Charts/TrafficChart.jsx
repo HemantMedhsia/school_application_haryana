@@ -2,28 +2,36 @@ import React, { useEffect } from "react";
 import ApexCharts from "apexcharts";
 
 const TrafficChart = ({
-  series = [35.1, 23.5, 2.4, 5.4], // Default series data
-  colors, // Default colors
-  labels = ["Direct", "Sponsor", "Affiliate", "Email marketing"], // Default labels
-  title = "Website Traffic", // Default title
-  height = 320, // Chart height
-  width = "100%", // Chart width
-  containerId = "donut-chart", // Default container ID
-  innerLable = "Unique visitors", // Default inner label
+  series = [35.1, 23.5, 2.4, 5.4], 
+  colors,
+  labels = ["Direct", "Sponsor", "Affiliate", "Email marketing"], 
+  title = "Website Traffic", 
+  height = "100%", 
+  width = "100%", 
+  containerId = "donut-chart", 
+  innerLable = "Unique visitors", 
 }) => {
   const adjustedColors = Array(series.length).fill().map((_, i) => colors[i % colors.length]);
 
-  const numberOfLabels = colors.length; // Replace with the actual number of labels
+  const numberOfLabels = colors.length;
   const labelColors = Array(numberOfLabels).fill("white");
 
-  // Dynamically set chart options using props
   const getChartOptions = () => ({
     series,
-    colors : adjustedColors,
+    colors: adjustedColors,
     chart: {
-      height,
-      width,
       type: "donut",
+      height: "100%",
+      width: "100%",
+      responsive: [{
+        breakpoint: 1000,
+        options: {
+          chart: {
+            width: "90%",
+            height: "90%",
+          }
+        }
+      }]
     },
     stroke: {
       colors: ["transparent"],
@@ -47,7 +55,7 @@ const TrafficChart = ({
               color: "white",
               formatter: function (w) {
                 const sum = w.globals.seriesTotals.reduce((a, b) => a + b, 0);
-                return `$${sum}k`;
+                return `${sum}`;
               },
             },
             value: {
@@ -56,7 +64,7 @@ const TrafficChart = ({
               color: "white",
               offsetY: -20,
               formatter: function (value) {
-                return `${value}k`;
+                return `${value}`;
               },
             },
           },
@@ -85,7 +93,7 @@ const TrafficChart = ({
         horizontal: 8,
       },
       labels: {
-        colors: labelColors, // Set the desired color here
+        colors: labelColors,
       },
     },
   });
@@ -101,7 +109,6 @@ const TrafficChart = ({
       );
       chart.render();
 
-      // Cleanup the chart on component unmount
       return () => {
         chart.destroy();
       };
@@ -109,13 +116,13 @@ const TrafficChart = ({
   }, [series, colors, labels, height, width, containerId]);
 
   return (
-    <div className="max-w-sm w-full bg-[#283046] rounded-lg shadow p-4 md:p-6">
+    <div className="w-1/3 rounded-md shadow p-4 md:p-6">
       <div className="flex justify-between mb-3">
         <div className="flex items-center">
           <h5 className="text-xl font-bold leading-none text-white">{title}</h5>
         </div>
       </div>
-      <div className="py-6" id={containerId}></div>
+      <div className="" id={containerId} style={{ height: height, width: width }}></div>
     </div>
   );
 };

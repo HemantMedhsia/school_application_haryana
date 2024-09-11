@@ -19,6 +19,7 @@ import Notice from "./pages/Notice.jsx";
 import Profile from "./pages/Student/Profile.jsx";
 import ParentAdd from "./pages/Parent/ParentAdd.jsx";
 import ParentInfo from "./pages/Parent/ParentInfo.jsx";
+import Attendence from "./pages/Attendence.jsx";
 import ParentProfile from "./pages/Parent/ParentProfile.jsx";
 
 const App = () => {
@@ -59,6 +60,7 @@ const App = () => {
           <Route path="calendar" element={<EventCalendar />} />
           <Route path="create-notice" element={<Notice />} />
           <Route path="profile/:studentId" element={<Profile />} />
+          <Route path="attendance" element={<Attendence />} />
           <Route path="parent-profile/:parentId" element={<ParentProfile />} />
           <Route path="parent-update/:parentId" element={<ParentAdd />} />
           <Route path="parent-update/:studentId" element={<ParentAdd />} />
