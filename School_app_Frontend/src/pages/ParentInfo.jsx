@@ -79,18 +79,18 @@ const ParentInfo = () => {
   ];
 
   const fetchData = async () => {
-    // try {
-    //   const [AllParentResponse] = await Promise.all([
-    //     getAPI("getAllStudents", {}, setAllParentData),
-    //   ]);
-    //   console.log(AllParentResponse);
-    // } catch (error) {
-    //   console.error("Error fetching data:", error);
-    // }
+    try {
+      const [AllParentResponse] = await Promise.all([
+        getAPI("getAllStudents", {}, setAllParentData),
+      ]);
+      console.log(AllParentResponse);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   };
 
   useEffect(() => {
-    // fetchData();
+    fetchData();
   }, []);
 
   const handleView = (parentData) => {

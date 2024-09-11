@@ -14,7 +14,7 @@ import { authorizeRoles } from "../Middlewares/authorizeRoles.js";
 const router = express.Router();
 
 router.post("/create-parent/:studentId", createParent);
-router.get("/get-all-parents",authenticateToken,authorizeRoles("Parent"), getParents);
+router.get("/get-all-parents",authenticateToken,authorizeRoles("Admin"), getParents);
 router.get("/get-parent/:id", getParent);
 router.put("/update-parent/:id", updateParent);
 router.delete("/delete-parent/:id", deleteParent);
