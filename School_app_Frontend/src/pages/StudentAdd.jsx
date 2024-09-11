@@ -8,9 +8,10 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const StudentAdd = () => {
+  const { studentId } = useParams();
   const [sessions, setSessions] = useState([]);
   const [classes, setClasses] = useState([]);
   const [sections, setSections] = useState([]);
@@ -42,41 +43,72 @@ const StudentAdd = () => {
     // medicalHistory: "",
   });
 
-  // Fetch data from API
-  const fetchData = async () => {
-    try {
-      const [sessionsResponse, classesResponse, sectionsResponse] =
-        await Promise.all([
-          getAPI("getAllSessions", {}, setSessions),
-          getAPI("getAllClasses", {}, setClasses),
-          getAPI("getAllSections", {}, setSections),
-        ]);
-      console.log(
-        "session",
-        sessionsResponse,
-        "class",
-        classesResponse,
-        "section",
-        sectionsResponse
-      );
-
-      setSessions(
-        Array.isArray(sessionsResponse.data) ? sessionsResponse.data : []
-      );
-      setClasses(
-        Array.isArray(classesResponse.data) ? classesResponse.data : []
-      );
-      setSections(
-        Array.isArray(sectionsResponse.data) ? sectionsResponse.data : []
-      );
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
-
   useEffect(() => {
+    setFormData({
+      admissionNo: "",
+      rollNumber: "",
+      password: "",
+      currentClass: "",
+      age: "",
+      currentSection: "",
+      currentSession: "",
+      firstName: "",
+      lastName: "",
+      gender: "",
+      dateOfBirth: "",
+      category: "",
+      religion: "",
+      mobileNumber: "",
+      email: "",
+      admissionDate: "",
+      bloodGroup: "",
+      house: "",
+      height: "",
+      weight: "",
+    });
+
+    const fetchData = async () => {
+      try {
+        const [sessionsResponse, classesResponse, sectionsResponse] =
+          await Promise.all([
+            getAPI("getAllSessions", {}, setSessions),
+            getAPI("getAllClasses", {}, setClasses),
+            getAPI("getAllSections", {}, setSections),
+          ]);
+
+        setSessions(
+          Array.isArray(sessionsResponse.data) ? sessionsResponse.data : []
+        );
+        setClasses(
+          Array.isArray(classesResponse.data) ? classesResponse.data : []
+        );
+        setSections(
+          Array.isArray(sectionsResponse.data) ? sectionsResponse.data : []
+        );
+        if (studentId) {
+          const studentResponse = await axios.get(
+            `${import.meta.env.VITE_BACKEND_URL}/api/get-student/${studentId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          );
+          console.log("Student data:", studentResponse.data.data);
+          const studentData = studentResponse.data.data;
+          setFormData({
+            ...studentData,
+            admissionDate: studentData.admissionDate.split("T")[0],
+            dateOfBirth: studentData.dateOfBirth.split("T")[0],
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
     fetchData();
-  }, []);
+  }, [studentId]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -87,34 +119,69 @@ const StudentAdd = () => {
     const schoolId = "66d1c1175fb4969242d7f896";
 
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/create-student/${schoolId}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const response = studentId
+        ? await axios.patch(
+            `${
+              import.meta.env.VITE_BACKEND_URL
+            }/api/update-student/${studentId}`,
+            formData,
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          )
+        : await axios.post(
+            `${
+              import.meta.env.VITE_BACKEND_URL
+            }/api/create-student/${schoolId}`,
+            formData,
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          );
 
-      console.log("Student added successfully:", response.data);
-      toast.success("Student added successfully!");
+      const action = studentId ? "updated" : "added";
+      toast.success(`Student ${action} successfully!`);
 
-      // Resetting the form fields
-      setFormData({
-        firstName: "",
-        lastName: "",
-        // Reset any other fields if necessary
-      });
+      if (!studentId) {
+        setFormData({
+          admissionNo: "",
+          rollNumber: "",
+          password: "",
+          currentClass: "",
+          age: "",
+          currentSection: "",
+          currentSession: "",
+          firstName: "",
+          lastName: "",
+          gender: "",
+          dateOfBirth: "",
+          category: "",
+          religion: "",
+          mobileNumber: "",
+          email: "",
+          admissionDate: "",
+          bloodGroup: "",
+          house: "",
+          height: "",
+          weight: "",
+        });
 
-      const studentId = response.data.data._id;
-      navigate(`/school/parent-add/${studentId}`);
+        const studentIdToNavigate = response.data.data._id;
+        navigate(`/school/parent-add/${studentIdToNavigate}`);
+      } else {
+        console.log("Student updated successfully.");
+      }
     } catch (error) {
       const errorMessage = error.response ? error.response.data : error.message;
-      console.error("Error adding student:", errorMessage);
+      console.error("Error adding/updating student:", errorMessage);
       toast.error(
-        "Error adding student: " + errorMessage.message.split(".")[0]
+        "Error adding/updating student: " + errorMessage.message.split(".")[0]
       );
     }
   };
@@ -124,7 +191,9 @@ const StudentAdd = () => {
       className="max-w-full mx-auto p-6 bg-[#283046] rounded-lg shadow-lg text-[#E0E0E0]"
       onSubmit={handleSubmit}
     >
-      <h2 className="text-2xl font-bold mb-6 text-[#7367F0]">Add Student</h2>
+      <h2 className="text-2xl font-bold mb-6 text-[#7367F0]">
+        {studentId ? "Edit Student" : "Add Student"}
+      </h2>
 
       {/* Personal Details Section */}
       <FormSection title="Personal Details">

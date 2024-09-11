@@ -33,31 +33,19 @@ export const navigation = [
     to: "#",
     icon: FaUsers,
     current: false,
-    roles: ["Admin", "Teacher","Student"],
+    roles: ["Admin", "Teacher", "Student"],
     children: [
       {
         name: "Student Information",
         to: "/school/student-information",
         icon: FaUser,
-        roles: ["Admin", "Teacher","Student"],
+        roles: ["Admin", "Teacher", "Student"],
       },
       {
         name: "Student Admission",
         to: "/school/student-admission",
         icon: FaUser,
-        roles: ["Admin", "Teacher","Student"],
-      },
-      {
-        name: "Grades",
-        to: "/grades",
-        icon: FaBook,
-        roles: ["Admin"],
-      },
-      {
-        name: "Attendance",
-        to: "/attendance",
-        icon: FaCheckCircle,
-        roles: ["Admin", "Student"],
+        roles: ["Admin", "Teacher", "Student"],
       },
     ],
   },
@@ -90,12 +78,12 @@ export const navigation = [
     roles: ["Admin"],
     children: [
       {
-        name: "Profile",
+        name: "Teacher Information",
         to: "/teacher-profile",
         icon: FaUser,
         roles: ["Admin"],
       },
-      { name: "Grades", to: "/teacher-grades", icon: FaBook, roles: ["Admin"] },
+      { name: "Add Teacher", to: "/teacher-grades", icon: FaBook, roles: ["Admin"] },
       {
         name: "Attendance",
         to: "/teacher-attendance",
@@ -255,6 +243,6 @@ export const navigation = [
         icon: FaBook,
         roles: ["Student", "Teacher", "Admin"],
       },
-    ]
+    ],
   },
 ];

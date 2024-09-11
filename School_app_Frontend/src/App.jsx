@@ -43,7 +43,7 @@ const App = () => {
           <Route path="testing" element={<Testing />} />
 
           <Route
-            path="student-admission"
+            path="student-admission/:studentId?"
             element={
               <RoleBasedAccess allowedRoles={["Admin", "Student"]}>
                 {" "}
@@ -58,7 +58,7 @@ const App = () => {
           <Route path="parent-information" element={<ParentInfo />} />
           <Route path="calendar" element={<EventCalendar />} />
           <Route path="create-notice" element={<Notice />} />
-          <Route path="profile" element={<Profile />} />
+          <Route path="profile/:studentId" element={<Profile />} />
         </Route>
       </>
     )
