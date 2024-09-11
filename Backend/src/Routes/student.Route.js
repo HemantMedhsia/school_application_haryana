@@ -18,7 +18,7 @@ router.post("/create-student/:schoolId", createStudent);
 router.get(
     "/get-all-students",
     authenticateToken,
-    authorizeRoles("Student"),
+    authorizeRoles("Admin"),
     getStudents
 );
 
