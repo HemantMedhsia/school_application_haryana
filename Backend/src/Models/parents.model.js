@@ -21,6 +21,7 @@ const parentSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+
     motherPhone: {
         type: String,
         required: true,
@@ -71,6 +72,11 @@ const parentSchema = new mongoose.Schema({
     role: {
         type: String,
         default: "Parent",
+    },
+
+    studentId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Student",
     },
 });
 

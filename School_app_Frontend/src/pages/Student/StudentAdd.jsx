@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { getAPI } from "../utility/api/apiCall";
-import Input from "../components/Form/Input";
-import Select from "../components/Form/Select";
-import FormSection from "../components/Form/FormSection";
-import FormButton from "../components/Form/FormButton";
+import { getAPI } from "../../utility/api/apiCall";
+import Input from "../../components/Form/Input";
+import Select from "../../components/Form/Select";
+import FormSection from "../../components/Form/FormSection";
+import FormButton from "../../components/Form/FormButton";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -322,12 +322,12 @@ const StudentAdd = () => {
           placeholder="Enter Roll Number"
         />
         <Input
-          labelName="Login Password"
+          labelName="Password"
           type="password"
           name="password"
           value={formData.password}
           onChange={handleChange}
-          placeholder="Enter Login Password"
+          placeholder="Enter  Password"
         />
         <Input
           labelName="Admission Date"

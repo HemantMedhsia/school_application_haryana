@@ -2,6 +2,12 @@ import React from "react";
 import FormButton from "../Form/FormButton";
 
 const ProfileHeader = ({ userData }) => {
+
+  const displayName = userData.fatherName
+    ? userData.fatherName
+    : `${userData.firstName} ${userData.lastName}`;
+
+
   return (
     <div className="relative mb-6">
       <img
@@ -20,7 +26,7 @@ const ProfileHeader = ({ userData }) => {
         />
         <div className="ml-4">
           <h2 className="text-2xl font-semibold">
-            {userData.firstName} {userData.lastName}
+            <h2 className="text-2xl font-semibold">{displayName}</h2>
           </h2>
           <p className="text-gray-400">Role: {userData.role}</p>
         </div>

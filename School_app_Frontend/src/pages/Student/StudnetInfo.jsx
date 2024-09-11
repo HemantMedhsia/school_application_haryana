@@ -1,41 +1,17 @@
 import React, { useEffect, useState } from "react";
-import Datatable from "../common/Datatables/Datatable";
-import SearchBar from "../common/SearchBar/SearchBar";
-import { deleteAPI, getAPI } from "../utility/api/apiCall";
+import Datatable from "../../common/Datatables/Datatable";
+import SearchBar from "../../common/SearchBar/SearchBar";
+import { deleteAPI, getAPI } from "../../utility/api/apiCall";
 import { useNavigate } from "react-router-dom";
-
-const ConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 bg-[#65FA9E] bg-opacity-20 flex items-center justify-center z-50">
-      <div className="bg-[#a49fdd] p-6 rounded-md shadow-lg">
-        <h2 className="text-lg text-grey-400 mb-4">
-          Are you sure you want to delete this student?
-        </h2>
-        <div className="flex justify-end">
-          <button
-            className="bg-red-500 hover:bg-red-300 text-white px-4 py-2 rounded mr-2"
-            onClick={onConfirm}
-          >
-            Yes
-          </button>
-          <button
-            className="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded"
-            onClick={onClose}
-          >
-            No
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
+import ConfirmationModal from "../../common/ConfirmationModal/ConfirmationModal";
+import DetailsSelectionModal from "../../common/ConfirmationModal/DetailsSelectionModal";
 
 const StudentInfo = () => {
   const [allStudentData, setAllStudentData] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [studentToDelete, setStudentToDelete] = useState(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState(null);
   const navigate = useNavigate();
 
   const columns = [
@@ -96,6 +72,24 @@ const StudentInfo = () => {
     },
   ];
 
+  const handleEdit = (studentData) => {
+    setSelectedStudent(studentData);
+    setIsDetailsModalOpen(true);
+  };
+
+  const handleDetailsSelect = (type) => {
+    if (type === "student") {
+      navigate(`/school/student-admission/${selectedStudent._id}`);
+    } else if (type === "parent") {
+      navigate(`/school/parent-update/${selectedStudent._id}`);
+    }
+  };
+
+  const closeDetailsModal = () => {
+    setSelectedStudent(null);
+    setIsDetailsModalOpen(false);
+  };
+
   const fetchData = async () => {
     try {
       const response = await getAPI("getAllStudents", {}, setAllStudentData);
@@ -119,9 +113,9 @@ const StudentInfo = () => {
     navigate(`/school/profile/${studentData._id}`);
   };
 
-  const handleEdit = (studentData) => {
-    navigate(`/school/student-admission/${studentData._id}`);
-  };
+  // const handleEdit = (studentData) => {
+  //   navigate(`/school/student-admission/${studentData._id}`);
+  // };
 
   const handleDelete = async () => {
     if (!studentToDelete) return;
@@ -165,6 +159,13 @@ const StudentInfo = () => {
         isOpen={isModalOpen}
         onClose={closeModal}
         onConfirm={handleDelete}
+        title="Delete Confirmation"
+        message="Are you sure you want to delete this student?"
+      />
+      <DetailsSelectionModal
+        isOpen={isDetailsModalOpen}
+        onClose={closeDetailsModal}
+        onSelect={handleDetailsSelect}
       />
     </div>
   );

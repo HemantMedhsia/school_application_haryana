@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import ProfileHeader from "../components/Profile/ProfileHeader";
-import ProfileCard from "../components/Profile/ProfileCard";
+import ProfileHeader from "../../components/Profile/ProfileHeader";
+import ProfileCard from "../../components/Profile/ProfileCard";
 
 const Profile = () => {
   const { studentId } = useParams();
@@ -79,7 +79,9 @@ const Profile = () => {
                   { label: "Gender", value: studentData.gender },
                   {
                     label: "Date of Birth",
-                    value: new Date(studentData.dateOfBirth).toLocaleDateString(),
+                    value: new Date(
+                      studentData.dateOfBirth
+                    ).toLocaleDateString(),
                   },
                   { label: "Category", value: studentData.category },
                   { label: "Religion", value: studentData.religion },
@@ -112,7 +114,10 @@ const Profile = () => {
                       studentData.measurementDate
                     ).toLocaleDateString(),
                   },
-                  { label: "Medical History", value: studentData.medicalHistory },
+                  {
+                    label: "Medical History",
+                    value: studentData.medicalHistory,
+                  },
                 ]}
               />
             </section>
