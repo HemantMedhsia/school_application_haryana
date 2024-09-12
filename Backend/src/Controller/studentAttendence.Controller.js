@@ -158,3 +158,19 @@ export const getAttendanceByDateRange = wrapAsync(async (req, res) => {
 
     res.status(200).json({ success: true, data: attendanceRecords });
 });
+
+export const createMultipleStudentAttendenceInBulk = wrapAsync(async (req, res) => {
+    const attendenceData = req.body;
+
+    if(!Array.isArray(attendenceData) || attendenceData.length === 0) {
+        return res.status(400).json({ message: "Invalid data provided." });
+    }
+
+    try {
+        const savedAttendence = await StudentAttendance.insertMany(attendenceData);
+        res.status(201).json({ success: true, data: savedAttendence });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+
+});
