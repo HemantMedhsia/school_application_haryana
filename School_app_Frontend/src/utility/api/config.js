@@ -47,4 +47,8 @@ export const getApiConfig = {
     url: `/get-student/${studentId}`,
     method: "GET",
   }),
+  getAllTeachers: {
+    url: "/get-all-teachers",
+    method: "GET"
+  }
 };

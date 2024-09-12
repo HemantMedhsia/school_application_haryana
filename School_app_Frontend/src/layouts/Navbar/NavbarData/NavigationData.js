@@ -79,14 +79,14 @@ export const navigation = [
     children: [
       {
         name: "Teacher Information",
-        to: "/teacher-profile",
+        to: "/school/all-teachers",
         icon: FaUser,
         roles: ["Admin"],
       },
       { name: "Add Teacher", to: "/teacher-grades", icon: FaBook, roles: ["Admin"] },
       {
         name: "Attendance",
-        to: "/teacher-attendance",
+        to: "school/teachers-attendance",
         icon: FaCheckCircle,
         roles: ["Admin"],
       },

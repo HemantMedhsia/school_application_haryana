@@ -119,6 +119,7 @@ const StudentInfo = () => {
     navigate(`/school/profile/${studentData._id}`);
   };
 
+  
   const handleEdit = (studentData) => {
     navigate(`/school/student-admission/${studentData._id}`);
   };
