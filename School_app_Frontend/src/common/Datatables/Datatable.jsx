@@ -56,7 +56,9 @@ const Datatable = ({ data = [], columns = [], actions = {} }) => {
                     key={colIndex}
                     className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-nowrap p-4 text-left"
                   >
-                    {column.render ? column.render(item[column.accessor], item) : item[column.accessor] || "N/A"}
+                    {typeof column.accessor === "function"
+                      ? column.accessor(item) // Call accessor function if it's a function
+                      : item[column.accessor] || "N/A"}
                   </td>
                 ))}
                 {/* Action buttons */}
