@@ -176,14 +176,14 @@ export const createMultipleStudentAttendenceInBulk = wrapAsync(async (req, res) 
 
 });
 
-export const getAllStudentAttendance = wrapAsync(async (req, res) => {
-    const attendanceRecords = await StudentAttendance.find();
+// export const getAllStudentAttendance = wrapAsync(async (req, res) => {
+//     const attendanceRecords = await StudentAttendance.find();
 
-    if (!attendanceRecords || attendanceRecords.length === 0) {
-        return res
-            .status(404)
-            .json({ message: "No attendance records found." });
-    }
+//     if (!attendanceRecords || attendanceRecords.length === 0) {
+//         return res
+//             .status(404)
+//             .json({ message: "No attendance records found." });
+//     }
 
-    res.status(200).json({ success: true, data: attendanceRecords });
-});
+//     res.status(200).json({ success: true, data: attendanceRecords });
+// });
