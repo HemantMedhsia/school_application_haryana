@@ -206,10 +206,19 @@ export const deleteParent = wrapAsync(async (req, res) => {
 
 export const getParentStudents = wrapAsync(async (req, res) => {
     const { studentId } = req.params;
-    console.log("Student id:", studentId);
-    const students = await Student.find({ parent: studentId }).populate(
-        "parent"
-    );
-    console.log("Students:", students);
-    return res.status(200).json(new ApiResponse(200, students));
+    const parent = await Parent.findOne({ studentId });
+    if (!parent) {
+        return res
+            .status(404)
+            .json(new ApiResponse(404, null, "Parent Not Found"));
+    }
+    const student = await Student.findById(studentId);
+    if (!student) {
+        return res
+            .status(404)
+            .json(new ApiResponse(404, null, "Student Not Found"));
+    }
+    return res
+        .status(200)
+        .json(new ApiResponse(200, parent, "Parent Student Found"));
 });

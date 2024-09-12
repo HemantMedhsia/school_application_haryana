@@ -64,6 +64,8 @@ const App = () => {
           <Route path="attendance" element={<Attendence />} />
           <Route path="all-teachers" element={<TeacherInfo />} />
           <Route path="parent-profile/:parentId" element={<ParentProfile />} />
+          <Route path ="parent-update/:parentId" element={<ParentAdd />} />
+          <Route path="parent-update-student/:studentId" element={<ParentAdd />} />
         </Route>
       </>
     )

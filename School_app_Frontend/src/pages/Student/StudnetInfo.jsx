@@ -81,7 +81,7 @@ const StudentInfo = () => {
     if (type === "student") {
       navigate(`/school/student-admission/${selectedStudent._id}`);
     } else if (type === "parent") {
-      navigate(`/school/parent-update/${selectedStudent._id}`);
+      navigate(`/school/parent-update-student/${selectedStudent._id}`);
     }
   };
 
