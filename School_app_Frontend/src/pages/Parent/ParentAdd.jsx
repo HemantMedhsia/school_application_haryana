@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { getAPI } from "../utility/api/apiCall";
-import Input from "../components/Form/Input";
-import FormSection from "../components/Form/FormSection";
+import { getAPI } from "../../utility/api/apiCall";
+import Input from "../../components/Form/Input";
+import FormSection from "../../components/Form/FormSection";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const ParentAdd = () => {
-  const { studentId } = useParams();
-  console.log(studentId);
+  const { studentId, parentId } = useParams();
+  console.log(studentId, parentId);
 
   const [formData, setFormData] = useState({
     fatherName: "",
@@ -31,11 +31,55 @@ const ParentAdd = () => {
     password: "",
   });
 
-  const fetchData = async () => {};
+  useEffect(() => {
+    if (parentId) {
+      const fetchParentData = async () => {
+        try {
+          const response = await axios.get(
+            `${import.meta.env.VITE_BACKEND_URL}/api/get-parent/${parentId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          );
+          const parentData = response.data.data;
+          setFormData({
+            ...parentData,
+          });
+        } catch (error) {
+          console.error("Error fetching parent data:", error);
+        }
+      };
+      fetchParentData();
+    }
+  }, [parentId]);
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (studentId) {
+      const fetchParentData = async () => {
+        try {
+          const response = await axios.get(
+            `${
+              import.meta.env.VITE_BACKEND_URL
+            }/api/get-parent-student/${studentId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          );
+          const parentData = response.data.data;
+          setFormData({
+            ...parentData,
+          });
+        } catch (error) {
+          console.error("Error fetching parent data:", error);
+        }
+      };
+      fetchParentData();
+    }
+  }, [studentId]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -43,13 +87,27 @@ const ParentAdd = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/create-parent/${studentId}`,
-        formData
-      );
-      console.log("Parent added successfully:", response.data);
-      toast.success("Parent added successfully!");
+      const url = parentId
+        ? `${import.meta.env.VITE_BACKEND_URL}/api/update-parent/${parentId}`
+        : `${import.meta.env.VITE_BACKEND_URL}/api/create-parent/${studentId}`;
+
+      const method = parentId ? "put" : "post";
+
+      const response = await axios({
+        method: method,
+        url: url,
+        data: formData,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      const successMessage = parentId
+        ? "Parent updated successfully!"
+        : "Parent added successfully!";
+      toast.success(successMessage);
 
       setFormData({
         fatherName: "",
@@ -68,8 +126,11 @@ const ParentAdd = () => {
         password: "",
       });
     } catch (error) {
-      console.error("Error adding parent:", error.response.data);
-      toast.error("Error adding parent: " + error.response.data.message);
+      const errorMessage = parentId
+        ? "Error updating parent: "
+        : "Error adding parent: ";
+      toast.error(errorMessage + error.response.data.message);
+      console.error(errorMessage, error.response.data);
     }
   };
 
@@ -78,7 +139,9 @@ const ParentAdd = () => {
       className="max-w-full mx-auto p-6 bg-[#283046] rounded-lg shadow-lg text-[#E0E0E0]"
       onSubmit={handleSubmit}
     >
-      <h2 className="text-2xl font-bold mb-6 text-[#7367F0]">Add Parent</h2>
+      <h2 className="text-2xl font-bold mb-6 text-[#7367F0]">
+        {parentId ? "Edit Parent" : "Add Parent"}
+      </h2>
 
       {/* Personal Details Section */}
       <FormSection title="Father's Details">

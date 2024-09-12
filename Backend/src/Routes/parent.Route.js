@@ -4,6 +4,7 @@ import {
     deleteParent,
     getParent,
     getParents,
+    getParentStudents,
     loginParent,
     refreshAccessTokenParent,
     updateParent,
@@ -18,6 +19,7 @@ router.get("/get-all-parents",authenticateToken,authorizeRoles("Admin"), getPare
 router.get("/get-parent/:id", getParent);
 router.put("/update-parent/:id", updateParent);
 router.delete("/delete-parent/:id", deleteParent);
+router.get("/get-parent-student/:studentId", getParentStudents);
 
 router.post("/login-parent",loginParent);
 router.post("/refresh-token-parent",refreshAccessTokenParent);

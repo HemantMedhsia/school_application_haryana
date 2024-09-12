@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import TeacherSearchBar from "../common/SearchBar/TeacherSearchBar";
-import Datatable from "../common/Datatables/Datatable";
-import { getAPI } from "../utility/api/apiCall";
+import TeacherSearchBar from "../../common/SearchBar/TeacherSearchBar";
+import Datatable from "../../common/Datatables/Datatable";
+import { getAPI } from "../../utility/api/apiCall";
+import { Navigate } from "react-router-dom";
 
 const columns = [
   {
@@ -35,7 +36,7 @@ const columns = [
 ];
 
 const handleView = (studentData) => {
-//   navigate(`/school/profile/${studentData._id}`);
+  Navigate(`/school/profile/${studentData._id}`);
 };
 
 const handleEdit = (studentData) => {};

@@ -51,6 +51,7 @@ export const createStudent = wrapAsync(async (req, res) => {
 
     const studentData = await student.save();
     school.students.push(studentData._id);
+    
     await school.save();
 
     await StudentHistory.findByIdAndUpdate(
@@ -235,6 +236,7 @@ export const deleteStudent = wrapAsync(async (req, res) => {
         .json(new ApiResponse(200, student, "Delete Successfully"));
 });
 
+
 export const getStudentByParent = wrapAsync(async (req, res) => {
     const student = await Student.find({ parent: req.params.parentId });
     if (!student) {
@@ -245,3 +247,16 @@ export const getStudentByParent = wrapAsync(async (req, res) => {
     }
     return res.status(200).json(new ApiResponse(200, student));
 });
+
+export const getParentByStudent = wrapAsync(async (req, res) => {
+    const student = await Student.findById(req.params.studentId).populate("parent");
+    if (!student) {
+        return res.status(404).json({
+            success: false,
+            message: "Student not found",
+        });
+    }
+    return res.status(200).json(new ApiResponse(200, student.parent));
+});
+
+
