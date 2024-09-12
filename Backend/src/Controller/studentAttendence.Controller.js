@@ -42,9 +42,9 @@ export const createStudentAttendence = wrapAsync(async (req, res) => {
 });
 
 export const getStudentAttendance = wrapAsync(async (req, res) => {
-    const { studentId } = req.params;
+    
 
-    const attendanceRecords = await StudentAttendance.find({ studentId : studentId });
+    const attendanceRecords = await StudentAttendance.find({ studentId : req.params.studentId });
 
     if (!attendanceRecords || attendanceRecords.length === 0) {
         return res

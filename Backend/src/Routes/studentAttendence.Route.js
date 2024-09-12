@@ -6,7 +6,7 @@ import {
     updateStudentAttendance,
     getAttendanceSummary,
     getAttendanceByDateRange,
-    createMultipleStudentAttendenceInBulk,
+    createMultipleStudentAttendenceInBulk,  
     getAllStudentAttendance,
 } from "../Controller/studentAttendence.Controller.js";
 import { authenticateToken } from "../Middlewares/authenticateToken.js";
