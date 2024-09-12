@@ -44,7 +44,7 @@ export const createStudentAttendence = wrapAsync(async (req, res) => {
 export const getStudentAttendance = wrapAsync(async (req, res) => {
     const { studentId } = req.params;
 
-    const attendanceRecords = await StudentAttendance.find({ studentId });
+    const attendanceRecords = await StudentAttendance.find({ studentId : studentId });
 
     if (!attendanceRecords || attendanceRecords.length === 0) {
         return res
@@ -104,13 +104,12 @@ export const getAttendanceSummary = wrapAsync(async (req, res) => {
     const student = await Student.findById(studentId).populate(
         "StudentAttendance"
     );
-    
+
     if (!student) {
         return res.status(404).json({ message: "Student not found." });
     }
 
     const attendanceRecords = student.StudentAttendance;
-    
 
     if (!attendanceRecords || attendanceRecords.length === 0) {
         return res
@@ -159,21 +158,24 @@ export const getAttendanceByDateRange = wrapAsync(async (req, res) => {
     res.status(200).json({ success: true, data: attendanceRecords });
 });
 
-export const createMultipleStudentAttendenceInBulk = wrapAsync(async (req, res) => {
-    const attendenceData = req.body;
+export const createMultipleStudentAttendenceInBulk = wrapAsync(
+    async (req, res) => {
+        const attendenceData = req.body;
 
-    if(!Array.isArray(attendenceData) || attendenceData.length === 0) {
-        return res.status(400).json({ message: "Invalid data provided." });
+        if (!Array.isArray(attendenceData) || attendenceData.length === 0) {
+            return res.status(400).json({ message: "Invalid data provided." });
+        }
+
+        try {
+            const savedAttendence = await StudentAttendance.insertMany(
+                attendenceData
+            );
+            res.status(201).json({ success: true, data: savedAttendence });
+        } catch (error) {
+            res.status(400).json({ message: error.message });
+        }
     }
-
-    try {
-        const savedAttendence = await StudentAttendance.insertMany(attendenceData);
-        res.status(201).json({ success: true, data: savedAttendence });
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-
-});
+);
 
 export const getAllStudentAttendance = wrapAsync(async (req, res) => {
     const attendanceRecords = await StudentAttendance.find();
