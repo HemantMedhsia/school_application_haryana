@@ -3,6 +3,7 @@ import { Student } from "../Models/student.model.js";
 import { Teacher } from "../Models/teacher.model.js";
 import { StudentAttendance } from "../Models/studentAttendence.Model.js";
 import { attendanceValidationSchema } from "../Validation/studentAttendence.validation.js";
+import { exec } from "apexcharts";
 
 export const createStudentAttendence = wrapAsync(async (req, res) => {
     const { studentId } = req.params;
@@ -173,4 +174,16 @@ export const createMultipleStudentAttendenceInBulk = wrapAsync(async (req, res) 
         res.status(400).json({ message: error.message });
     }
 
+});
+
+export const getAllStudentAttendance = wrapAsync(async (req, res) => {
+    const attendanceRecords = await StudentAttendance.find();
+
+    if (!attendanceRecords || attendanceRecords.length === 0) {
+        return res
+            .status(404)
+            .json({ message: "No attendance records found." });
+    }
+
+    res.status(200).json({ success: true, data: attendanceRecords });
 });
