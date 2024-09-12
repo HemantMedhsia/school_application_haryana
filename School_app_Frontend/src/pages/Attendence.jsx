@@ -138,19 +138,24 @@ const Attendence = () => {
     fetchData();
   }, []);
 
-  return (
+return (
     <div>
-      <AttendenceSearchBar />
-      <Datatable
-        columns={columns}
-        data={studentData}
-        actions={{ onPresent: handlePresent, onAbsent: handleAbsent }}
-      />
-      <div className="flex justify-end mr-5">
-      <button onClick={handleSave}>Save</button>
-      </div>
+        <AttendenceSearchBar />
+        <Datatable
+            columns={columns}
+            data={studentData}
+            actions={{ onPresent: handlePresent, onAbsent: handleAbsent }}
+        />
+        <div className="flex justify-end ">
+            <button 
+                onClick={handleSave}
+                className="bg-[#283046] hover:bg-gray-900 hover:border border-[#65FA9E] text-[#65FA9E] font-bold py-1 px-6 rounded"
+            >
+                Save
+            </button>
+        </div>
     </div>
-  );
+);
 };
 
 export default Attendence;
