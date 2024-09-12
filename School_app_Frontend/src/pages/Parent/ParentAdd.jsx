@@ -6,6 +6,7 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import FormButton from "../../components/Form/FormButton";
 
 const ParentAdd = () => {
   const { studentId, parentId } = useParams();
@@ -42,6 +43,7 @@ const ParentAdd = () => {
         }
       );
       const parentData = response.data.data;
+      console.log(parentData);
       setFormData({
         ...parentData,
       });
@@ -50,23 +52,31 @@ const ParentAdd = () => {
       toast.error("Error fetching parent data.");
     }
   };
-  
+
   const fetchParentDataByStudentId = async () => {
+    const url = `${
+      import.meta.env.VITE_BACKEND_URL
+    }/api/get-parent-student/${studentId}`;
+
     try {
-      const response = await axios.get(
-        `${
-          import.meta.env.VITE_BACKEND_URL
-        }/api/get-parent-student/${studentId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      const parentData = response.data;
+      const response = await axios.get(url);
+      const parentData = response.data.data;
       console.log(parentData);
       setFormData({
-        ...parentData,
+        fatherName: parentData.fatherName || "",
+        fatherPhone: parentData.fatherPhone || "",
+        fatherOccupation: parentData.fatherOccupation || "",
+        motherName: parentData.motherName || "",
+        motherPhone: parentData.motherPhone || "",
+        motherOccupation: parentData.motherOccupation || "",
+        guardianIs: parentData.guardianIs || "",
+        guardianName: parentData.guardianName || "",
+        guardianRelation: parentData.guardianRelation || "",
+        guardianPhone: parentData.guardianPhone || "",
+        guardianOccupation: parentData.guardianOccupation || "",
+        guardianAddress: parentData.guardianAddress || "",
+        email: parentData.email || "",
+        password: parentData.password || "",
       });
     } catch (error) {
       console.error("Error fetching parent data by studentId:", error);
@@ -77,7 +87,9 @@ const ParentAdd = () => {
   useEffect(() => {
     if (parentId) {
       fetchParentDataByParentId();
+      console.log("parent");
     } else if (studentId) {
+      console.log("student");
       fetchParentDataByStudentId();
     }
   }, [parentId, studentId]);
@@ -109,6 +121,10 @@ const ParentAdd = () => {
         ? "Parent updated successfully!"
         : "Parent added successfully!";
       toast.success(successMessage);
+
+      // if (successMessage === "Parent updated successfully!") {
+      //   window.location.href = "/school/parent-information";
+      // }
 
       setFormData({
         fatherName: "",
@@ -258,14 +274,12 @@ const ParentAdd = () => {
       </FormSection>
 
       {/* Submit Button */}
-      <div className="flex justify-end mt-6">
-        <button
-          type="submit"
-          className="bg-[#7367F0] text-white font-semibold py-2 px-6 rounded-md hover:bg-[#4C51BF] transition duration-200 ease-in-out shadow-md"
-        >
-          Add Parent
-        </button>
-      </div>
+      {parentId ? (
+        <FormButton name="Edit Parent" />
+      ) : (
+        <FormButton name="Add Parent" />
+      )}
+
       <ToastContainer />
     </form>
   );

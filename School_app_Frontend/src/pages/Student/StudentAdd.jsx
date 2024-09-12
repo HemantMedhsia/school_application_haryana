@@ -90,7 +90,7 @@ const StudentAdd = () => {
             `${import.meta.env.VITE_BACKEND_URL}/api/get-student/${studentId}`,
             {
               headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
               },
             }
           );
@@ -384,7 +384,12 @@ const StudentAdd = () => {
       </FormSection>
 
       {/* Submit Button */}
-      <FormButton name="Add Student" />
+      {studentId ? (
+        <FormButton name="Edit Student" />
+      ) : (
+        <FormButton name="Add Student" />
+      )}
+
       <ToastContainer />
     </form>
   );

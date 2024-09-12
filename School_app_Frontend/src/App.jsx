@@ -22,6 +22,8 @@ import ParentInfo from "./pages/Parent/ParentInfo.jsx";
 import Attendence from "./pages/Attendence.jsx";
 import ParentProfile from "./pages/Parent/ParentProfile.jsx";
 import TeacherInfo from "./pages/Teacher/TeacherInfo.jsx";
+import TeacherProfile from "./pages/Teacher/TeacherProfile.jsx";
+import TeacherAdd from "./pages/Teacher/TeacherAdd.jsx";
 
 const App = () => {
   const { userRole, authToken } = useAuth();
@@ -64,8 +66,17 @@ const App = () => {
           <Route path="attendance" element={<Attendence />} />
           <Route path="all-teachers" element={<TeacherInfo />} />
           <Route path="parent-profile/:parentId" element={<ParentProfile />} />
-          <Route path ="parent-update/:parentId" element={<ParentAdd />} />
-          <Route path="parent-update-student/:studentId" element={<ParentAdd />} />
+          <Route path="parent-update/:parentId" element={<ParentAdd />} />
+          <Route
+            path="parent-update-student/:studentId"
+            element={<ParentAdd />}
+          />
+          <Route
+            path="teacher-profile/:teacherId"
+            element={<TeacherProfile />}
+          />
+          <Route path="teacher-update/:teacherId" element={<TeacherAdd />} />
+          <Route path="teacher-add" element={<TeacherAdd />} />
         </Route>
       </>
     )

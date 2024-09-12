@@ -2,12 +2,13 @@ import React from "react";
 import FormButton from "../Form/FormButton";
 
 const ProfileHeader = ({ userData }) => {
-
-  const displayName = userData.fatherName
+  const displayName = userData.name
+    ? userData.name
+    : userData.fatherName
     ? userData.fatherName
-    : `${userData.firstName} ${userData.lastName}`;
-
-
+    : `${userData.firstName || ""} ${userData.lastName || ""}`.trim() ||
+      "No Name Provided";
+      
   return (
     <div className="relative mb-6">
       <img

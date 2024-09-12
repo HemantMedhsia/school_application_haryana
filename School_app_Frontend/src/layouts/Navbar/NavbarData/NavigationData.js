@@ -83,7 +83,7 @@ export const navigation = [
         icon: FaUser,
         roles: ["Admin"],
       },
-      { name: "Add Teacher", to: "/teacher-grades", icon: FaBook, roles: ["Admin"] },
+      { name: "Add Teacher", to: "/school/teacher-add", icon: FaBook, roles: ["Admin"] },
       {
         name: "Attendance",
         to: "school/teachers-attendance",
