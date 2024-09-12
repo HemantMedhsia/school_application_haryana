@@ -31,55 +31,56 @@ const ParentAdd = () => {
     password: "",
   });
 
-  useEffect(() => {
-    if (parentId) {
-      const fetchParentData = async () => {
-        try {
-          const response = await axios.get(
-            `${import.meta.env.VITE_BACKEND_URL}/api/get-parent/${parentId}`,
-            {
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-              },
-            }
-          );
-          const parentData = response.data.data;
-          setFormData({
-            ...parentData,
-          });
-        } catch (error) {
-          console.error("Error fetching parent data:", error);
+  const fetchParentDataByParentId = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/get-parent/${parentId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         }
-      };
-      fetchParentData();
+      );
+      const parentData = response.data.data;
+      setFormData({
+        ...parentData,
+      });
+    } catch (error) {
+      console.error("Error fetching parent data by parentId:", error);
+      toast.error("Error fetching parent data.");
     }
-  }, [parentId]);
+  };
+  
+  const fetchParentDataByStudentId = async () => {
+    try {
+      const response = await axios.get(
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/api/get-parent-student/${studentId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      const parentData = response.data;
+      console.log(parentData);
+      setFormData({
+        ...parentData,
+      });
+    } catch (error) {
+      console.error("Error fetching parent data by studentId:", error);
+      toast.error("Error fetching parent data.");
+    }
+  };
 
   useEffect(() => {
-    if (studentId) {
-      const fetchParentData = async () => {
-        try {
-          const response = await axios.get(
-            `${
-              import.meta.env.VITE_BACKEND_URL
-            }/api/get-parent-student/${studentId}`,
-            {
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-              },
-            }
-          );
-          const parentData = response.data.data;
-          setFormData({
-            ...parentData,
-          });
-        } catch (error) {
-          console.error("Error fetching parent data:", error);
-        }
-      };
-      fetchParentData();
+    if (parentId) {
+      fetchParentDataByParentId();
+    } else if (studentId) {
+      fetchParentDataByStudentId();
     }
-  }, [studentId]);
+  }, [parentId, studentId]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
