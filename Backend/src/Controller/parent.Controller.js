@@ -29,7 +29,7 @@ export const createParent = wrapAsync(async (req, res) => {
     await parentValidatonSchema.validateAsync(req.body, {
         abortEarly: false,
     });
-    const newParentData = {studentId: req.params.studentId, ...req.body}
+    const newParentData = { studentId: req.params.studentId, ...req.body };
     const parent = new Parent(newParentData);
     const parentData = await parent.save();
 
@@ -207,7 +207,9 @@ export const deleteParent = wrapAsync(async (req, res) => {
 export const getParentStudents = wrapAsync(async (req, res) => {
     const { studentId } = req.params;
     console.log("Student id:", studentId);
-    const students = await Student.find({ parent: studentId });
+    const students = await Student.find({ parent: studentId }).populate(
+        "parent"
+    );
     console.log("Students:", students);
     return res.status(200).json(new ApiResponse(200, students));
 });
