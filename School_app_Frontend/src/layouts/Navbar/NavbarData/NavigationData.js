@@ -145,6 +145,30 @@ export const navigation = [
         icon: FaCheckCircle,
         roles: ["Admin"],
       },
+      {
+        name: "Create Section",
+        to: "/school/create-section",
+        icon: FaCheckCircle,
+        roles: ["Admin"],
+      },
+      {
+        name: "Create Class",
+        to: "/school/create-class",
+        icon: FaCheckCircle,
+        roles: ["Admin"],
+      },
+      {
+        name: "Add Subjects",
+        to: "/school/add-subjects",
+        icon: FaCheckCircle,
+        roles: ["Admin"],
+      },
+      {
+        name: "Create Subject Group",
+        to: "/school/create-subject-group",
+        icon: FaCheckCircle,
+        roles: ["Admin"],
+      },
     ],
   },
 
@@ -211,7 +235,7 @@ export const navigation = [
       },
       {
         name: "Add Marks",
-        to: "/Add-Marks",
+        to: "/school/add-marks",
         icon: FaCheckCircle,
         roles: ["Admin", "Teacher"],
       },
