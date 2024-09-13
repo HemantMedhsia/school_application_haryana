@@ -5,43 +5,37 @@ const SubjectSchema = new mongoose.Schema(
         name: {
             type: String,
             required: true,
-            unique: true, // Ensures no two subjects have the same name
+            unique: true,
         },
         code: {
             type: String,
             required: true,
-            unique: true, // Unique identifier for the subject
+            unique: true,
         },
         description: {
             type: String,
-            default: "", // Optional description of the subject
-        },
-        createdBy: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Admin", // Reference to the Teacher model
-            required: true, // Indicates which teacher created the subject
+            default: "",
         },
 
         syllabus: {
             type: String,
-            default: "", // Optional syllabus details
+            default: "",
         },
         credits: {
             type: Number,
-            default: 0, // Number of credits assigned to the subject
+            default: 0,
         },
         status: {
             type: String,
-            enum: ["Active", "Inactive"], // Indicates if the subject is currently active
+            enum: ["Active", "Inactive"],
             default: "Active",
         },
     },
     {
-        timestamps: true, // Automatically adds createdAt and updatedAt fields
+        timestamps: true,
     }
 );
 
-// Middleware to update the updatedAt field before saving
 SubjectSchema.pre("save", function (next) {
     this.updatedAt = Date.now();
     next();

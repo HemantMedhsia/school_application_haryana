@@ -1,15 +1,24 @@
 import mongoose from "mongoose";
 
-const sectionSchema = new mongoose.Schema(
-    {
-        name: {
-            type: String,
-            enum: ["A", "B", "C", "D"],
-            required: true,
-            trim: true,
-        },
+const sectionSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true,
+        unique: true,
     },
-    { timestamps: true }
-);
+    classId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Class",
+    },
+    description: {
+        type: String,
+    },
+    subjects: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Subject",
+        },
+    ],
+});
 
 export const Section = mongoose.model("Section", sectionSchema);

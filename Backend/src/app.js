@@ -21,6 +21,7 @@ import { sectionRoute } from "./Routes/section.Route.js";
 import { sessionRoute } from "./Routes/session.Route.js";
 import { studentHistoryRoute } from "./Routes/studentHistory.Route.js";
 import { loginUserRouter } from "./Routes/loginUser.Route.js";
+import { subjectGroupRoute } from "./Routes/subjectGroup.Route.js";
 
 const app = express();
 
@@ -65,6 +66,7 @@ app.use("/api", sessionRoute);
 app.use("/api", sectionRoute);
 app.use("/api", studentHistoryRoute);
 app.use("/api", loginUserRouter);
+app.use("/api",subjectGroupRoute)
 
 // Global error handling middleware
 app.use((err, req, res, next) => {

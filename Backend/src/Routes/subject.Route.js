@@ -13,7 +13,7 @@ import { authenticateToken } from "../Middlewares/authenticateToken.js";
 
 const router = express.Router();
 
-router.post("/create-subject/:schoolId/", authenticateToken, createSubject);
+router.post("/create-subject/:schoolId/", createSubject);
 router.get("/all-subject", getAllSubjects);
 router.get("/single-subject/:id", getSubjectById);
 router.put("/subject-update/:id", updateSubject);

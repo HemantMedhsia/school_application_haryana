@@ -4,6 +4,7 @@ import {
     createClass,
     deleteClass,
     getAllClasses,
+    getAllClassesWithSections,
     getClassById,
     updateClass,
 } from "../Controller/class.Controller.js";
@@ -16,5 +17,6 @@ router.get("/all-class", getAllClasses);
 router.get("/single-class/:classId", getClassById);
 router.put("/update-class/:classId", updateClass);
 router.delete("/delete-class/:classId", deleteClass);
+router.get("/get-allclass-withsection", getAllClassesWithSections);
 
 export { router as classRoute };

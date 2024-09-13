@@ -15,7 +15,7 @@ import { useAuth } from "./context/AuthProvider.jsx";
 import StudentAdd from "./pages/Student/StudentAdd.jsx";
 import StudnetInfo from "./pages/Student/StudnetInfo.jsx";
 import EventCalendar from "./pages/Dashboard/EventCalendar.jsx";
-import Notice from "./pages/Notice.jsx";
+import Notice from "./pages/Notice/Notice.jsx";
 import Profile from "./pages/Student/Profile.jsx";
 import ParentAdd from "./pages/Parent/ParentAdd.jsx";
 import ParentInfo from "./pages/Parent/ParentInfo.jsx";
@@ -24,6 +24,7 @@ import ParentProfile from "./pages/Parent/ParentProfile.jsx";
 import TeacherInfo from "./pages/Teacher/TeacherInfo.jsx";
 import TeacherProfile from "./pages/Teacher/TeacherProfile.jsx";
 import TeacherAdd from "./pages/Teacher/TeacherAdd.jsx";
+import ViewNotice from "./pages/Notice/ViewNotice.jsx";
 
 const App = () => {
   const { userRole, authToken } = useAuth();
@@ -77,6 +78,7 @@ const App = () => {
           />
           <Route path="teacher-update/:teacherId" element={<TeacherAdd />} />
           <Route path="teacher-add" element={<TeacherAdd />} />
+          <Route path="view-notice" element={<ViewNotice />} />
         </Route>
       </>
     )

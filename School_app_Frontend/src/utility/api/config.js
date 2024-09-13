@@ -50,5 +50,9 @@ export const getApiConfig = {
   getAllTeachers: {
     url: "/get-all-teachers",
     method: "GET"
+  },
+  getAllNotice:{
+    url: "/all-notice",
+    method: "GET"
   }
 };

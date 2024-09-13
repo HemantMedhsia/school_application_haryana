@@ -2,7 +2,7 @@ import { School } from "../Models/school.model.js";
 import { Subject } from "../Models/subject.Model.js";
 import wrapAsync from "../Utils/wrapAsync.js";
 import { Admin } from "../Models/admin.Model.js";
-import { subjectSchema } from "../Validation/subject.Validation.js"; // Import the Joi validation schema
+import { subjectSchema } from "../Validation/subject.Validation.js"; 
 import { ApiResponse } from "../Utils/responseHandler.js";
 
 const validateSubject = async (data) => {
@@ -12,15 +12,8 @@ const validateSubject = async (data) => {
     }
 };
 
-// Create a new subject
 export const createSubject = wrapAsync(async (req, res) => {
     const { schoolId } = req.params;
-    const adminId = req.user.id;
-
-    const adminExists = await Admin.findById(adminId);
-    if (!adminExists) {
-        return res.status(404).json({ message: "Admin not found" });
-    }
 
     const schoolExists = await School.findById(schoolId);
     if (!schoolExists) {
@@ -29,25 +22,16 @@ export const createSubject = wrapAsync(async (req, res) => {
 
     await validateSubject(req.body);
 
-    const subject = new Subject({
-        ...req.body,
-        createdBy: adminId,
-    });
+    const savedSubject = await new Subject(req.body).save();
 
-    const savedSubject = await subject.save();
+    await schoolExists.updateOne({ $push: { subjects: savedSubject._id } });
 
-    await School.findByIdAndUpdate(
-        schoolId,
-        { $push: { subjects: savedSubject._id } },
-        { new: true }
-    );
     return res
         .status(201)
         .json(
             new ApiResponse(201, savedSubject, "Subject Created Successfully")
         );
 });
-
 
 // Get all subjects
 export const getAllSubjects = wrapAsync(async (req, res) => {
@@ -87,7 +71,7 @@ export const getSubjectsByStatus = wrapAsync(async (req, res) => {
     const status = req.params.status;
 
     const subjects = await Subject.find({
-        status: { $regex: new RegExp(`^${status}$`, "i") }, // Case-insensitive regex
+        status: { $regex: new RegExp(`^${status}$`, "i") }, 
     });
     return res.status(200).json(new ApiResponse(200, subjects));
 });
