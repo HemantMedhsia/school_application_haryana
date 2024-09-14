@@ -52,7 +52,7 @@ export const createSection = wrapAsync(async (req, res) => {
 // });
 
 export const getAllSections = wrapAsync(async (req, res) => {
-    const sections = await Section.find().populate("classId subjects");
+    const sections = await Section.find().populate("classIds subjects");
     res.status(200).json(new ApiResponse(200, sections, "All sections", true));
 });
 
