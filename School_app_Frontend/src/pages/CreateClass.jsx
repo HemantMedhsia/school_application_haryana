@@ -14,6 +14,7 @@ const CreateClass = ({ onCreate }) => {
   const [className, setClassName] = useState("");
   const [classes, setClasses] = useState([]);
   const [options, setOptions] = useState([]);
+  const [editingClassId, setEditingClassId] = useState(null);
 
   useEffect(() => {
     const fetchSections = async () => {
@@ -39,7 +40,7 @@ const CreateClass = ({ onCreate }) => {
         );
         console.log(response.data);
         const formattedClasses = response.data.map((classItem) => ({
-          id: classItem._id, 
+          id: classItem.id,
           name: classItem.className,
           sections: classItem.sections,
         }));
@@ -63,30 +64,57 @@ const CreateClass = ({ onCreate }) => {
   };
 
   const handleSubmit = async () => {
-    if (className && selectedCheckboxes.length > 0) {
-      const newClass = {
-        name: className,
-        sections: selectedCheckboxes,
-      };
+    const newClass = {
+      name: className,
+      sections: selectedCheckboxes,
+    };
 
-      try {
-        const response = await axios.post(
+    try {
+      let response; 
+
+      if (editingClassId) {
+        // Update existing class
+        response = await axios.put(
+          `${
+            import.meta.env.VITE_BACKEND_URL
+          }/api/update-class/${editingClassId}`,
+          newClass
+        );
+        toast.success("Class updated successfully!");
+      } else {
+        // Create new class
+        response = await axios.post(
           `${import.meta.env.VITE_BACKEND_URL}/api/create-class`,
           newClass
         );
-        console.log("Class created successfully:", response.data);
-
-        setClasses([...classes, newClass]);
-        setClassName("");
-        setSelectedCheckboxes([]);
-
-        if (onCreate) onCreate();
-      } catch (error) {
-        console.error("Error creating class:", error);
+        toast.success("Class created successfully!");
       }
-    } else {
-      alert("Please enter class name and select at least one section.");
+
+      // Reset state
+      setClasses((prevClasses) => {
+        if (editingClassId) {
+          return prevClasses.map((cls) =>
+            cls.id === editingClassId ? { ...cls, ...newClass } : cls
+          );
+        }
+        // Use response.data.id only if the response has a valid id
+        return [...prevClasses, { ...newClass, id: response.data.id }];
+      });
+
+      setClassName("");
+      setSelectedCheckboxes([]);
+      setEditingClassId(null); // Reset editing state
+      if (onCreate) onCreate();
+    } catch (error) {
+      console.error("Error submitting class:", error);
+      toast.error("Failed to create or update class.");
     }
+  };
+
+  const handleEdit = (classItem) => {
+    setEditingClassId(classItem.id);
+    setClassName(classItem.name);
+    setSelectedCheckboxes(classItem.sections);
   };
 
   const handleDelete = async (classId) => {
@@ -108,7 +136,7 @@ const CreateClass = ({ onCreate }) => {
   return (
     <div className="mt-4 flex">
       <div className="w-2/3 p-4 bg-[#283046] rounded-md">
-        <FormSection title="Create Class">
+        <FormSection title={editingClassId ? "Edit Class" : "Create Class"}>
           <Input
             labelName="Class Name"
             type="text"
@@ -125,7 +153,10 @@ const CreateClass = ({ onCreate }) => {
           />
         </FormSection>
         <div className="flex mt-6">
-          <FormButton name="Create Class" onClick={handleSubmit} />
+          <FormButton
+            name={editingClassId ? "Update Class" : "Create Class"}
+            onClick={handleSubmit}
+          />
         </div>
       </div>
       <div className="w-1/3 pl-4">

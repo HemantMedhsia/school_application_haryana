@@ -123,9 +123,14 @@ export const getClassById = wrapAsync(async (req, res) => {
 // });
 
 export const updateClass = wrapAsync(async (req, res) => {
-
     const { classId } = req.params;
     const { name, sections } = req.body;
+    const existingClass = await Class.findOne({ name, _id: { $ne: classId } });
+    if (existingClass) {
+        return res
+            .status(400)
+            .json(new ApiResponse(400, null, "Class name already exists."));
+    }
 
     const updatedClass = await Class.findByIdAndUpdate(
         classId,
@@ -138,36 +143,22 @@ export const updateClass = wrapAsync(async (req, res) => {
             .status(404)
             .json(new ApiResponse(404, null, "Class not found."));
     }
-   
     await Section.updateMany(
         { classIds: updatedClass._id, name: { $nin: sections } },
-        { $pull: { classIds: updatedClass._id } } 
+        { $pull: { classIds: updatedClass._id } }
     );
-    
+
     await Section.updateMany(
         { name: { $in: sections } },
-        { $addToSet: { classIds: updatedClass._id } } 
+        { $addToSet: { classIds: updatedClass._id } }
     );
 
     return res
         .status(200)
-        .json(new ApiResponse(200, updatedClass, "Class updated successfully"));
+        .json(
+            new ApiResponse(200, updatedClass, "Class updated successfully.")
+        );
 });
-
-// export const deleteClass = wrapAsync(async (req, res) => {
-//     const { classId } = req.params;
-
-//     const deletedClass = await Class.findByIdAndDelete(classId);
-
-//     if (!deletedClass) {
-//         return res.status(404).json({ message: "Class not found." });
-//     }
-//     return res
-//         .status(200)
-//         .json(
-//             new ApiResponse(200, deletedClass, "Class deleted successfully.")
-//         );
-// });
 
 export const deleteClass = wrapAsync(async (req, res) => {
     const { classId } = req.params;
