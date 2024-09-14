@@ -37,8 +37,8 @@ const CreateClass = ({ onCreate }) => {
         );
         console.log(response.data);
         const formattedClasses = response.data.map((classItem) => ({
-          name: classItem.className, 
-          sections: classItem.sections, 
+          name: classItem.className,
+          sections: classItem.sections,
         }));
 
         setClasses(formattedClasses);

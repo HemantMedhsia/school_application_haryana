@@ -123,11 +123,6 @@ export const getClassById = wrapAsync(async (req, res) => {
 // });
 
 export const updateClass = wrapAsync(async (req, res) => {
-    const { error } = classValidationSchema.validate(req.body);
-
-    if (error) {
-        return res.status(400).json({ message: error.details[0].message });
-    }
 
     const { classId } = req.params;
     const { name, sections } = req.body;
@@ -139,17 +134,19 @@ export const updateClass = wrapAsync(async (req, res) => {
     );
 
     if (!updatedClass) {
-        return res.status(404).json({ message: "Class not found." });
+        return res
+            .status(404)
+            .json(new ApiResponse(404, null, "Class not found."));
     }
-
+   
     await Section.updateMany(
-        { classId: updatedClass._id, name: { $nin: sections } },
-        { $unset: { classId: "" } }
+        { classIds: updatedClass._id, name: { $nin: sections } },
+        { $pull: { classIds: updatedClass._id } } 
     );
-
+    
     await Section.updateMany(
         { name: { $in: sections } },
-        { $set: { classId: updatedClass._id } }
+        { $addToSet: { classIds: updatedClass._id } } 
     );
 
     return res
@@ -177,11 +174,14 @@ export const deleteClass = wrapAsync(async (req, res) => {
     const deletedClass = await Class.findByIdAndDelete(classId);
 
     if (!deletedClass) {
-        return res.status(404).json({ message: "Class not found." });
+        return res
+            .status(404)
+            .json(new ApiResponse(404, null, "Class not found."));
     }
+
     await Section.updateMany(
-        { classId: deletedClass._id },
-        { $unset: { classId: "" } }
+        { classIds: deletedClass._id },
+        { $pull: { classIds: deletedClass._id } }
     );
 
     return res
@@ -244,29 +244,36 @@ export const bulkCreateClasses = wrapAsync(async (req, res) => {
 //         .json(new ApiResponse(200, classesWithSections, "Success"));
 // });
 
-
 export const getAllClassesWithSections = wrapAsync(async (req, res) => {
-    const classes = await Class.find(); 
-   
+    const classes = await Class.find();
+
     const sections = await Section.find();
-   
+
     const classSectionMap = {};
 
-    sections.forEach(section => {
-        section.classIds.forEach(classId => {
+    sections.forEach((section) => {
+        section.classIds.forEach((classId) => {
             if (!classSectionMap[classId]) {
                 classSectionMap[classId] = [];
             }
             classSectionMap[classId].push(section.name);
         });
     });
-    
-    const classWithSections = classes.map(classItem => {
+
+    const classWithSections = classes.map((classItem) => {
         return {
             className: classItem.name,
-            sections: classSectionMap[classItem._id] || [] 
+            sections: classSectionMap[classItem._id] || [],
         };
     });
 
-    return res.status(200).json(new ApiResponse(200, classWithSections, "Classes with sections retrieved successfully"));
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                classWithSections,
+                "Classes with sections retrieved successfully"
+            )
+        );
 });
