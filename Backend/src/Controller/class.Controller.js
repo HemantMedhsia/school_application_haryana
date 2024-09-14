@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Class } from "../Models/class.Model.js";
 import { Section } from "../Models/section.Model.js";
 import { ApiResponse } from "../Utils/responseHandler.js";
@@ -24,30 +25,62 @@ import { classValidationSchema } from "../Validation/class.Validation.js";
 //         .status(201)
 //         .json(new ApiResponse(201, newClass, "Class Add Successfully"));
 // });
+
 export const createClass = wrapAsync(async (req, res) => {
-    const { error } = classValidationSchema.validate(req.body);
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
-    if (error) {
-        return res.status(400).json({ message: error.details[0].message });
+    try {
+        const { error } = classValidationSchema.validate(req.body);
+        if (error) {
+            return res
+                .status(400)
+                .json(new ApiResponse(400, null, error.details[0].message));
+        }
+
+        const { name, sections } = req.body;
+
+        const existingClass = await Class.findOne({ name }).session(session);
+        if (existingClass) {
+            return res
+                .status(409)
+                .json(new ApiResponse(409, null, "Class already exists."));
+        }
+
+        const newClass = new Class({ name });
+        await newClass.save({ session });
+
+        const existingSections = await Section.find({
+            name: { $in: sections },
+        }).session(session);
+        const sectionMap = existingSections.reduce((acc, section) => {
+            acc[section.name] = section;
+            return acc;
+        }, {});
+
+        const updatePromises = existingSections.map(async (section) => {
+            if (!section.classIds.includes(newClass._id)) {
+                section.classIds.push(newClass._id);
+                return section.save({ session });
+            }
+            return null;
+        });
+
+        await Promise.all(updatePromises);
+
+        await session.commitTransaction();
+        return res
+            .status(201)
+            .json(new ApiResponse(201, newClass, "Class added successfully"));
+    } catch (err) {
+        await session.abortTransaction();
+        console.error("Error creating class:", err);
+        return res
+            .status(500)
+            .json(new ApiResponse(500, null, "Internal server error"));
+    } finally {
+        session.endSession();
     }
-
-    const { name, sections } = req.body;
-    const existingClass = await Class.findOne({ name });
-    if (existingClass) {
-        return res.status(409).json({ message: "Class already exists." });
-    }
-
-    const newClass = new Class({ name });
-    await newClass.save();
-
-    const updatedSections = await Section.updateMany(
-        { name: { $in: sections } },
-        { $set: { classId: newClass._id } }
-    );
-
-    return res
-        .status(201)
-        .json(new ApiResponse(201, newClass, "Class added successfully"));
 });
 
 export const getAllClasses = wrapAsync(async (req, res) => {
@@ -194,20 +227,46 @@ export const bulkCreateClasses = wrapAsync(async (req, res) => {
         );
 });
 
+//     const classes = await Class.find();
+
+//     const classesWithSections = await Promise.all(
+//         classes.map(async (classItem) => {
+//             const sections = await Section.find({ classId: classItem._id });
+//             return {
+//                 className: classItem.name,
+//                 sections: sections.map((section) => section.name),
+//             };
+//         })
+//     );
+
+//     return res
+//         .status(200)
+//         .json(new ApiResponse(200, classesWithSections, "Success"));
+// });
+
+
 export const getAllClassesWithSections = wrapAsync(async (req, res) => {
-    const classes = await Class.find();
+    const classes = await Class.find(); 
+   
+    const sections = await Section.find();
+   
+    const classSectionMap = {};
 
-    const classesWithSections = await Promise.all(
-        classes.map(async (classItem) => {
-            const sections = await Section.find({ classId: classItem._id });
-            return {
-                className: classItem.name,
-                sections: sections.map((section) => section.name),
-            };
-        })
-    );
+    sections.forEach(section => {
+        section.classIds.forEach(classId => {
+            if (!classSectionMap[classId]) {
+                classSectionMap[classId] = [];
+            }
+            classSectionMap[classId].push(section.name);
+        });
+    });
+    
+    const classWithSections = classes.map(classItem => {
+        return {
+            className: classItem.name,
+            sections: classSectionMap[classItem._id] || [] 
+        };
+    });
 
-    return res
-        .status(200)
-        .json(new ApiResponse(200, classesWithSections, "Success"));
+    return res.status(200).json(new ApiResponse(200, classWithSections, "Classes with sections retrieved successfully"));
 });

@@ -6,10 +6,7 @@ const sectionSchema = new mongoose.Schema({
         required: true,
         unique: true,
     },
-    classId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Class",
-    },
+    classIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "Class" }],
     description: {
         type: String,
     },

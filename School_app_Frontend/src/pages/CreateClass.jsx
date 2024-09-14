@@ -30,9 +30,18 @@ const CreateClass = ({ onCreate }) => {
   useEffect(() => {
     const fetchClasses = async () => {
       try {
-        const response = await getAPI("getAllClassesWithSections", {}, setClasses);
+        const response = await getAPI(
+          "getAllClassesWithSections",
+          {},
+          setClasses
+        );
         console.log(response.data);
-        setClasses(response.data);
+        const formattedClasses = response.data.map((classItem) => ({
+          name: classItem.className, 
+          sections: classItem.sections, 
+        }));
+
+        setClasses(formattedClasses);
       } catch (error) {
         console.error("Error fetching classes:", error);
       }
