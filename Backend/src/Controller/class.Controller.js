@@ -262,6 +262,7 @@ export const getAllClassesWithSections = wrapAsync(async (req, res) => {
 
     const classWithSections = classes.map((classItem) => {
         return {
+            id: classItem._id,
             className: classItem.name,
             sections: classSectionMap[classItem._id] || [],
         };

@@ -6,6 +6,8 @@ import FormButton from "../components/Form/FormButton";
 import CheckboxGroup from "../components/Form/CheckboxGroup";
 import { getAPI } from "../utility/api/apiCall";
 import axios from "axios";
+import { FaEdit, FaTrash } from "react-icons/fa";
+import { toast, ToastContainer } from "react-toastify";
 
 const CreateClass = ({ onCreate }) => {
   const [selectedCheckboxes, setSelectedCheckboxes] = useState([]);
@@ -37,6 +39,7 @@ const CreateClass = ({ onCreate }) => {
         );
         console.log(response.data);
         const formattedClasses = response.data.map((classItem) => ({
+          id: classItem._id, 
           name: classItem.className,
           sections: classItem.sections,
         }));
@@ -83,6 +86,22 @@ const CreateClass = ({ onCreate }) => {
       }
     } else {
       alert("Please enter class name and select at least one section.");
+    }
+  };
+
+  const handleDelete = async (classId) => {
+    console.log("Deleting class:", classId);
+    if (window.confirm("Are you sure you want to delete this class?")) {
+      try {
+        await axios.delete(
+          `${import.meta.env.VITE_BACKEND_URL}/api/delete-class/${classId}`
+        );
+        toast.success("Class deleted successfully!");
+        setClasses(classes.filter((cls) => cls.id !== classId));
+      } catch (error) {
+        console.error("Error deleting class:", error);
+        toast.error("Failed to delete class.");
+      }
     }
   };
 
@@ -151,6 +170,16 @@ const CreateClass = ({ onCreate }) => {
                       <p className="text-sm text-gray-400">
                         Sections: {classItem.sections.join(", ")}
                       </p>
+                      <div className="flex space-x-4 mt-2">
+                        <FaEdit
+                          className="text-yellow-400 cursor-pointer"
+                          onClick={() => handleEdit(classItem)}
+                        />
+                        <FaTrash
+                          className="text-red-500 cursor-pointer"
+                          onClick={() => handleDelete(classItem.id)}
+                        />
+                      </div>
                     </div>
                   </div>
                 </li>
@@ -161,6 +190,7 @@ const CreateClass = ({ onCreate }) => {
           </ul>
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 };
