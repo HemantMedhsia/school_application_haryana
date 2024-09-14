@@ -1,19 +1,83 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Input from "../components/Form/Input";
 import FormButton from "../components/Form/FormButton";
+import { deleteAPI, getAPI } from "../utility/api/apiCall";
+import { FaEdit, FaTrash } from "react-icons/fa";
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const CreateSection = () => {
   const [sectionName, setSectionName] = useState("");
   const [sections, setSections] = useState([]);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingIndex, setEditingIndex] = useState(null);
 
-  const handleAddSection = (e) => {
-    e.preventDefault(); // Prevent form submission default behavior
+  useEffect(() => {
+    fetchSections();
+  }, []);
+
+  const handleAddSection = async (e) => {
+    e.preventDefault();
     if (sectionName.trim() !== "") {
-      // Add the new section to the list
-      setSections([...sections, { name: sectionName }]);
-      setSectionName(""); // Reset input field
+      try {
+        if (isEditing) {
+          await axios.put(
+            `${import.meta.env.VITE_BACKEND_URL}/api/update-section/${
+              sections[editingIndex]._id
+            }`,
+            { name: sectionName }
+          );
+          toast.success("Section updated successfully!");
+        } else {
+          await axios.post(
+            `${import.meta.env.VITE_BACKEND_URL}/api/create-single-section`,
+            { name: sectionName }
+          );
+          toast.success("Section created successfully!");
+        }
+        fetchSections();
+        setSectionName("");
+        setIsEditing(false);
+        setEditingIndex(null);
+      } catch (error) {
+        console.error("Error saving section", error.message);
+        const errorMessage =
+          error.response?.data?.message ||
+          error.message ||
+          "Something went wrong";
+        toast.error(errorMessage);
+      }
     } else {
       console.log("Section name is empty");
+      toast.warning("Section name is empty");
+    }
+  };
+  
+  const fetchSections = async () => {
+    try {
+      const response = await getAPI("getAllSections", {}, setSections);
+      setSections(response.data);
+    } catch (error) {
+      console.error("Error fetching sections", error);
+      toast.error("Error fetching sections");
+    }
+  };
+
+  const handleEditSection = (index) => {
+    setSectionName(sections[index].name);
+    setIsEditing(true);
+    setEditingIndex(index);
+  };
+
+  const handleDeleteSection = async (index) => {
+    try {
+      await deleteAPI(`delete-single-section/${sections[index]._id}`);
+      setSections(sections.filter((_, i) => i !== index));
+      toast.success("Section deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting section", error);
+      toast.error("Error deleting section");
     }
   };
 
@@ -35,7 +99,9 @@ const CreateSection = () => {
             value={sectionName}
             onChange={(e) => setSectionName(e.target.value)}
           />
-          <FormButton name="Create Section" />
+          <div className="ml-2 flex">
+            <FormButton name="Save" />
+          </div>
         </form>
       </div>
 
@@ -45,15 +111,35 @@ const CreateSection = () => {
           <h2 className="text-2xl font-semibold text-[#7367F0] mb-6">
             Sections
           </h2>
-          <ul className="flex flex-col w-10">
+          <ul className="flex flex-col w-[25%] ">
             {sections.map((section, index) => (
-              <li key={index} className="mb-4 py-2 px-3.5 bg-[#7367F5] border w-auto rounded-3xl inline-block">
+              <li
+                key={section._id}
+                className="mb-4 py-2 px-3.5  bg-[#7367F5] border w-auto rounded-3xl inline-block"
+              >
                 {section.name}
+                <button
+                  className="ml-4  text-gray-200"
+                  onClick={() => handleEditSection(index)}
+                >
+                  <FaEdit />
+                </button>
+                <button
+                  className="ml-2 text-gray-200"
+                  onClick={() => handleDeleteSection(index)}
+                >
+                  <FaTrash />
+                </button>
               </li>
             ))}
           </ul>
         </div>
       </div>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+      />
     </div>
   );
 };

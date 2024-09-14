@@ -196,16 +196,18 @@ export const bulkCreateClasses = wrapAsync(async (req, res) => {
 
 export const getAllClassesWithSections = wrapAsync(async (req, res) => {
     const classes = await Class.find();
-    
+
     const classesWithSections = await Promise.all(
         classes.map(async (classItem) => {
             const sections = await Section.find({ classId: classItem._id });
             return {
-                ...classItem.toObject(),
-                sections,
+                className: classItem.name,
+                sections: sections.map((section) => section.name),
             };
         })
     );
 
-    return res.status(200).json(new ApiResponse(200, classesWithSections, "Success"));
+    return res
+        .status(200)
+        .json(new ApiResponse(200, classesWithSections, "Success"));
 });

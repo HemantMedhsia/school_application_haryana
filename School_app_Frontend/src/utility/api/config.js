@@ -12,7 +12,7 @@ export const getApiConfig = {
     method: "GET",
   },
   getAllTeachers: {
-    url: "/get-all-teachers", // Corrected URL to start with '/'
+    url: "/get-all-teachers",
     method: "GET",
   },
   getAllSubjects: {
@@ -49,10 +49,22 @@ export const getApiConfig = {
   }),
   getAllTeachers: {
     url: "/get-all-teachers",
-    method: "GET"
+    method: "GET",
   },
-  getAllNotice:{
+  getAllNotice: {
     url: "/all-notice",
-    method: "GET"
-  }
+    method: "GET",
+  },
+  getAllSections: {
+    url: "/get-all-sections",
+    method: "GET",
+  },
+  getAllSubjects: {
+    url: "/all-subject",
+    method: "GET",
+  },
+  getAllClassesWithSections: {
+    url: "/get-allclass-withsection",
+    method: "GET",
+  },
 };

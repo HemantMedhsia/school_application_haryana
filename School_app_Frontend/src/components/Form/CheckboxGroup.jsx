@@ -1,15 +1,17 @@
-import React from 'react';
+import React from "react";
 
-const CheckboxGroup = ({ labelName, name, selectedValues, onChange, options }) => {
+const CheckboxGroup = ({
+  labelName,
+  name,
+  selectedValues,
+  onChange,
+  options,
+}) => {
   const handleCheckboxChange = (e) => {
     const { value, checked } = e.target;
-    let updatedValues;
-
-    if (checked) {
-      updatedValues = [...selectedValues, value];
-    } else {
-      updatedValues = selectedValues.filter((val) => val !== value);
-    }
+    const updatedValues = checked
+      ? [...selectedValues, value]
+      : selectedValues.filter((v) => v !== value);
 
     onChange(updatedValues);
   };
@@ -21,12 +23,15 @@ const CheckboxGroup = ({ labelName, name, selectedValues, onChange, options }) =
       </label>
       <div className="flex flex-wrap">
         {options.map((option) => (
-          <label key={option.id} className="flex items-center text-sm text-[#FFFFFF] mr-4 mb-2">
+          <label
+            key={option._id}
+            className="flex items-center text-sm text-[#FFFFFF] mr-4 mb-2"
+          >
             <input
               type="checkbox"
               name={name}
-              value={option.id}
-              checked={selectedValues.includes(option.id)}
+              value={option.name}
+              checked={selectedValues.includes(option.name)}
               onChange={handleCheckboxChange}
               className="bg-[#283046] border-2 border-gray-600 focus:border-[#6B46C1] text-[#6B46C1] rounded-[5px] mr-2 h-4 w-4 outline-none"
             />
