@@ -67,4 +67,8 @@ export const getApiConfig = {
     url: "/get-allclass-withsection",
     method: "GET",
   },
+  getAllSubjects: {
+    url: "/all-subject",
+    method: "GET",
+  },
 };

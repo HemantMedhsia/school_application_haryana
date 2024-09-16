@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import FormSection from "../components/Form/FormSection";
 import Input from "../components/Form/Input";
 import Select from "../components/Form/Select";
 import FormButton from "../components/Form/FormButton";
+import { getAPI } from "../utility/api/apiCall";
 
 const options = [
   { id: "1", name: "A" },
@@ -18,6 +19,37 @@ const CreateSubjectGroup = () => {
     selectedSection: "",
     selectedSubject: "",
   });
+  const [classSectionOptions, setClassSectionOptions] = useState([]);
+  const [subjectOptions, setSubjectOptions] = useState([]);
+
+  useEffect(() => {
+    const fetchClassSectionData = async () => {
+      try {
+        const response = await getAPI("getAllClassesWithSections", {}, setClassSectionOptions);
+        setClassSectionOptions(response.data);
+        console.log("Class and section options:", response.data);
+      } catch (error) {
+        console.error("Error fetching class and section data", error);
+      }
+    };
+
+    fetchClassSectionData();
+  }, []);
+
+  useEffect(() => {
+    const fetchSubjectData = async () => {
+      try {
+        const response = await getAPI("getAllSubjects", {}, setSubjectOptions);
+        setSubjectOptions(response.data || []);
+        console.log("Subject options:", response.data);
+      } catch (error) {
+        console.error("Error fetching subjects", error);
+        setSubjectOptions([]);
+      }
+    };
+
+    fetchSubjectData();
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -33,8 +65,9 @@ const CreateSubjectGroup = () => {
   };
 
   return (
-    <div>
-      <FormSection title="Create Subject Group">
+    <div className="mt-8">
+      {/* <FormSection title="Create Subject Group"> */}
+      <div>
         <Input
           labelName="Subject Group Name"
           placeholder="Enter Subject Group Name"
@@ -61,11 +94,19 @@ const CreateSubjectGroup = () => {
           name="selectedSubject"
           value={formData.selectedSubject}
           onChange={handleInputChange}
-          options={options}
+          options={
+            subjectOptions.length > 0
+              ? subjectOptions.map((opt) => ({
+                  id: opt._id,
+                  name: opt.name,
+                }))
+              : []
+          }
         />
-      </FormSection>
+        {/* </FormSection> */}
+      </div>
       <div className="flex">
-        <FormButton name="Add Subject Group" onClick={handleSubmit} />
+        <FormButton name="Save" onClick={handleSubmit} />
       </div>
     </div>
   );

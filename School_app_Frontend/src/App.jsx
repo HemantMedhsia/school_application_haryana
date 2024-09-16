@@ -62,7 +62,7 @@ const App = () => {
               </RoleBasedAccess>
             }
           />
-          <Route path="parent-add/:studentId" element={<ParentAdd />} />
+          <Route path="parent-add/:Id" element={<ParentAdd />} />
           <Route path="student-information" element={<StudnetInfo />} />
 
           <Route path="parent-information" element={<ParentInfo />} />
