@@ -107,7 +107,7 @@ const CreateSection = () => {
 
       {/* Right Side: Display Sections */}
       <div className="w-1/2 mt-8 ml-4">
-        <div className="w-full bg-gray-900 text-gray-100 p-4 rounded-lg shadow-md">
+        <div className="w-full p-4 rounded-lg shadow-md">
           <h2 className="text-2xl font-semibold text-[#7367F0] mb-6">
             Sections
           </h2>
@@ -115,21 +115,23 @@ const CreateSection = () => {
             {sections.map((section, index) => (
               <li
                 key={section._id}
-                className="mb-4 py-2 px-3.5  bg-[#7367F5] border w-auto rounded-3xl inline-block"
+                className="mb-4 py-2 px-3.5 text-[#65FA9E] flex justify-between bg-gray-900 border border-[#65FA9E] w-auto rounded-3xl "
               >
                 {section.name}
+                <div>
                 <button
-                  className="ml-4  text-gray-200"
+                  className="ml-4  text-blue-500"
                   onClick={() => handleEditSection(index)}
                 >
                   <FaEdit />
                 </button>
                 <button
-                  className="ml-2 text-gray-200"
+                  className="ml-2 text-red-700"
                   onClick={() => handleDeleteSection(index)}
                 >
                   <FaTrash />
                 </button>
+                </div>
               </li>
             ))}
           </ul>

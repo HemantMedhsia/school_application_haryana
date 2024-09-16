@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const NavbarItem = ({ item, isActive, onClick }) => {
+const NavbarItem = ({ item, isActive, onClick, isCollapsed }) => {
   return (
     <Link
       to={item.to}
@@ -12,8 +12,11 @@ const NavbarItem = ({ item, isActive, onClick }) => {
       } group flex items-center px-2 py-2 text-sm font-medium rounded-md`}
       onClick={onClick}
     >
-      <item.icon className="mr-3 h-6 w-6" aria-hidden="true" />
-      {item.name}
+     {
+      isCollapsed ? <item.icon className=" h-6 w-6" aria-hidden="true" /> : <div className='flex'><item.icon className="mr-3 h-6 w-6" aria-hidden="true" />
+      <span>{item.name}</span></div>
+     }
+      
     </Link>
   );
 };

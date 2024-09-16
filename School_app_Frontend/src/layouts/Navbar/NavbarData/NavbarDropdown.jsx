@@ -2,7 +2,7 @@ import React from "react";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import NavbarItem from "./NavbarItem";
 
-const Dropdown = ({ item, isOpen, role, onClick }) => {
+const NavbarDropdown = ({ item, isOpen, role, onClick, isCollapsed }) => {
   return (
     <div>
       <button
@@ -14,7 +14,7 @@ const Dropdown = ({ item, isOpen, role, onClick }) => {
         onClick={onClick}
       >
         <item.icon className="mr-3 h-6 w-6" aria-hidden="true" />
-        {item.name}
+        {!isCollapsed && <span>{item.name}</span>} {/* Conditionally render text */}
         <span className="ml-auto">
           {isOpen ? (
             <FaChevronUp className="h-4 w-4" />
@@ -28,7 +28,12 @@ const Dropdown = ({ item, isOpen, role, onClick }) => {
           {item.children
             .filter((child) => child.roles.includes(role))
             .map((child) => (
-              <NavbarItem key={child.name} item={child} isActive={false} />
+              <NavbarItem
+                key={child.name}
+                item={child}
+                isActive={false}
+                isCollapsed={isCollapsed} // Pass collapse state to child
+              />
             ))}
         </div>
       )}
@@ -36,4 +41,4 @@ const Dropdown = ({ item, isOpen, role, onClick }) => {
   );
 };
 
-export default Dropdown;
+export default NavbarDropdown;

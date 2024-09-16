@@ -222,14 +222,14 @@ export const navigation = [
     roles: ["Admin", "Teacher", "Student"],
     children: [
       {
-        name: "Exam Result",
-        to: "/Exam-Result",
+        name: "Exam Group",
+        to: "/school/Exam-Group",
         icon: FaUser,
         roles: ["Student", "Teacher", "Admin"],
       },
       {
-        name: "Exam Schedule",
-        to: "/Exam-Schedule",
+        name: "Exam Type",
+        to: "/school/Exam-Type",
         icon: FaBook,
         roles: ["Student", "Teacher", "Admin"],
       },

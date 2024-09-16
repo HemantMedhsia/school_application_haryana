@@ -30,6 +30,8 @@ import CreateClass from "./pages/CreateClass.jsx";
 import AddSubjects from "./pages/AddSubjects.jsx";
 import CreateSubjectGroup from "./pages/CreateSubjectGroup.jsx";
 import ViewNotice from "./pages/Notice/ViewNotice.jsx";
+import ExamGrpup from "./pages/Examination/ExamGrpup.jsx";
+import ExamType from "./pages/Examination/ExamType.jsx";
 
 const App = () => {
   const { userRole, authToken } = useAuth();
@@ -89,6 +91,8 @@ const App = () => {
           <Route path="add-subjects" element={<AddSubjects />} />
           <Route path="create-subject-group" element={<CreateSubjectGroup />} />
           <Route path="view-notice" element={<ViewNotice />} />
+          <Route path="Exam-Group" element={<ExamGrpup />} />
+          <Route path="Exam-Type" element={<ExamType />} />
         </Route>
       </>
     )

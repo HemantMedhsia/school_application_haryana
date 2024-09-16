@@ -7,7 +7,7 @@ import { navigation } from "./NavbarData/NavigationData.js";
 
 const LeftNavbar = ({ role, onToggle }) => {
   const [dropdownOpen, setDropdownOpen] = useState({});
-  const [isCollapsed, setIsCollapsed] = useState(false); // State to handle collapse
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const location = useLocation();
 
   const handleDropdownClick = (name) => {
@@ -17,15 +17,13 @@ const LeftNavbar = ({ role, onToggle }) => {
     }));
   };
 
-  // Filter navigation based on the user's role
   const filteredNavigation = navigation.filter((item) =>
     item.roles.includes(role)
   );
 
-  // Toggle collapse state
   const handleToggleCollapse = () => {
     setIsCollapsed(!isCollapsed);
-    onToggle(); // Call parent function to adjust layout
+    onToggle();
   };
 
   return (
@@ -34,7 +32,7 @@ const LeftNavbar = ({ role, onToggle }) => {
         <div className="flex items-center justify-between h-16 p-2 bg-[#283046]">
           <img src={aradhyaTechLogo} alt="Logo" className={`h-16 mt-2 transition-all duration-300 ${isCollapsed ? "hidden" : "block"}`} />
           <button onClick={handleToggleCollapse} className="text-white focus:outline-none">
-            {isCollapsed ? "➔" : "←"} {/* Collapse toggle icon */}
+            {isCollapsed ? "➔" : "←"}
           </button>
         </div>
         <nav className="flex flex-col flex-grow p-4 space-y-2 overflow-y-auto">
@@ -46,14 +44,14 @@ const LeftNavbar = ({ role, onToggle }) => {
                   isOpen={dropdownOpen[item.name]}
                   role={role}
                   onClick={() => handleDropdownClick(item.name)}
-                  isCollapsed={isCollapsed} // Pass collapse state to child
+                  isCollapsed={isCollapsed}
                 />
               ) : (
                 <NavbarItem
                   item={item}
                   isActive={location.pathname === item.to}
                   onClick={null}
-                  isCollapsed={isCollapsed} // Pass collapse state to child
+                  isCollapsed={isCollapsed}
                 />
               )}
             </div>
