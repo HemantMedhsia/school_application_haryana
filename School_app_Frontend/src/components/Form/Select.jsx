@@ -1,13 +1,20 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from "react";
 
-const SearchableSelect = ({ labelName, name, value, onChange, options, placeholder = "Select" }) => {
-  const [searchTerm, setSearchTerm] = useState('');
+const SearchableSelect = ({
+  labelName,
+  name,
+  value,
+  onChange,
+  options,
+  placeholder = "Select",
+}) => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
 
   // Filter options based on search term
-  const filteredOptions = options.filter(option =>
-    option.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredOptions = options.filter((option) =>
+    option?.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Handle input change
@@ -24,7 +31,7 @@ const SearchableSelect = ({ labelName, name, value, onChange, options, placehold
         value: option.id,
       },
     });
-    setSearchTerm(option.name); // Set search term to selected option name
+    setSearchTerm(option?.name || ""); // Set search term to selected option name
     setShowDropdown(false); // Close the dropdown
   };
 
@@ -36,15 +43,20 @@ const SearchableSelect = ({ labelName, name, value, onChange, options, placehold
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
   return (
-    <span className="flex flex-col w-full md:w-1/3 px-2 mb-4 relative" ref={dropdownRef}>
-      <label className="text-sm font-medium leading-none text-gray-400">{labelName}</label>
+    <span
+      className="flex flex-col w-full md:w-1/3 px-2 mb-4 relative"
+      ref={dropdownRef}
+    >
+      <label className="text-sm font-medium leading-none text-gray-400">
+        {labelName}
+      </label>
       <input
         type="text"
         name={name}
@@ -63,7 +75,7 @@ const SearchableSelect = ({ labelName, name, value, onChange, options, placehold
                 className="px-2 py-1 hover:bg-[#6B46C1] cursor-pointer"
                 onClick={() => handleSelect(option)}
               >
-                {option.name}
+                {option?.name}
               </div>
             ))
           ) : (
@@ -76,4 +88,3 @@ const SearchableSelect = ({ labelName, name, value, onChange, options, placehold
 };
 
 export default SearchableSelect;
- 

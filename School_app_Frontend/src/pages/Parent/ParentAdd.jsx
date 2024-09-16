@@ -9,7 +9,7 @@ import "react-toastify/dist/ReactToastify.css";
 import FormButton from "../../components/Form/FormButton";
 
 const ParentAdd = () => {
-  const { studentId, parentId } = useParams();
+  const { studentId, parentId ,Id} = useParams();
   console.log(studentId, parentId);
 
   const [formData, setFormData] = useState({
@@ -38,18 +38,20 @@ const ParentAdd = () => {
         `${import.meta.env.VITE_BACKEND_URL}/api/get-parent/${parentId}`,
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${localStorage.getItem("authtoken")}`,
           },
         }
       );
       const parentData = response.data.data;
-      console.log(parentData);
       setFormData({
         ...parentData,
       });
     } catch (error) {
       console.error("Error fetching parent data by parentId:", error);
-      toast.error("Error fetching parent data.");
+      toast.error(
+        "Error fetching parent data: " +
+          (error.response?.data?.message || error.message)
+      );
     }
   };
 
@@ -87,9 +89,7 @@ const ParentAdd = () => {
   useEffect(() => {
     if (parentId) {
       fetchParentDataByParentId();
-      console.log("parent");
     } else if (studentId) {
-      console.log("student");
       fetchParentDataByStudentId();
     }
   }, [parentId, studentId]);
@@ -104,7 +104,7 @@ const ParentAdd = () => {
     try {
       const url = parentId
         ? `${import.meta.env.VITE_BACKEND_URL}/api/update-parent/${parentId}`
-        : `${import.meta.env.VITE_BACKEND_URL}/api/create-parent/${studentId}`;
+        : `${import.meta.env.VITE_BACKEND_URL}/api/create-parent/${Id}`;
 
       const method = parentId ? "put" : "post";
 
