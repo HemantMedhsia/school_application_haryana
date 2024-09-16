@@ -68,9 +68,10 @@ const CreateClass = ({ onCreate }) => {
       name: className,
       sections: selectedCheckboxes,
     };
+    console.log("newClass:", newClass);
 
     try {
-      let response; 
+      let response;
 
       if (editingClassId) {
         // Update existing class
@@ -80,6 +81,7 @@ const CreateClass = ({ onCreate }) => {
           }/api/update-class/${editingClassId}`,
           newClass
         );
+        console.log("Response:", response);
         toast.success("Class updated successfully!");
       } else {
         // Create new class
@@ -88,22 +90,30 @@ const CreateClass = ({ onCreate }) => {
           newClass
         );
         toast.success("Class created successfully!");
+        console.log("Response:", response);
       }
 
-      // Reset state
-      setClasses((prevClasses) => {
-        if (editingClassId) {
-          return prevClasses.map((cls) =>
-            cls.id === editingClassId ? { ...cls, ...newClass } : cls
-          );
-        }
-        // Use response.data.id only if the response has a valid id
-        return [...prevClasses, { ...newClass, id: response.data.id }];
-      });
+      try {
+        const response = await getAPI(
+          "getAllClassesWithSections",
+          {},
+          setClasses
+        );
+        const formattedClasses = response.data.map((classItem) => ({
+          id: classItem.id,
+          name: classItem.className,
+          sections: classItem.sections,
+        }));
+
+        setClasses(formattedClasses);
+        console.log(response.data);
+      } catch (error) {
+        console.error("Error fetching classes:", error);
+      }
 
       setClassName("");
       setSelectedCheckboxes([]);
-      setEditingClassId(null); // Reset editing state
+      setEditingClassId(null);
       if (onCreate) onCreate();
     } catch (error) {
       console.error("Error submitting class:", error);
