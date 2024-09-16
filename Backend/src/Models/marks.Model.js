@@ -1,65 +1,42 @@
 import mongoose from "mongoose";
 
-const MarksSchema = new mongoose.Schema(
+const marksSchema = new mongoose.Schema(
     {
-        studentId: {
+        student: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Student",
             required: true,
         },
-        teacherId: {
+        term: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "Teacher",
+            ref: "Term",
             required: true,
         },
-        examType: {
-            type: String,
+        class: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Class",
             required: true,
-            enum: [
-                "Chapter Wise Weekly Test",
-                "Monthly Test",
-                "Monthly Exam Practice",
-                "Internal Assessments Test",
-            ],
         },
-        subjectMarks: [
+        marks: [
             {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "SingleSubjectMark",
+                subject: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "Subject",
+                    required: true,
+                },
+                examType: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "ExamType",
+                    required: true,
+                },
+                marksObtained: {
+                    type: Number,
+                    required: true,
+                },
             },
         ],
-        percentage: {
-            type: Number,
-            required: true,
-            default: 0,
-        },
-        rank: {
-            type: Number,
-            required: true,
-            default: 0,
-        },
-        division: {
-            type: String,
-            enum: ["First", "Second", "Third", "Fail"],
-            required: true,
-            default: "Fail",
-        },
-        grandTotal: {
-            type: Number,
-            required: true,
-            default: 0,
-        },
-        totalObtainedMarks: {
-            type: Number,
-            required: true,
-            default: 0,
-        },
     },
-    {
-        timestamps: true,
-    }
+    { timestamps: true }
 );
 
-const Marks = mongoose.model("Marks", MarksSchema);
-
-export default Marks;
+export const Marks = mongoose.model("Marks", marksSchema);

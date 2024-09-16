@@ -4,12 +4,7 @@ const examScheduleSchema = new mongoose.Schema(
     {
         term: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "ExamTerm",
-            required: true,
-        },
-        examType: {
-            type: String,
-            enum: ["Unit Test", "Internal Test", "Half-Yearly", "Annual"],
+            ref: "Term",
             required: true,
         },
         class: {
@@ -17,20 +12,33 @@ const examScheduleSchema = new mongoose.Schema(
             ref: "Class",
             required: true,
         },
-        subjectGroups: [
+        examType: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "ExamType",
+            required: true,
+        },
+        subjectGroup: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "SubjectGroup",
+            required: true,
+        },
+        examDetails: [
             {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "SubjectGroup",
+                subject: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "Subject",
+                    required: true,
+                },
+                startTime: {
+                    type: Date,
+                    required: true,
+                },
+                endTime: {
+                    type: Date,
+                    required: true,
+                },
             },
         ],
-        startDate: {
-            type: Date,
-            required: true,
-        },
-        endDate: {
-            type: Date,
-            required: true,
-        },
     },
     {
         timestamps: true,

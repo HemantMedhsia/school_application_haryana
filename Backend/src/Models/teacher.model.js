@@ -22,7 +22,7 @@ const teacherSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
-        index:true,
+        index: true,
     },
     password: {
         type: String,
@@ -80,6 +80,11 @@ const teacherSchema = new mongoose.Schema({
     role: {
         type: String,
         default: "Teacher",
+    },
+    subject: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Subject",
+        required: true,
     },
 });
 

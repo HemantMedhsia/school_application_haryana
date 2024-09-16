@@ -1,4 +1,4 @@
-import Marks from "../Models/marks.Model.js";
+import {Marks} from "../Models/marks.Model.js";
 import { SingleSubjectMark } from "../Models/singleSubjectMark.Model.js";
 import { ApiResponse } from "../Utils/responseHandler.js";
 import wrapAsync from "../Utils/wrapAsync.js";
