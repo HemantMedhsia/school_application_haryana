@@ -92,7 +92,7 @@ export const loginStaff = wrapAsync(async (req, res, next) => {
             new ApiResponse(
                 200,
                 {
-                    staff: loggedInstaff,
+                    user: loggedInstaff,
                     accessToken,
                     refreshToken,
                 },

@@ -28,12 +28,12 @@ const StackedBarChart = ({
           total: {
             enabled: true,
             style: {
-              fontSize: "16px",
-              fontWeight: 900,
+              fontSize: "14px", // Adjusted for better readability on mobile
+              fontWeight: 700,
               colors: ["#ff00ff"], // Change this to your desired color
             },
             formatter: function (val) {
-              return val; // Change this to your desired color
+              return val;
             },
           },
         },
@@ -48,7 +48,7 @@ const StackedBarChart = ({
       text: chartTitle,
       align: "left",
       style: {
-        fontSize: "20px",
+        fontSize: "16px", // Adjusted for better readability on mobile
         fontWeight: "bold",
         color: "#7367F0",
       },
@@ -86,9 +86,9 @@ const StackedBarChart = ({
       colors: colors,
     },
     legend: {
-      position: "top",
-      horizontalAlign: "left",
-      offsetX: 40,
+      position: "bottom", // Moved legend to bottom for better mobile view
+      horizontalAlign: "center",
+      offsetX: 0,
       labels: {
         colors: "#ffffff",
       },
@@ -96,7 +96,7 @@ const StackedBarChart = ({
   };
 
   return (
-    <div className="p-4 bg-gray-900 rounded-lg shadow-lg">
+    <div className="ml-4 bg-gray-900 rounded-lg w-full">
       <ReactApexChart
         options={options}
         series={series}

@@ -100,7 +100,7 @@ export const loginTeacher = wrapAsync(async (req, res, next) => {
             new ApiResponse(
                 200,
                 {
-                    teacher: loggedInTeacher,
+                    user: loggedInTeacher,
                     accessToken,
                     refreshToken,
                 },

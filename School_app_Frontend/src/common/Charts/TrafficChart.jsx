@@ -2,14 +2,14 @@ import React, { useEffect } from "react";
 import ApexCharts from "apexcharts";
 
 const TrafficChart = ({
-  series = [35.1, 23.5, 2.4, 5.4], 
+  series = [35.1, 23.5, 2.4, 5.4],
   colors,
-  labels = ["Direct", "Sponsor", "Affiliate", "Email marketing"], 
-  title = "Website Traffic", 
-  height = "100%", 
-  width = "100%", 
-  containerId = "donut-chart", 
-  innerLable = "Unique visitors", 
+  labels = ["Direct", "Sponsor", "Affiliate", "Email marketing"],
+  title = "Website Traffic",
+  height = "300px", // Default height for better mobile visibility
+  width = "100%", // Full width for responsive design
+  containerId = "donut-chart",
+  innerLabel = "Unique visitors",
 }) => {
   const adjustedColors = Array(series.length).fill().map((_, i) => colors[i % colors.length]);
 
@@ -27,11 +27,33 @@ const TrafficChart = ({
         breakpoint: 1000,
         options: {
           chart: {
-            width: "90%",
-            height: "90%",
-          }
+            width: "100%",
+            height: "100%",
+          },
+          legend: {
+            position: "bottom",
+            horizontalAlign: "center",
+            itemMargin: {
+              horizontal: 8,
+            },
+          },
         }
-      }]
+      }, {
+        breakpoint: 600,
+        options: {
+          chart: {
+            width: "100%",
+            height: "100%",
+          },
+          legend: {
+            position: "bottom",
+            horizontalAlign: "center",
+            itemMargin: {
+              horizontal: 4,
+            },
+          },
+        }
+      }],
     },
     stroke: {
       colors: ["transparent"],
@@ -50,7 +72,7 @@ const TrafficChart = ({
             total: {
               showAlways: true,
               show: true,
-              label: innerLable,
+              label: innerLabel,
               fontFamily: "Inter, sans-serif",
               color: "white",
               formatter: function (w) {
@@ -116,13 +138,11 @@ const TrafficChart = ({
   }, [series, colors, labels, height, width, containerId]);
 
   return (
-    <div className="w-1/3 rounded-md shadow p-4 md:p-6">
+    <div className="w-full max-w-full p-4 rounded-md shadow-lg bg-gray-900">
       <div className="flex justify-between mb-3">
-        <div className="flex items-center">
-          <h5 className="text-xl font-bold leading-none text-white">{title}</h5>
-        </div>
+        <h5 className="text-xl font-bold leading-none text-white">{title}</h5>
       </div>
-      <div className="" id={containerId} style={{ height: height, width: width }}></div>
+      <div id={containerId} style={{ height: height, width: width }}></div>
     </div>
   );
 };

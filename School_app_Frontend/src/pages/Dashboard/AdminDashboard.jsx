@@ -69,32 +69,39 @@ const barChartColors = ["#FF4560", "#00E396"];
 
 const AdminDashboard = () => {
   return (
-    <div>
-      <div className="flex gap-4 w-full my-4">
-        <div className="">
-          <SmalldataBlock
-            title="Monthly Expense"
-            description="Total number of Expense this month"
-            iconUrl="https://img.icons8.com/ios/50/000000/graduation-cap--v1.png"
-            bgColor="bg-gray-900"
-            value={200000}
-          />
-          <SmalldataBlock
-            title="Monthly Fees Collection"
-            description="Total number of Expense this month"
-            iconUrl="https://img.icons8.com/ios/50/000000/graduation-cap--v1.png"
-            bgColor="bg-gray-900"
-            value={500000}
-          />
-          <SmalldataBlock
-            title="Total Donation"
-            description="Total number of Expense this month"
-            iconUrl="https://img.icons8.com/ios/50/000000/graduation-cap--v1.png"
-            bgColor="bg-gray-900"
-            value={50000}
-          />
+    <div className=" lg:p-0">
+      <div className="sm:flex">
+        <div className="flex flex-wrap justify-center gap-4 mb-4 lg:w-1/3">
+          <div className="w-full ">
+            <SmalldataBlock
+              title="Monthly Expense"
+              description="Total number of Expense this month"
+              iconUrl="https://img.icons8.com/ios/50/000000/graduation-cap--v1.png"
+              bgColor="bg-gray-900"
+              value={200000}
+            />
+          </div>
+
+          <div className="w-full">
+            <SmalldataBlock
+              title="Monthly Fees Collection"
+              description="Total number of Expense this month"
+              iconUrl="https://img.icons8.com/ios/50/000000/graduation-cap--v1.png"
+              bgColor="bg-gray-900"
+              value={500000}
+            />
+          </div>
+          <div className="w-full ">
+            <SmalldataBlock
+              title="Total Donation"
+              description="Total number of Expense this month"
+              iconUrl="https://img.icons8.com/ios/50/000000/graduation-cap--v1.png"
+              bgColor="bg-gray-900"
+              value={50000}
+            />
+          </div>
         </div>
-        <div className="w-3/4">
+        <div className="lg:w-1/2">
           <StackedBarChart
             series={seriesData}
             categories={categoriesData}
@@ -103,35 +110,37 @@ const AdminDashboard = () => {
           />
         </div>
       </div>
-      <div className="flex w-full border-4 border-[#283046] rounded-md">
-        <TrafficChart {...trafficChartData} />
-        <BarChart
-          label={"Student Weekly Attendance"}
-          series={barChartData}
-          colors={barChartColors}
-          height={"100%"}
-          width="100%"
-        />
-      </div>
-      <div className="flex w-full border-4 my-4 border-[#283046] rounded-md">
-        <TrafficChart {...trafficChartData2} />
-        <BarChart
-          label={"Teacher Weekly Attendance"}
-          series={barChartData}
-          colors={barChartColors}
-          height={"100%"}
-          width="100%"
-        />
-      </div>
-      <div className="flex w-full border-4 my-4 border-[#283046] rounded-md">
-        <TrafficChart {...trafficChartData3} />
-        <BarChart
-          label={"Staff Weekly Attendance"}
-          series={barChartData}
-          colors={barChartColors}
-          height={"100%"}
-          width="100%"
-        />
+      <div className="flex flex-wrap gap-4 mb-4">
+        <div className="flex-1 min-w-[300px] border-4 border-[#283046] rounded-md">
+          <TrafficChart {...trafficChartData} />
+          <BarChart
+            label={"Student Weekly Attendance"}
+            series={barChartData}
+            colors={barChartColors}
+            height={"100%"}
+            width="100%"
+          />
+        </div>
+        <div className="flex-1 min-w-[300px] border-4 border-[#283046] rounded-md">
+          <TrafficChart {...trafficChartData2} />
+          <BarChart
+            label={"Teacher Weekly Attendance"}
+            series={barChartData}
+            colors={barChartColors}
+            height={"100%"}
+            width="100%"
+          />
+        </div>
+        <div className="flex-1 min-w-[300px] border-4 border-[#283046] rounded-md">
+          <TrafficChart {...trafficChartData3} />
+          <BarChart
+            label={"Staff Weekly Attendance"}
+            series={barChartData}
+            colors={barChartColors}
+            height={"100%"}
+            width="100%"
+          />
+        </div>
       </div>
     </div>
   );

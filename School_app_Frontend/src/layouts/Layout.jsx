@@ -15,9 +15,18 @@ function Layout() {
 
   return (
     <div className="flex h-screen bg-gray-900">
+      {/* Left Navbar with fixed width */}
       <LeftNavbar role={userRole} onToggle={() => setIsCollapsed(!isCollapsed)} />
-      <div className={`flex-1 flex flex-col transition-all duration-300 ${isCollapsed ? 'ml-20' : 'ml-64'}`}>
-        <TopNavbar />
+
+      {/* Adjust the margin based on whether the navbar is collapsed or not */}
+      <div
+        className={`flex-1 flex flex-col transition-all duration-300`}
+        style={{
+          marginLeft: isCollapsed ? '80px' : '256px',
+          width: isCollapsed ? 'calc(100% - 80px)' : 'calc(100% - 256px)',
+        }}
+      >
+        <TopNavbar isCollapsed={isCollapsed} />
         <div className="flex-1 overflow-y-auto p-6 mt-16">
           <Outlet />
         </div>
