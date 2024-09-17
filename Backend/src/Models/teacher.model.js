@@ -81,10 +81,9 @@ const teacherSchema = new mongoose.Schema({
         type: String,
         default: "Teacher",
     },
-    subject: {
+    subjects: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Subject",
-        
     },
 });
 
