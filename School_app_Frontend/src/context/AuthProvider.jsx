@@ -76,10 +76,10 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const login = (authToken, refreshToken, admin) => {
+  const login = (authToken, refreshToken, user) => {
     setAuthToken(authToken);
     setRefreshToken(refreshToken);
-    setname(admin);
+    setname(user);
 
     const decodedToken = jwtDecode(authToken);
     setUserRole(decodedToken.role);

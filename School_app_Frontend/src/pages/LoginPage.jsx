@@ -51,8 +51,8 @@ const LoginPage = () => {
       );
 
       console.log("Login successful:", response.data);
-      const { accessToken, refreshToken, admin } = response.data.data;
-      login(accessToken, refreshToken, admin);
+      const { accessToken, refreshToken, user } = response.data.data;
+      login(accessToken, refreshToken, user);
 
       navigate("/school/dashboard");
     } catch (err) { 
