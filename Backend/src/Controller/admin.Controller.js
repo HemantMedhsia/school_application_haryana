@@ -99,7 +99,7 @@ export const loginAdmin = wrapAsync(async (req, res, next) => {
                 },
                 "Admin logged in successfully"
             )
-        );
+        ); 
 });
 
 export const refreshAccessTokenAdmin = wrapAsync(async (req, res, next) => {
