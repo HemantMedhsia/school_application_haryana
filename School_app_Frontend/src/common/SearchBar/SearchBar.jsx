@@ -21,9 +21,15 @@ const SearchBar = () => {
 
       <Dropdown label="All Class" items={["Class 1", "Class 2", "Class 3"]} />
 
-      <Dropdown label="Section" items={["Section A", "Section B", "Section C", "Section D"]} />
+      <Dropdown
+        label="Section"
+        items={["Section A", "Section B", "Section C", "Section D"]}
+      />
 
-      <Dropdown label="Session" items={["2024-2025", "2025-2026", "2026-2027"]} />
+      <Dropdown
+        label="Session"
+        items={["2024-2025", "2025-2026", "2026-2027"]}
+      />
 
       <Button
         icon={

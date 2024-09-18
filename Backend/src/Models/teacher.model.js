@@ -81,11 +81,12 @@ const teacherSchema = new mongoose.Schema({
         type: String,
         default: "Teacher",
     },
-    subject: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Subject",
-        required: true,
-    },
+    subjects: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Subject",
+        },
+    ],
 });
 
 teacherSchema.pre("save", async function (next) {

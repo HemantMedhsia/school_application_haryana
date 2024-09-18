@@ -24,6 +24,9 @@ import { loginUserRouter } from "./Routes/loginUser.Route.js";
 import { subjectGroupRoute } from "./Routes/subjectGroup.Route.js";
 import { termRoute } from "./Routes/term.Route.js";
 import { examTypeRoute } from "./Routes/examType.route.js";
+import { examScheduleRoute } from "./Routes/examSchedule.Route.js";
+import { markRoute } from "./Routes/mark.Route.js";
+import { classTimeTableRoute } from "./Routes/classTimeTable.Route.js";
 
 const app = express();
 
@@ -71,6 +74,10 @@ app.use("/api", loginUserRouter);
 app.use("/api",subjectGroupRoute)
 app.use("/api",termRoute);
 app.use("/api", examTypeRoute);
+app.use("/api",examScheduleRoute);
+app.use("/api",markRoute);
+app.use("/api",classTimeTableRoute);
+
 
 // Global error handling middleware
 app.use((err, req, res, next) => {
