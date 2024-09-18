@@ -1,9 +1,9 @@
-// IconInput.js
 import React from "react";
 
 const IconInput = ({ icon, placeholder }) => {
   return (
-    <div className="flex bg-gray-900 text-gray-100 px-4 py-1 w-72 space-x-4 rounded-lg">
+    <div className="flex items-center bg-gray-900 text-gray-100 px-4 py-2 w-full md:w-72 space-x-2 rounded-lg">
+      {/* Icon */}
       <svg
         xmlns="http://www.w3.org/2000/svg"
         className="h-6 w-6 opacity-30"
@@ -13,8 +13,10 @@ const IconInput = ({ icon, placeholder }) => {
       >
         {icon}
       </svg>
+
+      {/* Input Field */}
       <input
-        className="bg-gray-900 outline-none"
+        className="bg-transparent flex-grow outline-none text-sm md:text-base"
         type="text"
         placeholder={placeholder}
       />
@@ -23,4 +25,3 @@ const IconInput = ({ icon, placeholder }) => {
 };
 
 export default IconInput;
-

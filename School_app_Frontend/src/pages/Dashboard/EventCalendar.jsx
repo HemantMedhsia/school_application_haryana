@@ -90,7 +90,7 @@ const EventCalendar = () => {
                 <span className="calendar-label">{label}</span>
                 <button className="nav-btn" onClick={() => onNavigate('NEXT')}>❯</button>
                 <div className="view-buttons">
-                  <button className="view-btn" onClick={() => onView('month')}>Month</button>
+                  <button className="view-btn" onClick={() => onView('month')}>Month</button> 
                   <button className="view-btn" onClick={() => onView('week')}>Week</button>
                   <button className="view-btn" onClick={() => onView('day')}>Day</button>
                   <button className="view-btn" onClick={() => onView('agenda')}>List</button>

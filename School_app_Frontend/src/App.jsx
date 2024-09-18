@@ -32,6 +32,11 @@ import CreateSubjectGroup from "./pages/CreateSubjectGroup.jsx";
 import ViewNotice from "./pages/Notice/ViewNotice.jsx";
 import ExamGrpup from "./pages/Examination/ExamGrpup.jsx";
 import ExamType from "./pages/Examination/ExamType.jsx";
+import ExaminationSchedule from "./pages/Examination/ExaminationSchedule.jsx";
+import ClassTimetable from "./pages/ClassTimetable.jsx";
+import TeacherTimetable from "./pages/Teacher/TeacherTimetable.jsx";
+import CreateTimetabel from "./pages/CreateTimetabel.jsx";
+import AssingTeacher from "./pages/Teacher/AssingTeacher.jsx";
 
 const App = () => {
   const { userRole, authToken } = useAuth();
@@ -91,8 +96,13 @@ const App = () => {
           <Route path="add-subjects" element={<AddSubjects />} />
           <Route path="create-subject-group" element={<CreateSubjectGroup />} />
           <Route path="view-notice" element={<ViewNotice />} />
-          <Route path="Exam-Group" element={<ExamGrpup />} />
-          <Route path="Exam-Type" element={<ExamType />} />
+          <Route path="exam-group" element={<ExamGrpup />} />
+          <Route path="exam-type" element={<ExamType />} />
+          <Route path="exam-schedule" element={<ExaminationSchedule />} />
+          <Route path="class-timetable" element={<ClassTimetable />} />
+          <Route path="teacher-timetable" element={<TeacherTimetable />} />
+          <Route path="create-timetable" element={<CreateTimetabel />} />
+          <Route path="assign-teacher" element={<AssingTeacher />} />
         </Route>
       </>
     )

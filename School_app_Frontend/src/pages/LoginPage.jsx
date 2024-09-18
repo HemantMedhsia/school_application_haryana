@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import PyramidLoader from "../common/Loader/PyramidLoader";
 
+
 const LoginPage = () => {
   const { login, loading } = useAuth(); // Use login and loading from context
   const [email, setEmail] = useState("");
@@ -50,11 +51,11 @@ const LoginPage = () => {
       );
 
       console.log("Login successful:", response.data);
-      const { accessToken, refreshToken } = response.data.data;
-      login(accessToken, refreshToken);
+      const { accessToken, refreshToken, user } = response.data.data;
+      login(accessToken, refreshToken, user);
 
       navigate("/school/dashboard");
-    } catch (err) {
+    } catch (err) { 
       console.error("Login failed:", err);
       setError("Login failed. Please try again.");
     } finally {

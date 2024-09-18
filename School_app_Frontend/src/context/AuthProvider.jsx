@@ -22,6 +22,8 @@ const getRefreshEndpoint = (role) => {
 };
 
 export const AuthProvider = ({ children }) => {
+
+  const [name, setname] = useState();
   //  const navigate = useNavigate();
   const [authToken, setAuthToken] = useState(() =>
     localStorage.getItem("authToken")
@@ -44,6 +46,7 @@ export const AuthProvider = ({ children }) => {
         // Refresh the token if it's about to expire in the next 1 minute
         if (decodedToken.exp < currentTime + 60 && refreshToken) {
           await refreshAuthToken(refreshToken, decodedToken.role);
+          console.log("1234",decodedToken.role);
         }
       }
       setLoading(false);
@@ -73,9 +76,10 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const login = (authToken, refreshToken) => {
+  const login = (authToken, refreshToken, user) => {
     setAuthToken(authToken);
     setRefreshToken(refreshToken);
+    setname(user);
 
     const decodedToken = jwtDecode(authToken);
     setUserRole(decodedToken.role);
@@ -95,7 +99,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ authToken, refreshToken, userRole, login, logout, loading }}
+      value={{ authToken, refreshToken, userRole, name, login, logout, loading }}
     >
       {!loading ? (
         children

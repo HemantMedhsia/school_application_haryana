@@ -123,25 +123,25 @@ export const navigation = [
     children: [
       {
         name: "Class TimeTable",
-        to: "/class-timetable",
+        to: "/school/class-timetable",
         icon: FaUser,
         roles: ["Student", "Teacher", "Admin"],
       },
       {
-        name: "Teacher TimeTable",
-        to: "/Teacher-TimeTable",
+        name: "Teacher Timetable",
+        to: "/school/teacher-timetable",
         icon: FaBook,
         roles: ["Teacher", "Admin"],
       },
       {
         name: "Create TimeTable",
-        to: "/create-timetable",
+        to: "/school/create-timetable",
         icon: FaCheckCircle,
         roles: ["Admin"],
       },
       {
         name: "Assign Teacher",
-        to: "/assign-teacher",
+        to: "/school/assign-teacher",
         icon: FaCheckCircle,
         roles: ["Admin"],
       },
@@ -181,10 +181,10 @@ export const navigation = [
   },
   {
     name: "Class TimeTable",
-    to: "/Class-TimeTable",
+    to: "/school/class-timetable",
     icon: FaUserFriends,
     current: false,
-    roles: ["Student"],
+    roles: ["Student, Teacher, Admin"],
   },
   {
     name: "Lesson Plan",
@@ -223,13 +223,13 @@ export const navigation = [
     children: [
       {
         name: "Exam Group",
-        to: "/school/Exam-Group",
+        to: "/school/exam-group",
         icon: FaUser,
         roles: ["Student", "Teacher", "Admin"],
       },
       {
         name: "Exam Type",
-        to: "/school/Exam-Type",
+        to: "/school/exam-type",
         icon: FaBook,
         roles: ["Student", "Teacher", "Admin"],
       },
@@ -238,6 +238,12 @@ export const navigation = [
         to: "/school/add-marks",
         icon: FaCheckCircle,
         roles: ["Admin", "Teacher"],
+      },
+      {
+        name: "Exam Schedule",
+        to: "/school/exam-schedule",
+        icon: FaCheckCircle,
+        roles: ["Admin", "Teacher", "Student"],
       },
     ],
   },

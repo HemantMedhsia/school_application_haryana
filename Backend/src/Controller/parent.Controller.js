@@ -97,7 +97,7 @@ export const loginParent = wrapAsync(async (req, res, next) => {
             new ApiResponse(
                 200,
                 {
-                    parent: loggedInparent,
+                    user: loggedInparent,
                     accessToken,
                     refreshToken,
                 },

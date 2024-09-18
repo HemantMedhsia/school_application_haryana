@@ -124,7 +124,7 @@ export const loginStudent = wrapAsync(async (req, res, next) => {
             new ApiResponse(
                 200,
                 {
-                    student: loggedInStudent,
+                    user: loggedInStudent,
                     accessToken,
                     refreshToken,
                 },

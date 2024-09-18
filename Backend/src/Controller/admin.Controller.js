@@ -93,13 +93,13 @@ export const loginAdmin = wrapAsync(async (req, res, next) => {
             new ApiResponse(
                 200,
                 {
-                    admin,
+                    user: admin,
                     accessToken,
                     refreshToken,
                 },
                 "Admin logged in successfully"
             )
-        );
+        ); 
 });
 
 export const refreshAccessTokenAdmin = wrapAsync(async (req, res, next) => {

@@ -139,7 +139,7 @@ const Attendence = () => {
   }, []);
 
 return (
-    <div>
+    <div className="">
         <AttendenceSearchBar />
         <Datatable
             columns={columns}

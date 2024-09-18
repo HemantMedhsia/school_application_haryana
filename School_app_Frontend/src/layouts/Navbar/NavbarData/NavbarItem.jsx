@@ -9,12 +9,12 @@ const NavbarItem = ({ item, isActive, onClick, isCollapsed }) => {
         isActive
           ? 'bg-gray-900 text-white'
           : 'text-gray-300 hover:bg-gray-700 hover:text-white'
-      } group flex items-center px-2 py-2 text-sm font-medium rounded-md`}
+      } group flex px-3 py-2 text-sm items-center font-medium rounded-md`}
       onClick={onClick}
     >
      {
-      isCollapsed ? <item.icon className=" h-6 w-6" aria-hidden="true" /> : <div className='flex'><item.icon className="mr-3 h-6 w-6" aria-hidden="true" />
-      <span>{item.name}</span></div>
+      isCollapsed ? <item.icon className=" flex justify-center items-center h-6 w-6" aria-hidden="true" /> : <div className='flex'><item.icon className=" h-6 w-6" aria-hidden="true" />
+      <span className='ml-3 flex items-center'>{item.name}</span></div>
      }
       
     </Link>

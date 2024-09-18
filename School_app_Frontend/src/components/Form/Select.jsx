@@ -13,7 +13,7 @@ const SearchableSelect = ({
   const dropdownRef = useRef(null);
 
   // Filter options based on search term
-  const filteredOptions = options.filter((option) =>
+  const filteredOptions = options?.filter((option) =>
     option?.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -68,8 +68,8 @@ const SearchableSelect = ({
       />
       {showDropdown && (
         <div className="absolute z-10 mt-1 w-full bg-[#283046] border border-[#39424E] rounded-md shadow-lg max-h-40 overflow-y-auto">
-          {filteredOptions.length > 0 ? (
-            filteredOptions.map((option) => (
+          {filteredOptions?.length > 0 ? (
+            filteredOptions?.map((option) => (
               <div
                 key={option.id}
                 className="px-2 py-1 hover:bg-[#6B46C1] cursor-pointer"
