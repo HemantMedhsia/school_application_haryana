@@ -237,7 +237,6 @@ export const bulkCreateClasses = wrapAsync(async (req, res) => {
 
 export const getAllClassesWithSections = wrapAsync(async (req, res) => {
     const classes = await Class.find();
-
     const sections = await Section.find();
 
     const classSectionMap = {};
@@ -247,7 +246,10 @@ export const getAllClassesWithSections = wrapAsync(async (req, res) => {
             if (!classSectionMap[classId]) {
                 classSectionMap[classId] = [];
             }
-            classSectionMap[classId].push(section.name);
+            classSectionMap[classId].push({
+                id: section._id,
+                name: section.name,
+            });
         });
     });
 
