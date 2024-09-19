@@ -3,6 +3,13 @@ import { MdDeleteOutline } from "react-icons/md";
 
 // Generic Table Component
 const DynamicTable = ({ columns, data, handleInputChange, handleDelete }) => {
+
+    // Helper function to format dates to ISO 8601
+    const formatToISODate = (date) => {
+        const d = new Date(date);
+        return d.toISOString().split('T')[0]; // Converts to 'YYYY-MM-DD'
+    };
+
     return (
         <div className="overflow-x-auto">
             <table className="min-w-full shadow-md rounded-lg overflow-hidden">
@@ -21,6 +28,14 @@ const DynamicTable = ({ columns, data, handleInputChange, handleDelete }) => {
                                 <td key={colIndex} className="px-4 text-lg">
                                     {column.type === 'text' ? (
                                         row[column.accessor]
+                                    ) : column.type === 'date' ? (
+                                        // Date input, ensure it is formatted to ISO 8601
+                                        <input
+                                            type="date"
+                                            value={formatToISODate(row[column.accessor])} // Format the date value
+                                            onChange={(e) => handleInputChange(e, rowIndex, column.accessor)}
+                                            className="p-2 bg-gray-900 text-[#65FA9E] rounded-md focus:outline-none focus:ring-2 focus:ring-[#65FA9E] transition duration-300"
+                                        />
                                     ) : (
                                         <input
                                             type={column.type}
