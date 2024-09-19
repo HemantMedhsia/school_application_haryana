@@ -84,7 +84,7 @@ export const createClass = wrapAsync(async (req, res) => {
 });
 
 export const getAllClasses = wrapAsync(async (req, res) => {
-    const classes = await Class.find().populate("subjectGroups");
+    const classes = await Class.find().populate("subjectGroups subjects");
     return res.status(200).json(new ApiResponse(200, classes));
 });
 
