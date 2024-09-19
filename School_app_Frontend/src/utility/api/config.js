@@ -71,4 +71,12 @@ export const getApiConfig = {
     url: "/all-subject",
     method: "GET",
   },
+  getAllExamCategories: {
+    url: "/get-examgroup",
+    method: "GET",
+  },
+  getAllExamTypes: {
+    url: "/get-examtype",
+    method: "GET",
+  },
 };
