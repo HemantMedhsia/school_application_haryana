@@ -12,6 +12,12 @@ const SearchableSelect = ({
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
 
+  // Sync searchTerm with external value prop
+  useEffect(() => {
+    const selectedOption = options.find(option => option.id === value);
+    setSearchTerm(selectedOption ? selectedOption.name : ""); // Update searchTerm based on value prop
+  }, [value, options]);
+
   // Filter options based on search term
   const filteredOptions = options?.filter((option) =>
     option?.name?.toLowerCase().includes(searchTerm.toLowerCase())

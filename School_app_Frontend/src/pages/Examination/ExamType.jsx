@@ -1,9 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css"; // Import toast styles
 import FormSection from "../../components/Form/FormSection";
 import Input from "../../components/Form/Input";
 import FormButton from "../../components/Form/FormButton";
 import SearchableSelect from "../../components/Form/Select";
+import { getAPI } from "../../utility/api/apiCall";
+import axios from "axios";
 
 const ExamGroup = () => {
   const [examGroupName, setExamGroupName] = useState("");
@@ -12,21 +16,26 @@ const ExamGroup = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [totalMarks, setTotalMarks] = useState("");
   const [passingMarks, setPassingMarks] = useState("");
+  const [examCategories, setExamCategories] = useState([]);
 
-  // Dummy data for the exam category
-  const examCategories = [
-    { id: "Math",    name: "Mathematics" },
-    { id: "Science", name: "Science" },
-    { id: "History", name: "History" },
-    { id: "English", name: "English" },
-  ];
+  useEffect(() => {
+    const fetchExamCategories = async () => {
+      await getAPI("getAllExamCategories", {}, setExamCategories);
+    };
+    const fetchExamTypes = async () => {
+      await getAPI("getAllExamTypes", {}, setExamGroups);
+      console.log("Exam Types", examGroups);
+    };
+    fetchExamCategories();
+    fetchExamTypes();
+  }, []);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (examGroupName.trim() && selectedCategory && totalMarks && passingMarks) {
       if (editingGroupId) {
         setExamGroups(
           examGroups.map((group) =>
-            group.id === editingGroupId
+            group._id === editingGroupId
               ? {
                   ...group,
                   name: examGroupName,
@@ -38,22 +47,30 @@ const ExamGroup = () => {
           )
         );
         setEditingGroupId(null);
+        toast.success("Exam group updated successfully!");
       } else {
-        setExamGroups([
-          ...examGroups,
-          {
-            id: examGroups.length + 1,
-            name: examGroupName,
-            category: selectedCategory,
-            totalMarks,
-            passingMarks,
-          },
-        ]);
+        try {
+          await axios.post(
+            `${import.meta.env.VITE_BACKEND_URL}/api/create-examtype`,
+            {
+              name: examGroupName,
+              termId: selectedCategory,
+              maxMarks: totalMarks,
+              minMarks: passingMarks,
+            }
+          );
+          toast.success("Exam Type saved successfully!");
+        } catch (error) {
+          console.error("Error:", error);
+          toast.error("Failed to save exam group.");
+        }
       }
       setExamGroupName("");
-      setSelectedCategory("");
+      setSelectedCategory(null);
       setTotalMarks("");
       setPassingMarks("");
+    } else {
+      toast.warn("Please fill all fields.");
     }
   };
 
@@ -68,10 +85,13 @@ const ExamGroup = () => {
 
   const handleDelete = (id) => {
     setExamGroups(examGroups.filter((group) => group.id !== id));
+    toast.success("Exam group deleted successfully!");
   };
 
   return (
     <div className="flex flex-col md:flex-row md:space-y-0">
+      <ToastContainer /> {/* Add ToastContainer to display notifications */}
+
       <div className="w-full md:w-2/3 rounded-lg shadow-md p-6">
         <FormSection title="Exam Type">
           <Input
@@ -81,12 +101,16 @@ const ExamGroup = () => {
             value={examGroupName}
             onChange={(e) => setExamGroupName(e.target.value)}
           />
-          {/* Passing dummy data to SearchableSelect */}
           <SearchableSelect
             labelName="Select Exam Category"
-            options={examCategories} // Pass dummy options
+            options={examCategories.map((category) => ({
+              id: category._id,
+              name: category.name,
+            }))}
             value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
+            onChange={(e) => {
+              setSelectedCategory(e.target.value);
+            }}
           />
         </FormSection>
 
@@ -116,14 +140,11 @@ const ExamGroup = () => {
       </div>
 
       <div className="w-full md:w-1/3 p-6 rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold mb-4">Exam Groups</h2>
+        <h2 className="text-2xl font-bold mb-4">Exam Types</h2>
         {examGroups.length > 0 ? (
           <div className="space-y-4">
             {examGroups.map((group) => (
-              <div
-                key={group.id}
-                className="flex flex-col p-4 rounded-lg"
-              >
+              <div key={group.id} className="flex flex-col p-4 rounded-lg">
                 <p className="font-semibold text-lg">{group.name}</p>
                 <p className="text-gray-700">Category: {group.category}</p>
                 <p className="text-gray-700">Total Marks: {group.totalMarks}</p>
