@@ -164,9 +164,9 @@ const ExaminationScheduleComponent = () => {
         subjectGroup: selectedFilters.subjectGroup,  
         examDetails: examSubjects.map(subject => ({
           subject: subject.subject,
-          examDate: new Date(subject.examDate).toISOString(),
-          startTime: new Date(subject.startTime).toISOString(),  // Ensure correct format
-          endTime: new Date(subject.endTime).toISOString(),      // Ensure correct format
+          examDate: new Date(subject.examDate).toString(),
+          startTime: new Date(subject.startTime).toString(),  // Ensure correct format
+          endTime: new Date(subject.endTime).toString(),      // Ensure correct format
         })),
       };
   

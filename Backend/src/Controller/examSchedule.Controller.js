@@ -6,10 +6,10 @@ import mongoose from "mongoose";
 import { examScheduleValidation } from "../Validation/examSchedule.Validation.js";
 
 export const createExamSchedule = wrapAsync(async (req, res) => {
-    const { error } = examScheduleValidation.validate(req.body);
-    if (error) {
-        return res.status(400).json({ message: error.details[0].message });
-    }
+    // const { error } = examScheduleValidation.validate(req.body);
+    // if (error) {
+    //     return res.status(400).json({ message: error.details[0].message });
+    // }
 
     const { term, classId, examType, subjectGroup, examDetails } = req.body;
 

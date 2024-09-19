@@ -29,6 +29,27 @@ const examScheduleValidation = Joi.object({
                     "string.empty": '"subject" cannot be empty',
                     "any.required": '"subject" is a required field',
                 }),
+                examDate: Joi.date().iso().required().messages({
+                    "date.base": '"examDate" should be a valid date',
+                    "date.empty": '"examDate" cannot be empty',
+                    "any.required": '"examDate" is a required field',
+                }),
+                startTime: Joi.date().iso().required().messages({
+                    "date.base": '"startTime" should be a valid date',
+                    "date.empty": '"startTime" cannot be empty',
+                    "any.required": '"startTime" is a required field',
+                }),
+                endTime: Joi.date()
+                    .iso()
+                    .required()
+                    .greater(Joi.ref("startTime"))
+                    .messages({
+                        "date.base": '"endTime" should be a valid date',
+                        "date.empty": '"endTime" cannot be empty',
+                        "any.required": '"endTime" is a required field',
+                        "date.greater":
+                            '"endTime" must be greater than "startTime"',
+                    }),
             })
         )
         .required()
