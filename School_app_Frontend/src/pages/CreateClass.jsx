@@ -42,7 +42,7 @@ const CreateClass = ({ onCreate }) => {
         const formattedClasses = response.data.map((classItem) => ({
           id: classItem.id,
           name: classItem.className,
-          sections: classItem.sections,
+          sections: classItem.sections.map((section) => section.name),
         }));
 
         setClasses(formattedClasses);

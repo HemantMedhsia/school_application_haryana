@@ -136,6 +136,7 @@ export const updateSubjectGroup = wrapAsync(async (req, res) => {
 }); 
 
 
+
 export const deleteSubjectGroup = wrapAsync(async (req, res) => {
     const subjectGroup = await SubjectGroup.findByIdAndDelete(req.params.id);
     if (!subjectGroup) {

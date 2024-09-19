@@ -71,4 +71,8 @@ export const getApiConfig = {
     url: "/all-subject",
     method: "GET",
   },
+  getSubjectGroup:{
+    url:"/all-subject-groups",
+    method:"GET",
+  }
 };
