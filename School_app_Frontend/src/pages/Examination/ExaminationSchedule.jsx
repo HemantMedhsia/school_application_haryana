@@ -1,10 +1,10 @@
 import React from 'react'
-import ExaminationScheduleSearchbar from '../../common/SearchBar/ExaminationScheduleSearchbar'
+import ExaminationScheduleComponent from '../../components/ExaminationSchedule/ExaminationScheduleSearchbar'
 
 const ExaminationSchedule = () => {
   return (
     <div>
-      <ExaminationScheduleSearchbar />
+      <ExaminationScheduleComponent />
     </div>
   )
 }

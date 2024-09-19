@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import DynamicTable from "../Datatables/DynamicTable"; // Import your dynamic table
-import DynamicFilterBar from "../FilterBar/DynamicFilterBar"; // Import the dynamic filter bar
-import FormButton from "../../components/Form/FormButton";
+import DynamicTable from "../../common/Datatables/DynamicTable"; // Import your dynamic table
+import DynamicFilterBar from "../../common/FilterBar/DynamicFilterBar"; // Import the dynamic filter bar
+import FormButton from "../Form/FormButton";
 
-const ExaminationScheduleSearchbar = () => {
+const ExaminationScheduleComponent = () => {
   const [examSubjects, setExamSubjects] = useState([]);
   const [showTable, setShowTable] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState("");
@@ -131,4 +131,4 @@ const ExaminationScheduleSearchbar = () => {
   );
 };
 
-export default ExaminationScheduleSearchbar;
+export default ExaminationScheduleComponent;
