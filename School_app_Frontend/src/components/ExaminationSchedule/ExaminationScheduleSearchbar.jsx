@@ -164,15 +164,21 @@ const ExaminationScheduleComponent = () => {
         classId: selectedFilters.class,
         examType: selectedFilters.examType,
         subjectGroup: selectedFilters.subjectGroup,
-        examDetails: [...examSubjects],
+        examDetails: examSubjects.map((subject) => ({
+          subject: subject.subject,
+          examDate: subject.examDate, // Assuming examDate is already in ISO format
+          // Combine examDate with the time to create a full ISO date-time string
+          startTime: subject.examDate ? `${subject.examDate}T${subject.startTime}:00Z` : null,
+          endTime: subject.examDate ? `${subject.examDate}T${subject.endTime}:00Z` : null,
+        })),
       };
-
+  
       console.log("Payload", payload);
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/create-examschedule`,
         payload
       );
-
+  
       if (response.status === 201) {
         console.log("Exam schedule saved successfully");
       }
@@ -180,6 +186,7 @@ const ExaminationScheduleComponent = () => {
       console.error("Error saving exam schedule", error);
     }
   };
+  
 
   return (
     <div className=" rounded-md">
