@@ -1,21 +1,23 @@
-import React, { useState } from "react";
-import DynamicTable from "../../common/Datatables/DynamicTable"; // Import your dynamic table
-import DynamicFilterBar from "../../common/FilterBar/DynamicFilterBar"; // Import the dynamic filter bar
+import React, { useEffect, useState } from "react";
+import DynamicTable from "../../common/Datatables/DynamicTable";
+import DynamicFilterBar from "../../common/FilterBar/DynamicFilterBar";
 import FormButton from "../../components/Form/FormButton";
+import axios from "axios";
 
 const ViewExaminationSchedule = () => {
   const [examSubjects, setExamSubjects] = useState([]);
   const [showTable, setShowTable] = useState(false);
-  const [selectedGroup, setSelectedGroup] = useState("");
+  const [terms, setTerms] = useState([]);
+  const [classes, setClasses] = useState([]);
+  const [subjectGroups, setSubjectGroups] = useState([]);
+  const [examTypes, setExamTypes] = useState([]);
+  const [selectedFilters, setSelectedFilters] = useState({
+    term: null,
+    class: null,
+    subjectGroup: null,
+    examType: null,
+  });
 
-  // Subject groups for pre-filling based on selected group
-  const subjectGroups = {
-    C1: ["Hindi", "English", "Math"],
-    C2: ["Science", "Social Studies", "Geography"],
-    C3: ["Physics", "Chemistry", "Biology"],
-  };
-
-  // Define columns for the table
   const columns = [
     { header: "Subject", accessor: "subject", type: "text" },
     { header: "Exam Date", accessor: "examDate", type: "date" },
@@ -23,75 +25,128 @@ const ViewExaminationSchedule = () => {
     { header: "End Timing", accessor: "endTime", type: "time" },
   ];
 
-  // Filter configuration for DynamicFilterBar
   const filterConfig = [
     {
       name: "term",
       label: "Select Term",
       placeholder: "Select Term",
       required: true,
-      options: [
-        { label: "Term-1", value: "Term-1" },
-        { label: "Term-2", value: "Term-2" },
-      ],
+      options: (terms || []).map((term) => ({
+        label: term?.name || "Unknown",
+        value: term?._id || "",
+      })),
     },
     {
       name: "class",
       label: "Select Class",
       placeholder: "Select Class",
       required: true,
-      options: [
-        { label: "UKG", value: "UKG" },
-        { label: "LKG", value: "LKG" },
-      ],
+      options: (classes || []).map((cls) => ({
+        label: cls?.name || "Unknown",
+        value: cls?._id || "",
+      })),
     },
     {
       name: "subjectGroup",
       label: "Select Subject Group",
       placeholder: "Select Subject Group",
       required: true,
-      options: [
-        { label: "C1", value: "C1" },
-        { label: "C2", value: "C2" },
-        { label: "C3", value: "C3" },
-      ],
+      options: (subjectGroups || []).map((group) => ({
+        label: group?.name || "Unknown",
+        value: group?._id || "",
+      })),
     },
     {
       name: "examType",
       label: "Select Exam Type",
       placeholder: "Select Exam Type",
       required: true,
-      options: [
-        { label: "Half Yearly", value: "Half Yearly" },
-        { label: "Final", value: "Final" },
-      ],
+      options: (examTypes || []).map((examType) => ({
+        label: examType?.name || "Unknown",
+        value: examType?._id || "",
+      })),
     },
   ];
 
-  // Handles filter submission
-  const handleFilterSubmit = (filterValues) => {
-    if (filterValues.subjectGroup && subjectGroups[filterValues.subjectGroup]) {
-      const subjects = subjectGroups[filterValues.subjectGroup].map(
-        (subject) => ({
-          subject,
-          examDate: "",
-          startTime: "",
-          endTime: "",
-        })
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [termsResponse, classesResponse, examTypesResponse] =
+          await Promise.all([
+            axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/get-examgroup`),
+            axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/all-class`),
+            axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/get-examtype`),
+          ]);
+
+        setTerms(termsResponse.data.data || []);
+        setClasses(classesResponse.data.data || []);
+        setExamTypes(examTypesResponse.data.data || []);
+        setSubjectGroups(
+          classesResponse.data.data.flatMap((cls) =>
+            cls.subjectGroups.map((group) => ({
+              ...group,
+              classId: cls._id,
+              subjects: group.subjects || [],
+            }))
+          )
+        );
+      } catch (error) {
+        console.error("Error fetching data", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleFilterSubmit = async (filterValues) => {
+    const selectedSubjectGroup = subjectGroups.find(
+      (group) => group._id === filterValues.subjectGroup
+    );
+    try {
+      const payload = {
+        termId: filterValues.term,
+        classId: filterValues.class,
+        examTypeId: filterValues.examType,
+        subjectGroupId: filterValues.subjectGroup,
+      };
+      console.log("Payload", payload);
+
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/get-examschedule-byallids`,
+        payload
       );
+
+      if (response.status === 201) {
+        console.log("Exam schedule saved successfully");
+      }
+    } catch (error) {
+      console.error("Error saving exam schedule", error);
+    }
+
+    if (selectedSubjectGroup) {
+      const subjects = selectedSubjectGroup.subjects.map((subject) => ({
+        subject: subject._id,
+        examDate: "1970-01-01",
+        startTime: "09:00",
+        endTime: "10:00",
+      }));
+
       setExamSubjects(subjects);
       setShowTable(true);
+    } else {
+      setExamSubjects([]);
+      setShowTable(false);
     }
+
+    setSelectedFilters(filterValues);
   };
 
-  // Handles input change for dynamic fields in the table
   const handleInputChange = (e, rowIndex, accessor) => {
     const updatedSubjects = [...examSubjects];
     updatedSubjects[rowIndex][accessor] = e.target.value;
     setExamSubjects(updatedSubjects);
   };
 
-  // Handles row deletion
   const handleDelete = (indexToDelete) => {
     const updatedSubjects = examSubjects.filter(
       (_, index) => index !== indexToDelete
@@ -99,20 +154,45 @@ const ViewExaminationSchedule = () => {
     setExamSubjects(updatedSubjects);
   };
 
+  const handleSave = async () => {
+    try {
+      const payload = {
+        term: selectedFilters.term,
+        classId: selectedFilters.class,
+        examType: selectedFilters.examType,
+        subjectGroup: selectedFilters.subjectGroup,
+      };
+
+      console.log("Payload", payload);
+
+      console.log("Payload", payload);
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/create-examschedule`,
+        payload
+      );
+
+      if (response.status === 201) {
+        console.log("Exam schedule saved successfully");
+      }
+    } catch (error) {
+      console.error("Error saving exam schedule", error);
+    }
+  };
+
   return (
-    <div className=" rounded-md">
+    <div className="rounded-md">
       <div className="mb-4">
         <h2 className="text-[#7367F0] text-xl font-semibold">Filter Exams</h2>
       </div>
 
-      {/* Reusable Filter Bar */}
       <DynamicFilterBar filters={filterConfig} onSubmit={handleFilterSubmit} />
 
-      {/* Table is shown only after submitting */}
       {showTable && (
         <div>
           <div className="mb-4">
-            <h2 className="text-[#7367F0] font-semibold mt-4 text-xl">Exam Schedule</h2>
+            <h2 className="text-[#7367F0] font-semibold mt-4 text-xl">
+              Exam Schedule
+            </h2>
           </div>
 
           <DynamicTable
@@ -123,7 +203,7 @@ const ViewExaminationSchedule = () => {
           />
 
           <div className="flex justify-end mt-6">
-            <FormButton name="Save" />
+            <FormButton name="Save" onClick={handleSave} />
           </div>
         </div>
       )}

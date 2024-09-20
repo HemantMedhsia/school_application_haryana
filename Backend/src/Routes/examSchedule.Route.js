@@ -3,6 +3,7 @@ import {
     createExamSchedule,
     deleteExamSchedule,
     getExamScheduleById,
+    getExamScheduleBytcseId,
     getExamSchedules,
     getExamSchedulesByClass,
     getExamSchedulesByTerm,
@@ -12,6 +13,7 @@ const router = express.Router();
 
 router.post("/create-examschedule", createExamSchedule);
 router.get("/get-examschedules", getExamSchedules);
+router.post("/get-examschedule-byallids", getExamScheduleBytcseId);
 router.get("/get-examschedule/:id", getExamScheduleById);
 router.put("/update-examschedule/:id", updateExamSchedule);
 router.delete("/delete-examschedule/:id", deleteExamSchedule);
