@@ -126,14 +126,22 @@ const ExaminationScheduleComponent = () => {
     );
 
     if (selectedSubjectGroup) {
-      console.log("Selected subject group", selectedSubjectGroup.subjects);
+      const subjectMap = selectedSubjectGroup.subjects.reduce(
+        (map, subject) => {
+          map[subject._id] = subject.name; // Map ID to subject name
+          return map;
+        },
+        {}
+      );
 
       const subjects = selectedSubjectGroup.subjects.map((subject) => ({
-        subject: subject._id,
-        examDate: null, // Initialize dates and times as null
+        subject: subject._id, // Keep the ID
+        subjectName: subject.name, // Add subject name
+        examDate: null,
         startTime: null,
         endTime: null,
       }));
+
       setExamSubjects(subjects);
       setShowTable(true);
     } else {
@@ -166,9 +174,9 @@ const ExaminationScheduleComponent = () => {
         subjectGroup: selectedFilters.subjectGroup,
         examDetails: examSubjects.map((subject) => ({
           subject: subject.subject,
-          examDate: new Date(subject.examDate), // Ensure it's in Date format
-          startTime: subject.startTime ? subject.startTime : "00:00", // Ensure time is correctly formatted
-          endTime: subject.endTime ? subject.endTime : "00:00", // Same for end time
+          examDate: new Date(subject.examDate),
+          startTime: subject.startTime ? subject.startTime : "00:00",
+          endTime: subject.endTime ? subject.endTime : "00:00",
         })),
       };
 
@@ -204,7 +212,7 @@ const ExaminationScheduleComponent = () => {
 
           <DynamicTable
             columns={[
-              { header: "Subject", accessor: "subject", type: "text" },
+              { header: "Subject", accessor: "subjectName", type: "text" }, // Change accessor to subjectName
               {
                 header: "Exam Date",
                 accessor: "examDate",
