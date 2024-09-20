@@ -37,6 +37,7 @@ import ClassTimetable from "./pages/ClassTimetable.jsx";
 import TeacherTimetable from "./pages/Teacher/TeacherTimetable.jsx";
 import CreateTimetabel from "./pages/CreateTimetabel.jsx";
 import AssingTeacher from "./pages/Teacher/AssingTeacher.jsx";
+import ViewExaminationSchedule from "./pages/Examination/ViewExaminationSchedule.jsx";
 
 const App = () => {
   const { userRole, authToken } = useAuth();
@@ -103,6 +104,7 @@ const App = () => {
           <Route path="teacher-timetable" element={<TeacherTimetable />} />
           <Route path="create-timetable" element={<CreateTimetabel />} />
           <Route path="assign-teacher" element={<AssingTeacher />} />
+          <Route path="view-exam-schedule" element={<ViewExaminationSchedule />} />
         </Route>
       </>
     )

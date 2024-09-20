@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 import FormSection from "../../components/Form/FormSection";
 import Input from "../../components/Form/Input";
 import FormButton from "../../components/Form/FormButton";
@@ -13,26 +15,25 @@ const ExamGroup = () => {
   const handleSave = async () => {
     if (examGroupName.trim()) {
       if (editingGroupId) {
-        // Update existing exam group
         await handleUpdate();
       } else {
-        // Create a new exam group
         try {
           const response = await axios.post(
             `${import.meta.env.VITE_BACKEND_URL}/api/create-examgroup`,
             { name: examGroupName }
           );
-          if (response.status === 201) { 
+          if (response.status === 201) {
             const newGroup = response.data.data;
             setExamGroups([...examGroups, newGroup]);
-          } else {
-            console.error("Failed to create exam group");
+            toast.success("Exam group created successfully!");
           }
         } catch (error) {
-          console.error("Error:", error);
+          toast.error("Error creating exam group.");
         }
       }
       setExamGroupName("");
+    } else {
+      toast.warn("Exam group name cannot be empty.");
     }
   };
 
@@ -53,21 +54,23 @@ const ExamGroup = () => {
           );
           setEditingGroupId(null);
           setExamGroupName("");
-        } else {
-          console.error("Failed to update exam group");
+          toast.success("Exam group updated successfully!");
         }
       } catch (error) {
-        console.error("Error:", error);
+        toast.error(error.message);
       }
     }
   };
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/api/delete-examgroup/${id}`);
+      await axios.delete(
+        `${import.meta.env.VITE_BACKEND_URL}/api/delete-examgroup/${id}`
+      );
       setExamGroups(examGroups.filter((group) => group._id !== id));
+      toast.success("Exam group deleted successfully!");
     } catch (error) {
-      console.error("Failed to delete exam group", error);
+      toast.error("Error deleting exam group.");
     }
   };
 
@@ -79,7 +82,7 @@ const ExamGroup = () => {
         );
         setExamGroups(response.data.data);
       } catch (error) {
-        console.error("Error fetching exam groups:", error);
+        toast.error("Error fetching exam groups.");
       }
     };
     fetchExamGroups();
@@ -93,6 +96,7 @@ const ExamGroup = () => {
 
   return (
     <div className="flex">
+      <ToastContainer />
       <div className="w-1/2">
         <FormSection title="Create Exam Group">
           <Input

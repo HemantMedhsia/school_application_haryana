@@ -47,16 +47,24 @@ const StudentInfo = () => {
       header: "Attendance",
       accessor: "attendance",
       render: (value, item) => {
-        const attendanceValue = parseFloat(value);
+        console.log("Render Value:", value, "Item:", item); // Check if these logs appear
+        
+        const attendanceValue = value && !isNaN(value) ? parseFloat(value) : null;
+        const progressBarColor = item.color || "#4CAF50"; // Default color if item.color is not provided
+  
+        if (attendanceValue === null) {
+          return "N/A";
+        }
+  
         return (
           <div className="flex items-center">
-            <span className="mr-2">{value}</span>
+            <span className="mr-2">{`${attendanceValue}%`}</span>
             <div className="relative w-full">
               <div className="overflow-hidden h-2 text-xs flex rounded bg-gray-600">
                 <div
                   style={{
                     width: `${attendanceValue}%`,
-                    backgroundColor: item.color,
+                    backgroundColor: progressBarColor,
                   }}
                   className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center"
                 ></div>
@@ -93,6 +101,7 @@ const StudentInfo = () => {
   const fetchData = async () => {
     try {
       const response = await getAPI("getAllStudents", {}, setAllStudentData);
+      console.log("API Response:", response); // Add this line to check API response
       if (response && Array.isArray(response)) {
         setAllStudentData(response);
       } else if (response && typeof response === "object") {
@@ -104,6 +113,7 @@ const StudentInfo = () => {
       console.error("Error fetching data:", error);
     }
   };
+  
 
   useEffect(() => {
     fetchData();
