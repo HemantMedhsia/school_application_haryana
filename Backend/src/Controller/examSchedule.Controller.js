@@ -21,8 +21,8 @@ export const createExamSchedule = wrapAsync(async (req, res) => {
         examDetails: examDetails.map((details) => ({
             subject: new mongoose.Types.ObjectId(details.subject),
             examDate: new Date(details.examDate),
-            startTime: new Date(details.startTime),
-            endTime: new Date(details.endTime),
+            startTime: details.startTime, 
+            endTime: details.endTime, 
         })),
     });
 
@@ -112,7 +112,6 @@ export const deleteExamSchedule = wrapAsync(async (req, res) => {
     );
 });
 
-
 export const getExamSchedulesByClass = wrapAsync(async (req, res) => {
     const { classId } = req.params;
     const examSchedules = await ExamSchedule.find({ class: classId })
@@ -133,11 +132,9 @@ export const getExamSchedulesByClass = wrapAsync(async (req, res) => {
     );
 });
 
-
 export const getExamSchedulesByTerm = wrapAsync(async (req, res) => {
     const { termId } = req.params;
-    const examSchedules = await ExamSchedule
-        .find({ term: termId })
+    const examSchedules = await ExamSchedule.find({ term: termId })
         .populate("term")
         .populate("class")
         .populate("examType")
@@ -153,14 +150,13 @@ export const getExamSchedulesByTerm = wrapAsync(async (req, res) => {
             "Exam Schedules fetched successfully"
         )
     );
-
 });
-
 
 export const getExamSchedulesBySubjectGroup = wrapAsync(async (req, res) => {
     const { subjectGroupId } = req.params;
-    const examSchedules = await ExamSchedule
-        .find({ subjectGroup: subjectGroupId })
+    const examSchedules = await ExamSchedule.find({
+        subjectGroup: subjectGroupId,
+    })
         .populate("term")
         .populate("class")
         .populate("examType")
@@ -176,8 +172,4 @@ export const getExamSchedulesBySubjectGroup = wrapAsync(async (req, res) => {
             "Exam Schedules fetched successfully"
         )
     );
-}
-);
-
-
-
+});
