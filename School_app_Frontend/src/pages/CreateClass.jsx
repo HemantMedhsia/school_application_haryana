@@ -16,41 +16,38 @@ const CreateClass = ({ onCreate }) => {
   const [options, setOptions] = useState([]);
   const [editingClassId, setEditingClassId] = useState(null);
 
-  useEffect(() => {
-    const fetchSections = async () => {
-      try {
-        const response = await getAPI("getAllSections", {}, setOptions);
-        console.log(response.data);
-        setOptions(response.data);
-      } catch (error) {
-        console.error("Error fetching sections:", error);
-      }
-    };
+  const fetchClasses = async () => {
+    try {
+      const response = await getAPI(
+        "getAllClassesWithSections",
+        {},
+        setClasses
+      );
+      console.log(response.data);
+      const formattedClasses = response.data.map((classItem) => ({
+        id: classItem.id,
+        name: classItem.className,
+        sections: classItem.sections.map((section) => section.name),
+      }));
 
+      setClasses(formattedClasses);
+    } catch (error) {
+      console.error("Error fetching classes:", error);
+    }
+  };
+
+  const fetchSections = async () => {
+    try {
+      const response = await getAPI("getAllSections", {}, setOptions);
+      console.log(response.data);
+      setOptions(response.data);
+    } catch (error) {
+      console.error("Error fetching sections:", error);
+    }
+  };
+
+  useEffect(() => {
     fetchSections();
-  }, []);
-
-  useEffect(() => {
-    const fetchClasses = async () => {
-      try {
-        const response = await getAPI(
-          "getAllClassesWithSections",
-          {},
-          setClasses
-        );
-        console.log(response.data);
-        const formattedClasses = response.data.map((classItem) => ({
-          id: classItem.id,
-          name: classItem.className,
-          sections: classItem.sections.map((section) => section.name),
-        }));
-
-        setClasses(formattedClasses);
-      } catch (error) {
-        console.error("Error fetching classes:", error);
-      }
-    };
-
     fetchClasses();
   }, []);
 
@@ -81,7 +78,6 @@ const CreateClass = ({ onCreate }) => {
           }/api/update-class/${editingClassId}`,
           newClass
         );
-        console.log("Response:", response);
         toast.success("Class updated successfully!");
       } else {
         // Create new class
@@ -90,30 +86,16 @@ const CreateClass = ({ onCreate }) => {
           newClass
         );
         toast.success("Class created successfully!");
-        console.log("Response:", response);
       }
 
-      try {
-        const response = await getAPI(
-          "getAllClassesWithSections",
-          {},
-          setClasses
-        );
-        const formattedClasses = response.data.map((classItem) => ({
-          id: classItem.id,
-          name: classItem.className,
-          sections: classItem.sections,
-        }));
+      // Re-fetch classes to update the list after submitting
+      fetchClasses();
 
-        setClasses(formattedClasses);
-        console.log(response.data);
-      } catch (error) {
-        console.error("Error fetching classes:", error);
-      }
-
+      // Reset the form
       setClassName("");
       setSelectedCheckboxes([]);
       setEditingClassId(null);
+
       if (onCreate) onCreate();
     } catch (error) {
       console.error("Error submitting class:", error);
