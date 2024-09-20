@@ -173,7 +173,7 @@ const ExaminationScheduleComponent = () => {
         examType: selectedFilters.examType,
         subjectGroup: selectedFilters.subjectGroup,
         examDetails: examSubjects.map((subject) => ({
-          subject: subject.subject,
+          subject: subject.subject, 
           examDate: new Date(subject.examDate),
           startTime: subject.startTime ? subject.startTime : "00:00",
           endTime: subject.endTime ? subject.endTime : "00:00",
@@ -211,31 +211,32 @@ const ExaminationScheduleComponent = () => {
           </div>
 
           <DynamicTable
-            columns={[
-              { header: "Subject", accessor: "subjectName", type: "text" }, // Change accessor to subjectName
-              {
-                header: "Exam Date",
-                accessor: "examDate",
-                type: "date",
-                render: (row) => formatDate(row.examDate),
-              },
-              {
-                header: "Start Timing",
-                accessor: "startTime",
-                type: "time",
-                render: (row) => formatTime(row.startTime),
-              },
-              {
-                header: "End Timing",
-                accessor: "endTime",
-                type: "time",
-                render: (row) => formatTime(row.endTime),
-              },
-            ]}
-            data={examSubjects}
-            handleInputChange={handleInputChange}
-            handleDelete={handleDelete}
-          />
+  columns={[
+    { header: "Subject", accessor: "subjectName", type: "text" }, // Change accessor to subjectName
+    {
+      header: "Exam Date",
+      accessor: "examDate",
+      type: "date",
+      render: (row) => formatDate(row.examDate),
+    },
+    {
+      header: "Start Timing",
+      accessor: "startTime",
+      type: "time",
+      render: (row) => formatTime(row.startTime),
+    },
+    {
+      header: "End Timing",
+      accessor: "endTime",
+      type: "time",
+      render: (row) => formatTime(row.endTime),
+    },
+  ]}
+  data={examSubjects}
+  handleInputChange={handleInputChange}
+  handleDelete={handleDelete}
+/>
+
 
           <div className="flex justify-end mt-6">
             <FormButton name="Save" onClick={handleSave} />
