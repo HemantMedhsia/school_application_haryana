@@ -37,7 +37,7 @@ const examScheduleSchema = new mongoose.Schema({
                 required: true,
             },
             endTime: {
-                type: FormDataEvent,
+                type: Date,
                 required: true,
             },
         },
