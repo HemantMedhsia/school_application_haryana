@@ -29,15 +29,15 @@ const examScheduleSchema = new mongoose.Schema({
                 required: true,
             },
             examDate: {
-                type: String,
+                type: Date,
                 required: true,
             },
             startTime: {
-                type: String,
+                type: Date,
                 required: true,
             },
             endTime: {
-                type: String,
+                type: FormDataEvent,
                 required: true,
             },
         },

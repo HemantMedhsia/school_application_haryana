@@ -29,7 +29,9 @@ const ExaminationScheduleComponent = () => {
 
   const formatTime = (value) => {
     const time = new Date(`1970-01-01T${value}Z`); // Use any valid date for time parsing
-    return isNaN(time) ? "" : time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    return isNaN(time)
+      ? ""
+      : time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
 
   useEffect(() => {
@@ -127,7 +129,7 @@ const ExaminationScheduleComponent = () => {
       console.log("Selected subject group", selectedSubjectGroup.subjects);
 
       const subjects = selectedSubjectGroup.subjects.map((subject) => ({
-        subject: subject.name,
+        subject: subject._id,
         examDate: null, // Initialize dates and times as null
         startTime: null,
         endTime: null,
@@ -158,25 +160,19 @@ const ExaminationScheduleComponent = () => {
   const handleSave = async () => {
     try {
       const payload = {
-        term: selectedFilters.term,  
-        classId: selectedFilters.class,  
-        examType: selectedFilters.examType,  
-        subjectGroup: selectedFilters.subjectGroup,  
-        examDetails: examSubjects.map(subject => ({
-          subject: subject.subject,
-          examDate: new Date(subject.examDate).toString(),
-          startTime: new Date(subject.startTime).toString(),  // Ensure correct format
-          endTime: new Date(subject.endTime).toString(),      // Ensure correct format
-        })),
+        term: selectedFilters.term,
+        classId: selectedFilters.class,
+        examType: selectedFilters.examType,
+        subjectGroup: selectedFilters.subjectGroup,
+        examDetails: [...examSubjects],
       };
-  
-      console.log("Payload being sent:", payload); // Log the payload for debugging
-  
+
+      console.log("Payload", payload);
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/create-examschedule`,
         payload
       );
-  
+
       if (response.status === 201) {
         console.log("Exam schedule saved successfully");
       }
@@ -184,9 +180,6 @@ const ExaminationScheduleComponent = () => {
       console.error("Error saving exam schedule", error);
     }
   };
-  
-  
-  
 
   return (
     <div className=" rounded-md">
