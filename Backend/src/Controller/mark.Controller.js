@@ -13,10 +13,9 @@ export const addMarks = wrapAsync(async (req, res) => {
     const { student, term, class: classId, marks } = req.body;
     console.log(teacherId);
 
-    
     const newMarks = marks.map((mark) => ({
         subject: mark.subject,
-        teacher: teacherId, 
+        teacher: teacherId,
         exams: mark.exams.map((exam) => ({
             examType: exam.examType,
             marksObtained: exam.marksObtained,
@@ -34,6 +33,35 @@ export const addMarks = wrapAsync(async (req, res) => {
 
     res.status(201).json(
         new ApiResponse(201, marksEntry, "Marks Added Successfully")
+    );
+});
+
+export const addMultipleStudentMarks = wrapAsync(async (req, res) => {
+    const { termId, classId, examTypeId, subjectId, studentMarksArray } =
+        req.body;
+    const teacherId = req.user._id;
+    const marksData = studentMarksArray.map(({ studentId, marksObtained }) => ({
+        student: studentId,
+        term: termId,
+        class: classId,
+        marks: [
+            {
+                subject: subjectId,
+                teacher: teacherId,
+                exams: [
+                    {
+                        examType: examTypeId,
+                        marksObtained: marksObtained || 0,
+                    },
+                ],
+            },
+        ],
+    }));
+
+    const result = await Marks.insertMany(marksData);
+
+    res.status(201).json(
+        new ApiResponse(201, result, "Marks Added Successfully")
     );
 });
 
@@ -123,3 +151,5 @@ export const getMarksByClass = wrapAsync(async (req, res) => {
 
     res.status(200).json(new ApiResponse(200, marks));
 });
+
+

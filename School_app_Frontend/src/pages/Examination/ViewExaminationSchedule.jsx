@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import DynamicTable from "../../common/Datatables/DynamicTable";
 import DynamicFilterBar from "../../common/FilterBar/DynamicFilterBar";
-import FormButton from "../../components/Form/FormButton";
 import axios from "axios";
 
 const ViewExaminationSchedule = () => {
   const [examSubjects, setExamSubjects] = useState([]);
   const [showTable, setShowTable] = useState(false);
+  const [noDataMessage, setNoDataMessage] = useState("");
   const [terms, setTerms] = useState([]);
   const [classes, setClasses] = useState([]);
   const [subjectGroups, setSubjectGroups] = useState([]);
@@ -99,9 +99,6 @@ const ViewExaminationSchedule = () => {
   }, []);
 
   const handleFilterSubmit = async (filterValues) => {
-    const selectedSubjectGroup = subjectGroups.find(
-      (group) => group._id === filterValues.subjectGroup
-    );
     try {
       const payload = {
         termId: filterValues.term,
@@ -109,74 +106,41 @@ const ViewExaminationSchedule = () => {
         examTypeId: filterValues.examType,
         subjectGroupId: filterValues.subjectGroup,
       };
-      console.log("Payload", payload);
 
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/get-examschedule-byallids`,
         payload
       );
 
-      if (response.status === 201) {
-        console.log("Exam schedule saved successfully");
+      if (response.status === 200 && response.data.success) {
+        const examDetails = response.data.data.examDetails || [];
+
+        if (examDetails.length === 0) {
+          setNoDataMessage("Schedule is not available");
+          setShowTable(false);
+        } else {
+          const subjects = examDetails.map((detail) => ({
+            subject: detail.subject.name,
+            examDate: new Date(detail.examDate).toISOString().split("T")[0], // Format the date
+            startTime: detail.startTime,
+            endTime: detail.endTime,
+          }));
+
+          setExamSubjects(subjects);
+          setShowTable(true);
+          setNoDataMessage(""); // Clear message if data is found
+        }
+      } else {
+        setNoDataMessage("Schedule is not available");
+        setShowTable(false);
       }
     } catch (error) {
-      console.error("Error saving exam schedule", error);
-    }
-
-    if (selectedSubjectGroup) {
-      const subjects = selectedSubjectGroup.subjects.map((subject) => ({
-        subject: subject._id,
-        examDate: "1970-01-01",
-        startTime: "09:00",
-        endTime: "10:00",
-      }));
-
-      setExamSubjects(subjects);
-      setShowTable(true);
-    } else {
-      setExamSubjects([]);
+      console.error("Error fetching exam schedule", error);
+      setNoDataMessage("Schedule is not available");
       setShowTable(false);
     }
 
     setSelectedFilters(filterValues);
-  };
-
-  const handleInputChange = (e, rowIndex, accessor) => {
-    const updatedSubjects = [...examSubjects];
-    updatedSubjects[rowIndex][accessor] = e.target.value;
-    setExamSubjects(updatedSubjects);
-  };
-
-  const handleDelete = (indexToDelete) => {
-    const updatedSubjects = examSubjects.filter(
-      (_, index) => index !== indexToDelete
-    );
-    setExamSubjects(updatedSubjects);
-  };
-
-  const handleSave = async () => {
-    try {
-      const payload = {
-        term: selectedFilters.term,
-        classId: selectedFilters.class,
-        examType: selectedFilters.examType,
-        subjectGroup: selectedFilters.subjectGroup,
-      };
-
-      console.log("Payload", payload);
-
-      console.log("Payload", payload);
-      const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/create-examschedule`,
-        payload
-      );
-
-      if (response.status === 201) {
-        console.log("Exam schedule saved successfully");
-      }
-    } catch (error) {
-      console.error("Error saving exam schedule", error);
-    }
   };
 
   return (
@@ -187,6 +151,8 @@ const ViewExaminationSchedule = () => {
 
       <DynamicFilterBar filters={filterConfig} onSubmit={handleFilterSubmit} />
 
+      {noDataMessage && <p className="text-red-500 mt-4">{noDataMessage}</p>}
+
       {showTable && (
         <div>
           <div className="mb-4">
@@ -195,16 +161,7 @@ const ViewExaminationSchedule = () => {
             </h2>
           </div>
 
-          <DynamicTable
-            columns={columns}
-            data={examSubjects}
-            handleInputChange={handleInputChange}
-            handleDelete={handleDelete}
-          />
-
-          <div className="flex justify-end mt-6">
-            <FormButton name="Save" onClick={handleSave} />
-          </div>
+          <DynamicTable columns={columns} data={examSubjects} />
         </div>
       )}
     </div>
