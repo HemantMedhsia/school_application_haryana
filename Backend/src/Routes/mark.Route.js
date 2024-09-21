@@ -7,6 +7,7 @@ import {
     getMarkById,
     getMarksByClass,
     getMarksByStudent,
+    studentMarkbytermandexamtype,
     updateMarks,
 } from "../Controller/mark.Controller.js";
 import { authenticateToken } from "../Middlewares/authenticateToken.js";
@@ -26,5 +27,6 @@ router.put("/update-mark/:id", updateMarks);
 router.delete("/delete-mark/:id", deleteMarks);
 router.get("/get-mark-by-student/:studentId", getMarksByStudent);
 router.get("/get-mark-by-class/:classId", getMarksByClass);
+router.post("/student-mark", studentMarkbytermandexamtype);
 
 export { router as markRoute };

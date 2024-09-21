@@ -65,6 +65,25 @@ export const addMultipleStudentMarks = wrapAsync(async (req, res) => {
     );
 });
 
+export const studentMarkbytermandexamtype = wrapAsync(async (req, res) => {
+    const { termId, examTypeId, studentId } = req.body;
+    const marks = await Marks.find({
+        term: termId,
+        "marks.exams.examType": examTypeId,
+        student: studentId,
+    })
+        // .populate("term")
+        .populate("class")
+        .populate("marks.subject")
+        .populate("marks.exams.examType");
+
+    if (!marks || marks.length === 0) {
+        throw new ApiError(404, "Marks not found");
+    }
+
+    res.status(200).json(new ApiResponse(200, marks));
+});
+
 export const getAllMarks = wrapAsync(async (req, res) => {
     const marks = await Marks.find()
         .populate("student")
@@ -151,5 +170,3 @@ export const getMarksByClass = wrapAsync(async (req, res) => {
 
     res.status(200).json(new ApiResponse(200, marks));
 });
-
-

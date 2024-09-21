@@ -1,5 +1,6 @@
 import { School } from "../Models/school.model.js";
 import { Student } from "../Models/student.model.js";
+import { Parent } from "../Models/parents.model.js";
 import { ApiError } from "../Utils/errorHandler.js";
 import { generateAccessToken } from "../Utils/generateAcessToken.js";
 import { generateRefreshToken } from "../Utils/generateRefreshToken.js";
@@ -51,7 +52,7 @@ export const createStudent = wrapAsync(async (req, res) => {
 
     const studentData = await student.save();
     school.students.push(studentData._id);
-    
+
     await school.save();
 
     await StudentHistory.findByIdAndUpdate(
@@ -184,7 +185,9 @@ export const refreshAccessTokenStudent = wrapAsync(async (req, res, next) => {
 });
 
 export const getStudents = wrapAsync(async (req, res) => {
-    const students = await Student.find().populate("currentClass currentSection currentSession parent studentHistory");
+    const students = await Student.find().populate(
+        "currentClass currentSection currentSession parent studentHistory"
+    );
     return res.status(200).json(new ApiResponse(200, students));
 });
 
@@ -231,11 +234,18 @@ export const deleteStudent = wrapAsync(async (req, res) => {
             message: "Student not found",
         });
     }
+    const parent = await Parent.findByIdAndDelete({ studentId: req.params.id });
+    if (!parent) {
+        return res.status(404).json({
+            success: false,
+            message: "Parent not found",
+        });
+    }
+
     return res
         .status(200)
         .json(new ApiResponse(200, student, "Delete Successfully"));
 });
-
 
 export const getStudentByParent = wrapAsync(async (req, res) => {
     const student = await Student.find({ parent: req.params.parentId });
@@ -249,7 +259,9 @@ export const getStudentByParent = wrapAsync(async (req, res) => {
 });
 
 export const getParentByStudent = wrapAsync(async (req, res) => {
-    const student = await Student.findById(req.params.studentId).populate("parent");
+    const student = await Student.findById(req.params.studentId).populate(
+        "parent"
+    );
     if (!student) {
         return res.status(404).json({
             success: false,
@@ -258,5 +270,3 @@ export const getParentByStudent = wrapAsync(async (req, res) => {
     }
     return res.status(200).json(new ApiResponse(200, student.parent));
 });
-
-
