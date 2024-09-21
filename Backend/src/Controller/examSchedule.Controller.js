@@ -52,6 +52,28 @@ export const getExamSchedules = wrapAsync(async (req, res) => {
     );
 });
 
+export const getExamScheduleBytcseId = wrapAsync(async (req, res) => {
+    const { termId, classId, subjectGroupId, examTypeId } = req.body;
+    const examSchedule = await ExamSchedule.findOne({
+        term: termId,
+        class: classId,
+        subjectGroup: subjectGroupId,
+        examType: examTypeId,
+    })
+        .populate("term")
+        .populate("class")
+        .populate("examType")
+        .populate("subjectGroup")
+        .populate("examDetails.subject");
+    if (!examSchedule) {
+        throw new ApiError(404, "Exam Schedule not found");
+    }
+    res.status(200).json(
+        new ApiResponse(200, examSchedule, "Exam Schedule Fetched Successfully")
+    );
+});
+
+
 export const getExamScheduleById = wrapAsync(async (req, res) => {
     const { id } = req.params;
     const examSchedule = await ExamSchedule.findById(id)
