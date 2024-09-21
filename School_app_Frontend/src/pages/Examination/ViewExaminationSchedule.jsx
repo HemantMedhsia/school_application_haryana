@@ -25,11 +25,22 @@ const ViewExaminationSchedule = () => {
     { header: "End Timing", accessor: "endTime", type: "time" },
   ];
 
+  const handleClassChange = (selectedClassId) => {
+    const selectedClass = classes.find((cls) => cls._id === selectedClassId);
+
+    if (selectedClass) {
+      setSubjectGroups(selectedClass.subjectGroups || []);
+    } else {
+      setSubjectGroups([]); // Clear subject groups if no class is selected
+    }
+  };
+
   const filterConfig = [
     {
       name: "term",
       label: "Select Term",
       placeholder: "Select Term",
+      type: "select",
       required: true,
       options: (terms || []).map((term) => ({
         label: term?.name || "Unknown",
@@ -41,17 +52,20 @@ const ViewExaminationSchedule = () => {
       label: "Select Class",
       placeholder: "Select Class",
       required: true,
-      options: (classes || []).map((cls) => ({
-        label: cls?.name || "Unknown",
-        value: cls?._id || "",
+      type: "select",
+      options: (classes || []).map((classItem) => ({
+        label: classItem?.name || "Unknown",
+        value: classItem?._id || "",
       })),
+      onChange: handleClassChange,
     },
     {
       name: "subjectGroup",
       label: "Select Subject Group",
       placeholder: "Select Subject Group",
+      type: "select",
       required: true,
-      options: (subjectGroups || []).map((group) => ({
+      options: subjectGroups.map((group) => ({
         label: group?.name || "Unknown",
         value: group?._id || "",
       })),
@@ -60,6 +74,7 @@ const ViewExaminationSchedule = () => {
       name: "examType",
       label: "Select Exam Type",
       placeholder: "Select Exam Type",
+      type: "select",
       required: true,
       options: (examTypes || []).map((examType) => ({
         label: examType?.name || "Unknown",

@@ -3,17 +3,15 @@ import DynamicTable from "../../common/Datatables/DynamicTable"; // Import your 
 import DynamicFilterBar from "../../common/FilterBar/DynamicFilterBar"; // Import the dynamic filter bar
 import FormButton from "../Form/FormButton";
 import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
 
 const ExaminationScheduleComponent = () => {
   const [examSubjects, setExamSubjects] = useState([]);
   const [showTable, setShowTable] = useState(false);
-  const [filterConfig, setFilterConfig] = useState([]);
   const [terms, setTerms] = useState([]);
   const [classes, setClasses] = useState([]);
   const [subjectGroups, setSubjectGroups] = useState([]);
   const [examTypes, setExamTypes] = useState([]);
-  const [selectedClass, setSelectedClass] = useState(null);
-  const [filteredSubjectGroups, setFilteredSubjectGroups] = useState([]);
   const [selectedFilters, setSelectedFilters] = useState({
     term: null,
     class: null,
@@ -34,16 +32,7 @@ const ExaminationScheduleComponent = () => {
       : time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
 
-  useEffect(() => {
-    if (selectedClass) {
-      const relevantSubjectGroups = selectedClass.subjectGroups || [];
-      setFilteredSubjectGroups(relevantSubjectGroups);
-      console.log("Relevant subject groups", relevantSubjectGroups);
-    } else {
-      setFilteredSubjectGroups([]);
-    }
-  }, [selectedClass]);
-
+  // Fetching terms, classes, and exam types
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -57,16 +46,6 @@ const ExaminationScheduleComponent = () => {
         setTerms(termsResponse.data.data || []);
         setClasses(classesResponse.data.data || []);
         setExamTypes(examTypesResponse.data.data || []);
-
-        const allSubjectGroups = classesResponse.data.data.flatMap((cls) =>
-          cls.subjectGroups.map((group) => ({
-            ...group,
-            classId: cls._id,
-            subjects: group.subjects || [],
-          }))
-        );
-        console.log("All subject groups", allSubjectGroups);
-        setFilteredSubjectGroups(allSubjectGroups);
       } catch (error) {
         console.error("Error fetching data", error);
       }
@@ -75,65 +54,70 @@ const ExaminationScheduleComponent = () => {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    setFilterConfig([
-      {
-        name: "term",
-        label: "Select Term",
-        placeholder: "Select Term",
-        required: true,
-        options: (terms || []).map((term) => ({
-          label: term?.name || "Unknown",
-          value: term?._id || "",
-        })),
-      },
-      {
-        name: "class",
-        label: "Select Class",
-        placeholder: "Select Class",
-        required: true,
-        options: (classes || []).map((cls) => ({
-          label: cls?.name || "Unknown",
-          value: cls?._id || "",
-        })),
-      },
-      {
-        name: "subjectGroup",
-        label: "Select Subject Group",
-        placeholder: "Select Subject Group",
-        required: true,
-        options: (filteredSubjectGroups || []).map((group) => ({
-          label: group?.name || "Unknown",
-          value: group?._id || "",
-        })),
-      },
-      {
-        name: "examType",
-        label: "Select Exam Type",
-        placeholder: "Select Exam Type",
-        required: true,
-        options: (examTypes || []).map((examType) => ({
-          label: examType?.name || "Unknown",
-          value: examType?._id || "",
-        })),
-      },
-    ]);
-  }, [terms, classes, filteredSubjectGroups, examTypes]);
+  const handleClassChange = (selectedClassId) => {
+    const selectedClass = classes.find((cls) => cls._id === selectedClassId);
+
+    if (selectedClass) {
+      setSubjectGroups(selectedClass.subjectGroups || []);
+    } else {
+      setSubjectGroups([]); // Clear subject groups if no class is selected
+    }
+  };
+
+  const filterConfig = [
+    {
+      name: "term",
+      label: "Select Term",
+      placeholder: "Select Term",
+      type: "select",
+      required: true,
+      options: (terms || []).map((term) => ({
+        label: term?.name || "Unknown",
+        value: term?._id || "",
+      })),
+    },
+    {
+      name: "class",
+      label: "Select Class",
+      placeholder: "Select Class",
+      required: true,
+      type: "select",
+      options: (classes || []).map((classItem) => ({
+        label: classItem?.name || "Unknown",
+        value: classItem?._id || "",
+      })),
+      onChange: handleClassChange,
+    },
+    {
+      name: "subjectGroup",
+      label: "Select Subject Group",
+      placeholder: "Select Subject Group",
+      type: "select",
+      required: true,
+      options: subjectGroups.map((group) => ({
+        label: group?.name || "Unknown",
+        value: group?._id || "",
+      })),
+    },
+    {
+      name: "examType",
+      label: "Select Exam Type",
+      placeholder: "Select Exam Type",
+      type: "select",
+      required: true,
+      options: (examTypes || []).map((examType) => ({
+        label: examType?.name || "Unknown",
+        value: examType?._id || "",
+      })),
+    },
+  ];
 
   const handleFilterSubmit = (filterValues) => {
-    const selectedSubjectGroup = filteredSubjectGroups.find(
+    const selectedSubjectGroup = subjectGroups.find(
       (group) => group._id === filterValues.subjectGroup
     );
 
     if (selectedSubjectGroup) {
-      const subjectMap = selectedSubjectGroup.subjects.reduce(
-        (map, subject) => {
-          map[subject._id] = subject.name; // Map ID to subject name
-          return map;
-        },
-        {}
-      );
-
       const subjects = selectedSubjectGroup.subjects.map((subject) => ({
         subject: subject._id, // Keep the ID
         subjectName: subject.name, // Add subject name
@@ -143,13 +127,13 @@ const ExaminationScheduleComponent = () => {
       }));
 
       setExamSubjects(subjects);
-      setShowTable(true);
+      setShowTable(true); // Show table when subjects are available
     } else {
       setExamSubjects([]);
-      setShowTable(false);
+      setShowTable(false); // Hide table if no subjects are found
     }
 
-    setSelectedFilters(filterValues);
+    setSelectedFilters(filterValues); // Update selected filters
   };
 
   const handleInputChange = (e, rowIndex, accessor) => {
@@ -180,29 +164,29 @@ const ExaminationScheduleComponent = () => {
         })),
       };
 
-      console.log("Payload", payload);
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/create-examschedule`,
         payload
       );
 
       if (response.status === 201) {
-        console.log("Exam schedule saved successfully");
+        toast.success("Exam schedule saved successfully!");
       }
     } catch (error) {
       console.error("Error saving exam schedule", error);
+      toast.error("Error saving exam schedule. Please try again.");
     }
   };
 
   return (
-    <div className=" rounded-md">
+    <div className="rounded-md">
       <div className="mb-4">
         <h2 className="text-[#7367F0] text-xl font-semibold">Filter Exams</h2>
       </div>
 
       <DynamicFilterBar filters={filterConfig} onSubmit={handleFilterSubmit} />
 
-      {showTable && (
+      {showTable && examSubjects.length > 0 && (
         <div>
           <div className="mb-4">
             <h2 className="text-[#7367F0] font-semibold mt-4 text-xl">
@@ -242,6 +226,7 @@ const ExaminationScheduleComponent = () => {
           </div>
         </div>
       )}
+      <ToastContainer />
     </div>
   );
 };
