@@ -24,7 +24,7 @@ import ParentProfile from "./pages/Parent/ParentProfile.jsx";
 import TeacherInfo from "./pages/Teacher/TeacherInfo.jsx";
 import TeacherProfile from "./pages/Teacher/TeacherProfile.jsx";
 import TeacherAdd from "./pages/Teacher/TeacherAdd.jsx";
-import AddMarks from "./pages/AddMarks.jsx";
+import AddMarks from "./pages/Examination/AddMarks.jsx";
 import CreateSection from "./pages/CreateSection.jsx";
 import CreateClass from "./pages/CreateClass.jsx";
 import AddSubjects from "./pages/AddSubjects.jsx";

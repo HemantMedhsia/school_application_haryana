@@ -81,6 +81,7 @@ const ExaminationScheduleComponent = () => {
         name: "term",
         label: "Select Term",
         placeholder: "Select Term",
+        type: "select",
         required: true,
         options: (terms || []).map((term) => ({
           label: term?.name || "Unknown",
@@ -91,6 +92,7 @@ const ExaminationScheduleComponent = () => {
         name: "class",
         label: "Select Class",
         placeholder: "Select Class",
+        type: "select",
         required: true,
         options: (classes || []).map((cls) => ({
           label: cls?.name || "Unknown",
@@ -101,6 +103,7 @@ const ExaminationScheduleComponent = () => {
         name: "subjectGroup",
         label: "Select Subject Group",
         placeholder: "Select Subject Group",
+        type: "select",
         required: true,
         options: (filteredSubjectGroups || []).map((group) => ({
           label: group?.name || "Unknown",
@@ -111,6 +114,7 @@ const ExaminationScheduleComponent = () => {
         name: "examType",
         label: "Select Exam Type",
         placeholder: "Select Exam Type",
+        type: "select",
         required: true,
         options: (examTypes || []).map((examType) => ({
           label: examType?.name || "Unknown",
@@ -202,32 +206,7 @@ const ExaminationScheduleComponent = () => {
             </h2>
           </div>
 
-          <DynamicTable
-            columns={[
-              { header: "Subject", accessor: "subject", type: "text" },
-              {
-                header: "Exam Date",
-                accessor: "examDate",
-                type: "date",
-                render: (row) => formatDate(row.examDate),
-              },
-              {
-                header: "Start Timing",
-                accessor: "startTime",
-                type: "time",
-                render: (row) => formatTime(row.startTime),
-              },
-              {
-                header: "End Timing",
-                accessor: "endTime",
-                type: "time",
-                render: (row) => formatTime(row.endTime),
-              },
-            ]}
-            data={examSubjects}
-            handleInputChange={handleInputChange}
-            handleDelete={handleDelete}
-          />
+          
 
           <div className="flex justify-end mt-6">
             <FormButton name="Save" onClick={handleSave} />

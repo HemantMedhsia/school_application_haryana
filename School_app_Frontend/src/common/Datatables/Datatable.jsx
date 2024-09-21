@@ -20,7 +20,7 @@ const Datatable = ({ data = [], columns = [], actions = {} }) => {
 
   const handlePageClick = ({ selected }) => {
     setCurrentPage(selected);
-  };
+  }; 
 
   return (
     <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded bg-[#283046] pb-6">

@@ -36,7 +36,7 @@ export async function getAPI(apiName, params = {}, setData) {
     };
     const response = await axios(config);
     // console.log("API call successful:", response.data);
-    setData(response.data.data);
+    await setData(response.data.data);
     return response?.data;
   } catch (error) {
     console.error(
