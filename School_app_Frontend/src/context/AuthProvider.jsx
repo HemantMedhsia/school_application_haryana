@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode"; // Fix import
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 import PyramidLoader from "../common/Loader/PyramidLoader";
 
 const AuthContext = createContext();
@@ -22,7 +21,6 @@ const getRefreshEndpoint = (role) => {
 };
 
 export const AuthProvider = ({ children }) => {
-
   const [name, setname] = useState();
   //  const navigate = useNavigate();
   const [authToken, setAuthToken] = useState(() =>
@@ -46,7 +44,7 @@ export const AuthProvider = ({ children }) => {
         // Refresh the token if it's about to expire in the next 1 minute
         if (decodedToken.exp < currentTime + 60 && refreshToken) {
           await refreshAuthToken(refreshToken, decodedToken.role);
-          console.log("1234",decodedToken.role);
+          console.log("1234", decodedToken.role);
         }
       }
       setLoading(false);
@@ -94,18 +92,23 @@ export const AuthProvider = ({ children }) => {
     setUserRole(null);
     localStorage.removeItem("authToken");
     localStorage.removeItem("refreshToken");
+    alert("You have been logged out.");
     navigate("/");
   };
 
   return (
     <AuthContext.Provider
-      value={{ authToken, refreshToken, userRole, name, login, logout, loading }}
+      value={{
+        authToken,
+        refreshToken,
+        userRole,
+        name,
+        login,
+        logout,
+        loading,
+      }}
     >
-      {!loading ? (
-        children
-      ) : (
-        <PyramidLoader desc={""}/>
-      )}
+      {!loading ? children : <PyramidLoader desc={""} />}
     </AuthContext.Provider>
   );
 };

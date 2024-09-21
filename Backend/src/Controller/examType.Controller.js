@@ -82,3 +82,16 @@ export const getExamTypesByTerm = wrapAsync(async (req, res) => {
             new ApiResponse(200, examTypes, "Exam Types fetched successfully")
         );
 });
+
+export const getMaxMarkByexamType = wrapAsync(async (req, res) => {
+    const { examTypeId } = req.params;
+    const examType = await ExamType.findById(examTypeId);
+    const maxMarks = examType.maxMarks;
+    if (!examType) {
+        throw new ApiError(404, "Exam Type not found");
+    }
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, { maxMark: maxMarks }, "Max Marks fetched successfully"));
+});
