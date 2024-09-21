@@ -133,7 +133,7 @@ const ViewExaminationSchedule = () => {
 
       if (response.status === 201) {
         console.log("Exam schedule saved successfully");
-      }
+      } 
     } catch (error) {
       console.error("Error saving exam schedule", error);
     }
