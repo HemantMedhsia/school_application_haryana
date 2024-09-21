@@ -293,6 +293,7 @@ export const getAllStudentsByClassIdtoshownameandroll = wrapAsync(
         );
 
         const studentList = students.map((student) => ({
+            id: student._id,
             name: `${student.firstName} ${student.lastName}`,
             rollNumber: student.rollNumber,
         }));
