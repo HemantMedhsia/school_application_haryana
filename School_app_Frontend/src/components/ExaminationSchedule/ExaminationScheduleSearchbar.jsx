@@ -5,7 +5,7 @@ import FormButton from "../Form/FormButton";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 
-const ExaminationScheduleComponent = () => {
+const  ExaminationScheduleComponent = () => {
   const [examSubjects, setExamSubjects] = useState([]);
   const [showTable, setShowTable] = useState(false);
   const [terms, setTerms] = useState([]);

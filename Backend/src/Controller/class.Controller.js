@@ -285,11 +285,19 @@ export const getAllStudentsByclassId = wrapAsync(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, students));
 });
 
+export const getAllStudentsByClassIdtoshownameandroll = wrapAsync(
+    async (req, res) => {
+        const { classId } = req.params;
+        const students = await Student.find({ currentClass: classId }).select(
+            "firstName lastName rollNumber"
+        );
 
-export const getAllStudentsByClassIdtoshownameandroll = wrapAsync(async (req, res) => {
-    const { classId } = req.params;
-    const students = await Student.find({ currentClass: classId }).select(
-        "firstName lastName rollNumber"
-    );
-    return res.status(200).json(new ApiResponse(200, students));
-});
+        const studentList = students.map((student) => ({
+            id: student._id,
+            name: `${student.firstName} ${student.lastName}`,
+            rollNumber: student.rollNumber,
+        }));
+
+        return res.status(200).json(new ApiResponse(200, studentList));
+    }
+);

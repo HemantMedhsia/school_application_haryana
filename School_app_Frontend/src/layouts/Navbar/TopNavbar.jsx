@@ -6,7 +6,6 @@ import { MdOutlineMarkEmailUnread } from "react-icons/md";
 import { BiSupport } from "react-icons/bi";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthProvider";
-
 const navigation = [
   { name: "Happy Model English School", href: "#", current: false },
 ];
@@ -16,12 +15,14 @@ function classNames(...classes) {
 }
 
 const TopNavbar = ({ isCollapsed }) => {
+  const { logout, name, userRole } = useAuth();
 
-  const { logout, name, userRole } = useAuth(); 
   return (
     <Disclosure
       as="nav"
-      className={`fixed top-0 ${isCollapsed ? "left-20" : "left-64"} mx-6 my-2 mt-4 rounded-md right-0 h-14 bg-[#283046] transition-all duration-300 shadow-md z-50`}
+      className={`fixed top-0 ${
+        isCollapsed ? "left-20" : "left-64"
+      } mx-6 my-2 mt-4 rounded-md right-0 h-14 bg-[#283046] transition-all duration-300 shadow-md z-50`}
     >
       {({ open }) => (
         <>
@@ -138,7 +139,7 @@ const TopNavbar = ({ isCollapsed }) => {
                   <Menu.Item>
                     {({ active }) => (
                       <a
-                        onAbort={logout}
+                        onClick={logout}
                         href="#"
                         className={classNames(
                           active ? "bg-gray-100" : "",

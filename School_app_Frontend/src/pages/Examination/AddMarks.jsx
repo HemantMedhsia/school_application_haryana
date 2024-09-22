@@ -4,6 +4,8 @@ import DynamicTable from "../../common/Datatables/DynamicTable";
 import FormButton from "../../components/Form/FormButton";
 import { getAPI } from "../../utility/api/apiCall";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const AddMarks = () => {
   const [showTable, setShowTable] = useState(false);
@@ -14,6 +16,7 @@ const AddMarks = () => {
   const [examTypes, setExamTypes] = useState([]);
   const [subjectGroups, setSubjectGroups] = useState([]);
   const [subjects, setSubjects] = useState([]);
+  const [maxMarks, setMaxMarks] = useState();
   const [selectedTermId, setSelectedTermId] = useState("");
   const [selectedClassId, setSelectedClassId] = useState("");
   const [selectedExamTypeId, setSelectedExamTypeId] = useState("");
@@ -22,13 +25,30 @@ const AddMarks = () => {
   const handleClassChange = (selectedClassId) => {
     setSelectedClassId(selectedClassId);
     const selectedClass = classes.find((cls) => cls._id === selectedClassId);
-    setSubjectGroups(selectedClass ? selectedClass.subjectGroups : []);
-    fetchStudents(selectedClassId); // Fetch students when class changes
+    setSelectedClassId(selectedClass._id);
+
+    if (selectedClass) {
+      setSubjectGroups(selectedClass.subjectGroups || []);
+    } else {
+      setSubjectGroups([]);
+    }
   };
 
   const handleSubjectGroupChange = (selectedSubjectGroupId) => {
-    const selectedSubjectGroup = subjectGroups.find((group) => group._id === selectedSubjectGroupId);
-    setSubjects(selectedSubjectGroup ? selectedSubjectGroup.subjects : []);
+    const selectedSubjectGroup = subjectGroups.find(
+      (group) => group._id === selectedSubjectGroupId
+    );
+
+    if (selectedSubjectGroup) {
+      setSubjects(selectedSubjectGroup.subjects || []);
+    } else {
+      setSubjects([]);
+    }
+  };
+
+  const handleSubjectChange = (selectedSubjectId) => {
+    console.log("Selected Subject:", selectedSubjectId);
+    setSelectedSubjectId(selectedSubjectId);
   };
 
   const filterConfig = [
@@ -47,8 +67,10 @@ const AddMarks = () => {
       placeholder: "Select Exam Type",
       required: true,
       type: "select",
-      options: examTypes.map((examType) => ({ label: examType.name, value: examType._id })),
-      onChange: (value) => setSelectedExamTypeId(value),
+      options: (examTypes || []).map((exam) => ({
+        label: exam?.name || "Unknown",
+        value: exam?._id || "",
+      })),
     },
     {
       name: "class",
@@ -74,10 +96,36 @@ const AddMarks = () => {
       placeholder: "Select Subject",
       required: true,
       type: "select",
-      options: subjects.map((subject) => ({ label: subject.name, value: subject._id })),
-      onChange: (value) => setSelectedSubjectId(value),
+      options: (subjects || []).map((sub) => ({
+        label: sub?.name || "Unknown",
+        value: sub?._id || "",
+      })),
+      onChange: handleSubjectChange,
     },
   ];
+
+  const fetchStudentData = async (classId, examType) => {
+    if (!classId || !examType) return;
+    try {
+      const [studentsResponse, maxMarksResponse] = await Promise.all([
+        axios.get(
+          `${
+            import.meta.env.VITE_BACKEND_URL
+          }/api/getallstudentsinfo/${classId}`
+        ),
+        axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/api/max-marks/${examType}`
+        ),
+      ]);
+
+      setStudentsData(studentsResponse.data.data);
+      console.log("Students Data:", studentsResponse.data.data);
+      setMaxMarks(maxMarksResponse.data.data.maxMark);
+      console.log("Max Marks:", maxMarks);
+    } catch (error) {
+      console.error("Error fetching student data or max marks", error);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -94,32 +142,25 @@ const AddMarks = () => {
     fetchData();
   }, []);
 
-  const fetchStudents = async (classId) => {
-    if (classId) {
-      try {
-        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/getallstudentsinfo/${classId}`);
-        const mappedStudents = response.data.data.map(student => ({
-          _id: student.id,
-          name: student.name,
-          rollNo: student.rollNumber,
-          subject: student.subject || "", // Ensure there's a subject field
-          obtainedMarks: "", // Initialize for input
-        }));
-        setStudentsData(mappedStudents);
-      } catch (err) {
-        console.error("Error fetching students", err);
-      }
-    }
-  };
+  const handleFilterSubmit = async (filterValues) => {
+    const { class: classId, examType, subject, term } = filterValues;
+    setSelectedTermId(term);
+    setSelectedExamTypeId(examType);
 
-  const handleFilterSubmit = () => {
-    if (!selectedTermId || !selectedExamTypeId || !selectedClassId || !selectedSubjectId) {
-      alert("Please select all filter options.");
-      return;
-    }
+    const subjectsData = subjects.find((sub) => sub._id === subject);
 
-    const filtered = studentsData.filter((student) => student.subject === selectedSubjectId);
-    setFilteredStudents(filtered);
+    await fetchStudentData(classId, examType);
+
+    const refinedStudents = studentsData.map((student) => ({
+      name: student.name,
+      id: student.id,
+      rollNo: student.rollNumber,
+      subject: subjectsData?.name,
+      maxMarks,
+      obtainedMarks: "",
+    }));
+
+    setFilteredStudents(refinedStudents);
     setShowTable(true);
   };
 
@@ -129,35 +170,56 @@ const AddMarks = () => {
     setFilteredStudents(updatedStudents);
   };
 
-  const handleSave = async () => {
-    if (!selectedClassId || !selectedTermId || !selectedExamTypeId || !selectedSubjectId) {
-      alert("Please select all filter options before saving.");
-      return;
-    }
+  const handleSave = () => {
+    const termId = selectedTermId;
+    const classId = selectedClassId;
+    const examTypeId = selectedExamTypeId;
+    const subjectId = selectedSubjectId;
 
-    const studentMarksArray = filteredStudents.map((student) => ({
-      studentId: student._id,
-      marksObtained: student.obtainedMarks,
-    }));
+    const studentMarksArray = filteredStudents.map(
+      (student) => (
+        console.log("Student:", student),
+        {
+          studentId: student.id,
+          marksObtained: student.obtainedMarks || 0,
+        }
+      )
+    );
 
-    const dataToSend = {
-      termId: selectedTermId,
-      classId: selectedClassId,
-      examTypeId: selectedExamTypeId,
-      subjectId: selectedSubjectId,
+    const payload = {
+      termId,
+      classId,
+      examTypeId,
+      subjectId,
       studentMarksArray,
     };
 
-    try {
-      console.log(dataToSend); // Call your save API here
-      alert("Marks saved successfully!");
-    } catch (error) {
-      console.error("Error saving marks", error);
-    }
+    console.log("Payload:", payload);
+
+    axios
+      .post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/addmultiple-mark-data`,
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        }
+      )
+      .then((response) => {
+        console.log("Marks saved successfully:", response.data);
+        toast.success("Marks saved successfully!");
+      })
+      .catch((error) => {
+        console.error("Error saving marks:", error);
+        toast.error("Error saving marks, please try again.");
+      });
   };
 
   return (
     <div>
+      <ToastContainer />
       <div className="mb-4">
         <h2 className="text-[#7367F0] text-xl font-semibold">Add Marks</h2>
       </div>

@@ -39,7 +39,8 @@ export const addMarks = wrapAsync(async (req, res) => {
 export const addMultipleStudentMarks = wrapAsync(async (req, res) => {
     const { termId, classId, examTypeId, subjectId, studentMarksArray } =
         req.body;
-    const teacherId = req.user._id;
+    const teacherId = req.user?._id;
+    console.log(subjectId);
     const marksData = studentMarksArray.map(({ studentId, marksObtained }) => ({
         student: studentId,
         term: termId,

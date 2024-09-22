@@ -5,6 +5,7 @@ import {
     getExamTypeById,
     getExamTypes,
     getExamTypesByTerm,
+    getMaxMarkByexamType,
     updateExamType,
 } from "../Controller/examType.Controller.js";
 
@@ -16,5 +17,6 @@ router.get("/get-examtype/:id", getExamTypeById);
 router.delete("/delete-examtype/:id", deleteExamType);
 router.put("/update-examtype/:id", updateExamType);
 router.get("/get-examtype-byterm/:termId", getExamTypesByTerm);
+router.get("/max-marks/:examTypeId", getMaxMarkByexamType);
 
 export { router as examTypeRoute };
