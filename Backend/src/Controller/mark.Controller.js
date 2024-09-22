@@ -171,3 +171,43 @@ export const getMarksByClass = wrapAsync(async (req, res) => {
 
     res.status(200).json(new ApiResponse(200, marks));
 });
+
+export const getMarksByClassAndExamType = wrapAsync(async (req, res) => {
+    const { classId, examTypeId } = req.params;
+    const marks = await Marks.find({
+        class: classId,
+        "marks.exams.examType": examTypeId,
+    })
+        .populate("student")
+        .populate("term")
+        .populate("class")
+        .populate("marks.subject")
+        .populate("marks.exams.examType");
+
+    if (!marks || marks.length === 0) {
+        throw new ApiError(404, "Marks not found");
+    }
+
+    res.status(200).json(new ApiResponse(200, marks));
+});
+
+const getMarksByAllIds = wrapAsync(async (req, res) => {
+    const { termId, classId, examTypeId, subjectId } = req.body;
+    const marks = await Marks.find({
+        term: termId,
+        class: classId,
+        "marks.exams.examType": examTypeId,
+        "marks.subject": subjectId,
+    })
+        .populate("student")
+        .populate("term")
+        .populate("class")
+        .populate("marks.subject")
+        .populate("marks.exams.examType");
+
+    if (!marks || marks.length === 0) {
+        throw new ApiError(404, "Marks not found");
+    }
+
+    res.status(200).json(new ApiResponse(200, marks));
+});
