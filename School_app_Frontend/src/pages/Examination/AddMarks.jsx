@@ -3,189 +3,34 @@ import DynamicFilterBar from "../../common/FilterBar/DynamicFilterBar";
 import DynamicTable from "../../common/Datatables/DynamicTable";
 import FormButton from "../../components/Form/FormButton";
 import { getAPI } from "../../utility/api/apiCall";
-
-// Dummy data for students
-const dummyStudents = [
-  {
-    name: "John Doe",
-    rollNo: "101",
-    subject: "Hindi",
-    maxMarks: 100,
-    obtainedMarks: "",
-  },
-  {
-    name: "Jane Smith",
-    rollNo: "102",
-    subject: "English",
-    maxMarks: 100,
-    obtainedMarks: "",
-  },
-  {
-    name: "Mary Johnson",
-    rollNo: "103",
-    subject: "Math",
-    maxMarks: 100,
-    obtainedMarks: "",
-  },
-  {
-    name: "Alice Brown",
-    rollNo: "104",
-    subject: "Hindi",
-    maxMarks: 100,
-    obtainedMarks: "",
-  },
-  {
-    name: "Michael White",
-    rollNo: "105",
-    subject: "English",
-    maxMarks: 100,
-    obtainedMarks: "",
-  },
-  {
-    name: "Chris Davis",
-    rollNo: "106",
-    subject: "Math",
-    maxMarks: 100,
-    obtainedMarks: "",
-  },
-  {
-    name: "Emma Wilson",
-    rollNo: "107",
-    subject: "Hindi",
-    maxMarks: 100,
-    obtainedMarks: "",
-  },
-  {
-    name: "Olivia Taylor",
-    rollNo: "108",
-    subject: "English",
-    maxMarks: 100,
-    obtainedMarks: "",
-  },
-  {
-    name: "James Anderson",
-    rollNo: "109",
-    subject: "Math",
-    maxMarks: 100,
-    obtainedMarks: "",
-  },
-  {
-    name: "Sophia Thomas",
-    rollNo: "110",
-    subject: "Hindi",
-    maxMarks: 100,
-    obtainedMarks: "",
-  },
-  {
-    name: "Liam Martinez",
-    rollNo: "111",
-    subject: "English",
-    maxMarks: 100,
-    obtainedMarks: "",
-  },
-  {
-    name: "Noah Jackson",
-    rollNo: "112",
-    subject: "Math",
-    maxMarks: 100,
-    obtainedMarks: "",
-  },
-  {
-    name: "Mason Lee",
-    rollNo: "113",
-    subject: "Hindi",
-    maxMarks: 100,
-    obtainedMarks: "",
-  },
-  {
-    name: "Isabella Harris",
-    rollNo: "114",
-    subject: "English",
-    maxMarks: 100,
-    obtainedMarks: "",
-  },
-  {
-    name: "Lucas Clark",
-    rollNo: "115",
-    subject: "Math",
-    maxMarks: 100,
-    obtainedMarks: "",
-  },
-  {
-    name: "Ava Lewis",
-    rollNo: "116",
-    subject: "Hindi",
-    maxMarks: 100,
-    obtainedMarks: "",
-  },
-  {
-    name: "Mia Robinson",
-    rollNo: "117",
-    subject: "English",
-    maxMarks: 100,
-    obtainedMarks: "",
-  },
-  {
-    name: "Ethan Hall",
-    rollNo: "118",
-    subject: "Math",
-    maxMarks: 100,
-    obtainedMarks: "",
-  },
-  {
-    name: "Amelia Young",
-    rollNo: "119",
-    subject: "Hindi",
-    maxMarks: 100,
-    obtainedMarks: "",
-  },
-  {
-    name: "Harper Allen",
-    rollNo: "120",
-    subject: "English",
-    maxMarks: 100,
-    obtainedMarks: "",
-  },
-];
+import axios from "axios";
 
 const AddMarks = () => {
   const [showTable, setShowTable] = useState(false);
-  const [studentsData, setStudentsData] = useState(dummyStudents);
+  const [studentsData, setStudentsData] = useState([]);
   const [filteredStudents, setFilteredStudents] = useState([]);
   const [terms, setTerms] = useState([]);
   const [classes, setClasses] = useState([]);
   const [examTypes, setExamTypes] = useState([]);
   const [subjectGroups, setSubjectGroups] = useState([]);
   const [subjects, setSubjects] = useState([]);
+  const [selectedTermId, setSelectedTermId] = useState("");
+  const [selectedClassId, setSelectedClassId] = useState("");
+  const [selectedExamTypeId, setSelectedExamTypeId] = useState("");
+  const [selectedSubjectId, setSelectedSubjectId] = useState("");
 
-  // Move handleClassChange function above the filterConfig
   const handleClassChange = (selectedClassId) => {
+    setSelectedClassId(selectedClassId);
     const selectedClass = classes.find((cls) => cls._id === selectedClassId);
-    console.log("Selected Class:", selectedClass);
-
-    if (selectedClass) {
-      setSubjectGroups(selectedClass.subjectGroups || []);
-    } else {
-      setSubjectGroups([]); // Clear subject groups if no class is selected
-    }
+    setSubjectGroups(selectedClass ? selectedClass.subjectGroups : []);
+    fetchStudents(selectedClassId); // Fetch students when class changes
   };
 
   const handleSubjectGroupChange = (selectedSubjectGroupId) => {
-    const selectedSubjectGroup = subjectGroups.find(
-      (group) => group._id === selectedSubjectGroupId
-    );
-    console.log("Selected Subject Group:", selectedSubjectGroup);
+    const selectedSubjectGroup = subjectGroups.find((group) => group._id === selectedSubjectGroupId);
+    setSubjects(selectedSubjectGroup ? selectedSubjectGroup.subjects : []);
+  };
 
-    if (selectedSubjectGroup) {
-      // Fetch subjects based on selected subject group
-      setSubjects(selectedSubjectGroup.subjects || []);
-    }
-    else{
-      setSubjects([]);
-    }
-  }
-
-  // Now define the filterConfig
   const filterConfig = [
     {
       name: "term",
@@ -193,10 +38,8 @@ const AddMarks = () => {
       placeholder: "Select Term",
       required: true,
       type: "select",
-      options: (terms || []).map((term) => ({
-        label: term?.name || "Unknown",
-        value: term?._id || "",
-      })),
+      options: terms.map((term) => ({ label: term.name, value: term._id })),
+      onChange: (value) => setSelectedTermId(value),
     },
     {
       name: "examType",
@@ -204,10 +47,8 @@ const AddMarks = () => {
       placeholder: "Select Exam Type",
       required: true,
       type: "select",
-      options: (examTypes || []).map((term) => ({
-        label: term?.name || "Unknown",
-        value: term?._id || "",
-      })),
+      options: examTypes.map((examType) => ({ label: examType.name, value: examType._id })),
+      onChange: (value) => setSelectedExamTypeId(value),
     },
     {
       name: "class",
@@ -215,23 +56,16 @@ const AddMarks = () => {
       placeholder: "Select Class",
       required: true,
       type: "select",
-      options: (classes || []).map((classItem) => ({
-        label: classItem?.name || "Unknown",
-        value: classItem?._id || "",
-      })),
+      options: classes.map((classItem) => ({ label: classItem.name, value: classItem._id })),
       onChange: handleClassChange,
     },
-    
     {
       name: "subjectGroup",
       label: "Select Subject Group",
       placeholder: "Select Subject Group",
       required: true,
       type: "select",
-      options: (subjectGroups || []).map((group) => ({
-        label: group?.name || "Unknown",
-        value: group?._id || "",
-      })),
+      options: subjectGroups.map((group) => ({ label: group.name, value: group._id })),
       onChange: handleSubjectGroupChange,
     },
     {
@@ -240,10 +74,8 @@ const AddMarks = () => {
       placeholder: "Select Subject",
       required: true,
       type: "select",
-      options: (subjects || []).map((group) => ({
-        label: group?.name || "Unknown",
-        value: group?._id || "",
-      })),
+      options: subjects.map((subject) => ({ label: subject.name, value: subject._id })),
+      onChange: (value) => setSelectedSubjectId(value),
     },
   ];
 
@@ -262,15 +94,33 @@ const AddMarks = () => {
     fetchData();
   }, []);
 
-  const handleFilterSubmit = (filterValues) => {
-    console.log("Submitted Filter Values:", filterValues);
+  const fetchStudents = async (classId) => {
+    if (classId) {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/getallstudentsinfo/${classId}`);
+        const mappedStudents = response.data.data.map(student => ({
+          _id: student.id,
+          name: student.name,
+          rollNo: student.rollNumber,
+          subject: student.subject || "", // Ensure there's a subject field
+          obtainedMarks: "", // Initialize for input
+        }));
+        setStudentsData(mappedStudents);
+      } catch (err) {
+        console.error("Error fetching students", err);
+      }
+    }
+  };
 
-    const filtered = dummyStudents.filter(
-      (student) => student.subject === filterValues.subject && true // Additional filtering logic if needed
-    );
+  const handleFilterSubmit = () => {
+    if (!selectedTermId || !selectedExamTypeId || !selectedClassId || !selectedSubjectId) {
+      alert("Please select all filter options.");
+      return;
+    }
 
+    const filtered = studentsData.filter((student) => student.subject === selectedSubjectId);
     setFilteredStudents(filtered);
-    setShowTable(true); // Show table after filtering
+    setShowTable(true);
   };
 
   const handleInputChange = (e, rowIndex, columnAccessor) => {
@@ -279,9 +129,31 @@ const AddMarks = () => {
     setFilteredStudents(updatedStudents);
   };
 
-  const handleSave = () => {
-    console.log("Saved Data:", filteredStudents);
-    alert("Marks saved successfully!");
+  const handleSave = async () => {
+    if (!selectedClassId || !selectedTermId || !selectedExamTypeId || !selectedSubjectId) {
+      alert("Please select all filter options before saving.");
+      return;
+    }
+
+    const studentMarksArray = filteredStudents.map((student) => ({
+      studentId: student._id,
+      marksObtained: student.obtainedMarks,
+    }));
+
+    const dataToSend = {
+      termId: selectedTermId,
+      classId: selectedClassId,
+      examTypeId: selectedExamTypeId,
+      subjectId: selectedSubjectId,
+      studentMarksArray,
+    };
+
+    try {
+      console.log(dataToSend); // Call your save API here
+      alert("Marks saved successfully!");
+    } catch (error) {
+      console.error("Error saving marks", error);
+    }
   };
 
   return (
@@ -294,9 +166,7 @@ const AddMarks = () => {
       {showTable && (
         <div>
           <div className="mb-4">
-            <h2 className="text-[#7367F0] font-semibold mt-4 text-xl">
-              Student Marks Table
-            </h2>
+            <h2 className="text-[#7367F0] font-semibold mt-4 text-xl">Student Marks Table</h2>
           </div>
 
           <DynamicTable

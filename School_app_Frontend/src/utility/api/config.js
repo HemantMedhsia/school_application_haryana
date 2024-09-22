@@ -82,5 +82,9 @@ export const getApiConfig = {
   getSubjectGroup:{
     url:"/all-subject-groups",
     method:"GET",
+  },
+  getallstudentsinfo:{
+    url:"/getallstudentsinfo",
+    method:"GET",
   }
 };
