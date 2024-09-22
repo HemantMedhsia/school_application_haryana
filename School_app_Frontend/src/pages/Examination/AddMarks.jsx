@@ -3,170 +3,33 @@ import DynamicFilterBar from "../../common/FilterBar/DynamicFilterBar";
 import DynamicTable from "../../common/Datatables/DynamicTable";
 import FormButton from "../../components/Form/FormButton";
 import { getAPI } from "../../utility/api/apiCall";
-
-// Dummy data for students
-const dummyStudents = [
-  {
-    name: "John Doe",
-    rollNo: "101",
-    subject: "Hindi",
-    maxMarks: 100,
-    obtainedMarks: "",
-  },
-  {
-    name: "Jane Smith",
-    rollNo: "102",
-    subject: "English",
-    maxMarks: 100,
-    obtainedMarks: "",
-  },
-  {
-    name: "Mary Johnson",
-    rollNo: "103",
-    subject: "Math",
-    maxMarks: 100,
-    obtainedMarks: "",
-  },
-  {
-    name: "Alice Brown",
-    rollNo: "104",
-    subject: "Hindi",
-    maxMarks: 100,
-    obtainedMarks: "",
-  },
-  {
-    name: "Michael White",
-    rollNo: "105",
-    subject: "English",
-    maxMarks: 100,
-    obtainedMarks: "",
-  },
-  {
-    name: "Chris Davis",
-    rollNo: "106",
-    subject: "Math",
-    maxMarks: 100,
-    obtainedMarks: "",
-  },
-  {
-    name: "Emma Wilson",
-    rollNo: "107",
-    subject: "Hindi",
-    maxMarks: 100,
-    obtainedMarks: "",
-  },
-  {
-    name: "Olivia Taylor",
-    rollNo: "108",
-    subject: "English",
-    maxMarks: 100,
-    obtainedMarks: "",
-  },
-  {
-    name: "James Anderson",
-    rollNo: "109",
-    subject: "Math",
-    maxMarks: 100,
-    obtainedMarks: "",
-  },
-  {
-    name: "Sophia Thomas",
-    rollNo: "110",
-    subject: "Hindi",
-    maxMarks: 100,
-    obtainedMarks: "",
-  },
-  {
-    name: "Liam Martinez",
-    rollNo: "111",
-    subject: "English",
-    maxMarks: 100,
-    obtainedMarks: "",
-  },
-  {
-    name: "Noah Jackson",
-    rollNo: "112",
-    subject: "Math",
-    maxMarks: 100,
-    obtainedMarks: "",
-  },
-  {
-    name: "Mason Lee",
-    rollNo: "113",
-    subject: "Hindi",
-    maxMarks: 100,
-    obtainedMarks: "",
-  },
-  {
-    name: "Isabella Harris",
-    rollNo: "114",
-    subject: "English",
-    maxMarks: 100,
-    obtainedMarks: "",
-  },
-  {
-    name: "Lucas Clark",
-    rollNo: "115",
-    subject: "Math",
-    maxMarks: 100,
-    obtainedMarks: "",
-  },
-  {
-    name: "Ava Lewis",
-    rollNo: "116",
-    subject: "Hindi",
-    maxMarks: 100,
-    obtainedMarks: "",
-  },
-  {
-    name: "Mia Robinson",
-    rollNo: "117",
-    subject: "English",
-    maxMarks: 100,
-    obtainedMarks: "",
-  },
-  {
-    name: "Ethan Hall",
-    rollNo: "118",
-    subject: "Math",
-    maxMarks: 100,
-    obtainedMarks: "",
-  },
-  {
-    name: "Amelia Young",
-    rollNo: "119",
-    subject: "Hindi",
-    maxMarks: 100,
-    obtainedMarks: "",
-  },
-  {
-    name: "Harper Allen",
-    rollNo: "120",
-    subject: "English",
-    maxMarks: 100,
-    obtainedMarks: "",
-  },
-];
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const AddMarks = () => {
   const [showTable, setShowTable] = useState(false);
-  const [studentsData, setStudentsData] = useState(dummyStudents);
+  const [studentsData, setStudentsData] = useState([]);
   const [filteredStudents, setFilteredStudents] = useState([]);
   const [terms, setTerms] = useState([]);
   const [classes, setClasses] = useState([]);
   const [examTypes, setExamTypes] = useState([]);
   const [subjectGroups, setSubjectGroups] = useState([]);
   const [subjects, setSubjects] = useState([]);
+  const [maxMarks, setMaxMarks] = useState();
+  const [selectedTermId, setSelectedTermId] = useState("");
+  const [selectedClassId, setSelectedClassId] = useState("");
+  const [selectedExamTypeId, setSelectedExamTypeId] = useState("");
+  const [selectedSubjectId, setSelectedSubjectId] = useState("");
 
-  // Move handleClassChange function above the filterConfig
   const handleClassChange = (selectedClassId) => {
     const selectedClass = classes.find((cls) => cls._id === selectedClassId);
-    console.log("Selected Class:", selectedClass);
+    setSelectedClassId(selectedClass._id);
 
     if (selectedClass) {
       setSubjectGroups(selectedClass.subjectGroups || []);
     } else {
-      setSubjectGroups([]); // Clear subject groups if no class is selected
+      setSubjectGroups([]);
     }
   };
 
@@ -174,18 +37,19 @@ const AddMarks = () => {
     const selectedSubjectGroup = subjectGroups.find(
       (group) => group._id === selectedSubjectGroupId
     );
-    console.log("Selected Subject Group:", selectedSubjectGroup);
 
     if (selectedSubjectGroup) {
-      // Fetch subjects based on selected subject group
       setSubjects(selectedSubjectGroup.subjects || []);
-    }
-    else{
+    } else {
       setSubjects([]);
     }
-  }
+  };
 
-  // Now define the filterConfig
+  const handleSubjectChange = (selectedSubjectId) => {
+    console.log("Selected Subject:", selectedSubjectId);
+    setSelectedSubjectId(selectedSubjectId);
+  };
+
   const filterConfig = [
     {
       name: "term",
@@ -204,9 +68,9 @@ const AddMarks = () => {
       placeholder: "Select Exam Type",
       required: true,
       type: "select",
-      options: (examTypes || []).map((term) => ({
-        label: term?.name || "Unknown",
-        value: term?._id || "",
+      options: (examTypes || []).map((exam) => ({
+        label: exam?.name || "Unknown",
+        value: exam?._id || "",
       })),
     },
     {
@@ -221,7 +85,6 @@ const AddMarks = () => {
       })),
       onChange: handleClassChange,
     },
-    
     {
       name: "subjectGroup",
       label: "Select Subject Group",
@@ -240,12 +103,36 @@ const AddMarks = () => {
       placeholder: "Select Subject",
       required: true,
       type: "select",
-      options: (subjects || []).map((group) => ({
-        label: group?.name || "Unknown",
-        value: group?._id || "",
+      options: (subjects || []).map((sub) => ({
+        label: sub?.name || "Unknown",
+        value: sub?._id || "",
       })),
+      onChange: handleSubjectChange,
     },
   ];
+
+  const fetchStudentData = async (classId, examType) => {
+    if (!classId || !examType) return;
+    try {
+      const [studentsResponse, maxMarksResponse] = await Promise.all([
+        axios.get(
+          `${
+            import.meta.env.VITE_BACKEND_URL
+          }/api/getallstudentsinfo/${classId}`
+        ),
+        axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/api/max-marks/${examType}`
+        ),
+      ]);
+
+      setStudentsData(studentsResponse.data.data);
+      console.log("Students Data:", studentsResponse.data.data);
+      setMaxMarks(maxMarksResponse.data.data.maxMark);
+      console.log("Max Marks:", maxMarks);
+    } catch (error) {
+      console.error("Error fetching student data or max marks", error);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -262,15 +149,26 @@ const AddMarks = () => {
     fetchData();
   }, []);
 
-  const handleFilterSubmit = (filterValues) => {
-    console.log("Submitted Filter Values:", filterValues);
+  const handleFilterSubmit = async (filterValues) => {
+    const { class: classId, examType, subject, term } = filterValues;
+    setSelectedTermId(term);
+    setSelectedExamTypeId(examType);
 
-    const filtered = dummyStudents.filter(
-      (student) => student.subject === filterValues.subject && true // Additional filtering logic if needed
-    );
+    const subjectsData = subjects.find((sub) => sub._id === subject);
 
-    setFilteredStudents(filtered);
-    setShowTable(true); // Show table after filtering
+    await fetchStudentData(classId, examType);
+
+    const refinedStudents = studentsData.map((student) => ({
+      name: student.name,
+      id: student.id,
+      rollNo: student.rollNumber,
+      subject: subjectsData?.name,
+      maxMarks,
+      obtainedMarks: "",
+    }));
+
+    setFilteredStudents(refinedStudents);
+    setShowTable(true);
   };
 
   const handleInputChange = (e, rowIndex, columnAccessor) => {
@@ -280,12 +178,55 @@ const AddMarks = () => {
   };
 
   const handleSave = () => {
-    console.log("Saved Data:", filteredStudents);
-    alert("Marks saved successfully!");
+    const termId = selectedTermId;
+    const classId = selectedClassId;
+    const examTypeId = selectedExamTypeId;
+    const subjectId = selectedSubjectId;
+
+    const studentMarksArray = filteredStudents.map(
+      (student) => (
+        console.log("Student:", student),
+        {
+          studentId: student.id,
+          marksObtained: student.obtainedMarks || 0,
+        }
+      )
+    );
+
+    const payload = {
+      termId,
+      classId,
+      examTypeId,
+      subjectId,
+      studentMarksArray,
+    };
+
+    console.log("Payload:", payload);
+
+    axios
+      .post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/addmultiple-mark-data`,
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        }
+      )
+      .then((response) => {
+        console.log("Marks saved successfully:", response.data);
+        toast.success("Marks saved successfully!");
+      })
+      .catch((error) => {
+        console.error("Error saving marks:", error);
+        toast.error("Error saving marks, please try again.");
+      });
   };
 
   return (
     <div>
+      <ToastContainer />
       <div className="mb-4">
         <h2 className="text-[#7367F0] text-xl font-semibold">Add Marks</h2>
       </div>

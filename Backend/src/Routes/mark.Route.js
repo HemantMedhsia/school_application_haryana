@@ -18,7 +18,6 @@ const router = express.Router();
 router.post("/add-mark-data", authenticateToken, addMarks);
 router.post(
     "/addmultiple-mark-data",
-    authenticateToken,
     addMultipleStudentMarks
 );
 router.get("/getall-marks", getAllMarks);
