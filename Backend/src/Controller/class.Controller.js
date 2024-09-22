@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { Class } from "../Models/class.Model.js";
 import { Section } from "../Models/section.Model.js";
 import { ApiResponse } from "../Utils/responseHandler.js";
+import { Student } from "../Models/student.model.js";
 import wrapAsync from "../Utils/wrapAsync.js";
 import { classValidationSchema } from "../Validation/class.Validation.js";
 
@@ -87,8 +88,8 @@ export const getAllClasses = wrapAsync(async (req, res) => {
     const classes = await Class.find().populate({
         path: "subjectGroups",
         populate: {
-            path: "subjects", 
-            model: "Subject", 
+            path: "subjects",
+            model: "Subject",
         },
     });
     return res.status(200).json(new ApiResponse(200, classes));
@@ -276,4 +277,19 @@ export const getAllClassesWithSections = wrapAsync(async (req, res) => {
                 "Classes with sections retrieved successfully"
             )
         );
+});
+
+export const getAllStudentsByclassId = wrapAsync(async (req, res) => {
+    const { classId } = req.params;
+    const students = await Student.find({ currentClass: classId });
+    return res.status(200).json(new ApiResponse(200, students));
+});
+
+
+export const getAllStudentsByClassIdtoshownameandroll = wrapAsync(async (req, res) => {
+    const { classId } = req.params;
+    const students = await Student.find({ currentClass: classId }).select(
+        "firstName lastName rollNumber"
+    );
+    return res.status(200).json(new ApiResponse(200, students));
 });

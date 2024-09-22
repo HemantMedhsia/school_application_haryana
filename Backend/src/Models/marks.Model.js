@@ -9,7 +9,6 @@ const marksSchema = new mongoose.Schema({
     term: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Term",
-        required: true,
     },
     class: {
         type: mongoose.Schema.Types.ObjectId,
