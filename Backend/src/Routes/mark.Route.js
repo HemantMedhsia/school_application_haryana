@@ -6,6 +6,7 @@ import {
     getAllMarks,
     getMarkById,
     getMarksByClass,
+    getMarksByClassAndExamType,
     getMarksByStudent,
     studentMarkbytermandexamtype,
     updateMarks,
@@ -27,5 +28,6 @@ router.delete("/delete-mark/:id", deleteMarks);
 router.get("/get-mark-by-student/:studentId", getMarksByStudent);
 router.get("/get-mark-by-class/:classId", getMarksByClass);
 router.post("/student-mark", studentMarkbytermandexamtype);
+router.get("/get-mark-by-class-and-exam-type/:classId/:examTypeId", getMarksByClassAndExamType);
 
 export { router as markRoute };

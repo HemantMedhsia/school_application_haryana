@@ -8,76 +8,90 @@ import DetailsSelectionModal from "../../common/ConfirmationModal/DetailsSelecti
 
 const StudentInfo = () => {
   const [allStudentData, setAllStudentData] = useState([]);
+  const [filteredStudentData, setFilteredStudentData] = useState([]);
+  const [classItems, setClassItems] = useState([]);
+  const [sectionItems, setSectionItems] = useState([]);
+  const [sessionItems, setSessionItems] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [studentToDelete, setStudentToDelete] = useState(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const navigate = useNavigate();
 
+  const fetchDropdownData = async () => {
+    try {
+      const classes = await getAPI("getAllClasses", {}, setClassItems);
+      const sections = await getAPI("getAllSections", {}, setSectionItems);
+      const sessions = await getAPI("getAllSessions", {}, setSessionItems);
+      console.log(sessionItems)
+    } catch (error) {
+      console.error("Error fetching dropdown data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchDropdownData();
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const response = await getAPI("getAllStudents", {}, setAllStudentData);
+      if (response && Array.isArray(response)) {
+        setAllStudentData(response);
+        setFilteredStudentData(response); // Initialize filtered data
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const handleFilter = ({ type, value }) => {
+    let filteredData = allStudentData;
+
+    if (type === "class" && value) {
+      filteredData = filteredData.filter(student => student.currentClass._id === value._id);
+    } else if (type === "section" && value) {
+      filteredData = filteredData.filter(student => student.currentSection._id === value._id);
+    } else if (type === "session" && value) {
+      filteredData = filteredData.filter(student => student.session._id === value._id);
+    }
+
+    setFilteredStudentData(filteredData); // Update the filtered student data
+  };
+
   const columns = [
+    { header: "First Name", accessor: "firstName" },
+    { header: "Last Name", accessor: "lastName" },
+    { header: "Roll Number", accessor: "rollNumber" },
+    { header: "Age", accessor: "age" },
+    { header: "Father Name", accessor: (rowData) => rowData?.parent?.fatherName || "N/A" },
+    { header: "Class", accessor: (rowData) => rowData?.currentClass?.name || "N/A" },
+    { header: "Section", accessor: (rowData) => rowData?.currentSection?.name || "N/A" },
     {
-      header: "First Name",
-      accessor: "firstName",
-    },
-    {
-      header: "Last Name",
-      accessor: "lastName",
-    },
-    {
-      header: "Roll Number",
-      accessor: "rollNumber",
-    },
-    {
-      header: "Age",
-      accessor: "age",
-    },
-    {
-      header: "Father Name",
-      accessor: (rowData) => rowData?.parent?.fatherName || "N/A",
-    },
-    {
-      header: "Class",
-      accessor: (rowData) => rowData?.currentClass?.name || "N/A",
-    },
-    {
-      header: "Section",
-      accessor: (rowData) => rowData?.currentSection?.name || "N/A",
-    },
-    {
-      header: "Attendance",
+      header: "Attendance Percentage",
       accessor: "attendance",
-      render: (value, item) => {
-        console.log("Render Value:", value, "Item:", item); // Check if these logs appear
-        
-        const attendanceValue = value && !isNaN(value) ? parseFloat(value) : null;
-        const progressBarColor = item.color || "#4CAF50"; // Default color if item.color is not provided
-  
-        if (attendanceValue === null) {
-          return "N/A";
-        }
-  
+      render: (rowData) => {
+        const attendanceValue = parseFloat(rowData.attendance);
         return (
           <div className="flex items-center">
-            <span className="mr-2">{`${attendanceValue}%`}</span>
+            <span className="mr-2">{attendanceValue}%</span>
             <div className="relative w-full">
-              <div className="overflow-hidden h-2 text-xs flex rounded bg-gray-600">
+              <div className="overflow-hidden h-2 text-xs flex rounded bg-gray-300">
                 <div
                   style={{
                     width: `${attendanceValue}%`,
-                    backgroundColor: progressBarColor,
+                    backgroundColor: attendanceValue >= 75 ? "#4caf50" : "#ff5252",
                   }}
-                  className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center"
-                ></div>
+                  className="h-2 shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center"
+                />
               </div>
             </div>
           </div>
         );
       },
     },
-    {
-      header: "Grade",
-      accessor: "grade",
-    },
+    { header: "Grade", accessor: "grade" },
   ];
 
   const handleEdit = (studentData) => {
@@ -85,61 +99,27 @@ const StudentInfo = () => {
     setIsDetailsModalOpen(true);
   };
 
-  const handleDetailsSelect = (type) => {
-    if (type === "student") {
-      navigate(`/school/student-admission/${selectedStudent._id}`);
-    } else if (type === "parent") {
-      navigate(`/school/parent-update-student/${selectedStudent._id}`);
-    }
-  };
-
-  const closeDetailsModal = () => {
-    setSelectedStudent(null);
-    setIsDetailsModalOpen(false);
-  };
-
-  const fetchData = async () => {
-    try {
-      const response = await getAPI("getAllStudents", {}, setAllStudentData);
-      console.log("API Response:", response); // Add this line to check API response
-      if (response && Array.isArray(response)) {
-        setAllStudentData(response);
-      } else if (response && typeof response === "object") {
-        setAllStudentData(response.data || []);
-      } else {
-        console.error("Unexpected response format:", response);
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
-  
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
   const handleView = (studentData) => {
     navigate(`/school/profile/${studentData._id}`);
   };
 
-  // const handleEdit = (studentData) => {
-  //   navigate(`/school/student-admission/${studentData._id}`);
-  // };
+  const handleDelete = (studentData) => {
+    setStudentToDelete(studentData);
+    setIsModalOpen(true);
+  };
 
-  const handleDelete = async () => {
-    if (!studentToDelete) return;
-
-    try {
-      console.log("Deleting student data:", studentToDelete._id);
-      const res = await deleteAPI(`delete-student/${studentToDelete._id}`);
-      setAllStudentData((prevData) =>
-        prevData.filter((data) => data._id !== studentToDelete._id)
-      );
-      console.log(res);
-      closeModal(); // Close modal after deletion
-    } catch (error) {
-      console.error("Error deleting data:", error);
+  const confirmDelete = async () => {
+    if (studentToDelete) {
+      console.log("Deleting student:", studentToDelete);
+      try {
+        await deleteAPI(`delete-student/${studentToDelete._id}`);
+        fetchData(); // Refresh the student data
+      } catch (error) {
+        console.error("Error deleting student:", error);
+      } finally {
+        setIsModalOpen(false);
+        setStudentToDelete(null);
+      }
     }
   };
 
@@ -148,16 +128,16 @@ const StudentInfo = () => {
     setIsModalOpen(true);
   };
 
-  const closeModal = () => {
-    setStudentToDelete(null);
-    setIsModalOpen(false);
-  };
-
   return (
     <div className="">
-      <SearchBar />
+      <SearchBar
+        classItems={classItems}
+        sectionItems={sectionItems}
+        sessionItems={sessionItems}
+        onFilter={handleFilter} // Pass filter function
+      />
       <Datatable
-        data={allStudentData}
+        data={filteredStudentData}
         columns={columns}
         actions={{
           onView: handleView,
@@ -167,15 +147,14 @@ const StudentInfo = () => {
       />
       <ConfirmationModal
         isOpen={isModalOpen}
-        onClose={closeModal}
-        onConfirm={handleDelete}
-        title="Delete Confirmation"
-        message="Are you sure you want to delete this student?"
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={confirmDelete}
+        message={`Are you sure you want to delete ${studentToDelete ? studentToDelete.firstName : ""}?`}
       />
       <DetailsSelectionModal
         isOpen={isDetailsModalOpen}
-        onClose={closeDetailsModal}
-        onSelect={handleDetailsSelect}
+        onClose={() => setIsDetailsModalOpen(false)}
+        student={selectedStudent}
       />
     </div>
   );
