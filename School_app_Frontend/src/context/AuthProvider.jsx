@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode"; // Fix import
 import axios from "axios";
 import PyramidLoader from "../common/Loader/PyramidLoader";
+import { toast, ToastContainer } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
 
@@ -68,8 +70,7 @@ export const AuthProvider = ({ children }) => {
       setUserRole(decodedToken.role);
       localStorage.setItem("authToken", newAuthToken);
     } catch (error) {
-      console.error("Token refresh failed:", error);
-      alert("Session expired, please login again.");
+      toast.error("Failed to refresh token. Please login again.");
       logout();
     }
   };
@@ -92,12 +93,14 @@ export const AuthProvider = ({ children }) => {
     setUserRole(null);
     localStorage.removeItem("authToken");
     localStorage.removeItem("refreshToken");
-    alert("You have been logged out.");
-    navigate("/");
+    toast.success("Logged out successfully!");
+    // navigate("/");
   };
 
   return (
-    <AuthContext.Provider
+    <div>
+      <ToastContainer/>
+      <AuthContext.Provider
       value={{
         authToken,
         refreshToken,
@@ -110,6 +113,7 @@ export const AuthProvider = ({ children }) => {
     >
       {!loading ? children : <PyramidLoader desc={""} />}
     </AuthContext.Provider>
+    </div>
   );
 };
 

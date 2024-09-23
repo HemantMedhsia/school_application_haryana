@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import AttendenceSearchBar from "../common/SearchBar/AttendenceSearchBar";
 import Datatable from "../common/Datatables/Datatable";
 import { getAPI } from "../utility/api/apiCall";
-import { jwtDecode } from "jwt-decode"; // Correctly import jwt-decode as a named import
+import { jwtDecode } from "jwt-decode"; 
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify"; // Import toast
 
 const columns = [
   {
@@ -21,7 +22,7 @@ const columns = [
   {
     header: "Attendance Percentage",
     accessor: "attendancePercentage",
-    render: (value, item) => {
+    render: (value) => {
       const attendanceValue = parseFloat(value);
       return (
         <div className="flex items-center">
@@ -31,7 +32,7 @@ const columns = [
               <div
                 style={{
                   width: `${attendanceValue}%`,
-                  backgroundColor: item.color || "#4caf50", // Default color if item.color is undefined
+                  backgroundColor: "#4caf50",
                 }}
                 className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center"
               ></div>
@@ -48,89 +49,76 @@ const columns = [
 ];
 
 const Attendence = () => {
-  const [studentData, setStudentData] = useState([]); // Initialize as an empty array
+  const [studentData, setStudentData] = useState([]);
   const [studentAttendance, setStudentAttendance] = useState([]);
+  const [attendanceStatus, setAttendanceStatus] = useState({});
 
-  const handlePresent = (item) => {
-    console.log(`Student with ID ${item._id} marked as Present`);
+  const handleAttendance = (item, status) => {
     const token = localStorage.getItem("authToken");
     if (!token) {
       console.error("Token not found");
       return;
     }
-
+  
     try {
       const decodedToken = jwtDecode(token);
-      console.log("Decoded token:", decodedToken);
       const newAttendance = {
         studentId: item._id,
-        status: "Present",
+        status,
         teacherId: decodedToken.id,
       };
-
-      // Update the state using a function to access the current state correctly
+  
+      setAttendanceStatus((prev) => ({
+        ...prev,
+        [item._id]: status,
+      }));
+  
       setStudentAttendance((prev) => {
-        const updatedAttendance = [...prev, newAttendance];
-        console.log("Updated Attendance:", updatedAttendance); // Log the updated state correctly
-        return updatedAttendance;
+        const existingIndex = prev.findIndex((att) => att.studentId === item._id);
+        if (existingIndex !== -1) {
+          const updatedAttendance = [...prev];
+          updatedAttendance[existingIndex] = newAttendance;
+          return updatedAttendance;
+        } else {
+          return [...prev, newAttendance];
+        }
       });
+  
+      console.log(`Student with ID ${item._id} marked as ${status}`);
     } catch (error) {
       console.error("Error decoding token:", error);
     }
   };
+  
 
-  const handleAbsent = (item) => {
-    console.log(`Student with ID ${item._id} marked as Present`);
-    const token = localStorage.getItem("authToken");
-    if (!token) {
-      console.error("Token not found");
-      return;
-    }
-
+  const handleSave = async () => {
     try {
-      const decodedToken = jwtDecode(token);
-      console.log("Decoded token:", decodedToken);
-      const newAttendance = {
-        studentId: item._id,
-        status: "Absent",
-        teacherId: decodedToken.id,
-      };
-
-      // Update the state using a function to access the current state correctly
-      setStudentAttendance((prev) => {
-        const updatedAttendance = [...prev, newAttendance];
-        console.log("Updated Attendance:", updatedAttendance); // Log the updated state correctly
-        return updatedAttendance;
-      });
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/insert-student-attendance-in-bulk`,
+        studentAttendance,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        }
+      );
+      toast.success("Data saved successfully!"); // Success toast
+      console.log("Attendance marked/saved successfully:", response.data);
     } catch (error) {
-      console.error("Error decoding token:", error);
+      console.error("Error saving data:", error);
+      toast.error("Error saving data!"); // Error toast
     }
   };
-
-    const handleSave = async () => {
-        try {
-            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/insert-student-attendance-in-bulk`, studentAttendance , {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-                },
-            });
-            console.log("Data saved successfully:", response.data);
-        }
-        catch (error) {
-            console.error("Error saving data:", error);
-        }
-    };
-
 
   const fetchData = async () => {
     try {
       const response = await getAPI("getAllStudents", {}, setStudentData);
       if (response) {
-        setStudentData(response.data); // Assuming response.data contains the student array
-        console.log("Data fetched successfully:", response.data);
+        setStudentData(response.data);
       }
     } catch (error) {
       console.error("Error fetching data:", error);
+      toast.error("Error fetching student data!"); // Error toast
     }
   };
 
@@ -138,24 +126,29 @@ const Attendence = () => {
     fetchData();
   }, []);
 
-return (
-    <div className="">
-        <AttendenceSearchBar />
-        <Datatable
-            columns={columns}
-            data={studentData}
-            actions={{ onPresent: handlePresent, onAbsent: handleAbsent }}
-        />
-        <div className="flex justify-end ">
-            <button 
-                onClick={handleSave}
-                className="bg-[#283046] hover:bg-gray-900 hover:border border-[#65FA9E] text-[#65FA9E] font-bold py-1 px-6 rounded"
-            >
-                Save
-            </button>
-        </div>
+  return (
+    <div>
+      <AttendenceSearchBar />
+      <Datatable
+        columns={columns}
+        data={studentData}
+        actions={{
+          onPresent: (item) => handleAttendance(item, "Present"),
+          onAbsent: (item) => handleAttendance(item, "Absent"),
+        }}
+        attendanceStatus={attendanceStatus}
+      />
+      <div className="flex justify-end">
+        <button
+          onClick={handleSave}
+          className="bg-[#283046] hover:bg-gray-900 hover:border border-[#65FA9E] text-[#65FA9E] font-bold py-1 px-6 rounded"
+        >
+          Save
+        </button>
+      </div>
+      <ToastContainer /> {/* Toast container to display notifications */}
     </div>
-);
+  );
 };
 
 export default Attendence;

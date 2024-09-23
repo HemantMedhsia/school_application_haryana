@@ -67,29 +67,3 @@ export const deleteAPI = async (endpoint) => {
   }
 };
 
-// export async function postAPI(apiName, data = {}, setData, schoolId) {
-//     const BASE_URL = "https://school-application-three.vercel.app/api";
-//     try {
-//         console.log("API Name:", apiName); // Debugging line
-//         const config = {
-//             method: getApiConfig[apiName]?.method, // Use optional chaining to avoid accessing undefined
-//             headers: await getHeaders(["access-token", "typeApplication"]),
-//             url: BASE_URL + getApiConfig[apiName]?.url.replace(':schoolId', schoolId), // Replace placeholder with schoolId
-//             data: data
-//         };
-
-//         // Check if config is defined
-//         if (!config.method || !config.url) {
-//             throw new Error("Invalid API configuration");
-//         }
-
-//         const response = await axios(config);
-//         console.log("API response:", response);
-//         setData(response.data.data);
-//         return response.data;
-//     } catch (error) {
-//         console.error("API call failed:", error.response ? error.response.data : error.message);
-//         setData(error.response ? error.response.data.message : 'An error occurred');
-//         return error;
-//     }
-// }

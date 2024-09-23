@@ -1,7 +1,6 @@
-// Dropdown.js
 import React, { useState } from "react";
 
-const Dropdown = ({ label, items }) => {
+const Dropdown = ({ label, items, onSelect }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(label);
 
@@ -10,8 +9,9 @@ const Dropdown = ({ label, items }) => {
   };
 
   const handleItemClick = (item) => {
-    setSelectedItem(item); // Update the selected item
+    setSelectedItem(item.name || item.sessionYear); // Update the selected item to show the name
     setIsDropdownOpen(false); // Close the dropdown
+    onSelect(item); // Call onSelect with the selected item
   };
 
   return (
@@ -38,15 +38,15 @@ const Dropdown = ({ label, items }) => {
       </div>
 
       {isDropdownOpen && (
-        <div className="absolute top-full mt-2 bg-gray-800 text-gray-300 w-auto rounded-md shadow-lg z-20">
+        <div className="absolute max-h-40 overflow-auto  top-full mt-2 bg-gray-800 text-gray-300 w-auto rounded-md shadow-lg z-20">
           <ul className="p-1">
             {items.map((item, index) => (
               <li
-                key={index}
+                key={item._id} // Use _id as the key
                 className="mx-2 my-2 px-6 rounded-md hover:bg-gray-700 cursor-pointer"
                 onClick={() => handleItemClick(item)}
               >
-                {item}
+                {item.name || item.sessionYear} {/* Display the name */}
               </li>
             ))}
           </ul>
