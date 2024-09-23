@@ -158,8 +158,7 @@ export const getAttendanceByDateRange = wrapAsync(async (req, res) => {
     res.status(200).json({ success: true, data: attendanceRecords });
 });
 
- export const createMultipleStudentAttendenceInBulk = wrapAsync(
-
+export const createMultipleStudentAttendenceInBulk = wrapAsync(
     async (req, res) => {
         const attendenceData = req.body;
 
@@ -168,6 +167,19 @@ export const getAttendanceByDateRange = wrapAsync(async (req, res) => {
         }
 
         try {
+            for (const attendance of attendenceData) {
+                const existingAttendance = await StudentAttendance.findOne({
+                    studentId: attendance.studentId,
+                    date: attendance.date,
+                });
+
+                if (existingAttendance) {
+                    return res.status(400).json({
+                        message: `Attendance for student ${attendance.studentId} on date ${attendance.date} already exists.`,
+                    });
+                }
+            }
+
             const savedAttendence = await StudentAttendance.insertMany(
                 attendenceData
             );
@@ -183,7 +195,6 @@ export const getAttendanceByDateRange = wrapAsync(async (req, res) => {
         }
     }
 );
-
 
 export const getAllStudentAttendance = wrapAsync(async (req, res) => {
     const attendanceRecords = await StudentAttendance.find();
