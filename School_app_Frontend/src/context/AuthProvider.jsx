@@ -36,6 +36,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isTokenRefereshed = false;
     const handleTokenRefresh = async () => {
       if (authToken) {
         const decodedToken = jwtDecode(authToken);
