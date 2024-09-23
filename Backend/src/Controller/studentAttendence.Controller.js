@@ -4,97 +4,40 @@ import { Teacher } from "../Models/teacher.model.js";
 import { StudentAttendance } from "../Models/studentAttendence.Model.js";
 import { attendanceValidationSchema } from "../Validation/studentAttendence.validation.js";
 
-// export const createStudentAttendence = wrapAsync(async (req, res) => {
-//     const { studentId } = req.params;
-//     const teacherId = req.user.id;
-
-//     const { error } = attendanceValidationSchema.validate(req.body);
-//     if (error) {
-//         return res.status(400).json({ message: error.details[0].message });
-//     }
-
-//     const teacher = await Teacher.findById(teacherId);
-
-//     if (!teacher) {
-//         return res.status(404).json({ message: "Teacher not found" });
-//     }
-
-//     const student = await Student.findById(studentId);
-//     if (!student) {
-//         return res.status(404).json({ message: "Student not found" });
-//     }
-
-//     const attendance = new StudentAttendance({
-//         studentId,
-//         ...req.body,
-//         teacherId,
-//     });
-
-//     const savedAttendance = await attendance.save();
-
-//     await Student.findByIdAndUpdate(
-//         studentId,
-//         { $push: { StudentAttendance: savedAttendance._id } },
-//         { new: true }
-//     );
-
-//     res.status(201).json({ success: true, data: savedAttendance });
-// });
-
 export const createStudentAttendence = wrapAsync(async (req, res) => {
     const { studentId } = req.params;
     const teacherId = req.user.id;
 
-    // Validate request body
     const { error } = attendanceValidationSchema.validate(req.body);
     if (error) {
         return res.status(400).json({ message: error.details[0].message });
     }
 
-    // Find teacher by ID
     const teacher = await Teacher.findById(teacherId);
+
     if (!teacher) {
         return res.status(404).json({ message: "Teacher not found" });
     }
 
-    // Find student by ID
     const student = await Student.findById(studentId);
     if (!student) {
         return res.status(404).json({ message: "Student not found" });
     }
 
-    // Set date to 00:00:00 to compare by date only
-    const today = new Date().setHours(0, 0, 0, 0);
-
-    // Check if attendance already exists for today for the same student
-    const existingAttendance = await StudentAttendance.findOne({
-        studentId: studentId,
-        date: today,  // Assuming your schema has a 'date' field to track the date of attendance
-    });
-
-    if (existingAttendance) {
-        return res.status(400).json({ message: "Attendance already taken on that day" });
-    }
-
-    // Create new attendance record
     const attendance = new StudentAttendance({
         studentId,
         ...req.body,
         teacherId,
-        date: today,  // Ensure the date is saved correctly
     });
 
-    // Save the attendance
     const savedAttendance = await attendance.save();
 
-    // Update student record to include new attendance
     await Student.findByIdAndUpdate(
         studentId,
-        { $push: { StudentAttendance: savedAttendance._id } },  // Assuming student schema has 'StudentAttendance' field
+        { $push: { StudentAttendance: savedAttendance._id } },
         { new: true }
     );
 
-    // Send response
     res.status(201).json({ success: true, data: savedAttendance });
 });
 
