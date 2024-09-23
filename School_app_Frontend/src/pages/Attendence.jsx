@@ -65,6 +65,7 @@ const Attendence = () => {
       const newAttendance = {
         studentId: item._id,
         status,
+        date: new Date().toISOString(),
         teacherId: decodedToken.id,
       };
   
