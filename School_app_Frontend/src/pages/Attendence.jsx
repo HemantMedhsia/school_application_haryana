@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import AttendenceSearchBar from "../common/SearchBar/AttendenceSearchBar";
 import Datatable from "../common/Datatables/Datatable";
 import { getAPI } from "../utility/api/apiCall";
-import { jwtDecode } from "jwt-decode"; 
+import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify"; // Import toast
 
@@ -59,7 +59,7 @@ const Attendence = () => {
       console.error("Token not found");
       return;
     }
-  
+
     try {
       const decodedToken = jwtDecode(token);
       const newAttendance = {
@@ -68,14 +68,16 @@ const Attendence = () => {
         date: new Date().toISOString(),
         teacherId: decodedToken.id,
       };
-  
+
       setAttendanceStatus((prev) => ({
         ...prev,
         [item._id]: status,
       }));
-  
+
       setStudentAttendance((prev) => {
-        const existingIndex = prev.findIndex((att) => att.studentId === item._id);
+        const existingIndex = prev.findIndex(
+          (att) => att.studentId === item._id
+        );
         if (existingIndex !== -1) {
           const updatedAttendance = [...prev];
           updatedAttendance[existingIndex] = newAttendance;
@@ -84,18 +86,19 @@ const Attendence = () => {
           return [...prev, newAttendance];
         }
       });
-  
+
       console.log(`Student with ID ${item._id} marked as ${status}`);
     } catch (error) {
       console.error("Error decoding token:", error);
     }
   };
-  
 
   const handleSave = async () => {
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/insert-student-attendance-in-bulk`,
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/api/insert-student-attendance-in-bulk`,
         studentAttendance,
         {
           headers: {
@@ -107,7 +110,13 @@ const Attendence = () => {
       console.log("Attendance marked/saved successfully:", response.data);
     } catch (error) {
       console.error("Error saving data:", error);
-      toast.error("Error saving data!"); // Error toast
+      if (
+        error.response.status === 401 &&
+        error.response.data.AttendenceErr === true
+      ) {
+        return toast.error(error.response.data.message); // Error toast
+      }
+      toast.error("Error saving data!");
     }
   };
 

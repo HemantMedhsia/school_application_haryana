@@ -175,6 +175,7 @@ export const createMultipleStudentAttendenceInBulk = wrapAsync(
 
                 if (existingAttendance) {
                     return res.status(400).json({
+                        AttendenceErr: true,
                         message: `Attendance for student ${attendance.studentId} on date ${attendance.date} already exists.`,
                     });
                 }
