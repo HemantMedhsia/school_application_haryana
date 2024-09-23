@@ -168,9 +168,16 @@ export const createMultipleStudentAttendenceInBulk = wrapAsync(
 
         try {
             for (const attendance of attendenceData) {
+                const attendanceDate = new Date(attendance.date);
+                const startOfDay = new Date(attendanceDate.setHours(0, 0, 0, 0));
+                const endOfDay = new Date(attendanceDate.setHours(23, 59, 59, 999));
+
                 const existingAttendance = await StudentAttendance.findOne({
                     studentId: attendance.studentId,
-                    date: attendance.date,
+                    date: {
+                        $gte: startOfDay,
+                        $lt: endOfDay,
+                    },
                 });
 
                 if (existingAttendance) {
@@ -181,9 +188,7 @@ export const createMultipleStudentAttendenceInBulk = wrapAsync(
                 }
             }
 
-            const savedAttendence = await StudentAttendance.insertMany(
-                attendenceData
-            );
+            const savedAttendence = await StudentAttendance.insertMany(attendenceData);
 
             for (const attendance of savedAttendence) {
                 await Student.findByIdAndUpdate(attendance.studentId, {
@@ -196,6 +201,7 @@ export const createMultipleStudentAttendenceInBulk = wrapAsync(
         }
     }
 );
+
 
 export const getAllStudentAttendance = wrapAsync(async (req, res) => {
     const attendanceRecords = await StudentAttendance.find();

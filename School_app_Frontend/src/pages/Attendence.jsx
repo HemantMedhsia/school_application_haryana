@@ -111,7 +111,7 @@ const Attendence = () => {
     } catch (error) {
       console.error("Error saving data:", error);
       if (
-        error.response.status === 401 &&
+        error.response.status === 400 &&
         error.response.data.AttendenceErr === true
       ) {
         return toast.error(error.response.data.message); // Error toast
