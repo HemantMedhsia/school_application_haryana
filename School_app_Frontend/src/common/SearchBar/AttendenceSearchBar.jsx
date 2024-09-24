@@ -3,23 +3,25 @@ import IconInput from "./IconInput";
 import Dropdown from "./Dropdown";
 import Button from "./Button";
 
-const AttendenceSearchBar = ({ onSearch }) => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedClass, setSelectedClass] = useState("All Class");
-  const [selectedSection, setSelectedSection] = useState("Section");
+const AttendenceSearchBar = ({ classItems, sectionItems, onFilter, onSearch }) => {
+  const [searchText, setSearchText] = useState("");
+
+  const handleClassSelect = (selectedClass) => {
+    onFilter({ type: "class", value: selectedClass });
+  };
+
+  const handleSectionSelect = (selectedSection) => {
+    onFilter({ type: "section", value: selectedSection });
+  };
 
   const handleSearch = () => {
-    const filters = {
-      searchTerm,
-      selectedClass,
-      selectedSection,
-    };
-    onSearch(filters); // Pass filters to parent component
+    console.log("Search text:", searchText);
+    onSearch(searchText); // Pass the search text to the parent
   };
 
   return (
-    <div className="flex sm:flex-col md:flex-row flex-wrap justify-between items-center mb-4 px-4 space-y-4 md:space-y-0 md:space-x-4 bg-[#283046] rounded-md shadow-lg hover:shadow-xl transition duration-500 relative z-10">
-      <div className="w-full md:w-auto">
+    <div className="flex flex-col md:flex-row md:flex-wrap justify-between items-center mb-6 sm:p-4 px-4 py-2 space-y-4 md:space-y-0 md:space-x-6 bg-[#283046] rounded-md shadow-lg hover:shadow-xl transition duration-500 relative z-10">
+      <div className="w-full md:flex-1 lg:w-1/2">
         <IconInput
           icon={
             <path
@@ -30,31 +32,20 @@ const AttendenceSearchBar = ({ onSearch }) => {
             />
           }
           placeholder="Article name or keyword..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full my-2"
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)} // Update search text state
         />
       </div>
 
-      <div className="w-full md:w-auto">
-        <Dropdown
-          label="All Class"
-          items={["Class 1", "Class 2", "Class 3"]}
-          onSelect={(item) => setSelectedClass(item)}
-          className="w-full md:w-auto"
-        />
+      <div className="w-full md:w-auto lg:flex-1">
+        <Dropdown label="All Class" items={classItems} onSelect={handleClassSelect} />
       </div>
 
-      <div className="w-full md:w-auto">
-        <Dropdown
-          label="Section"
-          items={["Section A", "Section B", "Section C", "Section D"]}
-          onSelect={(item) => setSelectedSection(item)}
-          className="w-full md:w-auto"
-        />
+      <div className="w-full md:w-auto lg:flex-1">
+        <Dropdown label="Section" items={sectionItems} onSelect={handleSectionSelect} />
       </div>
 
-      <div className="w-full md:w-auto">
+      <div className="w-full md:w-auto flex justify-center lg:justify-start">
         <Button
           icon={
             <path
@@ -65,12 +56,12 @@ const AttendenceSearchBar = ({ onSearch }) => {
             />
           }
           label="Search"
-          onClick={handleSearch}
-          className="w-full md:w-auto"
+          onClick={handleSearch} // Trigger search on button click
         />
       </div>
     </div>
   );
 };
+
 
 export default AttendenceSearchBar;

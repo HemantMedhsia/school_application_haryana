@@ -38,8 +38,61 @@ const columns = [
 
 const Attendence = () => {
   const [studentData, setStudentData] = useState([]);
+  const [filteredStudentData, setFilteredStudentData] = useState([]); // Use this for displaying filtered data
   const [studentAttendance, setStudentAttendance] = useState([]);
   const [attendanceStatus, setAttendanceStatus] = useState({});
+  const [classItems, setClassItems] = useState([]);
+  const [sectionItems, setSectionItems] = useState([]);
+  const [selectedClass, setSelectedClass] = useState(null);
+  const [searchText, setSearchText] = useState("");
+
+  const fetchDropdownData = async () => {
+    try {
+      await getAPI("getAllClasses", {}, setClassItems);
+      await getAPI("getAllSections", {}, setSectionItems);
+    } catch (error) {
+      console.error("Error fetching dropdown data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchDropdownData();
+  }, []);
+
+  const handleFilter = ({ type, value }) => {
+    let filteredData = studentData;
+
+    if (type === "class" && value) {
+      setSelectedClass(value); // Store selected class
+      filteredData = filteredData.filter(
+        (student) => student.currentClass._id === value._id
+      );
+    } else if (type === "section" && value && selectedClass) {
+      // Check if a class is selected
+      filteredData = filteredData.filter(
+        (student) => student.currentSection._id === value._id
+      );
+    }
+
+    if (searchText) {
+      filteredData = filteredData.filter((student) => {
+        const fullName =
+          `${student.firstName} ${student.lastName}`.toLowerCase();
+        return (
+          fullName.includes(searchText.toLowerCase()) ||
+          student.rollNumber.toLowerCase().includes(searchText.toLowerCase())
+        );
+      });
+    }
+
+    setFilteredStudentData(filteredData);
+  };
+
+  // Trigger filter whenever search text changes
+  const handleSearch = (searchText) => {
+    setSearchText(searchText);
+    handleFilter({});
+  };
 
   const handleAttendance = (item, status) => {
     const token = localStorage.getItem("authToken");
@@ -116,15 +169,12 @@ const Attendence = () => {
       const response = await getAPI("getAllStudents", params, setStudentData);
       if (response) {
         setStudentData(response.data);
+        setFilteredStudentData(response.data); // Set filtered data initially
       }
     } catch (error) {
       console.error("Error fetching data:", error);
       toast.error("Error fetching student data!");
     }
-  };
-
-  const handleSearch = (filters) => {
-    fetchData(filters);
   };
 
   useEffect(() => {
@@ -136,13 +186,12 @@ const Attendence = () => {
       <AttendenceSearchBar
         classItems={classItems}
         sectionItems={sectionItems}
-        sessionItems={sessionItems}
         onFilter={handleFilter}
         onSearch={handleSearch}
       />
       <Datatable
         columns={columns}
-        data={studentData}
+        data={filteredStudentData} // Use filtered data here
         actions={{
           onPresent: (item) => handleAttendance(item, "Present"),
           onAbsent: (item) => handleAttendance(item, "Absent"),
