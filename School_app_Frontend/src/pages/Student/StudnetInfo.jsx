@@ -57,11 +57,10 @@ const StudentInfo = () => {
 
               console.log("data", data.data.percentage);
 
-              const attendancePercentage = data?.data?.percentage || 99 // Default to 89 if not available
-
+              const attendancePercentage = data?.data?.percentage || 99;
               return {
                 ...student,
-                attendancePercentage: attendancePercentage, // Ensure percentage is formatted
+                attendancePercentage: attendancePercentage,
                 grade: "A", // Example grade
               };
             } catch (error) {
@@ -174,12 +173,22 @@ const StudentInfo = () => {
           <div className="flex items-center">
             <span className="mr-2">{attendanceValue}%</span>
             <div className="relative w-full">
-              <div className="overflow-hidden h-2 text-xs flex rounded bg-gray-300">
+              <div className="overflow-hidden h-2 text-xs flex rounded bg-gray-700">
                 <div
                   style={{
                     width: `${attendanceValue}%`,
                     backgroundColor:
-                      attendanceValue >= 75 ? "#4caf50" : "#ff5252",
+                      attendanceValue >= 90
+                        ? "#00e676" // Bright green for 90% and above
+                        : attendanceValue >= 80
+                        ? "#66bb6a" // Green for 80% to 89%
+                        : attendanceValue >= 70
+                        ? "#ffeb3b" // Yellow for 70% to 79%
+                        : attendanceValue >= 60
+                        ? "#ffa726" // Orange for 60% to 69%
+                        : attendanceValue >= 50
+                        ? "#ff7043" // Dark orange for 50% to 59%
+                        : "#f44336", // Red for below 50%
                   }}
                   className="h-2 shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center"
                 />

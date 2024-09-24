@@ -10,30 +10,43 @@ const columns = [
   { header: "First Name", accessor: "firstName" },
   { header: "Last Name", accessor: "lastName" },
   { header: "Roll Number", accessor: "rollNumber" },
+  { header: "Total Classes", accessor: "total" },
+  { header: "Total Present", accessor: "present" },
+  { header: "Total Absent", accessor: "absent" },
   {
     header: "Attendance Percentage",
-    accessor: "attendancePercentage",
-    render: (value) => {
-      const attendanceValue = parseFloat(value);
+    accessor: "attendancePercentage", // Corrected the field name
+    render: (rowData) => {
+      const attendanceValue = parseFloat(rowData.attendancePercentage); // Using the correct field
       return (
         <div className="flex items-center">
           <span className="mr-2">{attendanceValue}%</span>
           <div className="relative w-full">
-            <div className="overflow-hidden h-2 text-xs flex rounded bg-gray-600">
+            <div className="overflow-hidden h-2 text-xs flex rounded bg-gray-700">
               <div
                 style={{
                   width: `${attendanceValue}%`,
-                  backgroundColor: "#4caf50",
+                  backgroundColor:
+                    attendanceValue >= 90
+                      ? "#00e676" // Bright green for 90% and above
+                      : attendanceValue >= 80
+                      ? "#66bb6a" // Green for 80% to 89%
+                      : attendanceValue >= 70
+                      ? "#ffeb3b" // Yellow for 70% to 79%
+                      : attendanceValue >= 60
+                      ? "#ffa726" // Orange for 60% to 69%
+                      : attendanceValue >= 50
+                      ? "#ff7043" // Dark orange for 50% to 59%
+                      : "#f44336", // Red for below 50%
                 }}
-                className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center"
-              ></div>
+                className="h-2 shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center"
+              />
             </div>
           </div>
         </div>
       );
     },
   },
-  { header: "Age", accessor: "age" },
 ];
 
 const Attendence = () => {
@@ -148,6 +161,7 @@ const Attendence = () => {
         }
       );
       toast.success("Data saved successfully!");
+      fetchData();
       console.log("Attendance marked/saved successfully:", response.data);
     } catch (error) {
       console.error("Error saving data:", error);
@@ -167,9 +181,58 @@ const Attendence = () => {
         ...filters,
       };
       const response = await getAPI("getAllStudents", params, setStudentData);
-      if (response) {
-        setStudentData(response.data);
-        setFilteredStudentData(response.data); // Set filtered data initially
+      // if (response) {
+      //   setStudentData(response.data);
+      //   setFilteredStudentData(response.data); // Set filtered data initially
+      // }
+
+      if (response.data && Array.isArray(response.data)) {
+        console.log("Fetching student attendance summaries...");
+
+        // Use Promise.all to handle the asynchronous calls inside map
+        const updatedResponse = await Promise.all(
+          response.data.map(async (student) => {
+            try {
+              const { data } = await axios.get(
+                `${
+                  import.meta.env.VITE_BACKEND_URL
+                }/api/get-student-attendance-summary/${student._id}`
+              );
+
+              console.log("data", data.data.percentage);
+
+              const attendancePercentage = data?.data?.percentage || 99;
+              const present = data?.data?.present || 0;
+              const absent = data?.data?.absent || 0;
+              const total = data?.data?.total || 0;
+              return {
+                ...student,
+                attendancePercentage: attendancePercentage,
+                present: present,
+                absent: absent,
+                total: total,
+                grade: "A", // Example grade
+              };
+            } catch (error) {
+              console.error(
+                `Error fetching attendance for student ${student._id}:`,
+                error
+              );
+              return {
+                ...student,
+                attendancePercentage: 89, // Default in case of error
+                grade: "A", // Example grade
+              };
+            }
+          })
+        );
+
+        console.log(
+          "Updated student data with attendance percentage:",
+          updatedResponse
+        );
+        setStudentData(updatedResponse);
+        setFilteredStudentData(updatedResponse);
       }
     } catch (error) {
       console.error("Error fetching data:", error);
