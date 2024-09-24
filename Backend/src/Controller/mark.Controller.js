@@ -240,7 +240,7 @@ export const getMarksByClassAndExamType = wrapAsync(async (req, res) => {
     res.status(200).json(new ApiResponse(200, marks));
 });
 
-const getMarksByAllIds = wrapAsync(async (req, res) => {
+export const getMarksByAllIds = wrapAsync(async (req, res) => {
     const { termId, classId, examTypeId, subjectId } = req.body;
     const marks = await Marks.find({
         term: termId,
