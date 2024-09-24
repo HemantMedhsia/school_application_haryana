@@ -23,7 +23,6 @@ const AddMarks = () => {
   const [selectedSubjectId, setSelectedSubjectId] = useState("");
 
   const handleClassChange = (selectedClassId) => {
-    setSelectedClassId(selectedClassId);
     const selectedClass = classes.find((cls) => cls._id === selectedClassId);
     setSelectedClassId(selectedClass._id);
 
@@ -58,8 +57,10 @@ const AddMarks = () => {
       placeholder: "Select Term",
       required: true,
       type: "select",
-      options: terms.map((term) => ({ label: term.name, value: term._id })),
-      onChange: (value) => setSelectedTermId(value),
+      options: (terms || []).map((term) => ({
+        label: term?.name || "Unknown",
+        value: term?._id || "",
+      })),
     },
     {
       name: "examType",
@@ -78,7 +79,10 @@ const AddMarks = () => {
       placeholder: "Select Class",
       required: true,
       type: "select",
-      options: classes.map((classItem) => ({ label: classItem.name, value: classItem._id })),
+      options: (classes || []).map((classItem) => ({
+        label: classItem?.name || "Unknown",
+        value: classItem?._id || "",
+      })),
       onChange: handleClassChange,
     },
     {
@@ -87,7 +91,10 @@ const AddMarks = () => {
       placeholder: "Select Subject Group",
       required: true,
       type: "select",
-      options: subjectGroups.map((group) => ({ label: group.name, value: group._id })),
+      options: (subjectGroups || []).map((group) => ({
+        label: group?.name || "Unknown",
+        value: group?._id || "",
+      })),
       onChange: handleSubjectGroupChange,
     },
     {
@@ -150,21 +157,27 @@ const AddMarks = () => {
     const subjectsData = subjects.find((sub) => sub._id === subject);
 
     await fetchStudentData(classId, examType);
-
-    const refinedStudents = studentsData.map((student) => ({
-      name: student.name,
-      id: student.id,
-      rollNo: student.rollNumber,
-      subject: subjectsData?.name,
-      maxMarks,
-      obtainedMarks: "",
-    }));
-
-    setFilteredStudents(refinedStudents);
-    setShowTable(true);
   };
 
+  useEffect(() => {
+    if (studentsData.length > 0) {
+      const refinedStudents = studentsData.map((student) => ({
+        name: student.name,
+        id: student.id,
+        rollNo: student.rollNumber,
+        subject: subjects.find((sub) => sub._id === selectedSubjectId)?.name,
+        maxMarks,
+        obtainedMarks: "",
+      }));
+
+      setFilteredStudents(refinedStudents);
+      setShowTable(true);
+    }
+  }, [studentsData, maxMarks, subjects, selectedSubjectId]);
+
   const handleInputChange = (e, rowIndex, columnAccessor) => {
+    if(columnAccessor ==="maxMarks") return;
+
     const updatedStudents = [...filteredStudents];
     updatedStudents[rowIndex][columnAccessor] = e.target.value;
     setFilteredStudents(updatedStudents);
@@ -228,7 +241,9 @@ const AddMarks = () => {
       {showTable && (
         <div>
           <div className="mb-4">
-            <h2 className="text-[#7367F0] font-semibold mt-4 text-xl">Student Marks Table</h2>
+            <h2 className="text-[#7367F0] font-semibold mt-4 text-xl">
+              Student Marks Table
+            </h2>
           </div>
 
           <DynamicTable

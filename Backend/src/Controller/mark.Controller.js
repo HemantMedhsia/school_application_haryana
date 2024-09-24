@@ -36,11 +36,60 @@ export const addMarks = wrapAsync(async (req, res) => {
     );
 });
 
+// export const addMultipleStudentMarks = wrapAsync(async (req, res) => {
+//     const { termId, classId, examTypeId, subjectId, studentMarksArray } =
+//         req.body;
+//     const teacherId = req.user?._id;
+//     console.log(subjectId);
+//     const marksData = studentMarksArray.map(({ studentId, marksObtained }) => ({
+//         student: studentId,
+//         term: termId,
+//         class: classId,
+//         marks: [
+//             {
+//                 subject: subjectId,
+//                 teacher: teacherId,
+//                 exams: [
+//                     {
+//                         examType: examTypeId,
+//                         marksObtained: marksObtained || 0,
+//                     },
+//                 ],
+//             },
+//         ],
+//     }));
+
+//     const result = await Marks.insertMany(marksData);
+
+//     res.status(201).json(
+//         new ApiResponse(201, result, "Marks Added Successfully")
+//     );
+// });
+
 export const addMultipleStudentMarks = wrapAsync(async (req, res) => {
     const { termId, classId, examTypeId, subjectId, studentMarksArray } =
         req.body;
     const teacherId = req.user?._id;
-    console.log(subjectId);
+
+    const existingClassMarks = await Marks.findOne({
+        term: termId,
+        class: classId,
+        "marks.subject": subjectId,
+        "marks.exams.examType": examTypeId,
+    });
+
+    if (existingClassMarks) {
+        return res
+            .status(400)
+            .json(
+                new ApiResponse(
+                    400,
+                    null,
+                    `Marks for subject ${subjectId} have already been entered for the class.`
+                )
+            );
+    }
+
     const marksData = studentMarksArray.map(({ studentId, marksObtained }) => ({
         student: studentId,
         term: termId,
