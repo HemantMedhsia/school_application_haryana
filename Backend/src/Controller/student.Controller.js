@@ -242,7 +242,8 @@ export const deleteStudent = wrapAsync(async (req, res) => {
             message: "Student not found",
         });
     }
-    const parent = await Parent.findOneAndDelete({ studentId: req.params.id });
+    const parent = await Parent.findOneAndDelete({ studentId: req.params.id }); // this is checking if the parent has a student with the id Parent
+    console.log("Parent", parent); 
     if (!parent) {
         return res.status(404).json({
             success: false,

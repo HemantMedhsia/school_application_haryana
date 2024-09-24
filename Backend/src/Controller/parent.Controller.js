@@ -162,7 +162,7 @@ export const getParents = wrapAsync(async (req, res) => {
     const parents = await Parent.find();
     return res.status(200).json(new ApiResponse(200, parents));
 });
-
+ 
 export const getParent = wrapAsync(async (req, res) => {
     const { id } = req.params;
     const parent = await Parent.findById(id).select("-password");
