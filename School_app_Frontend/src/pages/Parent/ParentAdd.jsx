@@ -9,8 +9,8 @@ import "react-toastify/dist/ReactToastify.css";
 import FormButton from "../../components/Form/FormButton";
 
 const ParentAdd = () => {
-  const { studentId, parentId ,Id} = useParams();
-  console.log(studentId, parentId);
+  const { studentId, parentId, Id } = useParams();
+  console.log("1", studentId, "2", parentId, Id);
 
   const [formData, setFormData] = useState({
     fatherName: "",
@@ -31,6 +31,7 @@ const ParentAdd = () => {
     guardianAddress: "",
     password: "",
   });
+  const [existingParentId, setExistingParentId] = useState(null);
 
   const fetchParentDataByParentId = async () => {
     try {
@@ -63,7 +64,11 @@ const ParentAdd = () => {
     try {
       const response = await axios.get(url);
       const parentData = response.data.data;
-      console.log(parentData);
+
+      if (parentData._id) {
+        setExistingParentId(parentData._id);
+      }
+
       setFormData({
         fatherName: parentData.fatherName || "",
         fatherPhone: parentData.fatherPhone || "",
@@ -102,11 +107,21 @@ const ParentAdd = () => {
     e.preventDefault();
 
     try {
-      const url = parentId
-        ? `${import.meta.env.VITE_BACKEND_URL}/api/update-parent/${parentId}`
-        : `${import.meta.env.VITE_BACKEND_URL}/api/create-parent/${Id}`;
+      let url, method;
 
-      const method = parentId ? "put" : "post";
+      if (existingParentId || parentId) {
+        // If parentId exists (edit mode) or we found an existing parent by studentId, update the parent
+        url = `${import.meta.env.VITE_BACKEND_URL}/api/update-parent/${
+          parentId || existingParentId
+        }`;
+        method = "put";
+      } else {
+        // If no parentId exists, create a new parent
+        url = `${
+          import.meta.env.VITE_BACKEND_URL
+        }/api/create-parent/${Id}`;
+        method = "post";
+      }
 
       const response = await axios({
         method: method,
@@ -117,15 +132,13 @@ const ParentAdd = () => {
         },
       });
 
-      const successMessage = parentId
-        ? "Parent updated successfully!"
-        : "Parent added successfully!";
+      const successMessage =
+        parentId || existingParentId
+          ? "Parent updated successfully!"
+          : "Parent added successfully!";
       toast.success(successMessage);
 
-      // if (successMessage === "Parent updated successfully!") {
-      //   window.location.href = "/school/parent-information";
-      // }
-
+      // Clear form data after submission
       setFormData({
         fatherName: "",
         fatherPhone: "",
@@ -143,9 +156,10 @@ const ParentAdd = () => {
         password: "",
       });
     } catch (error) {
-      const errorMessage = parentId
-        ? "Error updating parent: "
-        : "Error adding parent: ";
+      const errorMessage =
+        parentId || existingParentId
+          ? "Error updating parent: "
+          : "Error adding parent: ";
       toast.error(errorMessage + error.response.data.message);
       console.error(errorMessage, error.response.data);
     }
@@ -157,7 +171,7 @@ const ParentAdd = () => {
       onSubmit={handleSubmit}
     >
       <h2 className="text-2xl font-bold mb-6 text-[#7367F0]">
-        {parentId ? "Edit Parent" : "Add Parent"}
+        {parentId || existingParentId ? "Edit Parent" : "Add Parent"}
       </h2>
 
       {/* Personal Details Section */}
@@ -263,6 +277,7 @@ const ParentAdd = () => {
           onChange={handleChange}
           placeholder="Enter Email"
         />
+        { Id ?
         <Input
           labelName="Password"
           type="password"
@@ -271,10 +286,12 @@ const ParentAdd = () => {
           onChange={handleChange}
           placeholder="Enter Password"
         />
+        : null
+        }
       </FormSection>
 
       {/* Submit Button */}
-      {parentId ? (
+      {parentId || existingParentId ? (
         <FormButton name="Edit Parent" />
       ) : (
         <FormButton name="Add Parent" />
