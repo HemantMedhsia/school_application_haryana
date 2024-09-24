@@ -14,8 +14,8 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-const TopNavbar = ({ isCollapsed }) => {
-  const {  logout, name, userRole } = useAuth();
+const TopNavbar =  ({ isCollapsed }) => {
+  const {  logout, name, userRole } =  useAuth();
 
   return (
     <Disclosure
@@ -93,7 +93,7 @@ const TopNavbar = ({ isCollapsed }) => {
             <div className="absolute w-full inset-y-0 right-0 flex justify-end items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
               <div className="flex flex-col justify-end items-center mx-1">
                 <div className="w-full text-sm text-gray-400">
-                  {name ? name.name : "You login as Guest"}
+                  {name && name.name ? name.name : "You login as Guest"}
                 </div>
                 <div className="text-right w-full text-xs font-semibold text-[#65FA9E]">
                   {userRole ? userRole : "Guest"}

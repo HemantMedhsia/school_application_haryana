@@ -85,7 +85,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const login = (authToken, refreshToken, user) => {
+  const login = async (authToken, refreshToken, user) => {
     setAuthToken(authToken);
     setRefreshToken(refreshToken);
     setname(user);
