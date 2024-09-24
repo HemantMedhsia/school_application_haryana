@@ -2,6 +2,7 @@ import React from "react";
 import FormButton from "../Form/FormButton";
 
 const ProfileHeader = ({ userData }) => {
+  console.log("userData", userData.studentPhoto);
   const displayName = userData.name
     ? userData.name
     : userData.fatherName
