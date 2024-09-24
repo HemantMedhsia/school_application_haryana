@@ -260,3 +260,19 @@ const getMarksByAllIds = wrapAsync(async (req, res) => {
 
     res.status(200).json(new ApiResponse(200, marks));
 });
+
+export const getExistingMarks = wrapAsync(async (req, res) => {
+    const { termId, classId, examTypeId, subjectId } = req.params;
+    const marks = await Marks.findOne({
+        term: termId,
+        class: classId,
+        "marks.exams.examType": examTypeId,
+        "marks.subject": subjectId,
+    }).populate("marks.subject").populate("student");
+
+    if (!marks) {
+        throw new ApiError(404, "Marks not found");
+    }
+
+    res.status(200).json(new ApiResponse(200, marks));
+});

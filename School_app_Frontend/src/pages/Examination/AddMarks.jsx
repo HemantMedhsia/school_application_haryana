@@ -123,12 +123,11 @@ const AddMarks = () => {
         axios.get(
           `${import.meta.env.VITE_BACKEND_URL}/api/max-marks/${examType}`
         ),
+
       ]);
 
       setStudentsData(studentsResponse.data.data);
-      console.log("Students Data:", studentsResponse.data.data);
       setMaxMarks(maxMarksResponse.data.data.maxMark);
-      console.log("Max Marks:", maxMarks);
     } catch (error) {
       console.error("Error fetching student data or max marks", error);
     }
@@ -176,10 +175,19 @@ const AddMarks = () => {
   }, [studentsData, maxMarks, subjects, selectedSubjectId]);
 
   const handleInputChange = (e, rowIndex, columnAccessor) => {
-    if(columnAccessor ==="maxMarks") return;
+    if (columnAccessor === "maxMarks") return;
 
     const updatedStudents = [...filteredStudents];
-    updatedStudents[rowIndex][columnAccessor] = e.target.value;
+    const obtainedMarks = e.target.value;
+
+    if (Number(obtainedMarks) > Number(updatedStudents[rowIndex].maxMarks)) {
+      toast.error(
+        `Obtained marks cannot be greater than max marks (${updatedStudents[rowIndex].maxMarks}).`
+      );
+      return;
+    }
+
+    updatedStudents[rowIndex][columnAccessor] = obtainedMarks;
     setFilteredStudents(updatedStudents);
   };
 
@@ -226,7 +234,10 @@ const AddMarks = () => {
       })
       .catch((error) => {
         console.error("Error saving marks:", error);
-        toast.error("Error saving marks, please try again.");
+        const errorMessage =
+          error.response?.data?.message ||
+          "An error occurred while saving marks.";
+        toast.error(errorMessage);
       });
   };
 
