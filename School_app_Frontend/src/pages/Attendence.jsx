@@ -4,21 +4,12 @@ import Datatable from "../common/Datatables/Datatable";
 import { getAPI } from "../utility/api/apiCall";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify"; // Import toast
+import { ToastContainer, toast } from "react-toastify";
 
 const columns = [
-  {
-    header: "First Name",
-    accessor: "firstName",
-  },
-  {
-    header: "Last Name",
-    accessor: "lastName",
-  },
-  {
-    header: "Roll Number",
-    accessor: "rollNumber",
-  },
+  { header: "First Name", accessor: "firstName" },
+  { header: "Last Name", accessor: "lastName" },
+  { header: "Roll Number", accessor: "rollNumber" },
   {
     header: "Attendance Percentage",
     accessor: "attendancePercentage",
@@ -42,10 +33,7 @@ const columns = [
       );
     },
   },
-  {
-    header: "Age",
-    accessor: "age",
-  },
+  { header: "Age", accessor: "age" },
 ];
 
 const Attendence = () => {
@@ -106,7 +94,7 @@ const Attendence = () => {
           },
         }
       );
-      toast.success("Data saved successfully!"); // Success toast
+      toast.success("Data saved successfully!"); 
       console.log("Attendance marked/saved successfully:", response.data);
     } catch (error) {
       console.error("Error saving data:", error);
@@ -114,22 +102,29 @@ const Attendence = () => {
         error.response.status === 400 &&
         error.response.data.AttendenceErr === true
       ) {
-        return toast.error(error.response.data.message); // Error toast
+        return toast.error(error.response.data.message); 
       }
       toast.error("Error saving data!");
     }
   };
 
-  const fetchData = async () => {
+  const fetchData = async (filters = {}) => {
     try {
-      const response = await getAPI("getAllStudents", {}, setStudentData);
+      const params = {
+        ...filters,
+      };
+      const response = await getAPI("getAllStudents", params, setStudentData);
       if (response) {
         setStudentData(response.data);
       }
     } catch (error) {
       console.error("Error fetching data:", error);
-      toast.error("Error fetching student data!"); // Error toast
+      toast.error("Error fetching student data!");
     }
+  };
+
+  const handleSearch = (filters) => {
+    fetchData(filters);
   };
 
   useEffect(() => {
@@ -138,7 +133,7 @@ const Attendence = () => {
 
   return (
     <div>
-      <AttendenceSearchBar />
+      <AttendenceSearchBar onSearch={handleSearch} />
       <Datatable
         columns={columns}
         data={studentData}
@@ -156,7 +151,7 @@ const Attendence = () => {
           Save
         </button>
       </div>
-      <ToastContainer /> {/* Toast container to display notifications */}
+      <ToastContainer />
     </div>
   );
 };

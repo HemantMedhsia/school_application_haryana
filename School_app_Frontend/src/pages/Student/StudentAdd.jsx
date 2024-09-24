@@ -69,13 +69,15 @@ const StudentAdd = () => {
 
     const fetchData = async () => {
       try {
+        // Fetch sessions, classes, and sections data
         const [sessionsResponse, classesResponse, sectionsResponse] =
           await Promise.all([
             getAPI("getAllSessions", {}, setSessions),
             getAPI("getAllClasses", {}, setClasses),
             getAPI("getAllSections", {}, setSections),
           ]);
-
+  
+        // Set sessions, classes, and sections data
         setSessions(
           Array.isArray(sessionsResponse.data) ? sessionsResponse.data : []
         );
@@ -85,6 +87,8 @@ const StudentAdd = () => {
         setSections(
           Array.isArray(sectionsResponse.data) ? sectionsResponse.data : []
         );
+  
+        // If editing a student, fetch the student data
         if (studentId) {
           const studentResponse = await axios.get(
             `${import.meta.env.VITE_BACKEND_URL}/api/get-student/${studentId}`,
@@ -94,12 +98,17 @@ const StudentAdd = () => {
               },
             }
           );
-          console.log("Student data:", studentResponse.data.data);
+  
           const studentData = studentResponse.data.data;
+  
+          // Update formData with student information
           setFormData({
             ...studentData,
             admissionDate: studentData.admissionDate.split("T")[0],
             dateOfBirth: studentData.dateOfBirth.split("T")[0],
+            currentSession: studentData.currentSession?._id || "",  // Populate current session
+            currentClass: studentData.currentClass?._id || "",      // Populate current class
+            currentSection: studentData.currentSection?._id || "",  // Populate current section
           });
         }
       } catch (error) {
