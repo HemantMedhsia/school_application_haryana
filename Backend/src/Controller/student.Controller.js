@@ -196,7 +196,6 @@ export const getStudents = wrapAsync(async (req, res) => {
         })
         .populate("studentHistory")
         .lean();
-
     return res.status(200).json(new ApiResponse(200, students));
 });
 
