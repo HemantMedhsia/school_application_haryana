@@ -165,7 +165,7 @@ export const getParents = wrapAsync(async (req, res) => {
 
 export const getParent = wrapAsync(async (req, res) => {
     const { id } = req.params;
-    const parent = await Parent.findById(id);
+    const parent = await Parent.findById(id).select("-password");
     if (!parent) {
         return res
             .status(404)

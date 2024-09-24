@@ -185,9 +185,18 @@ export const refreshAccessTokenStudent = wrapAsync(async (req, res, next) => {
 });
 
 export const getStudents = wrapAsync(async (req, res) => {
-    const students = await Student.find().populate(
-        "currentClass currentSection currentSession parent studentHistory"
-    );
+    const students = await Student.find()
+        .populate("currentClass")
+        .populate("currentSection")
+        .populate("currentSession")
+        .populate("parent")
+        .populate({
+            path: "StudentAttendance",
+            model: "StudentAttendance",
+        })
+        .populate("studentHistory")
+        .lean();
+
     return res.status(200).json(new ApiResponse(200, students));
 });
 

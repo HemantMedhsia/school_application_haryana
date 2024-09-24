@@ -94,6 +94,7 @@ parentSchema.pre("save", async function (next) {
     }
 });
 
+
 // Method to validate the password
 parentSchema.methods.isValidPassword = async function (password) {
     try {

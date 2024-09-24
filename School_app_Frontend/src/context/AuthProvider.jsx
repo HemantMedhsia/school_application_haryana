@@ -24,7 +24,6 @@ const getRefreshEndpoint = (role) => {
 
 export const AuthProvider = ({ children }) => {
   const [name, setname] = useState();
-  //  const navigate = useNavigate();
   const [authToken, setAuthToken] = useState(() =>
     localStorage.getItem("authToken")
   );
@@ -36,21 +35,29 @@ export const AuthProvider = ({ children }) => {
     return token ? jwtDecode(token).role : null;
   });
   const [loading, setLoading] = useState(true);
+  const [isLoggingOut, setIsLoggingOut] = useState(false); // New state to track logout
 
   useEffect(() => {
+    let isTokenRefreshed = false;
+
     const handleTokenRefresh = async () => {
       if (authToken) {
         const decodedToken = jwtDecode(authToken);
         const currentTime = Date.now() / 1000;
 
         // Refresh the token if it's about to expire in the next 1 minute
-        if (decodedToken.exp < currentTime + 60 && refreshToken) {
+        if (
+          decodedToken.exp < currentTime + 60 &&
+          refreshToken &&
+          !isTokenRefreshed
+        ) {
+          isTokenRefreshed = true;
           await refreshAuthToken(refreshToken, decodedToken.role);
-          console.log("1234", decodedToken.role);
         }
       }
       setLoading(false);
     };
+
     handleTokenRefresh();
   }, [authToken, refreshToken]);
 
@@ -70,8 +77,11 @@ export const AuthProvider = ({ children }) => {
       setUserRole(decodedToken.role);
       localStorage.setItem("authToken", newAuthToken);
     } catch (error) {
-      toast.error("Failed to refresh token. Please login again.");
-      logout();
+      if (!isLoggingOut) {
+        setIsLoggingOut(true);
+        toast.error("Failed to refresh token. Please login again.");
+        logout(false); // Pass `false` to avoid double toast
+      }
     }
   };
 
@@ -87,32 +97,37 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem("refreshToken", refreshToken);
   };
 
-  const logout = () => {
+  const logout = (showToast = true) => {
     setAuthToken(null);
     setRefreshToken(null);
     setUserRole(null);
     localStorage.removeItem("authToken");
     localStorage.removeItem("refreshToken");
-    toast.success("Logged out successfully!");
-    // navigate("/");
+
+    if (showToast) {
+      toast.success("Logged out successfully!");
+    }
+
+    setIsLoggingOut(false);
+    // navigate("/"); // Uncomment if you want to navigate after logout
   };
 
   return (
     <div>
-      <ToastContainer/>
+      <ToastContainer />
       <AuthContext.Provider
-      value={{
-        authToken,
-        refreshToken,
-        userRole,
-        name,
-        login,
-        logout,
-        loading,
-      }}
-    >
-      {!loading ? children : <PyramidLoader desc={""} />}
-    </AuthContext.Provider>
+        value={{
+          authToken,
+          refreshToken,
+          userRole,
+          name,
+          login,
+          logout,
+          loading,
+        }}
+      >
+        {!loading ? children : <PyramidLoader desc={""} />}
+      </AuthContext.Provider>
     </div>
   );
 };

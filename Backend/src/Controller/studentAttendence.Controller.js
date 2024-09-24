@@ -42,9 +42,9 @@ export const createStudentAttendence = wrapAsync(async (req, res) => {
 });
 
 export const getStudentAttendance = wrapAsync(async (req, res) => {
-    
-
-    const attendanceRecords = await StudentAttendance.find({ studentId : req.params.studentId });
+    const attendanceRecords = await StudentAttendance.find({
+        studentId: req.params.studentId,
+    });
 
     if (!attendanceRecords || attendanceRecords.length === 0) {
         return res
@@ -167,15 +167,41 @@ export const createMultipleStudentAttendenceInBulk = wrapAsync(
         }
 
         try {
-            const savedAttendence = await StudentAttendance.insertMany(
-                attendenceData
-            );
+            for (const attendance of attendenceData) {
+                const attendanceDate = new Date(attendance.date);
+                const startOfDay = new Date(attendanceDate.setHours(0, 0, 0, 0));
+                const endOfDay = new Date(attendanceDate.setHours(23, 59, 59, 999));
+
+                const existingAttendance = await StudentAttendance.findOne({
+                    studentId: attendance.studentId,
+                    date: {
+                        $gte: startOfDay,
+                        $lt: endOfDay,
+                    },
+                });
+
+                if (existingAttendance) {
+                    return res.status(400).json({
+                        AttendenceErr: true,
+                        message: `Attendance for student ${attendance.studentId} on date ${attendance.date} already exists.`,
+                    });
+                }
+            }
+
+            const savedAttendence = await StudentAttendance.insertMany(attendenceData);
+
+            for (const attendance of savedAttendence) {
+                await Student.findByIdAndUpdate(attendance.studentId, {
+                    $push: { StudentAttendance: attendance._id },
+                });
+            }
             res.status(201).json({ success: true, data: savedAttendence });
         } catch (error) {
             res.status(400).json({ message: error.message });
         }
     }
 );
+
 
 export const getAllStudentAttendance = wrapAsync(async (req, res) => {
     const attendanceRecords = await StudentAttendance.find();
