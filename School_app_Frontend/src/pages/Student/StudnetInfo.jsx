@@ -56,7 +56,7 @@ const StudentInfo = () => {
 
               console.log("data", data.data.percentage);
 
-              const attendancePercentage = data?.data?.percentage || 99cd  // Default to 89 if not available
+              const attendancePercentage = data?.data?.percentage || 99  // Default to 89 if not available
 
               return {
                 ...student,
