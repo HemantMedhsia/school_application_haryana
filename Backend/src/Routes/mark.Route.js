@@ -6,6 +6,7 @@ import {
     getAllMarks,
     getExistingMarks,
     getMarkById,
+    getMarksByAllIds,
     getMarksByClass,
     getMarksByClassAndExamType,
     getMarksByStudent,
@@ -33,7 +34,8 @@ router.get(
 router.get(
     "/getexisting/:termId/:classId/:examTypeId/:subjectId",
     getExistingMarks
-);  
+);
 
+router.get("/get-allid", getMarksByAllIds);
 
 export { router as markRoute };
