@@ -36,6 +36,6 @@ router.get(
     getExistingMarks
 );
 
-router.get("/get-allid", getMarksByAllIds);
+router.get("/get-allid/:termId/:classId/:examTypeId/:subjectId", getMarksByAllIds);
 
 export { router as markRoute };

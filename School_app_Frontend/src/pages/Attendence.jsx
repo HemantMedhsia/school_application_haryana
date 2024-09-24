@@ -94,7 +94,7 @@ const Attendence = () => {
           },
         }
       );
-      toast.success("Data saved successfully!"); 
+      toast.success("Data saved successfully!");
       console.log("Attendance marked/saved successfully:", response.data);
     } catch (error) {
       console.error("Error saving data:", error);
@@ -102,7 +102,7 @@ const Attendence = () => {
         error.response.status === 400 &&
         error.response.data.AttendenceErr === true
       ) {
-        return toast.error(error.response.data.message); 
+        return toast.error(error.response.data.message);
       }
       toast.error("Error saving data!");
     }
@@ -133,7 +133,13 @@ const Attendence = () => {
 
   return (
     <div>
-      <AttendenceSearchBar onSearch={handleSearch} />
+      <AttendenceSearchBar
+        classItems={classItems}
+        sectionItems={sectionItems}
+        sessionItems={sessionItems}
+        onFilter={handleFilter}
+        onSearch={handleSearch}
+      />
       <Datatable
         columns={columns}
         data={studentData}
