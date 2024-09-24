@@ -167,26 +167,26 @@ export const createMultipleStudentAttendenceInBulk = wrapAsync(
         }
 
         try {
-            for (const attendance of attendenceData) {
-                const attendanceDate = new Date(attendance.date);
-                const startOfDay = new Date(attendanceDate.setHours(0, 0, 0, 0));
-                const endOfDay = new Date(attendanceDate.setHours(23, 59, 59, 999));
+            // for (const attendance of attendenceData) {
+            //     const attendanceDate = new Date(attendance.date);
+            //     const startOfDay = new Date(attendanceDate.setHours(0, 0, 0, 0));
+            //     const endOfDay = new Date(attendanceDate.setHours(23, 59, 59, 999));
 
-                const existingAttendance = await StudentAttendance.findOne({
-                    studentId: attendance.studentId,
-                    date: {
-                        $gte: startOfDay,
-                        $lt: endOfDay,
-                    },
-                });
+            //     const existingAttendance = await StudentAttendance.findOne({
+            //         studentId: attendance.studentId,
+            //         date: {
+            //             $gte: startOfDay,
+            //             $lt: endOfDay,
+            //         },
+            //     });
 
-                if (existingAttendance) {
-                    return res.status(400).json({
-                        AttendenceErr: true,
-                        message: `Attendance for student ${attendance.studentId} on date ${attendance.date} already exists.`,
-                    });
-                }
-            }
+            //     if (existingAttendance) {
+            //         return res.status(400).json({
+            //             AttendenceErr: true,
+            //             message: `Attendance for student ${attendance.studentId} on date ${attendance.date} already exists.`,
+            //         });
+            //     }
+            // }
 
             const savedAttendence = await StudentAttendance.insertMany(attendenceData);
 

@@ -54,11 +54,13 @@ const StudentInfo = () => {
                 }/api/get-student-attendance-summary/${student._id}`
               );
 
-              const attendancePercentage = data?.data?.percentage || 89; // Default to 89 if not available
+              console.log("data", data.data.percentage);
+
+              const attendancePercentage = data?.data?.percentage || 99cd  // Default to 89 if not available
 
               return {
                 ...student,
-                attendancePercentage: attendancePercentage.toFixed(2), // Ensure percentage is formatted
+                attendancePercentage: attendancePercentage, // Ensure percentage is formatted
                 grade: "A", // Example grade
               };
             } catch (error) {
