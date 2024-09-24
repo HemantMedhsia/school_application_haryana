@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import IconInput from "./IconInput";
 import Dropdown from "./Dropdown";
 import Button from "./Button";
 
-const SearchBar = ({ classItems, sectionItems, sessionItems, onFilter }) => {
+const SearchBar = ({ classItems, sectionItems, sessionItems, onFilter, onSearch }) => {
+  const [searchText, setSearchText] = useState("");
+
   const handleClassSelect = (selectedClass) => {
     onFilter({ type: "class", value: selectedClass });
   };
@@ -14,6 +16,11 @@ const SearchBar = ({ classItems, sectionItems, sessionItems, onFilter }) => {
 
   const handleSessionSelect = (selectedSession) => {
     onFilter({ type: "session", value: selectedSession });
+  };
+
+  const handleSearch = () => {
+    console.log("Search text:", searchText);
+    onSearch(searchText); // Pass the search text to the parent
   };
 
   return (
@@ -29,6 +36,8 @@ const SearchBar = ({ classItems, sectionItems, sessionItems, onFilter }) => {
             />
           }
           placeholder="Article name or keyword..."
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)} // Update search text state
         />
       </div>
 
@@ -55,7 +64,7 @@ const SearchBar = ({ classItems, sectionItems, sessionItems, onFilter }) => {
             />
           }
           label="Search"
-          onClick={() => console.log("Search clicked")}
+          onClick={handleSearch} // Trigger search on button click
         />
       </div>
     </div>
