@@ -243,7 +243,7 @@ export const deleteStudent = wrapAsync(async (req, res) => {
         });
     }
     const parent = await Parent.findOneAndDelete({ studentId: req.params.id }); // Delete parent if student is deleted kdjjkdf
-    console.log("Parent", parent); 
+    console.log("Parent", parent);
     if (!parent) {
         return res.status(404).json({
             success: false,
@@ -257,7 +257,10 @@ export const deleteStudent = wrapAsync(async (req, res) => {
 });
 
 export const getStudentByParent = wrapAsync(async (req, res) => {
-    const student = await Student.find({ parent: req.params.parentId });
+    const student = await Student.find({
+        parent: req.params.parentId,
+    }).populate("currentClass");
+    
     if (!student) {
         return res.status(404).json({
             success: false,

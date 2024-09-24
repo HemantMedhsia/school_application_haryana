@@ -5,6 +5,7 @@ import { deleteAPI, getAPI } from "../../utility/api/apiCall";
 import { useNavigate } from "react-router-dom";
 import ConfirmationModal from "../../common/ConfirmationModal/ConfirmationModal";
 import DetailsSelectionModal from "../../common/ConfirmationModal/DetailsSelectionModal";
+import { toast, ToastContainer } from "react-toastify";
 
 const StudentInfo = () => {
   const [allStudentData, setAllStudentData] = useState([]);
@@ -85,7 +86,7 @@ const StudentInfo = () => {
     if (type === "student") {
       navigate(`/school/student-admission/${selectedStudent._id}`);
     } else if (type === "parent") {
-      console.log("selected", selectedStudent._id)
+      console.log("selected", selectedStudent._id);
       navigate(`/school/parent-update-student/${selectedStudent._id}`);
     }
   };
@@ -166,9 +167,20 @@ const StudentInfo = () => {
     if (studentToDelete) {
       try {
         await deleteAPI(`delete-student/${studentToDelete._id}`);
-        fetchData();
+
+        setAllStudentData((prevData) =>
+          prevData.filter((student) => student._id !== studentToDelete._id)
+        );
+        setFilteredStudentData((prevData) =>
+          prevData.filter((student) => student._id !== studentToDelete._id)
+        );
+
+        toast.success(
+          `${studentToDelete.firstName} has been deleted successfully`
+        );
       } catch (error) {
         console.error("Error deleting student:", error);
+        toast.error("Failed to delete the student.");
       } finally {
         setIsModalOpen(false);
         setStudentToDelete(null);
@@ -207,6 +219,7 @@ const StudentInfo = () => {
         onClose={closeDetailsModal}
         onSelect={handleDetailsSelect}
       />
+      <ToastContainer />
     </div>
   );
 };
