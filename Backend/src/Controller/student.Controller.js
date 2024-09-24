@@ -196,7 +196,6 @@ export const getStudents = wrapAsync(async (req, res) => {
         })
         .populate("studentHistory")
         .lean();
-
     return res.status(200).json(new ApiResponse(200, students));
 });
 
@@ -243,7 +242,7 @@ export const deleteStudent = wrapAsync(async (req, res) => {
             message: "Student not found",
         });
     }
-    const parent = await Parent.findByIdAndDelete({ studentId: req.params.id });
+    const parent = await Parent.findOneAndDelete({ studentId: req.params.id });
     if (!parent) {
         return res.status(404).json({
             success: false,
