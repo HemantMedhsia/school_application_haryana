@@ -5,14 +5,16 @@ import { deleteAPI, getAPI } from "../../utility/api/apiCall";
 import { useNavigate } from "react-router-dom";
 import ConfirmationModal from "../../common/ConfirmationModal/ConfirmationModal";
 import DetailsSelectionModal from "../../common/ConfirmationModal/DetailsSelectionModal";
+import axios from "axios";
 
 const StudentInfo = () => {
   const [allStudentData, setAllStudentData] = useState([]);
+  const [updatedAllStudentdata, setUpdatedAllStudentdata] = useState([]);
   const [filteredStudentData, setFilteredStudentData] = useState([]);
   const [classItems, setClassItems] = useState([]);
   const [sectionItems, setSectionItems] = useState([]);
   const [sessionItems, setSessionItems] = useState([]);
-  const [selectedClass, setSelectedClass] = useState(null); // New state for selected class
+  const [selectedClass, setSelectedClass] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [studentToDelete, setStudentToDelete] = useState(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
@@ -38,18 +40,57 @@ const StudentInfo = () => {
   const fetchData = async () => {
     try {
       const response = await getAPI("getAllStudents", {}, setAllStudentData);
-      if (response && Array.isArray(response)) {
-        setAllStudentData(response);
-        setFilteredStudentData(response);
+
+      if (response.data && Array.isArray(response.data)) {
+        console.log("Fetching student attendance summaries...");
+
+        // Use Promise.all to handle the asynchronous calls inside map
+        const updatedResponse = await Promise.all(
+          response.data.map(async (student) => {
+            try {
+              const { data } = await axios.get(
+                `${
+                  import.meta.env.VITE_BACKEND_URL
+                }/api/get-student-attendance-summary/${student._id}`
+              );
+
+              const attendancePercentage = data?.data?.percentage || 89; // Default to 89 if not available
+
+              return {
+                ...student,
+                attendancePercentage: attendancePercentage.toFixed(2), // Ensure percentage is formatted
+                grade: "A", // Example grade
+              };
+            } catch (error) {
+              console.error(
+                `Error fetching attendance for student ${student._id}:`,
+                error
+              );
+              return {
+                ...student,
+                attendancePercentage: 89, // Default in case of error
+                grade: "A", // Example grade
+              };
+            }
+          })
+        );
+
+        console.log(
+          "Updated student data with attendance percentage:",
+          updatedResponse
+        );
+        setAllStudentData(updatedResponse);
+        setFilteredStudentData(updatedResponse);
       }
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error fetching student data:", error);
     }
   };
 
   // Handle filter logic
   const handleFilter = ({ type, value }) => {
     let filteredData = allStudentData;
+    console.log("filteredData", filteredData);
 
     if (type === "class" && value) {
       setSelectedClass(value); // Store selected class
@@ -85,7 +126,7 @@ const StudentInfo = () => {
     if (type === "student") {
       navigate(`/school/student-admission/${selectedStudent._id}`);
     } else if (type === "parent") {
-      console.log("selected", selectedStudent._id)
+      console.log("selected", selectedStudent._id);
       navigate(`/school/parent-update-student/${selectedStudent._id}`);
     }
   };
@@ -123,9 +164,9 @@ const StudentInfo = () => {
     },
     {
       header: "Attendance Percentage",
-      accessor: "attendance",
+      accessor: "attendancePercentage", // Corrected the field name
       render: (rowData) => {
-        const attendanceValue = parseFloat(rowData.attendance);
+        const attendanceValue = parseFloat(rowData.attendancePercentage); // Using the correct field
         return (
           <div className="flex items-center">
             <span className="mr-2">{attendanceValue}%</span>
