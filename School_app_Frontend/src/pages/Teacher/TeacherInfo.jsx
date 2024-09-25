@@ -4,49 +4,30 @@ import Datatable from "../../common/Datatables/Datatable";
 import { getAPI, deleteAPI } from "../../utility/api/apiCall";
 import { useNavigate } from "react-router-dom";
 import ConfirmationModal from "../../common/ConfirmationModal/ConfirmationModal";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 
 const columns = [
-  {
-    header: "Name",
-    accessor: "name",
-  },
-  {
-    header: "Age",
-    accessor: "age",
-  },
-  {
-    header: "Gender",
-    accessor: "gender",
-  },
-  {
-    header: "Email",
-    accessor: "email",
-  },
-  {
-    header: "Subject",
-    accessor: "subject",
-  },
-  {
-    header: "Contact",
-    accessor: "contact",
-  },
-  {
-    header: "Address",
-    accessor: "address",
-  },
+  { header: "Name", accessor: "name" },
+  { header: "Age", accessor: "age" },
+  { header: "Gender", accessor: "gender" },
+  { header: "Email", accessor: "email" },
+  { header: "Subject", accessor: "subject" },
+  { header: "Contact", accessor: "contact" },
+  { header: "Address", accessor: "address" },
 ];
 
 const TeacherInfo = () => {
   const navigate = useNavigate();
   const [allTeacherData, setAllTeacherData] = useState([]);
+  const [filteredTeacherData, setFilteredTeacherData] = useState([]);
+  const [searchText, setSearchText] = useState(""); // For search input
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [teacherToDelete, setTeacherToDelete] = useState(null);
 
   const fetchData = async () => {
     try {
       const response = await getAPI("getAllTeachers", {}, setAllTeacherData);
-      console.log(response.data);
+      setFilteredTeacherData(response.data); // Initialize filtered data
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -55,6 +36,15 @@ const TeacherInfo = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    // Filter the teacher data based on the search text
+    const filteredData = allTeacherData.filter((teacher) =>
+      teacher.name.toLowerCase().includes(searchText.toLowerCase()) ||
+      teacher.subject.toLowerCase().includes(searchText.toLowerCase()) // Add more fields as needed
+    );
+    setFilteredTeacherData(filteredData);
+  }, [searchText, allTeacherData]);
 
   const handleView = (teacherData) => {
     navigate(`/school/teacher-profile/${teacherData._id}`);
@@ -68,7 +58,6 @@ const TeacherInfo = () => {
     if (!teacherToDelete) return;
 
     try {
-      console.log("Deleting teacher data:", teacherToDelete._id);
       const res = await deleteAPI(`delete-teacher/${teacherToDelete._id}`);
       setAllTeacherData((prevData) =>
         prevData.filter((data) => data._id !== teacherToDelete._id)
@@ -93,10 +82,11 @@ const TeacherInfo = () => {
 
   return (
     <div>
-      <TeacherSearchBar />
+      <ToastContainer />
+      <TeacherSearchBar searchText={searchText} setSearchText={setSearchText} /> 
       <Datatable
         columns={columns}
-        data={allTeacherData}
+        data={filteredTeacherData} // Pass filtered data to Datatable
         actions={{
           onView: handleView,
           onEdit: handleEdit,

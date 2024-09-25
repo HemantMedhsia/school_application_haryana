@@ -152,9 +152,10 @@ const ParentProfile = () => {
                 />
               ) : (
                 <p>No student data available.</p>
+                
               )}
             </section>
-
+              
             <section
               ref={studentInfoRef}
               className="flex-1 min-w-[48%]"
