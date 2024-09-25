@@ -225,7 +225,7 @@ export const getMarksByClassAndExamType = wrapAsync(async (req, res) => {
     const { classId, examTypeId } = req.params;
     const marks = await Marks.find({
         class: classId,
-        "marks.exams.examType": examTypeId,
+        "marks.exams.examType": examTypeId, //examTypeId
     })
         .populate("student")
         .populate("term")
@@ -276,3 +276,4 @@ export const getExistingMarks = wrapAsync(async (req, res) => {
 
     res.status(200).json(new ApiResponse(200, marks));
 });
+

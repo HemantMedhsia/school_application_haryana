@@ -39,15 +39,35 @@ const ViewMarks = () => {
     if (!classId || !examType) return;
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/api/get-mark-by-class-and-exam-type/${classId}/${examType}`
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/api/get-mark-by-class-and-exam-type/${classId}/${examType}`
       );
       console.log("Student marks data:", response.data.data);
       setStudentsData(response.data.data);
-      setFilteredStudents(response.data.data);
+
+      const filteredData = response.data.data.filter((student) =>
+        student.marks.some((mark) => mark.subject._id === selectedSubjectId)
+      );
+
+      console.log("Filtered data:", filteredData);
+
+      if(filteredData.length === 0) {
+        toast.error("No data found for the selected subject");
+
+        setShowTable(false);
+        return;
+      }
+      setFilteredStudents(filteredData);
       setShowTable(true);
     } catch (error) {
       console.error("Error fetching student marks data", error);
-      toast.error("Failed to load student marks");
+      const errorMessage =
+        error.response && error.response.data && error.response.data.message
+          ? error.response.data.message
+          : "Failed to load student marks";
+
+      toast.error(errorMessage);
     }
   };
 
@@ -67,9 +87,10 @@ const ViewMarks = () => {
   }, []);
 
   const handleFilterSubmit = async (filterValues) => {
-    const { class: classId, examType } = filterValues;
+    const { class: classId, examType, subject } = filterValues;
     setSelectedTermId(filterValues.term);
     setSelectedExamTypeId(examType);
+    setSelectedSubjectId(subject);
     await fetchStudentMarks(classId, examType);
   };
 
@@ -150,46 +171,60 @@ const ViewMarks = () => {
       <DynamicFilterBar filters={filterConfig} onSubmit={handleFilterSubmit} />
       {showTable && (
         <div>
-          <h2 className="text-[#7367F0] font-semibold mt-4 text-xl">Student Marks Table</h2>
+          <h2 className="text-[#7367F0] font-semibold mt-4 text-xl">
+            Student Marks Table
+          </h2>
           <DynamicTable
             columns={[
               { header: "Student Name", accessor: "studentName", type: "text" },
               { header: "Roll No", accessor: "rollNumber", type: "text" },
               { header: "Subject", accessor: "subjectName", type: "text" },
-              { header: "Marks Obtained", accessor: "marksObtained", type: "text" },
               {
-                header: "View",
-                accessor: "view",
-                type: "button",
-                render: (row) => (
-                  <button onClick={() => viewDetails(row)} className="text-blue-500 underline">View</button>
-                ),
+                header: "Max Marks",
+                accessor: "maxMarks",
+                type: "text",
+              },
+              {
+                header: "Marks Obtained",
+                accessor: "marksObtained",
+                type: "text",
               },
             ]}
-            data={filteredStudents.map((student) => {
-              const marks = student.marks.map(mark => ({
-                subjectName: mark.subject.name, // Retrieve subject name from marks
-                marksObtained: mark.marksObtained,
-              }));
-
-              return {
-                studentName: student.student.firstName || "No name found",
-                rollNumber: student.student.rollNumber || "No roll number found",
-                subjectName: marks.length > 0 ? marks[0].subjectName : "No subject",
-                marksObtained: marks.length > 0 ? marks[0].marksObtained : "N/A",
-              };
-            })}
+            data={filteredStudents
+              .map((student) => {
+                return student.marks
+                  .filter((mark) => mark.subject._id === selectedSubjectId)
+                  .map((mark) => {
+                    const exam = mark.exams[0];
+                    return {
+                      studentName: student.student.firstName || "No name found",
+                      rollNumber:
+                        student.student.rollNumber || "No roll number found",
+                      subjectName: mark.subject.name || "No subject",
+                      maxMarks: exam ? exam.examType.maxMarks : "N/A",
+                      marksObtained: exam ? exam.marksObtained : "N/A",
+                    };
+                  });
+              })
+              .flat()}
           />
         </div>
       )}
       {showPopup && selectedStudent && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-8 rounded shadow-lg">
-            <h3 className="text-xl font-semibold mb-4">Detailed Marks for {selectedStudent.student.firstName}</h3>
+            <h3 className="text-xl font-semibold mb-4">
+              Detailed Marks for {selectedStudent.student.firstName}
+            </h3>
             <p>Roll No: {selectedStudent.student.rollNumber}</p>
             <p>Subject: {selectedStudent.subject.name}</p>
             <p>Marks Obtained: {selectedStudent.marks}</p>
-            <button onClick={closePopup} className="mt-4 bg-blue-500 text-white p-2 rounded">Close</button>
+            <button
+              onClick={closePopup}
+              className="mt-4 bg-blue-500 text-white p-2 rounded"
+            >
+              Close
+            </button>
           </div>
         </div>
       )}
