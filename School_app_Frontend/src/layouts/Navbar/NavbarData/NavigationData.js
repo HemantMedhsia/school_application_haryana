@@ -252,6 +252,12 @@ export const navigation = [
         roles: ["Admin", "Teacher", "Student"],
       },
       {
+        name: "View Exam Schedule 2",
+        to: "/school/view-exam-schedule-student-and-parent",
+        icon: FaCheckCircle,
+        roles: ["Admin", "Teacher", "Student"],
+      },
+      {
         name: "View Marks",
         to: "/school/view-marks",
         icon: FaCheckCircle,

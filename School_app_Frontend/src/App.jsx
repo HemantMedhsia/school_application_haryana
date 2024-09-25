@@ -39,6 +39,7 @@ import CreateTimetabel from "./pages/CreateTimetabel.jsx";
 import AssingTeacher from "./pages/Teacher/AssingTeacher.jsx";
 import ViewExaminationSchedule from "./pages/Examination/ViewExaminationSchedule.jsx";
 import ViewMarks from "./pages/Examination/ViewMarks.jsx";
+import ViewExaminationScheduleForStudentAndParent from "./pages/Examination/ViewExaminationScheduleForStudentAndParent.jsx";
 
 const App = () => {
   const { userRole, authToken } = useAuth();
@@ -107,6 +108,7 @@ const App = () => {
           <Route path="assign-teacher" element={<AssingTeacher />} />
           <Route path="view-exam-schedule" element={<ViewExaminationSchedule />} />
           <Route path="view-marks" element={<ViewMarks />} />
+          <Route path="view-exam-schedule-student-and-parent" element={<ViewExaminationScheduleForStudentAndParent />} />
         </Route>
       </>
     )
