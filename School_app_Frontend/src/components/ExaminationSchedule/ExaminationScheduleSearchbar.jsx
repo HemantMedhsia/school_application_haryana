@@ -174,7 +174,11 @@ const ExaminationScheduleComponent = () => {
       }
     } catch (error) {
       console.error("Error saving exam schedule", error);
-      toast.error("Error saving exam schedule. Please try again.");
+      const errorMessage =
+        error.response && error.response.data && error.response.data.message
+          ? error.response.data.message
+          : "Error saving exam schedule";
+          toast.error(errorMessage);
     }
   };
 

@@ -4,6 +4,7 @@ import { ApiError } from "../Utils/errorHandler.js";
 import { ExamSchedule } from "../Models/examSchedule.model.js";
 import mongoose from "mongoose";
 import { examScheduleValidation } from "../Validation/examSchedule.Validation.js";
+import { Student } from "../Models/student.model.js";
 
 export const createExamSchedule = wrapAsync(async (req, res) => {
     // const { error } = examScheduleValidation.validate(req.body);
@@ -23,7 +24,6 @@ export const createExamSchedule = wrapAsync(async (req, res) => {
     if (existingExamSchedule) {
         throw new ApiError(400, "Exam Schedule already exists");
     }
-    
 
     const newExamSchedule = new ExamSchedule({
         term: new mongoose.Types.ObjectId(term),
@@ -33,8 +33,8 @@ export const createExamSchedule = wrapAsync(async (req, res) => {
         examDetails: examDetails.map((details) => ({
             subject: new mongoose.Types.ObjectId(details.subject),
             examDate: new Date(details.examDate),
-            startTime: details.startTime, 
-            endTime: details.endTime, 
+            startTime: details.startTime,
+            endTime: details.endTime,
         })),
     });
 
@@ -47,8 +47,6 @@ export const createExamSchedule = wrapAsync(async (req, res) => {
         )
     );
 });
-
-
 
 export const getExamSchedules = wrapAsync(async (req, res) => {
     const examSchedules = await ExamSchedule.find()
@@ -86,7 +84,6 @@ export const getExamScheduleBytcseId = wrapAsync(async (req, res) => {
         new ApiResponse(200, examSchedule, "Exam Schedule Fetched Successfully")
     );
 });
-
 
 export const getExamScheduleById = wrapAsync(async (req, res) => {
     const { id } = req.params;
@@ -205,6 +202,124 @@ export const getExamSchedulesBySubjectGroup = wrapAsync(async (req, res) => {
         new ApiResponse(
             200,
             examSchedules,
+            "Exam Schedules fetched successfully"
+        )
+    );
+});
+
+export const getExamSchedulesByStudentId = wrapAsync(async (req, res) => {
+    const { studentId } = req.params;
+    const student = await Student.findById(studentId)
+        .select("currentClass")
+        .lean();
+
+    if (!student) {
+        throw new ApiError(404, "Student not found");
+    }
+
+    const examSchedules = await ExamSchedule.find({
+        class: student.currentClass,
+    })
+        .select("examType examDetails")
+        .populate("examType", "name")
+        .populate({
+            path: "examDetails.subject",
+            select: "name",
+        })
+        .lean();
+
+    if (!examSchedules || examSchedules.length === 0) {
+        throw new ApiError(404, "Exam Schedules not found");
+    }
+
+    const responseMap = {};
+
+    examSchedules.forEach((schedule) => {
+        const examTypeName = schedule.examType.name;
+
+        if (!responseMap[examTypeName]) {
+            responseMap[examTypeName] = {
+                serial: Object.keys(responseMap).length + 1,
+                examType: examTypeName,
+                examDetails: [],
+            };
+        }
+
+        const examDetailWithSubjectName = schedule.examDetails.map(
+            (detail) => ({
+                ...detail,
+                subject: detail.subject ? detail.subject.name : null,
+            })
+        );
+
+        responseMap[examTypeName].examDetails.push(
+            ...examDetailWithSubjectName
+        );
+    });
+
+    const responseArray = Object.values(responseMap);
+
+    res.status(200).json(
+        new ApiResponse(
+            200,
+            responseArray,
+            "Exam Schedules fetched successfully"
+        )
+    );
+});
+
+export const getExamSchedulesByParentId = wrapAsync(async (req, res) => {
+    const { parentId } = req.params;
+    const student = await Student.findOne({ parent: parentId })
+        .select("currentClass")
+        .lean();
+
+    if (!student) {
+        throw new ApiError(404, "Student not found");
+    }
+
+    const examSchedules = await ExamSchedule.find({
+        class: student.currentClass,
+    })
+        .select("examType examDetails")
+        .populate("examType", "name")
+        .populate({ path: "examDetails.subject", select: "name" })
+        .lean();
+
+    if (!examSchedules || examSchedules.length === 0) {
+        throw new ApiError(404, "Exam Schedules not found");
+    }
+
+    const responseMap = {};
+
+    examSchedules.forEach((schedule) => {
+        const examTypeName = schedule.examType.name;
+
+        if (!responseMap[examTypeName]) {
+            responseMap[examTypeName] = {
+                serial: Object.keys(responseMap).length + 1,
+                examType: examTypeName,
+                examDetails: [],
+            };
+        }
+
+        const examDetailWithSubjectName = schedule.examDetails.map(
+            (detail) => ({
+                ...detail,
+                subject: detail.subject ? detail.subject.name : null,
+            })
+        );
+
+        responseMap[examTypeName].examDetails.push(
+            ...examDetailWithSubjectName
+        );
+    });
+
+    const responseArray = Object.values(responseMap);
+    res.status(200).json(
+        new ApiResponse(
+            200,
+            responseArray,
             "Exam Schedules fetched successfully"
         )
     );

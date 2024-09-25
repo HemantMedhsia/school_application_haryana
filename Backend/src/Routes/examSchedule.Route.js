@@ -6,6 +6,8 @@ import {
     getExamScheduleBytcseId,
     getExamSchedules,
     getExamSchedulesByClass,
+    getExamSchedulesByParentId,
+    getExamSchedulesByStudentId,
     getExamSchedulesByTerm,
     updateExamSchedule,
 } from "../Controller/examSchedule.Controller.js";
@@ -19,5 +21,11 @@ router.put("/update-examschedule/:id", updateExamSchedule);
 router.delete("/delete-examschedule/:id", deleteExamSchedule);
 router.get("/get-examschedule-byclass/:classId", getExamSchedulesByClass);
 router.get("/get-examschedule-byterm/:termId", getExamSchedulesByTerm);
+
+router.get(
+    "/get-examschedule-bystudent/:studentId",
+    getExamSchedulesByStudentId
+);
+router.get("/get-examschedule-byparent/:parentId", getExamSchedulesByParentId);
 
 export { router as examScheduleRoute };
