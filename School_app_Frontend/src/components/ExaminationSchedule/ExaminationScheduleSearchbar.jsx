@@ -5,7 +5,7 @@ import FormButton from "../Form/FormButton";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 
-const  ExaminationScheduleComponent = () => {
+const ExaminationScheduleComponent = () => {
   const [examSubjects, setExamSubjects] = useState([]);
   const [showTable, setShowTable] = useState(false);
   const [terms, setTerms] = useState([]);
@@ -26,7 +26,7 @@ const  ExaminationScheduleComponent = () => {
   };
 
   const formatTime = (value) => {
-    const time = new Date(`1970-01-01T${value}Z`); // Use any valid date for time parsing
+    const time = new Date(`2024-01-01T${value}Z`); // Use any valid date for time parsing
     return isNaN(time)
       ? ""
       : time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -121,7 +121,7 @@ const  ExaminationScheduleComponent = () => {
       const subjects = selectedSubjectGroup.subjects.map((subject) => ({
         subject: subject._id, // Keep the ID
         subjectName: subject.name, // Add subject name
-        examDate: null,
+        examDate: "2024-01-01",
         startTime: null,
         endTime: null,
       }));

@@ -13,6 +13,18 @@ export const createExamSchedule = wrapAsync(async (req, res) => {
 
     const { term, classId, examType, subjectGroup, examDetails } = req.body;
 
+    const existingExamSchedule = await ExamSchedule.findOne({
+        term,
+        class: classId,
+        examType,
+        subjectGroup,
+    });
+
+    if (existingExamSchedule) {
+        throw new ApiError(400, "Exam Schedule already exists");
+    }
+    
+
     const newExamSchedule = new ExamSchedule({
         term: new mongoose.Types.ObjectId(term),
         class: new mongoose.Types.ObjectId(classId),
@@ -35,6 +47,8 @@ export const createExamSchedule = wrapAsync(async (req, res) => {
         )
     );
 });
+
+
 
 export const getExamSchedules = wrapAsync(async (req, res) => {
     const examSchedules = await ExamSchedule.find()
