@@ -48,22 +48,21 @@ export const createParent = wrapAsync(async (req, res) => {
 });
 
 export const loginParent = wrapAsync(async (req, res, next) => {
-    const { guardianEmail, parentLoginPassword } = req.body;
+    const { email, password } = req.body;
 
-    if (!guardianEmail) {
+    if (!email) {
         return next(new ApiError(400, "email is required"));
     }
 
-    const parent = await Parent.findOne({ guardianEmail });
+    const parent = await Parent.findOne({ email });
 
     if (!parent) {
-        console.log("parent not found");
         return next(new ApiError(404, "parent does not exist"));
     }
 
-    console.log("parent found:", parent.guardianEmail);
+    console.log("parent found:", parent);
 
-    const isPasswordValid = await parent.isValidPassword(parentLoginPassword);
+    const isPasswordValid = await parent.isValidPassword(password);
     console.log("Is password valid:", isPasswordValid);
 
     if (!isPasswordValid) {
@@ -162,7 +161,7 @@ export const getParents = wrapAsync(async (req, res) => {
     const parents = await Parent.find();
     return res.status(200).json(new ApiResponse(200, parents));
 });
- 
+
 export const getParent = wrapAsync(async (req, res) => {
     const { id } = req.params;
     const parent = await Parent.findById(id).select("-password");

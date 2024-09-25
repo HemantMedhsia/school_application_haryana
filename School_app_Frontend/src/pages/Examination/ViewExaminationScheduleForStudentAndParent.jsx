@@ -25,60 +25,8 @@ const ViewExaminationScheduleForStudentAndParent = () => {
   useEffect(() => {
     // Simulating API call
     const fetchData = async () => {
-      const apiResponse = {
-        statusCode: 200,
-        data: [
-          {
-            serial: 1,
-            examType: "Half Yearly",
-            examDetails: [
-              {
-                subject: "Science 101",
-                examDate: "2024-01-01T00:00:00.000Z",
-                startTime: "10:20",
-                endTime: "12:20",
-                _id: "66f3be82d1659ff2650d8765",
-              },
-              {
-                subject: "Hindi",
-                examDate: "2024-01-02T00:00:00.000Z",
-                startTime: "10:20",
-                endTime: "12:20",
-                _id: "66f3be82d1659ff2650d8766",
-              },
-              {
-                subject: "History",
-                examDate: "2024-01-03T00:00:00.000Z",
-                startTime: "10:20",
-                endTime: "12:20",
-                _id: "66f3be82d1659ff2650d8767",
-              },
-            ],
-          },
-          {
-            serial: 2,
-            examType: "Unit Test",
-            examDetails: [
-              {
-                subject: "Science 101",
-                examDate: "2024-01-01T00:00:00.000Z",
-                startTime: "08:20",
-                endTime: "10:20",
-                _id: "66f3c0742e1a7cf2911b6c8e",
-              },
-              {
-                subject: "Hindi",
-                examDate: "2024-01-01T00:00:00.000Z",
-                startTime: "08:20",
-                endTime: "10:20",
-                _id: "66f3c0742e1a7cf2911b6c8f",
-              },
-            ],
-          },
-        ],
-        message: "Exam Schedules fetched successfully",
-        success: true,
-      };
+      const token = localStorage.getItem("authToken");
+      const apiResponse = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/get-examschedule-bystudent/${studnetId}`)
 
       setData(apiResponse.data);
     };

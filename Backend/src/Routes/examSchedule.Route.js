@@ -11,6 +11,8 @@ import {
     getExamSchedulesByTerm,
     updateExamSchedule,
 } from "../Controller/examSchedule.Controller.js";
+import { authenticateToken } from "../Middlewares/authenticateToken.js";
+import { authorizeRoles } from "../Middlewares/authorizeRoles.js";
 const router = express.Router();
 
 router.post("/create-examschedule", createExamSchedule);
@@ -23,9 +25,16 @@ router.get("/get-examschedule-byclass/:classId", getExamSchedulesByClass);
 router.get("/get-examschedule-byterm/:termId", getExamSchedulesByTerm);
 
 router.get(
-    "/get-examschedule-bystudent/:studentId",
+    "/get-examschedule-bystudent",
+    authenticateToken,
+    authorizeRoles("Student"),
     getExamSchedulesByStudentId
 );
-router.get("/get-examschedule-byparent/:parentId", getExamSchedulesByParentId);
+router.get(
+    "/get-examschedule-byparent",
+    authenticateToken,
+    authorizeRoles("Parent"),
+    getExamSchedulesByParentId
+);
 
 export { router as examScheduleRoute };
