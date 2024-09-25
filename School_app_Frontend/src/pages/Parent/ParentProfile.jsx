@@ -140,7 +140,13 @@ const ParentProfile = () => {
                       label: "Date of Birth",
                       value: new Date(student.dateOfBirth).toLocaleDateString(),
                     },
-                    { label: "Class", value: student.currentClass },
+                    {
+                      label: "Class",
+                      value:
+                        typeof student.currentClass === "object"
+                          ? student.currentClass.name
+                          : student.currentClass,
+                    },
                     { label: "Address", value: student.address },
                   ]}
                 />
