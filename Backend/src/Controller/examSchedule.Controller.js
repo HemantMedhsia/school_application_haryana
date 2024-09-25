@@ -208,7 +208,8 @@ export const getExamSchedulesBySubjectGroup = wrapAsync(async (req, res) => {
 });
 
 export const getExamSchedulesByStudentId = wrapAsync(async (req, res) => {
-    const { studentId } = req.params;
+   const studentId = req.user?.id;
+   console.log(studentId);
     const student = await Student.findById(studentId)
         .select("currentClass")
         .lean();
@@ -269,7 +270,7 @@ export const getExamSchedulesByStudentId = wrapAsync(async (req, res) => {
 });
 
 export const getExamSchedulesByParentId = wrapAsync(async (req, res) => {
-    const { parentId } = req.params;
+   const parentId = req.user?.id;
     const student = await Student.findOne({ parent: parentId })
         .select("currentClass")
         .lean();
