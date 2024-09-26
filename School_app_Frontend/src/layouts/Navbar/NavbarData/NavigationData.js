@@ -12,6 +12,7 @@ import {
   FaUsers,
   FaUserTie,
 } from "react-icons/fa";
+import { Navigate } from "react-router-dom";
 
 export const navigation = [
   {
@@ -23,10 +24,10 @@ export const navigation = [
   },
   {
     name: "My Profile",
-    to: "/school/profile",
+    to: `/school/profile/${localStorage.getItem("userId")}`,
     icon: FaUserFriends,
     current: false,
-    roles: ["Student", "Teacher"],
+    roles: ["Student", "Teacher","Parent"],
   },
   {
     name: "Student",
