@@ -14,7 +14,7 @@ const Modal = ({ isOpen, onClose, examDetails }) => {
         </h2>
 
         {/* Block Table Structure */}
-        <div className="grid grid-cols-4 gap-4 text-left font-medium mb-2">
+        <div className="grid grid-cols-4 gap-4 text-[#65FA9E] text-left font-medium mb-2">
           <div>Subject</div>
           <div>Exam Date</div>
           <div>Start Time</div>
@@ -25,9 +25,9 @@ const Modal = ({ isOpen, onClose, examDetails }) => {
           {subjects?.map((subject, index) => (
             <div key={subject._id} className="grid grid-cols-4 gap-4 py-3">
               <div>{subject.subject}</div>
-              <div>{moment(subject.examDate).format("YYYY-MM-DD")}</div>
-              <div>{subject.startTime}</div>
-              <div>{subject.endTime}</div>
+              <div className="text-red-600 font-semibold">{moment(subject.examDate).format("YYYY-MM-DD")}</div>
+              <div className="text-red-600 font-semibold">{subject.startTime}</div>
+              <div >{subject.endTime}</div>
             </div>
           ))}
         </div>
