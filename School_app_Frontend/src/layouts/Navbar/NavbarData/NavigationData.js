@@ -22,19 +22,19 @@ export const navigation = [
     current: true,
     roles: ["Admin", "Teacher", "Student"],
   },
-  {
-    name: "My Profile",
-    to: `/school/profile/${localStorage.getItem("userId")}`,
-    icon: FaUserFriends,
-    current: false,
-    roles: ["Student", "Teacher","Parent"],
-  },
+  // {
+  //   name: "My Profile",
+  //   to: "/school/profile",
+  //   icon: FaUserFriends,
+  //   current: false,
+  //   roles: ["Student", "Teacher"],
+  // },
   {
     name: "Student",
     to: "#",
     icon: FaUsers,
     current: false,
-    roles: ["Admin", "Teacher", "Student"],
+    roles: ["Admin", "Teacher"],
     children: [
       {
         name: "Student Information",
@@ -114,6 +114,20 @@ export const navigation = [
     icon: FaUserTie,
     current: false,
     roles: ["Admin"],
+    children: [
+      {
+        name: "Staff Information",
+        to: "/school/all-staffs",
+        icon: FaUser,
+        roles: ["Admin"],
+      },
+      {
+        name: "Add Staff",
+        to: "/school/staff-add",
+        icon: FaBook,
+        roles: ["Admin"],
+      },
+    ],
   },
   {
     name: "Academic",

@@ -4,8 +4,10 @@ import { IoCalendarOutline, IoLocationSharp } from "react-icons/io5";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { MdOutlineMarkEmailUnread } from "react-icons/md";
 import { BiSupport } from "react-icons/bi";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthProvider";
+import { jwtDecode } from "jwt-decode";
+
 const navigation = [
   { name: "Happy Model English School", href: "#", current: false },
 ];
@@ -14,10 +16,33 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-const TopNavbar =  ({ isCollapsed }) => {
-  const {  logout, name, userRole } =  useAuth();
-  console.log("Name:", name);
-  console.log("Role:", userRole);
+const TopNavbar = ({ isCollapsed }) => {
+  const { logout, name, userRole, authToken } = useAuth();
+  const navigate = useNavigate();
+
+  const handleProfileClick = () => {
+    if (authToken) {
+      const decoded = jwtDecode(authToken);
+      const userId = decoded.id;
+
+      switch (userRole) {
+        case "Admin":
+          navigate(`/school/admin/profile/${userId}`);
+          break;
+        case "Teacher":
+          navigate(`/school/teacher-profile/${userId}`);
+          break;
+        case "Student":
+          navigate(`/school/profile/${userId}`);
+          break;
+        case "Parent":
+          navigate(`/school/parent-profile/${userId}`);
+          break;
+        default:
+          navigate(`/school/profile/${userId}`);
+      }
+    }
+  };
 
   return (
     <Disclosure
@@ -95,7 +120,7 @@ const TopNavbar =  ({ isCollapsed }) => {
             <div className="absolute w-full inset-y-0 right-0 flex justify-end items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
               <div className="flex flex-col justify-end items-center mx-1">
                 <div className="w-full text-sm text-gray-400">
-                  {name && name.name ? name.name : "You login as Guest"}
+                  {name ? name : "You login as Guest"}
                 </div>
                 <div className="text-right w-full text-xs font-semibold text-[#65FA9E]">
                   {userRole ? userRole : "Guest"}
@@ -114,15 +139,15 @@ const TopNavbar =  ({ isCollapsed }) => {
                 <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                   <Menu.Item>
                     {({ active }) => (
-                      <a
-                        href="#"
+                      <button
+                        onClick={handleProfileClick}
                         className={classNames(
                           active ? "bg-gray-100" : "",
                           "block px-4 py-2 text-sm text-gray-700"
                         )}
                       >
                         Your Profile
-                      </a>
+                      </button>
                     )}
                   </Menu.Item>
                   <Menu.Item>
