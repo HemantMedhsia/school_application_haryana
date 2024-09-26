@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Datatable from "../../common/Datatables/Datatable";
 import Modal from "../../common/Modal/ExamScheduleView"; // Import the modal component
+import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 
 const ViewExaminationScheduleForStudentAndParent = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -8,7 +10,7 @@ const ViewExaminationScheduleForStudentAndParent = () => {
   const [data, setData] = useState([]);
 
   const columns = [
-    { header: "Serial No.", accessor: "Sno", type: "text" },
+    { header: "Serial No.", accessor: "serial", type: "text" },
     { header: "Exam Type", accessor: "examType", type: "text" },
   ];
 
@@ -23,12 +25,38 @@ const ViewExaminationScheduleForStudentAndParent = () => {
   // Sample data including multiple subjects for each exam
   // Fetch data from the API
   useEffect(() => {
-    // Simulating API call
+    let decodeTokenRole;
     const fetchData = async () => {
       const token = localStorage.getItem("authToken");
-      const apiResponse = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/get-examschedule-bystudent/${studnetId}`)
+        if (token) {
+             decodeTokenRole = jwtDecode(token).role;
+        }
+        else {
+            console.error("Token not found");
+            return;
+        }
 
-      setData(apiResponse.data);
+        let endPoint;
+        if (decodeTokenRole === "Student") {
+            endPoint = "get-examschedule-bystudent";
+        }
+        else if (decodeTokenRole === "Parent") {
+            endPoint = "get-examschedule-byparent";
+        }
+        else {
+            console.error("Invalid role");
+        }
+      const apiResponse = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/${endPoint}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log("Exam schedule data:", apiResponse);
+
+      setData(apiResponse.data.data);
     };
 
     fetchData();

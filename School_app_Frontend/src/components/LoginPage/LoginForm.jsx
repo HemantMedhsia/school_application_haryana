@@ -55,6 +55,7 @@ const LoginForm = ({
                   <option value="Teacher">Teacher</option>
                   <option value="Student">Student</option>
                   <option value="Admin">Admin</option>
+                  <option value="Parent">Parent</option>
                 </select>
               </div>
 

@@ -5,7 +5,6 @@ import { useAuth } from "../context/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import PyramidLoader from "../common/Loader/PyramidLoader";
 
-
 const LoginPage = () => {
   const { login, loading } = useAuth(); // Use login and loading from context
   const [email, setEmail] = useState("");
@@ -33,6 +32,9 @@ const LoginPage = () => {
       case "Staff":
         apiEndpoint = `${import.meta.env.VITE_BACKEND_URL}/api/login-staff`;
         break;
+      case "Parent":
+        apiEndpoint = `${import.meta.env.VITE_BACKEND_URL}/api/login-parent`;
+        break;
       default:
         setError("Invalid role selected.");
         return;
@@ -55,7 +57,7 @@ const LoginPage = () => {
       login(accessToken, refreshToken, user);
 
       navigate("/school/dashboard");
-    } catch (err) { 
+    } catch (err) {
       console.error("Login failed:", err);
       setError("Login failed. Please try again.");
     } finally {
@@ -65,7 +67,8 @@ const LoginPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 text-gray-900 flex justify-center items-center">
-      {loader && <PyramidLoader desc={"Loading Data..."}/>} {/* Loader will be displayed while loader is true */}
+      {loader && <PyramidLoader desc={"Loading Data..."} />}{" "}
+      {/* Loader will be displayed while loader is true */}
       <LoginForm
         email={email}
         setEmail={setEmail}

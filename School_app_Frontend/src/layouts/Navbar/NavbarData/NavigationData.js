@@ -219,19 +219,19 @@ export const navigation = [
     to: "#",
     icon: FaChartLine,
     current: false,
-    roles: ["Admin", "Teacher", "Student"],
+    roles: ["Admin", "Teacher", "Student","Parent"],
     children: [
       {
         name: "Exam Group",
         to: "/school/exam-group",
         icon: FaUser,
-        roles: ["Student", "Teacher", "Admin"],
+        roles: ["Teacher", "Admin"],
       },
       {
         name: "Exam Type",
         to: "/school/exam-type",
         icon: FaBook,
-        roles: ["Student", "Teacher", "Admin"],
+        roles: ["Teacher", "Admin"],
       },
       {
         name: "Add Marks",
@@ -243,19 +243,19 @@ export const navigation = [
         name: "Exam Schedule",
         to: "/school/exam-schedule",
         icon: FaCheckCircle,
-        roles: ["Admin", "Teacher", "Student"],
+        roles: ["Admin", "Teacher"],
       },
       {
         name: "View Exam Schedule",
         to: "/school/view-exam-schedule",
         icon: FaCheckCircle,
-        roles: ["Admin", "Teacher", "Student"],
+        roles: ["Admin", "Teacher"],
       },
       {
-        name: "View Exam Schedule 2",
+        name: "View Exam Schedule",
         to: "/school/view-exam-schedule-student-and-parent",
         icon: FaCheckCircle,
-        roles: ["Admin", "Teacher", "Student"],
+        roles: ["Student", "Parent"],
       },
       {
         name: "View Marks",
