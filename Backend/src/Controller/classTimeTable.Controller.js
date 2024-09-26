@@ -240,6 +240,67 @@ export const updateClassTimeTable = wrapAsync(async (req, res) => {
 //         );
 // });
 
+// export const getClassTimeTableByClassId = wrapAsync(async (req, res) => {
+//     const classId = new mongoose.Types.ObjectId(req.params.classId);
+
+//     const timetable = await Timetable.aggregate([
+//         { $match: { classId } },
+//         { $unwind: "$entries" },
+//         {
+//             $lookup: {
+//                 from: "teachers",
+//                 localField: "entries.teacherId",
+//                 foreignField: "_id",
+//                 as: "teacherDetails",
+//             },
+//         },
+//         { $unwind: "$teacherDetails" },
+//         {
+//             $lookup: {
+//                 from: "subjects",
+//                 localField: "entries.subjectId",
+//                 foreignField: "_id",
+//                 as: "subjectDetails",
+//             },
+//         },
+//         { $unwind: "$subjectDetails" },
+//         {
+//             $project: {
+//                 dayOfWeek: 1,
+//                 "entries.period": 1,
+//                 "entries.startTime": 1,
+//                 "entries.endTime": 1,
+//                 "subjectDetails.name": 1,
+//                 "teacherDetails.name": 1,
+//             },
+//         },
+//         {
+//             $group: {
+//                 _id: "$dayOfWeek",
+//                 periods: {
+//                     $push: {
+//                         period: "$entries.period",
+//                         subject: "$subjectDetails.name",
+//                         teacher: "$teacherDetails.name",
+//                         startTime: "$entries.startTime",
+//                         endTime: "$entries.endTime",
+//                     },
+//                 },
+//             },
+//         },
+//     ]);
+
+//     return res
+//         .status(200)
+//         .json(
+//             new ApiResponse(
+//                 200,
+//                 timetable,
+//                 "Class Timetable fetched successfully"
+//             )
+//         );
+// });
+
 export const getClassTimeTableByClassId = wrapAsync(async (req, res) => {
     const classId = new mongoose.Types.ObjectId(req.params.classId);
 
@@ -279,23 +340,49 @@ export const getClassTimeTableByClassId = wrapAsync(async (req, res) => {
                 _id: "$dayOfWeek",
                 periods: {
                     $push: {
-                        period: "$entries.period",
                         subject: "$subjectDetails.name",
+                        time: {
+                            $concat: [
+                                {
+                                    $dateToString: {
+                                        format: "%H:%M",
+                                        date: "$entries.startTime",
+                                    },
+                                }, 
+                                " - ",
+                                {
+                                    $dateToString: {
+                                        format: "%H:%M",
+                                        date: "$entries.endTime",
+                                    },
+                                },
+                            ],
+                        },
                         teacher: "$teacherDetails.name",
-                        startTime: "$entries.startTime",
-                        endTime: "$entries.endTime",
                     },
                 },
             },
         },
     ]);
+    
+    const formattedTimetable = timetable.reduce((acc, curr) => {
+        const day = curr._id;
+        acc[day] = curr.periods.map((period) => ({
+            subject: period.subject,
+            time: period.time,
+            teacher: period.teacher,
+        }));
+        return acc;
+    }, {});
+
+    const classLabel = `Class ${classId}`; // Dynamic class label based on classId
 
     return res
         .status(200)
         .json(
             new ApiResponse(
                 200,
-                timetable,
+                { [classLabel]: formattedTimetable },
                 "Class Timetable fetched successfully"
             )
         );

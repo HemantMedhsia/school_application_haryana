@@ -4,15 +4,16 @@ import LoginForm from "../components/LoginPage/LoginForm";
 import { useAuth } from "../context/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import PyramidLoader from "../common/Loader/PyramidLoader";
+import { ToastContainer, toast } from "react-toastify";
 
 const LoginPage = () => {
-  const { login, loading } = useAuth(); // Use login and loading from context
+  const { login, loading } = useAuth();
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("Teacher");
   const [error, setError] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
-  const [loader, setLoader] = useState(false); // State to manage loader
+  const [loader, setLoader] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -41,7 +42,7 @@ const LoginPage = () => {
     }
 
     try {
-      setLoader(true); // Set loader before making the API call
+      setLoader(true);
 
       const response = await axios.post(
         apiEndpoint,
@@ -51,24 +52,20 @@ const LoginPage = () => {
           headers: { "Content-Type": "application/json" },
         }
       );
-
-      console.log("Login successful:", response.data);
       const { accessToken, refreshToken, user } = response.data.data;
       login(accessToken, refreshToken, user);
 
       navigate("/school/dashboard");
     } catch (err) {
-      console.error("Login failed:", err);
-      setError("Login failed. Please try again.");
+      toast.error("Login failed. Please check your credentials.");
     } finally {
-      setLoader(false); // Reset loader regardless of success or failure
+      setLoader(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-100 text-gray-900 flex justify-center items-center">
       {loader && <PyramidLoader desc={"Loading Data..."} />}{" "}
-      {/* Loader will be displayed while loader is true */}
       <LoginForm
         email={email}
         setEmail={setEmail}
@@ -78,8 +75,9 @@ const LoginPage = () => {
         error={error}
         role={role}
         setRole={setRole}
-        loading={loading} // Pass loading to the LoginForm
+        loading={loading}
       />
+      <ToastContainer />
     </div>
   );
 };

@@ -23,7 +23,15 @@ const getRefreshEndpoint = (role) => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [name, setname] = useState();
+  const [name, setName] = useState(() => {
+    const storedName = localStorage.getItem("name");
+    try {
+      return storedName ? JSON.parse(storedName) : null;
+    } catch (error) {
+      return storedName;
+    }
+  });
+
   const [authToken, setAuthToken] = useState(() =>
     localStorage.getItem("authToken")
   );
@@ -35,7 +43,7 @@ export const AuthProvider = ({ children }) => {
     return token ? jwtDecode(token).role : null;
   });
   const [loading, setLoading] = useState(true);
-  const [isLoggingOut, setIsLoggingOut] = useState(false); 
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
     let isTokenRefreshed = false;
@@ -88,13 +96,26 @@ export const AuthProvider = ({ children }) => {
   const login = async (authToken, refreshToken, user) => {
     setAuthToken(authToken);
     setRefreshToken(refreshToken);
-    setname(user);
+    let userName;
+    if (user.role === "Student") {
+      userName = user.firstName;
+    } else if (user.role === "Admin") {
+      userName = user.name;
+    } else if (user.role === "Parent") {
+      userName = user.fatherName;
+    } else {
+      userName = user.name;
+    }
+
+    console.log("User:", user);
+    setName(userName);
 
     const decodedToken = jwtDecode(authToken);
     setUserRole(decodedToken.role);
 
     localStorage.setItem("authToken", authToken);
     localStorage.setItem("refreshToken", refreshToken);
+    localStorage.setItem("name", userName);
   };
 
   const logout = (showToast = true) => {
@@ -103,6 +124,7 @@ export const AuthProvider = ({ children }) => {
     setUserRole(null);
     localStorage.removeItem("authToken");
     localStorage.removeItem("refreshToken");
+    localStorage.removeItem("name");
 
     if (showToast) {
       toast.success("Logged out successfully!");

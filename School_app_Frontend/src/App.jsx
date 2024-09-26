@@ -40,6 +40,8 @@ import AssingTeacher from "./pages/Teacher/AssingTeacher.jsx";
 import ViewExaminationSchedule from "./pages/Examination/ViewExaminationSchedule.jsx";
 import ViewMarks from "./pages/Examination/ViewMarks.jsx";
 import ViewExaminationScheduleForStudentAndParent from "./pages/Examination/ViewExaminationScheduleForStudentAndParent.jsx";
+import StaffAdd from "./pages/Staff/StaffAdd.jsx";
+import StaffInfo from "./pages/Staff/StaffInfo.jsx";
 
 const App = () => {
   const { userRole, authToken } = useAuth();
@@ -74,6 +76,9 @@ const App = () => {
           />
           <Route path="parent-add/:Id" element={<ParentAdd />} />
           <Route path="student-information" element={<StudnetInfo />} />
+          <Route path="staff-add" element={<StaffAdd />} />
+          <Route path="all-staffs" element={<StaffInfo/>} />
+          <Route path="staff-update/:staffId" element={<StaffAdd />} />
 
           <Route path="parent-information" element={<ParentInfo />} />
           <Route path="calendar" element={<EventCalendar />} />
@@ -106,9 +111,15 @@ const App = () => {
           <Route path="teacher-timetable" element={<TeacherTimetable />} />
           <Route path="create-timetable" element={<CreateTimetabel />} />
           <Route path="assign-teacher" element={<AssingTeacher />} />
-          <Route path="view-exam-schedule" element={<ViewExaminationSchedule />} />
+          <Route
+            path="view-exam-schedule"
+            element={<ViewExaminationSchedule />}
+          />
           <Route path="view-marks" element={<ViewMarks />} />
-          <Route path="view-exam-schedule-student-and-parent" element={<ViewExaminationScheduleForStudentAndParent />} />
+          <Route
+            path="view-exam-schedule-student-and-parent"
+            element={<ViewExaminationScheduleForStudentAndParent />}
+          />
         </Route>
       </>
     )
