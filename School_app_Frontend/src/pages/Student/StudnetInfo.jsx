@@ -57,7 +57,7 @@ const StudentInfo = () => {
 
               console.log("data", data.data.percentage);
 
-              const attendancePercentage = data?.data?.percentage || 99;
+              const attendancePercentage = data?.data?.percentage;
               return {
                 ...student,
                 attendancePercentage: attendancePercentage,
@@ -70,7 +70,7 @@ const StudentInfo = () => {
               );
               return {
                 ...student,
-                attendancePercentage: 89, // Default in case of error
+                attendancePercentage: 0, // Default in case of error
                 grade: "A", // Example grade
               };
             }

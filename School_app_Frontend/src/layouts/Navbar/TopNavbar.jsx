@@ -16,6 +16,8 @@ function classNames(...classes) {
 
 const TopNavbar =  ({ isCollapsed }) => {
   const {  logout, name, userRole } =  useAuth();
+  console.log("Name:", name);
+  console.log("Role:", userRole);
 
   return (
     <Disclosure

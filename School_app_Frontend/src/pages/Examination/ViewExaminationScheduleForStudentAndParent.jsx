@@ -19,9 +19,7 @@ const ViewExaminationScheduleForStudentAndParent = () => {
     "Ensure that you have all the necessary stationery, including pens, pencils, and erasers.",
     "Follow the instructions of the invigilators during the exam.",
   ];
-
-  // Sample data including multiple subjects for each exam
-  // Fetch data from the API
+  
   useEffect(() => {
     // Simulating API call
     const fetchData = async () => {

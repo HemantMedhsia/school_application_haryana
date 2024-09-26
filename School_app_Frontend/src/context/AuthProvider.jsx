@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { jwtDecode } from "jwt-decode"; // Fix import
+import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import PyramidLoader from "../common/Loader/PyramidLoader";
 import { toast, ToastContainer } from "react-toastify";
@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }) => {
     return token ? jwtDecode(token).role : null;
   });
   const [loading, setLoading] = useState(true);
-  const [isLoggingOut, setIsLoggingOut] = useState(false); // New state to track logout
+  const [isLoggingOut, setIsLoggingOut] = useState(false); 
 
   useEffect(() => {
     let isTokenRefreshed = false;

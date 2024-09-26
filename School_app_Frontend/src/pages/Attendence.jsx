@@ -220,7 +220,7 @@ const Attendence = () => {
               );
               return {
                 ...student,
-                attendancePercentage: 89, // Default in case of error
+                attendancePercentage: 0, // Default in case of error
                 grade: "A", // Example grade
               };
             }
