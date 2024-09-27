@@ -140,8 +140,15 @@ export const navigation = [
         name: "Class TimeTable",
         to: "/school/class-timetable",
         icon: FaUser,
-        roles: ["Student", "Teacher", "Admin"],
+        roles: ["Admin"],
       },
+      {
+        name: "Class TimeTable",
+        to: "/school/class-timetable-user",
+        icon: FaUser,
+        roles: ["Student","Teacher","Parent"],
+      },
+
       {
         name: "Teacher Timetable",
         to: "/school/teacher-timetable",
@@ -234,7 +241,7 @@ export const navigation = [
     to: "#",
     icon: FaChartLine,
     current: false,
-    roles: ["Admin", "Teacher", "Student","Parent"],
+    roles: ["Admin", "Teacher", "Student", "Parent"],
     children: [
       {
         name: "Exam Group",
@@ -277,7 +284,7 @@ export const navigation = [
         to: "/school/view-marks",
         icon: FaCheckCircle,
         roles: ["Admin", "Teacher"],
-      }
+      },
     ],
   },
   {

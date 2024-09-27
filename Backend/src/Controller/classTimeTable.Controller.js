@@ -4,6 +4,7 @@ import { ApiError } from "../Utils/errorHandler.js";
 import { Timetable } from "../Models/classTimeTable.Model.js";
 import { Teacher } from "../Models/teacher.model.js";
 import mongoose from "mongoose";
+import { Student } from "../Models/student.model.js";
 
 export const createClassTimeTable = wrapAsync(async (req, res) => {
     const { classId, dayOfWeek, entries } = req.body;
@@ -208,99 +209,6 @@ export const updateClassTimeTable = wrapAsync(async (req, res) => {
         );
 });
 
-// export const getClassTimeTableByClassId = wrapAsync(async (req, res) => {
-//     const timetable = await Timetable.find({ classId: req.params.classId })
-//         .populate("entries.teacherId", "name")
-//         .populate("entries.subjectId", "name")
-//         .select(
-//             "dayOfWeek entries.period entries.subjectId entries.teacherId entries.startTime entries.endTime"
-//         );
-
-//     const transformedTimetable = timetable.map((entry) => {
-//         const day = entry.dayOfWeek;
-//         const periods = entry.entries.map((periodEntry) => ({
-//             period: periodEntry.period,
-//             subject: periodEntry.subjectId.name,
-//             teacher: periodEntry.teacherId.name,
-//             startTime: periodEntry.startTime,
-//             endTime: periodEntry.endTime,
-//         }));
-
-//         return { day, periods };
-//     });
-
-//     return res
-//         .status(200)
-//         .json(
-//             new ApiResponse(
-//                 200,
-//                 transformedTimetable,
-//                 "Class Timetable fetched successfully"
-//             )
-//         );
-// });
-
-// export const getClassTimeTableByClassId = wrapAsync(async (req, res) => {
-//     const classId = new mongoose.Types.ObjectId(req.params.classId);
-
-//     const timetable = await Timetable.aggregate([
-//         { $match: { classId } },
-//         { $unwind: "$entries" },
-//         {
-//             $lookup: {
-//                 from: "teachers",
-//                 localField: "entries.teacherId",
-//                 foreignField: "_id",
-//                 as: "teacherDetails",
-//             },
-//         },
-//         { $unwind: "$teacherDetails" },
-//         {
-//             $lookup: {
-//                 from: "subjects",
-//                 localField: "entries.subjectId",
-//                 foreignField: "_id",
-//                 as: "subjectDetails",
-//             },
-//         },
-//         { $unwind: "$subjectDetails" },
-//         {
-//             $project: {
-//                 dayOfWeek: 1,
-//                 "entries.period": 1,
-//                 "entries.startTime": 1,
-//                 "entries.endTime": 1,
-//                 "subjectDetails.name": 1,
-//                 "teacherDetails.name": 1,
-//             },
-//         },
-//         {
-//             $group: {
-//                 _id: "$dayOfWeek",
-//                 periods: {
-//                     $push: {
-//                         period: "$entries.period",
-//                         subject: "$subjectDetails.name",
-//                         teacher: "$teacherDetails.name",
-//                         startTime: "$entries.startTime",
-//                         endTime: "$entries.endTime",
-//                     },
-//                 },
-//             },
-//         },
-//     ]);
-
-//     return res
-//         .status(200)
-//         .json(
-//             new ApiResponse(
-//                 200,
-//                 timetable,
-//                 "Class Timetable fetched successfully"
-//             )
-//         );
-// });
-
 export const getClassTimeTableByClassId = wrapAsync(async (req, res) => {
     const classId = new mongoose.Types.ObjectId(req.params.classId);
 
@@ -348,7 +256,7 @@ export const getClassTimeTableByClassId = wrapAsync(async (req, res) => {
                                         format: "%H:%M",
                                         date: "$entries.startTime",
                                     },
-                                }, 
+                                },
                                 " - ",
                                 {
                                     $dateToString: {
@@ -364,7 +272,7 @@ export const getClassTimeTableByClassId = wrapAsync(async (req, res) => {
             },
         },
     ]);
-    
+
     const formattedTimetable = timetable.reduce((acc, curr) => {
         const day = curr._id;
         acc[day] = curr.periods.map((period) => ({
@@ -389,7 +297,9 @@ export const getClassTimeTableByClassId = wrapAsync(async (req, res) => {
 });
 
 export const getTeacherTimetable = wrapAsync(async (req, res) => {
-    const teacherId = new mongoose.Types.ObjectId(req.params.teacherId);
+    const teacherId = new mongoose.Types.ObjectId(req.user?.id);
+    
+
     const timetable = await Timetable.aggregate([
         { $unwind: "$entries" },
         { $match: { "entries.teacherId": teacherId } },
@@ -454,6 +364,181 @@ export const getTeacherTimetable = wrapAsync(async (req, res) => {
                 200,
                 timetable,
                 "Teacher's Timetable fetched successfully"
+            )
+        );
+});
+
+export const getStudentTimetable = wrapAsync(async (req, res) => {
+    const studentId = new mongoose.Types.ObjectId(req.user?.id);
+
+    const student = await Student.findById(studentId).select("currentClass");
+
+    if (!student) {
+        return res
+            .status(404)
+            .json(new ApiResponse(404, null, "Student not found"));
+    }
+
+    const classId = student.currentClass;
+
+    const timetable = await Timetable.aggregate([
+        { $match: { classId: classId } },
+        { $unwind: "$entries" },
+        {
+            $lookup: {
+                from: "classes",
+                localField: "classId",
+                foreignField: "_id",
+                as: "classDetails",
+            },
+        },
+        { $unwind: "$classDetails" },
+        {
+            $lookup: {
+                from: "teachers",
+                localField: "entries.teacherId",
+                foreignField: "_id",
+                as: "teacherDetails",
+            },
+        },
+        { $unwind: "$teacherDetails" },
+        {
+            $lookup: {
+                from: "subjects",
+                localField: "entries.subjectId",
+                foreignField: "_id",
+                as: "subjectDetails",
+            },
+        },
+        { $unwind: "$subjectDetails" },
+        {
+            $project: {
+                dayOfWeek: 1,
+                "entries.period": 1,
+                "entries.startTime": 1,
+                "entries.endTime": 1,
+                "subjectDetails.name": 1,
+                "teacherDetails.name": 1,
+                "classDetails.name": 1,
+            },
+        },
+        {
+            $group: {
+                _id: "$dayOfWeek",
+                periods: {
+                    $push: {
+                        period: "$entries.period",
+                        subject: "$subjectDetails.name",
+                        startTime: "$entries.startTime",
+                        endTime: "$entries.endTime",
+                        teacher: "$teacherDetails.name",
+                        className: "$classDetails.name",
+                    },
+                },
+            },
+        },
+    ]);
+
+    if (!timetable || timetable.length === 0) {
+        return res
+            .status(404)
+            .json(
+                new ApiResponse(404, null, "No timetable found for this class")
+            );
+    }
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                timetable,
+                "Student's Timetable fetched successfully"
+            )
+        );
+});
+
+export const getStudentTimetableByParentId = wrapAsync(async (req, res) => {
+    const parentId = new mongoose.Types.ObjectId(req.user?.id);
+
+    const student = await Student.findOne({ parent: parentId }).select(
+        "currentClass"
+    );
+    const classId = student.currentClass;
+
+    const timetable = await Timetable.aggregate([
+        { $match: { classId: classId } },
+        { $unwind: "$entries" },
+        {
+            $lookup: {
+                from: "classes",
+                localField: "classId",
+                foreignField: "_id",
+                as: "classDetails",
+            },
+        },
+        { $unwind: "$classDetails" },
+        {
+            $lookup: {
+                from: "teachers",
+                localField: "entries.teacherId",
+                foreignField: "_id",
+                as: "teacherDetails",
+            },
+        },
+        { $unwind: "$teacherDetails" },
+        {
+            $lookup: {
+                from: "subjects",
+                localField: "entries.subjectId",
+                foreignField: "_id",
+                as: "subjectDetails",
+            },
+        },
+        { $unwind: "$subjectDetails" },
+        {
+            $project: {
+                dayOfWeek: 1,
+                "entries.period": 1,
+                "entries.startTime": 1,
+                "entries.endTime": 1,
+                "subjectDetails.name": 1,
+                "teacherDetails.name": 1,
+                "classDetails.name": 1,
+            },
+        },
+        {
+            $group: {
+                _id: "$dayOfWeek",
+                periods: {
+                    $push: {
+                        period: "$entries.period",
+                        subject: "$subjectDetails.name",
+                        startTime: "$entries.startTime",
+                        endTime: "$entries.endTime",
+                        teacher: "$teacherDetails.name",
+                        className: "$classDetails.name",
+                    },
+                },
+            },
+        },
+    ]);
+
+    if (!timetable || timetable.length === 0) {
+        return res
+            .status(404)
+            .json(
+                new ApiResponse(404, null, "No timetable found for this class")
+            );
+    }
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                timetable,
+                "Student's Timetable fetched successfully"
             )
         );
 });
