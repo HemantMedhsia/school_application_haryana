@@ -22,33 +22,41 @@ const SelectDropdown = ({ filter, value, onChange }) => {
 
 // Standard Time Input Component
 const TimeInput = ({ value, onChange, placeholder }) => (
-  <div className=" flex justify-center items-center border-gray-600 border p-2 rounded-md bg-gray-700">
+  <div className="flex justify-center items-center border-gray-600 border p-2 rounded-md bg-gray-700">
     <label className="text-white">{placeholder}</label>
     <input
       type="time"
       value={value}
       onChange={onChange}
-      className="ml-3 bg-gray-700 text-white rounded-md  border-gray-600 focus:outline-none focus:ring-2 focus:ring-[#7367F0]"
+      className="ml-3 bg-gray-700 text-white rounded-md border-gray-600 focus:outline-none focus:ring-2 focus:ring-[#7367F0]"
       placeholder={placeholder}
     />
   </div>
 );
 
-// Main DynamicFilterBar Component
+// Main DynamicFilterBar2 Component
 const DynamicFilterBar2 = ({ filters, onSubmit }) => {
   const [filterValues, setFilterValues] = useState({});
 
   const handleChange = (e, filter) => {
     const value = e.target.value;
-    setFilterValues({
-      ...filterValues,
+
+    // Update filterValues state with the selected value
+    setFilterValues((prevValues) => ({
+      ...prevValues,
       [filter.name]: value,
-    });
+    }));
+
+    // Call the onChange handler if provided
+    if (filter.onChange) {
+      filter.onChange(value); // Trigger the specific onChange for the filter
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(filterValues);
+    console.log(filterValues); // Log the current filter values
+    onSubmit(filterValues); // Call the onSubmit with the filter values
   };
 
   return (
