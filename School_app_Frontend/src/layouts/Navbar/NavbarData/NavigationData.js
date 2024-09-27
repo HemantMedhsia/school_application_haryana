@@ -134,7 +134,7 @@ export const navigation = [
     to: "#",
     icon: FaClock,
     current: false,
-    roles: ["Admin", "Teacher", "Student"],
+    roles: ["Admin", "Teacher", "Parent","Student"],
     children: [
       {
         name: "Class TimeTable",

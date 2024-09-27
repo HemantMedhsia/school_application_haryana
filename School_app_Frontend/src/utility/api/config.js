@@ -91,4 +91,8 @@ export const getApiConfig = {
     url: "/get-all-staffs",
     method: "GET",
   },
+  getAllTeachers: {
+    url: "/get-all-teachers",
+    method: "GET",
+  },
 };
