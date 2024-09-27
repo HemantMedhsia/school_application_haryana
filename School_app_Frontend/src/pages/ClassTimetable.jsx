@@ -3,171 +3,6 @@ import DynamicFilterBar from "../common/FilterBar/DynamicFilterBar";
 import { getAPI } from "../utility/api/apiCall";
 import axios from "axios";
 
-const scheduleData = {
-  "Class 1": {
-    Monday: [
-      {
-        subject: "HINDI (HIN)",
-        time: "8:20 AM - 9:05 AM",
-        teacher: "Shivani Singh (VIS/010)",
-        room: "Room No: 1",
-      },
-      {
-        subject: "HINDI (HIN)",
-        time: "8:20 AM - 9:05 AM",
-        teacher: "Shivani Singh (VIS/010)",
-        room: "Room No: 1",
-      },
-      {
-        subject: "HINDI (HIN)",
-        time: "8:20 AM - 9:05 AM",
-        teacher: "Shivani Singh (VIS/010)",
-        room: "Room No: 1",
-      },
-      {
-        subject: "HINDI (HIN)",
-        time: "8:20 AM - 9:05 AM",
-        teacher: "Shivani Singh (VIS/010)",
-        room: "Room No: 1",
-      },
-    ],
-    Tuesday: [
-      {
-        subject: "MATHEMATICS (MATH)",
-        time: "9:05 AM - 9:50 AM",
-        teacher: "Jamuna Prasad Maurya (VIS/05)",
-        room: "Room No: 1",
-      },
-      {
-        subject: "MATHEMATICS (MATH)",
-        time: "9:05 AM - 9:50 AM",
-        teacher: "Jamuna Prasad Maurya (VIS/05)",
-        room: "Room No: 1",
-      },
-      {
-        subject: "MATHEMATICS (MATH)",
-        time: "9:05 AM - 9:50 AM",
-        teacher: "Jamuna Prasad Maurya (VIS/05)",
-        room: "Room No: 1",
-      },
-    ],
-    Wednesday: [
-      {
-        subject: "HINDI (HIN)",
-        time: "8:20 AM - 9:05 AM",
-        teacher: "Shivani Singh (VIS/010)",
-        room: "Room No: 1",
-      },
-      {
-        subject: "HINDI (HIN)",
-        time: "8:20 AM - 9:05 AM",
-        teacher: "Shivani Singh (VIS/010)",
-        room: "Room No: 1",
-      },
-      {
-        subject: "HINDI (HIN)",
-        time: "8:20 AM - 9:05 AM",
-        teacher: "Shivani Singh (VIS/010)",
-        room: "Room No: 1",
-      },
-      {
-        subject: "HINDI (HIN)",
-        time: "8:20 AM - 9:05 AM",
-        teacher: "Shivani Singh (VIS/010)",
-        room: "Room No: 1",
-      },
-    ],
-    Thursday: [
-      {
-        subject: "HINDI (HIN)",
-        time: "8:20 AM - 9:05 AM",
-        teacher: "Shivani Singh (VIS/010)",
-        room: "Room No: 1",
-      },
-      {
-        subject: "HINDI (HIN)",
-        time: "8:20 AM - 9:05 AM",
-        teacher: "Shivani Singh (VIS/010)",
-        room: "Room No: 1",
-      },
-      {
-        subject: "HINDI (HIN)",
-        time: "8:20 AM - 9:05 AM",
-        teacher: "Shivani Singh (VIS/010)",
-        room: "Room No: 1",
-      },
-      {
-        subject: "HINDI (HIN)",
-        time: "8:20 AM - 9:05 AM",
-        teacher: "Shivani Singh (VIS/010)",
-        room: "Room No: 1",
-      },
-    ],
-    Friday: [
-      {
-        subject: "HINDI (HIN)",
-        time: "8:20 AM - 9:05 AM",
-        teacher: "Shivani Singh (VIS/010)",
-        room: "Room No: 1",
-      },
-      {
-        subject: "HINDI (HIN)",
-        time: "8:20 AM - 9:05 AM",
-        teacher: "Shivani Singh (VIS/010)",
-        room: "Room No: 1",
-      },
-      {
-        subject: "HINDI (HIN)",
-        time: "8:20 AM - 9:05 AM",
-        teacher: "Shivani Singh (VIS/010)",
-        room: "Room No: 1",
-      },
-      {
-        subject: "HINDI (HIN)",
-        time: "8:20 AM - 9:05 AM",
-        teacher: "Shivani Singh (VIS/010)",
-        room: "Room No: 1",
-      },
-    ],
-    Saturday: [
-      {
-        subject: "HINDI (HIN)",
-        time: "8:20 AM - 9:05 AM",
-        teacher: "Shivani Singh (VIS/010)",
-        room: "Room No: 1",
-      },
-      {
-        subject: "HINDI (HIN)",
-        time: "8:20 AM - 9:05 AM",
-        teacher: "Shivani Singh (VIS/010)",
-        room: "Room No: 1",
-      },
-      {
-        subject: "HINDI (HIN)",
-        time: "8:20 AM - 9:05 AM",
-        teacher: "Shivani Singh (VIS/010)",
-        room: "Room No: 1",
-      },
-      {
-        subject: "HINDI (HIN)",
-        time: "8:20 AM - 9:05 AM",
-        teacher: "Shivani Singh (VIS/010)",
-        room: "Room No: 1",
-      },
-    ],
-  },
-  "Class 2": {
-    Wednesday: [
-      {
-        subject: "ENGLISH (ENG)",
-        time: "10:00 AM - 10:45 AM",
-        teacher: "Rahul Sharma (VIS/02)",
-        room: "Room No: 2",
-      },
-    ],
-  },
-};
-  
 const ClassTimetable = () => {
   const [classes, setClasses] = useState([]);
   const [selectedClass, setSelectedClass] = useState("");
@@ -181,15 +16,6 @@ const ClassTimetable = () => {
       } catch (error) {
         console.error("Error fetching classes", error);
       }
-
-      // Mock data
-      // const mockClasses = [
-      //   { name: "Class 1" },
-      //   { name: "Class 2" },
-      //   { name: "Class 3" },
-      // ];
-
-      // setClasses(mockClasses);
     };
 
     fetchClasses();
@@ -197,20 +23,43 @@ const ClassTimetable = () => {
 
   const handleClassChange = (selectedClass) => {
     setSelectedClass(selectedClass);
-    setShowTable(false); // Reset the table view when the class changes
+    setShowTable(false);
   };
 
-  const handleFilterSubmit = (filterData) => {
-    const selectedClassName = filterData.class;
-    const timetableData = scheduleData[selectedClassName];
-    console.log("Timetable data:", timetableData);
-    console.log("Selected class:", selectedClassName);
-    console.log("filterData:", filterData);
+  const formatTime = (timeString) => {
+    const [startTime, endTime] = timeString.split(" - ");
+    const format = (time) => {
+      const [hour, minute] = time.split(":").map(Number);
+      const ampm = hour >= 12 ? "PM" : "AM";
+      const formattedHours = hour % 12 || 12;
+      const formattedMinutes = minute < 10 ? `0${minute}` : minute;
+      return `${formattedHours}:${formattedMinutes} ${ampm}`;
+    };
 
-    if (timetableData) {
-      setTimetable(timetableData);
-      setShowTable(true);
-    } else {
+    return `${format(startTime)} - ${format(endTime)}`;
+  };
+
+  const handleFilterSubmit = async (filterData) => {
+    const selectedClassId = `Class ${filterData.class.trim()}`;
+
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/get-class-timetable/${
+          filterData.class
+        }`
+      );
+
+      const timetableData = response.data.data[selectedClassId];
+
+      if (timetableData) {
+        setTimetable(timetableData);
+        setShowTable(true);
+      } else {
+        setTimetable(null);
+        setShowTable(false);
+      }
+    } catch (error) {
+      console.error("Error fetching timetable:", error);
       setTimetable(null);
       setShowTable(false);
     }
@@ -225,10 +74,19 @@ const ClassTimetable = () => {
       type: "select",
       options: classes.map((classItem) => ({
         label: classItem.name,
-        value: classItem.name, 
+        value: classItem._id,
       })),
       onChange: handleClassChange,
     },
+  ];
+
+  const daysOfWeek = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
   ];
 
   return (
@@ -240,32 +98,42 @@ const ClassTimetable = () => {
       <div className="mt-6">
         {showTable ? (
           <div className="flex flex-wrap gap-8">
-            {Object.entries(timetable).map(([day, subjects], dayIndex) => (
-              <div key={dayIndex} className="flex-1">
-                {/* Day heading */}
-                <h2 className="text-xl font-bold mb-4 text-center">{day}</h2>
-                <div className="flex flex-col gap-4">
-                  {subjects.map((subjectData, index) => (
-                    <div
-                      key={index}
-                      className="border border-gray-300 p-4 rounded-md bg-[#203046] text-white"
-                    >
-                      <h3 className="font-bold text-lg">
-                        {subjectData.subject}
-                      </h3>
-                      <p className="text-sm">{subjectData.time}</p>
-                      <p className="text-sm">{subjectData.teacher}</p>
-                      <p className="text-sm">{subjectData.room}</p>
-                    </div>
-                  ))}
+            {daysOfWeek.map((day, dayIndex) => {
+              const subjects = timetable ? timetable[day] : []; // Default to an empty array if timetable is undefined
+              return (
+                <div key={dayIndex} className="flex-1">
+                  {/* Day heading */}
+                  <h2 className="text-xl font-bold mb-4 text-center">{day}</h2>
+                  <div className="flex flex-col gap-4">
+                    {subjects && subjects.length > 0 ? ( // Check if subjects is defined and has length
+                      subjects.map((subjectData, index) => (
+                        <div
+                          key={index}
+                          className="border border-gray-300 p-4 rounded-md bg-[#203046] text-white"
+                        >
+                          <h3 className="font-bold text-lg">
+                            {subjectData.subject}
+                          </h3>
+                          <p className="text-sm">
+                            {formatTime(subjectData.time)}
+                          </p>
+                          <p className="text-sm">{subjectData.teacher}</p>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-center text-gray-400">
+                        No classes scheduled.
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
           <p className="text-center text-red-500">
             {selectedClass
-              ? "No timetable available for this class."
+              ? ""
               : "Please select a class to view the timetable."}
           </p>
         )}

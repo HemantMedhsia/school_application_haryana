@@ -42,6 +42,7 @@ import ViewMarks from "./pages/Examination/ViewMarks.jsx";
 import ViewExaminationScheduleForStudentAndParent from "./pages/Examination/ViewExaminationScheduleForStudentAndParent.jsx";
 import StaffAdd from "./pages/Staff/StaffAdd.jsx";
 import StaffInfo from "./pages/Staff/StaffInfo.jsx";
+import CommonClassTimeTable from "./pages/CommonClassTimeTable.jsx";
 
 const App = () => {
   const { userRole, authToken } = useAuth();
@@ -108,6 +109,7 @@ const App = () => {
           <Route path="exam-type" element={<ExamType />} />
           <Route path="exam-schedule" element={<ExaminationSchedule />} />
           <Route path="class-timetable" element={<ClassTimetable />} />
+          <Route path ="class-timetable-user" element={<CommonClassTimeTable />} />
           <Route path="teacher-timetable" element={<TeacherTimetable />} />
           <Route path="create-timetable" element={<CreateTimetabel />} />
           <Route path="assign-teacher" element={<AssingTeacher />} />
