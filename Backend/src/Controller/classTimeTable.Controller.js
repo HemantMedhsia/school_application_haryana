@@ -368,6 +368,78 @@ export const getTeacherTimetable = wrapAsync(async (req, res) => {
         );
 });
 
+export const getTeacherTimetableById = wrapAsync(async (req, res) => {
+    const teacherId = new mongoose.Types.ObjectId(req.params.teacherId);
+    
+
+    const timetable = await Timetable.aggregate([
+        { $unwind: "$entries" },
+        { $match: { "entries.teacherId": teacherId } },
+        {
+            $lookup: {
+                from: "classes",
+                localField: "classId",
+                foreignField: "_id",
+                as: "classDetails",
+            },
+        },
+        { $unwind: "$classDetails" },
+        {
+            $lookup: {
+                from: "teachers",
+                localField: "entries.teacherId",
+                foreignField: "_id",
+                as: "teacherDetails",
+            },
+        },
+        { $unwind: "$teacherDetails" },
+        {
+            $lookup: {
+                from: "subjects",
+                localField: "entries.subjectId",
+                foreignField: "_id",
+                as: "subjectDetails",
+            },
+        },
+        { $unwind: "$subjectDetails" },
+        {
+            $project: {
+                dayOfWeek: 1,
+                "entries.period": 1,
+                "entries.startTime": 1,
+                "entries.endTime": 1,
+                "subjectDetails.name": 1,
+                "teacherDetails.name": 1,
+                "classDetails.name": 1,
+            },
+        },
+        {
+            $group: {
+                _id: "$dayOfWeek",
+                periods: {
+                    $push: {
+                        period: "$entries.period",
+                        subject: "$subjectDetails.name",
+                        startTime: "$entries.startTime",
+                        endTime: "$entries.endTime",
+                        className: "$classDetails.name",
+                    },
+                },
+            },
+        },
+    ]);
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                timetable,
+                "Teacher's Timetable fetched successfully"
+            )
+        );
+});
+
 export const getStudentTimetable = wrapAsync(async (req, res) => {
     const studentId = new mongoose.Types.ObjectId(req.user?.id);
 
