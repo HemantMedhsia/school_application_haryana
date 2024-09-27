@@ -7,7 +7,7 @@ const TeacherTimetable = () => {
   const [teachers, setTeachers] = useState([]);
   const [selectedTeacher, setSelectedTeacher] = useState("");
   const [showTable, setShowTable] = useState(false);
-  const [timetable, setTimetable] = useState(null);
+  const [timetable, setTimetable] = useState([]);
 
   useEffect(() => {
     const fetchTeachers = async () => {
@@ -28,15 +28,19 @@ const TeacherTimetable = () => {
 
   const handleSubmit = async (formData) => {
     const teacherId = formData.teacher;
-    console.log("Selected teacher:", teacherId);
     setSelectedTeacher(teacherId);
+    console.log("Selected teacher:", selectedTeacher);
 
     if (teacherId) {
       try {
         const response = await axios.get(
-          `https://your-api-url/getTimetable/${teacherId}`
+          `${
+            import.meta.env.VITE_BACKEND_URL
+          }/api/get-teacher-timetable/${teacherId}`
         );
-        setTimetable(response.data.data); 
+        setTimetable(response.data.data); // Set timetable from response
+        console.log(response.data);
+        console.log("Timetable data:", response.data.data);
         setShowTable(true);
       } catch (error) {
         console.error("Error fetching timetable", error);
@@ -77,24 +81,37 @@ const TeacherTimetable = () => {
       <div className="mt-6">
         {showTable ? (
           <div className="flex flex-wrap gap-8">
-            {daysOfWeek.map((day, dayIndex) => {
-              const subjects = timetable ? timetable[day] : []; // Default to an empty array if timetable is undefined
+            {daysOfWeek.map((day) => {
+              const dayData = timetable.find((item) => item._id === day); // Get the correct day's data
+              const subjects = dayData ? dayData.periods : []; // Access periods for the specific day
+
               return (
-                <div key={dayIndex} className="flex-1">
+                <div key={day} className="flex-1">
                   {/* Day heading */}
                   <h2 className="text-xl font-bold mb-4 text-center">{day}</h2>
                   <div className="flex flex-col gap-4">
-                    {subjects && subjects.length > 0 ? (
+                    {subjects.length > 0 ? (
                       subjects.map((subjectData, index) => (
                         <div
                           key={index}
                           className="border border-gray-300 p-4 rounded-md bg-[#203046] text-white"
                         >
                           <h3 className="font-bold text-lg">
-                            {subjectData.subject}
+                            {subjectData.className}
                           </h3>
-                          <p className="text-sm">{subjectData.time}</p>
-                          <p className="text-sm">{subjectData.class}</p>
+                          <p className="text-sm">{subjectData.period}</p>
+                          <p className="text-sm">{subjectData.subject}</p>
+                          <p className="text-sm">{`${new Date(
+                            subjectData.startTime
+                          ).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })} - ${new Date(
+                            subjectData.endTime
+                          ).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}`}</p>
                         </div>
                       ))
                     ) : (
