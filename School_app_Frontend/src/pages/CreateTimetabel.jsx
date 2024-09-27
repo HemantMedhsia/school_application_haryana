@@ -17,6 +17,8 @@ const CreateTimetable = () => {
   const [lunchBreakAfterPeriod, setLunchBreakAfterPeriod] = useState("2");
   const [subjectGroups, setSubjectGroups] = useState([]);
   const [entries, setEntries] = useState([]);
+  const [subjects, setSubjects] = useState([]);
+  const [data, setData] = useState([]);
   const [classes, setClasses] = useState([]);
 
   useEffect(() => {
@@ -40,6 +42,31 @@ const CreateTimetable = () => {
     const selectedClass = classes.find((cls) => cls._id === selectedClassId);
     setSubjectGroups(selectedClass?.subjectGroups || []);
   };
+
+  const handleSubjectGroupChange = (selectedSubjectGroupId) => {
+    const selectedSubjectGroup = subjectGroups.find(
+      (group) => group._id === selectedSubjectGroupId
+    );
+
+    if (selectedSubjectGroup) {
+      console.log("Selected Subject Group:", selectedSubjectGroup);
+
+      // Set the subjects and data based on the selected subject group
+      setSubjects(selectedSubjectGroup.subjects);
+      setData(selectedSubjectGroup.subjects);
+
+      // Log the subjects to verify the state has been updated
+      console.log("Subjects:", selectedSubjectGroup.subjects);
+    } else {
+      setSubjects([]);
+      setData([]);
+    }
+  };
+
+  // Effect to log the current subjects state whenever it changes
+  useEffect(() => {
+    console.log("Current Subjects State:", subjects);
+  }, [subjects]);
 
   const handleAddPeriod = () => {
     const intervalInMinutes = parseInt(classInterval);
@@ -114,11 +141,12 @@ const CreateTimetable = () => {
   const handleEntryChange = (index, field, value) => {
     const updatedEntries = entries.map((entry, i) => {
       if (i === index) {
-        return { ...entry, [field]: value };
+        return { ...entry, [field]: value.target.value };
       }
       return entry;
     });
     setEntries(updatedEntries);
+    console.log("Updated Entries:", updatedEntries);
   };
 
   const handleSubmit = () => {
@@ -145,7 +173,10 @@ const CreateTimetable = () => {
       placeholder: "Select Class",
       required: true,
       type: "select",
-      options: classes.map((classItem) => ({ label: classItem?.name, value: classItem?._id })),
+      options: classes.map((classItem) => ({
+        label: classItem?.name,
+        value: classItem?._id,
+      })),
       onChange: handleClassChange,
     },
     {
@@ -154,13 +185,24 @@ const CreateTimetable = () => {
       placeholder: "Select Subject Group",
       required: true,
       type: "select",
-      options: subjectGroups.map((group) => ({ label: group?.name, value: group?._id })),
+      options: subjectGroups.map((group) => ({
+        label: group?.name,
+        value: group?._id,
+      })),
+      onChange: handleSubjectGroupChange,
     },
     {
       name: "dayOfWeek",
       type: "select",
       placeholder: "Select Day",
-      options: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].map((day) => ({
+      options: [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      ].map((day) => ({
         value: day.toLowerCase(),
         label: day,
       })),
@@ -311,11 +353,13 @@ const CreateTimetable = () => {
               onChange={(value) => handleEntryChange(index, "teacherId", value)}
             />
             <SearchableSelect
+              labelName={""}
               placeholder="Select Subject"
-              options={[
-                { value: "subject1", label: "Subject 1" },
-                { value: "subject2", label: "Subject 2" },
-              ]}
+              value={entries[index].subjectId}
+              options={subjects.map((subject) => ({
+                id: subject._id,
+                name: subject.name,
+              }))}
               onChange={(value) => handleEntryChange(index, "subjectId", value)}
             />
             <TimeInput

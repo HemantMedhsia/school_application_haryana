@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from "react";
 const SearchableSelect = ({
   labelName,
   name,
-  value,
+  value="",
   onChange,
   options,
   placeholder = "Select",
