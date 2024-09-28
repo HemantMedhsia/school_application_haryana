@@ -47,6 +47,8 @@ const DynamicFilterBar2 = ({ filters, onSubmit }) => {
       [filter.name]: value,
     }));
 
+    console.log(`Updated ${filter.name}:`, value); // Add this log to debug the updated values
+
     // Call the onChange handler if provided
     if (filter.onChange) {
       filter.onChange(value); // Trigger the specific onChange for the filter
@@ -55,7 +57,8 @@ const DynamicFilterBar2 = ({ filters, onSubmit }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(filterValues); // Log the current filter values
+
+    console.log("Final filter values on submit:", filterValues); // Log the current filter values
     onSubmit(filterValues); // Call the onSubmit with the filter values
   };
 
