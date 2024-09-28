@@ -76,10 +76,10 @@ export const loginTeacher = wrapAsync(async (req, res, next) => {
     );
 
     teacher.refreshToken = refreshToken;
-    await teacher.save();
+    await teacher.save({ validateBeforeSave: false });
 
     const loggedInTeacher = await Teacher.findById(teacher._id).select(
-        "-password -refreshToken"
+        "-password"
     );
 
     // Cookie options

@@ -2,7 +2,6 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import PyramidLoader from "../common/Loader/PyramidLoader";
-import { toast, ToastContainer } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
@@ -53,14 +52,13 @@ export const AuthProvider = ({ children }) => {
         const decodedToken = jwtDecode(authToken);
         const currentTime = Date.now() / 1000;
 
-        // Refresh the token if it's about to expire in the next 1 minute
-        if (
-          decodedToken.exp < currentTime + 60 &&
-          refreshToken &&
-          !isTokenRefreshed
-        ) {
-          isTokenRefreshed = true;
-          await refreshAuthToken(refreshToken, decodedToken.role);
+        if (decodedToken.exp < currentTime + 60) {
+          if (refreshToken) {
+            await refreshAuthToken(refreshToken, decodedToken.role);
+          } else {
+            logout(false);
+            navigate("/login");
+          }
         }
       }
       setLoading(false);
@@ -70,6 +68,7 @@ export const AuthProvider = ({ children }) => {
   }, [authToken, refreshToken]);
 
   const refreshAuthToken = async (token, role) => {
+    console.log("Refreshing token...", token, role);
     try {
       const endpoint = getRefreshEndpoint(role);
       const response = await axios.post(
@@ -77,6 +76,7 @@ export const AuthProvider = ({ children }) => {
         { token },
         { headers: { "Content-Type": "application/json" } }
       );
+      console.log("Refresh token response:", response.data);
 
       const newAuthToken = response.data.authToken;
       const decodedToken = jwtDecode(newAuthToken);
@@ -87,8 +87,7 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       if (!isLoggingOut) {
         setIsLoggingOut(true);
-        toast.error("Failed to refresh token. Please login again.");
-        logout(false); // Pass `false` to avoid double toast
+        logout(false);
       }
     }
   };
@@ -127,7 +126,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("name");
 
     if (showToast) {
-      toast.success("Logged out successfully!");
+      console.log("Logged out successfully!");
     }
 
     setIsLoggingOut(false);
@@ -136,7 +135,6 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <div>
-      <ToastContainer />
       <AuthContext.Provider
         value={{
           authToken,

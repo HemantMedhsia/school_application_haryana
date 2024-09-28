@@ -102,12 +102,13 @@ export const loginStudent = wrapAsync(async (req, res, next) => {
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
         student._id
     );
+    console.log("refereshToken", refreshToken);
 
     student.refreshToken = refreshToken;
-    await student.save();
+    await student.save({ validateBeforeSave: false });
 
     const loggedInStudent = await Student.findById(student._id).select(
-        "-password -refreshToken"
+        "-password "
     );
 
     // Cookie options
@@ -260,7 +261,7 @@ export const getStudentByParent = wrapAsync(async (req, res) => {
     const student = await Student.find({
         parent: req.params.parentId,
     }).populate("currentClass");
-    
+
     if (!student) {
         return res.status(404).json({
             success: false,
