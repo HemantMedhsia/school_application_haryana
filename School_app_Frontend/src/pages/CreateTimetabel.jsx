@@ -176,37 +176,40 @@ const CreateTimetable = () => {
   };
 
   const handleSubmit = () => {
-    const filteredEntries = entries.filter(
-      (entry) => entry.period !== "Lunch Break"
-    );
+    // Get today's date in YYYY-MM-DD format
+    const today = new Date().toISOString().split("T")[0];
+  
+    // Map over entries to convert times to ISO format
+    const formattedEntries = entries.map(entry => ({
+      ...entry,
+      startTime: new Date(`${today}T${entry.startTime}:00Z`).toISOString(),  // Combine date and time
+      endTime: new Date(`${today}T${entry.endTime}:00Z`).toISOString(),
+    }));
 
+    const filteredEntries = formattedEntries.filter(entry => entry.period !== "Lunch Break");
+    
     const timetable = {
       classId,
       dayOfWeek,
-      entries: filteredEntries, // Use filteredEntries here
+      entries: filteredEntries,  // Use formatted entries
     };
+  
     console.log("Submitted Timetable:", timetable);
-
-    axios
-      .post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/create-class-timetable`,
-        timetable,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-        }
-      )
-      .then((response) => {
+  
+    axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/create-class-timetable`, timetable, {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+    })
+      .then(response => {
         console.log("Timetable created successfully:", response.data);
-        // Optionally, you can reset the form or redirect the user here
       })
-      .catch((error) => {
+      .catch(error => {
         console.error("Error creating timetable:", error);
       });
   };
-
+  
   const filterConfig = [
     {
       name: "classId",
