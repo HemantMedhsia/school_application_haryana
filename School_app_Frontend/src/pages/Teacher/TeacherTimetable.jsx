@@ -2,6 +2,10 @@ import { useState, useEffect } from "react";
 import DynamicFilterBar from "../../common/FilterBar/DynamicFilterBar";
 import { getAPI } from "../../utility/api/apiCall";
 import axios from "axios";
+import { LuTimer } from "react-icons/lu";
+import { MdClass, MdSubject } from "react-icons/md";
+import { PiPersonSimpleBikeThin } from "react-icons/pi";
+
 
 const TeacherTimetable = () => {
   const [teachers, setTeachers] = useState([]);
@@ -88,30 +92,45 @@ const TeacherTimetable = () => {
               return (
                 <div key={day} className="flex-1">
                   {/* Day heading */}
-                  <h2 className="text-xl font-bold mb-4 text-center">{day}</h2>
+                  <h2 className="text-xl text-[#7367F0] font-bold mb-4 text-center">
+                    {day}
+                  </h2>
                   <div className="flex flex-col gap-4">
                     {subjects.length > 0 ? (
                       subjects.map((subjectData, index) => (
                         <div
                           key={index}
-                          className="border border-gray-300 p-4 rounded-md bg-[#203046] text-white"
+                          className="shadow-[#7367F0] hover:shadow-[#65FA9E] duration-300 hover:translate-y-2 shadow-md p-4 rounded-md  text-[#65FA9E]"
                         >
-                          <h3 className="font-bold text-lg">
-                            {subjectData.className}
+                          <p className="text-sm flex items-center gap-1"><span className="text-lg"><PiPersonSimpleBikeThin/></span>Period: {subjectData.period}</p>
+                          <h3 className="font-bold text-lg flex items-center gap-1"><span><MdClass/></span>
+                            Class: {subjectData.className}
                           </h3>
-                          <p className="text-sm">{subjectData.period}</p>
-                          <p className="text-sm">{subjectData.subject}</p>
-                          <p className="text-sm">{`${new Date(
-                            subjectData.startTime
-                          ).toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })} - ${new Date(
-                            subjectData.endTime
-                          ).toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}`}</p>
+
+                          <div className="flex gap-1 items-center text-xl">
+                            <div>
+                              <MdSubject />
+                            </div>
+                            <h3 className="font-bold ">
+                              {subjectData.subject}
+                            </h3>
+                          </div>
+                          <div className=" text-red-400 my-2 flex gap-1 items-center">
+                            <div className=" text-lg">
+                              <LuTimer />
+                            </div>
+                            <p className="text-sm">{`${new Date(
+                              subjectData.startTime
+                            ).toLocaleTimeString([], {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })} - ${new Date(
+                              subjectData.endTime
+                            ).toLocaleTimeString([], {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}`}</p>
+                          </div>
                         </div>
                       ))
                     ) : (

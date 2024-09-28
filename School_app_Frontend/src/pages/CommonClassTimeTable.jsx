@@ -70,27 +70,28 @@ const CommonClassTimeTable = () => {
 
             return (
               <div key={dayIndex} className="flex flex-col">
-                <h2 className="text-xl font-bold mb-4 text-center">{day}</h2>
+                <h2 className="text-xl text-[#7367F0] font-bold mb-6 text-center">{day}</h2>
                 <div className="flex flex-col gap-4">
                   {periods.length > 0 ? (
                     periods.map((periodData, index) => (
                       <div
                         key={index}
-                        className="border border-gray-300 p-4 rounded-md bg-[#203046] text-white shadow-md transition-transform transform hover:scale-105"
+                        className="shadow-[#7367F0] hover:shadow-[#65FA9E] duration-300 hover:translate-y-2 shadow-md p-4 rounded-md  text-[#65FA9E]"
                       >
                         {/* For Teacher Role */}
                         {userRole === "Teacher" ? (
                           <div className="flex-1">
                             <h3 className="font-bold text-lg flex items-center">
-                              <AiOutlineUser className="mr-2 text-xl" />
+                              <AiOutlineUser className="mr-1 text-xl" />
+                              Class:
                               {periodData.className}
                             </h3>
                             <p className="text-sm flex mt-2 items-center">
-                              <AiOutlineBook className="mr-2 text-xl" />
+                              <AiOutlineBook className="mr-1 text-xl" />
                               {periodData.subject}
                             </p>
-                            <p className="text-sm flex mt-2 items-center">
-                              <AiOutlineClockCircle className="mr-2 text-xl" />
+                            <p className="text-sm text-red-400 flex mt-2 items-center">
+                              <AiOutlineClockCircle className="mr-1 text-xl" />
                               {formatTime(
                                 periodData.startTime,
                                 periodData.endTime

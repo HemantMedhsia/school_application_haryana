@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import DynamicFilterBar from "../common/FilterBar/DynamicFilterBar";
+import { LuTimer } from "react-icons/lu";
+import { MdSubject } from "react-icons/md";
 import { getAPI } from "../utility/api/apiCall";
+import { GiTeacher } from "react-icons/gi";
 import axios from "axios";
 
 const ClassTimetable = () => {
@@ -103,21 +106,36 @@ const ClassTimetable = () => {
               return (
                 <div key={dayIndex} className="flex-1">
                   {/* Day heading */}
-                  <h2 className="text-xl font-bold mb-4 text-center">{day}</h2>
+                  <h2 className="text-xl text-[#7367F0] font-bold mb-4 text-center">
+                    {day}
+                  </h2>
                   <div className="flex flex-col gap-4">
                     {subjects && subjects.length > 0 ? ( // Check if subjects is defined and has length
                       subjects.map((subjectData, index) => (
                         <div
                           key={index}
-                          className="border border-gray-300 p-4 rounded-md bg-[#203046] text-white"
+                          className="shadow-[#7367F0] shadow-md p-4 rounded-md  text-[#65FA9E]"
                         >
-                          <h3 className="font-bold text-lg">
-                            {subjectData.subject}
-                          </h3>
-                          <p className="text-sm">
-                            {formatTime(subjectData.time)}
-                          </p>
-                          <p className="text-sm">{subjectData.teacher}</p>
+                          <div className="flex gap-1 items-center text-xl">
+                            <div>
+                              <MdSubject />
+                            </div>
+                            <h3 className="font-bold ">
+                              {subjectData.subject}
+                            </h3>
+                          </div>
+                          <div className=" text-red-400 my-2 flex gap-1 items-center">
+                            <div className=" text-lg">
+                              <LuTimer />
+                            </div>
+                            <p className="text-sm">
+                              {formatTime(subjectData.time)}
+                            </p>
+                          </div>
+                          <div className="flex item-center gap-1">
+                            <div className="text-md"><GiTeacher /></div>
+                            <p className="text-sm">{subjectData.teacher}</p>
+                          </div>
                         </div>
                       ))
                     ) : (
