@@ -16,6 +16,8 @@ const getRefreshEndpoint = (role) => {
       return `${import.meta.env.VITE_BACKEND_URL}/api/refresh-token-teacher`;
     case "Staff":
       return `${import.meta.env.VITE_BACKEND_URL}/api/refresh-token-staff`;
+    case "Parent":
+      return `${import.meta.env.VITE_BACKEND_URL}/api/refresh-token-parent`;  
     default:
       return "https://school-application-three.vercel.app/api/refresh-token";
   }
@@ -45,8 +47,6 @@ export const AuthProvider = ({ children }) => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
-    let isTokenRefreshed = false;
-
     const handleTokenRefresh = async () => {
       if (authToken) {
         const decodedToken = jwtDecode(authToken);
@@ -56,7 +56,7 @@ export const AuthProvider = ({ children }) => {
           if (refreshToken) {
             await refreshAuthToken(refreshToken, decodedToken.role);
           } else {
-            logout(false);
+            logout();
             navigate("/login");
           }
         }
@@ -73,21 +73,32 @@ export const AuthProvider = ({ children }) => {
       const endpoint = getRefreshEndpoint(role);
       const response = await axios.post(
         endpoint,
-        { token },
+        { refreshToken: token },
         { headers: { "Content-Type": "application/json" } }
       );
       console.log("Refresh token response:", response.data);
 
-      const newAuthToken = response.data.authToken;
-      const decodedToken = jwtDecode(newAuthToken);
+      const newAuthToken = response.data.data.accessToken;
+      const newRefreshToken = response.data.data.refreshToken;
 
-      setAuthToken(newAuthToken);
-      setUserRole(decodedToken.role);
-      localStorage.setItem("authToken", newAuthToken);
+      if (newAuthToken && typeof newAuthToken === "string") {
+        const decodedToken = jwtDecode(newAuthToken);
+
+        setAuthToken(newAuthToken);
+        setRefreshToken(newRefreshToken);
+        setUserRole(decodedToken.role);
+
+        localStorage.setItem("authToken", newAuthToken);
+        localStorage.setItem("refreshToken", newRefreshToken);
+      } else {
+        throw new Error("Invalid new auth token");
+      }
     } catch (error) {
+      console.error("Error refreshing token:", error);
       if (!isLoggingOut) {
         setIsLoggingOut(true);
-        logout(false);
+        logout();
+        navigate("/login");
       }
     }
   };
