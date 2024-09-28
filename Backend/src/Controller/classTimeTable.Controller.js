@@ -68,7 +68,7 @@ export const getAvailableTeacher = wrapAsync(async (req, res) => {
 
     const availableTeachers = await Teacher.find({
         _id: { $nin: assignedTeacherIds },
-    });
+    }).select("name");
 
     return res
         .status(200)
