@@ -162,12 +162,6 @@ export const navigation = [
         roles: ["Admin"],
       },
       {
-        name: "Assign Teacher",
-        to: "/school/assign-teacher",
-        icon: FaCheckCircle,
-        roles: ["Admin"],
-      },
-      {
         name: "Create Section",
         to: "/school/create-section",
         icon: FaCheckCircle,
