@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const timetableEntrySchema = new mongoose.Schema({
-    period: Number,
+    period: String,
     teacherId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Teacher",

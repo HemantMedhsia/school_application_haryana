@@ -60,13 +60,9 @@ export const loginParent = wrapAsync(async (req, res, next) => {
         return next(new ApiError(404, "parent does not exist"));
     }
 
-    console.log("parent found:", parent);
-
     const isPasswordValid = await parent.isValidPassword(password);
-    console.log("Is password valid:", isPasswordValid);
 
     if (!isPasswordValid) {
-        console.log("Invalid password attempt for parent:", parent.email);
         return next(new ApiError(401, " Invalid parent credentials "));
     }
 
@@ -78,7 +74,7 @@ export const loginParent = wrapAsync(async (req, res, next) => {
     await parent.save();
 
     const loggedInparent = await Parent.findById(parent._id).select(
-        "-parentLoginPassword -refreshToken"
+        "-parentLoginPassword "
     );
 
     // Cookie options

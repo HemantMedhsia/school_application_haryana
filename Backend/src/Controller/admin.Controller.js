@@ -85,6 +85,9 @@ export const loginAdmin = wrapAsync(async (req, res, next) => {
         admin._id
     );
 
+    admin.refreshToken = refreshToken;
+    await admin.save({ validateBeforeSave: false });
+
     return res
         .status(200)
         .cookie("accessToken", accessToken)
@@ -99,7 +102,7 @@ export const loginAdmin = wrapAsync(async (req, res, next) => {
                 },
                 "Admin logged in successfully"
             )
-        ); 
+        );
 });
 
 export const refreshAccessTokenAdmin = wrapAsync(async (req, res, next) => {
