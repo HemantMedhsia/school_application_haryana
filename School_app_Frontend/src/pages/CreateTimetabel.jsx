@@ -8,7 +8,6 @@ import axios from "axios";
 
 const CreateTimetable = () => {
   const [classId, setClassId] = useState("");
-  const [subjectGroupId, setSubjectGroupId] = useState("");
   const [dayOfWeek, setDayOfWeek] = useState("");
   const [classInterval, setClassInterval] = useState("30");
   const [periodRunningTime, setPeriodRunningTime] = useState("45");
@@ -18,8 +17,11 @@ const CreateTimetable = () => {
   const [subjectGroups, setSubjectGroups] = useState([]);
   const [entries, setEntries] = useState([]);
   const [subjects, setSubjects] = useState([]);
+  const [teachers, setTeachers] = useState([]);
   const [data, setData] = useState([]);
   const [classes, setClasses] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [subjectGroupId, setSubjectGroupId] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -27,7 +29,6 @@ const CreateTimetable = () => {
         const [classesResponse] = await Promise.all([
           axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/all-class`),
         ]);
-
         setClasses(classesResponse.data.data || []);
       } catch (error) {
         console.error("Error fetching data", error);
@@ -36,6 +37,31 @@ const CreateTimetable = () => {
 
     fetchData();
   }, []);
+
+  const fetchAvailableTeachers = async (dayOfWeek, periods) => {
+    try {
+      console.log("dayofweek", dayOfWeek);
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/available-teachers`,
+        {
+          params: {
+            dayOfWeek,
+            periods,
+          },
+        }
+      );
+      setTeachers(response.data.data || []);
+      console.log("avl", teachers); // Adjust this based on your API response structure
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDayOfWeekChange = (selectedDay) => {
+    fetchAvailableTeachers(selectedDay, 1);
+  };
 
   const handleClassChange = (selectedClassId) => {
     console.log("Selected Class:");
@@ -150,25 +176,40 @@ const CreateTimetable = () => {
   };
 
   const handleSubmit = () => {
+    const filteredEntries = entries.filter(
+      (entry) => entry.period !== "Lunch Break"
+    );
+
     const timetable = {
       classId,
-      subjectGroupId,
       dayOfWeek,
-      classInterval,
-      periodStartTiming,
-      periodRunningTime,
-      lunchBreak,
-      lunchBreakAfterPeriod,
-      entries,
+      entries: filteredEntries, // Use filteredEntries here
     };
     console.log("Submitted Timetable:", timetable);
-    // Submit timetable to backend (API call)
-    // Example: axios.post('/api/timetables', timetable)
+
+    axios
+      .post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/create-class-timetable`,
+        timetable,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      )
+      .then((response) => {
+        console.log("Timetable created successfully:", response.data);
+        // Optionally, you can reset the form or redirect the user here
+      })
+      .catch((error) => {
+        console.error("Error creating timetable:", error);
+      });
   };
 
   const filterConfig = [
     {
-      name: "class",
+      name: "classId",
       label: "Select Class",
       placeholder: "Select Class",
       required: true,
@@ -203,9 +244,10 @@ const CreateTimetable = () => {
         "Friday",
         "Saturday",
       ].map((day) => ({
-        value: day.toLowerCase(),
+        value: day,
         label: day,
       })),
+      onChange: handleDayOfWeekChange,
     },
     {
       name: "classInterval",
@@ -346,10 +388,11 @@ const CreateTimetable = () => {
           <FormSection>
             <SearchableSelect
               placeholder="Select Teacher"
-              options={[
-                { value: "teacher1", label: "Teacher 1" },
-                { value: "teacher2", label: "Teacher 2" },
-              ]}
+              value={entries[index].teacherId}
+              options={teachers.map((teacher) => ({
+                id: teacher._id,
+                name: teacher.name,
+              }))}
               onChange={(value) => handleEntryChange(index, "teacherId", value)}
             />
             <SearchableSelect
@@ -372,8 +415,10 @@ const CreateTimetable = () => {
         </div>
       ))}
 
-      <FormButton onClick={handleAddPeriod} text="Add Period" />
-      <FormButton onClick={handleSubmit} text="Submit Timetable" />
+      <div className="flex gap-4">
+        <FormButton onClick={handleAddPeriod} name="Add Period" />
+        <FormButton onClick={handleSubmit} name="Submit Timetable" />
+      </div>
     </div>
   );
 };
