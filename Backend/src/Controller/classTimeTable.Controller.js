@@ -48,6 +48,39 @@ export const createClassTimeTable = wrapAsync(async (req, res) => {
         );
 });
 
+// export const getAvailableTeacher = wrapAsync(async (req, res) => {
+//     const { dayOfWeek, periods } = req.query;
+
+//     if (!periods) {
+//         return res.status(400).json({
+//             message: "Periods are required",
+//         });
+//     }
+
+//     const assignedTeachers = await Timetable.find({
+//         dayOfWeek,
+//         "entries.period": { $in: periods.split(",").map(Number) },
+//     }).select("entries.teacherId");
+
+//     const assignedTeacherIds = assignedTeachers.flatMap((t) =>
+//         t.entries.map((entry) => entry.teacherId.toString())
+//     );
+
+//     const availableTeachers = await Teacher.find({
+//         _id: { $nin: assignedTeacherIds },
+//     }).select("name");
+
+//     return res
+//         .status(200)
+//         .json(
+//             new ApiResponse(
+//                 200,
+//                 availableTeachers,
+//                 "Available Teachers fetched successfully"
+//             )
+//         );
+// });
+
 export const getAvailableTeacher = wrapAsync(async (req, res) => {
     const { dayOfWeek, periods } = req.query;
 
@@ -57,28 +90,34 @@ export const getAvailableTeacher = wrapAsync(async (req, res) => {
         });
     }
 
+    const periodArray = periods.split(",").map(Number);
+
     const assignedTeachers = await Timetable.find({
         dayOfWeek,
-        "entries.period": { $in: periods.split(",").map(Number) },
-    }).select("entries.teacherId");
+        "entries.period": { $in: periodArray },
+    }).select("entries.teacherId entries.period");
 
-    const assignedTeacherIds = assignedTeachers.flatMap((t) =>
-        t.entries.map((entry) => entry.teacherId.toString())
-    );
+    const assignedTeacherIds = new Set();
+
+    assignedTeachers.forEach((timetable) => {
+        if (timetable.entries && timetable.entries.length > 0) {
+            timetable.entries.forEach((entry) => {
+                if (periodArray.includes(Number(entry.period))) {
+                    assignedTeacherIds.add(entry.teacherId.toString());
+                }
+            });
+        }
+    });
 
     const availableTeachers = await Teacher.find({
-        _id: { $nin: assignedTeacherIds },
+        _id: { $nin: Array.from(assignedTeacherIds) },
     }).select("name");
 
-    return res
-        .status(200)
-        .json(
-            new ApiResponse(
-                200,
-                availableTeachers,
-                "Available Teachers fetched successfully"
-            )
-        );
+    return res.status(200).json({
+        status: 200,
+        data: availableTeachers,
+        message: "Available Teachers fetched successfully",
+    });
 });
 
 export const getClassTimeTable = wrapAsync(async (req, res) => {
@@ -298,7 +337,6 @@ export const getClassTimeTableByClassId = wrapAsync(async (req, res) => {
 
 export const getTeacherTimetable = wrapAsync(async (req, res) => {
     const teacherId = new mongoose.Types.ObjectId(req.user?.id);
-    
 
     const timetable = await Timetable.aggregate([
         { $unwind: "$entries" },
@@ -370,7 +408,6 @@ export const getTeacherTimetable = wrapAsync(async (req, res) => {
 
 export const getTeacherTimetableById = wrapAsync(async (req, res) => {
     const teacherId = new mongoose.Types.ObjectId(req.params.teacherId);
-    
 
     const timetable = await Timetable.aggregate([
         { $unwind: "$entries" },
