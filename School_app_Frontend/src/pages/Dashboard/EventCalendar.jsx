@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-// import './EventCalendar.css'; // Custom styles
+import Modal from 'react-modal';
 
 const localizer = momentLocalizer(moment);
 
+Modal.setAppElement('#root'); // For accessibility
+
 const EventCalendar = () => {
-  const [events] = useState([
+  const [events, setEvents] = useState([
     {
       title: 'Design Review',
       start: new Date(2024, 8, 6, 12, 58),
@@ -28,8 +30,25 @@ const EventCalendar = () => {
     },
   ]);
 
+  const [modalOpen, setModalOpen] = useState(false);
+  const [newEvent, setNewEvent] = useState({ title: '', start: '', end: '', type: 'Personal' });
+
+  const handleSelectSlot = (slotInfo) => {
+    setNewEvent({
+      ...newEvent,
+      start: slotInfo.start,
+      end: slotInfo.end,
+    });
+    setModalOpen(true);
+  };
+
+  const handleAddEvent = () => {
+    setEvents([...events, newEvent]);
+    setModalOpen(false);
+  };
+
   const eventStyleGetter = (event) => {
-    let backgroundColor = '#3174ad'; // Default color
+    let backgroundColor = '#3174ad';
     switch (event.type) {
       case 'Personal':
         backgroundColor = '#0277bd';
@@ -59,7 +78,7 @@ const EventCalendar = () => {
   return (
     <div className="calendar-layout rounded-md">
       <aside className="sidebar">
-        <button className="add-event-btn">Add Event</button>
+        <button className="add-event-btn" onClick={() => setModalOpen(true)}>Add Event</button>
         <div className="filters">
           <h3 className="filter-title">Calendars</h3>
           <ul className="filter-list">
@@ -78,11 +97,13 @@ const EventCalendar = () => {
           events={events}
           startAccessor="start"
           endAccessor="end"
+          selectable
           style={{ border: 'none' }}
           popup
           views={['month', 'week', 'day', 'agenda']}
           defaultView="month"
           eventPropGetter={eventStyleGetter}
+          onSelectSlot={handleSelectSlot}
           components={{
             toolbar: ({ label, onNavigate, onView }) => (
               <div className="calendar-toolbar">
@@ -90,7 +111,7 @@ const EventCalendar = () => {
                 <span className="calendar-label">{label}</span>
                 <button className="nav-btn" onClick={() => onNavigate('NEXT')}>❯</button>
                 <div className="view-buttons">
-                  <button className="view-btn" onClick={() => onView('month')}>Month</button> 
+                  <button className="view-btn" onClick={() => onView('month')}>Month</button>
                   <button className="view-btn" onClick={() => onView('week')}>Week</button>
                   <button className="view-btn" onClick={() => onView('day')}>Day</button>
                   <button className="view-btn" onClick={() => onView('agenda')}>List</button>
@@ -100,6 +121,34 @@ const EventCalendar = () => {
           }}
         />
       </main>
+
+      {/* Add Event Modal */}
+      <Modal
+        isOpen={modalOpen}
+        onRequestClose={() => setModalOpen(false)}
+        contentLabel="Add Event"
+        className="event-modal"
+        overlayClassName="event-overlay"
+      >
+        <h2>Add Event</h2>
+        <input
+          type="text"
+          placeholder="Event Title"
+          value={newEvent.title}
+          onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
+        />
+        <label>Event Type:</label>
+        <select
+          value={newEvent.type}
+          onChange={(e) => setNewEvent({ ...newEvent, type: e.target.value })}
+        >
+          <option value="Personal">Personal</option>
+          <option value="Business">Business</option>
+          <option value="Family">Family</option>
+        </select>
+        <button onClick={handleAddEvent}>Add Event</button>
+        <button onClick={() => setModalOpen(false)}>Cancel</button>
+      </Modal>
     </div>
   );
 };
