@@ -66,6 +66,55 @@ export const addMarks = wrapAsync(async (req, res) => {
 //     );
 // });
 
+// export const addMultipleStudentMarks = wrapAsync(async (req, res) => {
+//     const { termId, classId, examTypeId, subjectId, studentMarksArray } =
+//         req.body;
+//     const teacherId = req.user?._id;
+
+//     const existingClassMarks = await Marks.findOne({
+//         term: termId,
+//         class: classId,
+//         "marks.subject": subjectId,
+//         "marks.exams.examType": examTypeId,
+//     });
+
+//     if (existingClassMarks) {
+//         return res
+//             .status(400)
+//             .json(
+//                 new ApiResponse(
+//                     400,
+//                     null,
+//                     `Marks for subject ${subjectId} have already been entered for the class.`
+//                 )
+//             );
+//     }
+
+//     const marksData = studentMarksArray.map(({ studentId, marksObtained }) => ({
+//         student: studentId,
+//         term: termId,
+//         class: classId,
+//         marks: [
+//             {
+//                 subject: subjectId,
+//                 teacher: teacherId,
+//                 exams: [
+//                     {
+//                         examType: examTypeId,
+//                         marksObtained: marksObtained || 0,
+//                     },
+//                 ],
+//             },
+//         ],
+//     }));
+
+//     const result = await Marks.insertMany(marksData);
+
+//     res.status(201).json(
+//         new ApiResponse(201, result, "Marks Added Successfully")
+//     );
+// });
+
 export const addMultipleStudentMarks = wrapAsync(async (req, res) => {
     const { termId, classId, examTypeId, subjectId, studentMarksArray } =
         req.body;
@@ -108,7 +157,25 @@ export const addMultipleStudentMarks = wrapAsync(async (req, res) => {
         ],
     }));
 
-    const result = await Marks.insertMany(marksData);
+    const result = [];
+    for (const mark of marksData) {
+        try {
+            const newMark = new Marks(mark);
+            await newMark.save();
+            result.push(newMark);
+        } catch (error) {
+            console.error("Error saving mark:", error);
+            return res
+                .status(500)
+                .json(
+                    new ApiResponse(
+                        500,
+                        null,
+                        "Error saving marks. Please try again later."
+                    )
+                );
+        }
+    }
 
     res.status(201).json(
         new ApiResponse(201, result, "Marks Added Successfully")
@@ -268,7 +335,9 @@ export const getExistingMarks = wrapAsync(async (req, res) => {
         class: classId,
         "marks.exams.examType": examTypeId,
         "marks.subject": subjectId,
-    }).populate("marks.subject").populate("student");
+    })
+        .populate("marks.subject")
+        .populate("student");
 
     if (!marks) {
         throw new ApiError(404, "Marks not found");
@@ -276,6 +345,3 @@ export const getExistingMarks = wrapAsync(async (req, res) => {
 
     res.status(200).json(new ApiResponse(200, marks));
 });
-
-
-

@@ -79,27 +79,36 @@ const marksSchema = new mongoose.Schema({
     },
 });
 
-marksSchema.pre("save", function (next) {
+marksSchema.pre("save", async function (next) {
+    console.log("Pre-save middleware triggered");
+    console.log("Current marks:", this.marks);
+
     let totalMarksObtained = 0;
     let totalMarksPossible = 0;
 
-    this.marks.forEach((subject) => {
+    for (const subject of this.marks) {
         let subjectTotal = 0;
         let subjectMaxTotal = 0;
 
-        subject.exams.forEach((exam) => {
-            subjectTotal += exam.marksObtained;
-            if (exam.examType && exam.examType.maxMarks) {
-                subjectMaxTotal += exam.examType.maxMarks;
-            }
-        });
+        await Promise.all(
+            subject.exams.map(async (exam) => {
+                const populatedExam = await mongoose
+                    .model("ExamType")
+                    .findById(exam.examType)
+                    .exec();
+                if (populatedExam) {
+                    subjectMaxTotal += populatedExam.maxMarks;
+                    subjectTotal += exam.marksObtained;
+                }
+            })
+        );
 
         subject.subjectGrade = calculateGrade(subjectTotal);
         subject.subjectTotalMarks = subjectTotal;
 
         totalMarksObtained += subjectTotal;
         totalMarksPossible += subjectMaxTotal;
-    });
+    }
 
     this.totalMarkObtained = totalMarksObtained;
     this.totalMarkPossible = totalMarksPossible;
@@ -122,8 +131,5 @@ marksSchema.statics.calculateRank = async function (classId, termId) {
         await mark.save();
     }
 };
-
-
-
 
 export const Marks = mongoose.model("Marks", marksSchema);
