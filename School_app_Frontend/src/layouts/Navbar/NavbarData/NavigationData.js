@@ -288,6 +288,21 @@ export const navigation = [
     ],
   },
   {
+    name: "Results",
+    to: "/results",
+    icon: FaBell,
+    current: false,
+    roles: ["Admin", "Teacher", "Student"],
+    children: [
+      {
+        name: "All Students Result",
+        to: "/school/students-results",
+        icon: FaUser,
+        roles: ["Admin"],
+      }
+    ],
+  },
+  {
     name: "Notice",
     to: "/notice",
     icon: FaBell,
