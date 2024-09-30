@@ -1,16 +1,12 @@
-import express from 'express';
-import {  getAllClassStudentMarks, getResultByStudent } from '../Controller/result.Controller.js';
-
+import express from "express";
+import {
+    getClassResults,
+    getStudentResult,
+} from "../Controller/result.Controller.js";
 
 const router = express.Router();
 
-
-router.post("/create-result", getAllClassStudentMarks);
-router.get("/get-result/:studentId",getResultByStudent);
-
-
-
-
-
+router.post("/get-class-result", getClassResults);
+router.post("/get-result", getStudentResult);
 
 export { router as resultRoute };
