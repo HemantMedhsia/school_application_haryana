@@ -9,18 +9,21 @@ const StudentsResults = () => {
       rollNumber: "23312",
       examTypes: ["Halfyearly", "Unit Test", "Internal"],
       percentage: [41.67, 64.86, 93.33],
+      overallPercentage: 66.29,
     },
     {
       name: "Jane Smith",
       rollNumber: "23313",
       examTypes: ["Halfyearly", "Unit Test"],
       percentage: [75.0, 85.71],
+      overallPercentage: 80.36,
     },
     {
       name: "Sam Johnson",
       rollNumber: "23314",
       examTypes: ["Unit Test", "Internal"],
       percentage: [100.0, 100.0],
+      overallPercentage: 100.0,
     },
     // Add more student data as needed
   ];
