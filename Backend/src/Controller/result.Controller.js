@@ -4,46 +4,29 @@ import { ApiResponse } from "../Utils/responseHandler.js";
 import { ApiError } from "../Utils/errorHandler.js";
 import { Student } from "../Models/student.model.js";
 
-export const getAllClassStudentMarks = wrapAsync(async (req, res) => {
+export const getClassResults = async (req, res) => {
     const { classId, termId } = req.body;
 
-    const marks = await Marks.find({ class: classId, term: termId })
+    const classResults = await Marks.calculateClassResults(classId, termId);
+
+    return res.json(classResults);
+};
+
+export const getStudentResult = async (req, res) => {
+    const { studentId, termId, classId } = req.body;
+    const studentMarks = await Marks.findOne({ student: studentId, term: termId, class: classId })
         .populate("student")
+        .populate("class")
         .populate("marks.subject")
         .populate("marks.exams.examType");
 
-    if (!marks || marks.length === 0) {
-        return res
-            .status(404)
-            .json({ message: "No marks found for this class and term." });
+    if (!studentMarks) {
+        return res.status(404).json({ message: "Marks not found for the student" });
     }
 
-    res.status(200).json(new ApiResponse(200, marks));
-});
+    await studentMarks.calculateTotalMarks();
 
-export const getResultByStudent = wrapAsync(async (req, res) => {
-    const { studentId } = req.params;
+    res.json(studentMarks);
+};
 
-    const marksRecord = await Marks.findOne({ student: studentId }).populate({
-        path: "marks",
-        populate: [
-            { path: "subject" },
-            { path: "teacher" },
-            { path: "exams.examType" },
-        ],
-    });
 
-    if (!marksRecord) {
-        return res.status(404).json({ message: "Marks record not found." });
-    }
-
-    res.status(200).json(new ApiResponse(200, marksRecord));
-});
-
-export const calculateRank = wrapAsync(async (req, res) => {
-    const { classId, termId } = req.body;
-
-    await Marks.calculateRank(classId, termId);
-
-    res.status(200).json({ message: "Rank calculated successfully." });
-});
