@@ -146,8 +146,6 @@ export const getAllMarks = wrapAsync(async (req, res) => {
     res.status(200).json(new ApiResponse(200, marks));
 });
 
-
-
 export const getMarkById = wrapAsync(async (req, res) => {
     const { id } = req.params;
     const marks = await Marks.findById(id)
@@ -282,11 +280,15 @@ export const getExistingMarks = wrapAsync(async (req, res) => {
     res.status(200).json(new ApiResponse(200, marks));
 });
 
-export const getMarksByExamCategoryClassAndSection = wrapAsync(async (req, res) => {
-    const marks = await Marks.find({
-        "marks.exams.examType": req.params.examCategory,
-        class: req.params.class,
-    }).populate('student class marks.subject marks.teacher marks.exams.examType');
+export const getMarksByExamCategoryClassAndSection = wrapAsync(
+    async (req, res) => {
+        const marks = await Marks.find({
+            "marks.exams.examType": req.params.examCategory,
+            class: req.params.class,
+        }).populate(
+            "student class marks.subject marks.teacher marks.exams.examType"
+        );
 
-    res.status(200).json(new ApiResponse(200, marks));
-});
+        res.status(200).json(new ApiResponse(200, marks));
+    }
+);
