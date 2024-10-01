@@ -53,4 +53,8 @@ const marksSchema = new mongoose.Schema({
     ],
 });
 
+marksSchema.index({ student: 1 });
+marksSchema.index({ term: 1 });
+marksSchema.index({ class: 1 });
+
 export const Marks = mongoose.model("Marks", marksSchema);

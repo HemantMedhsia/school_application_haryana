@@ -17,7 +17,7 @@ const getRefreshEndpoint = (role) => {
     case "Staff":
       return `${import.meta.env.VITE_BACKEND_URL}/api/refresh-token-staff`;
     case "Parent":
-      return `${import.meta.env.VITE_BACKEND_URL}/api/refresh-token-parent`;  
+      return `${import.meta.env.VITE_BACKEND_URL}/api/refresh-token-parent`;
     default:
       return "https://school-application-three.vercel.app/api/refresh-token";
   }
