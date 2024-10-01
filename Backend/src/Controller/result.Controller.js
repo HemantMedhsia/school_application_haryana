@@ -2,8 +2,10 @@ import { Marks } from "../Models/marks.Model.js";
 import wrapAsync from "../Utils/wrapAsync.js";
 import { ApiResponse } from "../Utils/responseHandler.js";
 import { ApiError } from "../Utils/errorHandler.js";
-import { Student } from "../Models/student.model.js";
 import mongoose from "mongoose";
+
+
+
 
 export const getStudentExamResultsByExamType = wrapAsync(async (req, res) => {
     const { studentId, examType } = req.body;
@@ -459,3 +461,150 @@ export const getStudentExamResultsByTerm = wrapAsync(async (req, res) => {
     res.status(200).json(new ApiResponse(200, results));
 });
 
+const calculateGrade = (percentage) => {
+    if (percentage >= 90) return "A+";
+    if (percentage >= 80) return "A";
+    if (percentage >= 70) return "B";
+    if (percentage >= 60) return "C";
+    if (percentage >= 50) return "D";
+    return "F";
+};
+
+export const getExamResultsForTerm = wrapAsync(async (req, res) => {
+    const { termId, classId } = req.body;
+
+    const results = await Marks.aggregate([
+        {
+            $match: {
+                term: new mongoose.Types.ObjectId(termId),
+                class: new mongoose.Types.ObjectId(classId),
+            },
+        },
+        {
+            $lookup: {
+                from: "students",
+                localField: "student",
+                foreignField: "_id",
+                as: "studentDetails",
+            },
+        },
+        {
+            $unwind: "$studentDetails",
+        },
+        {
+            $lookup: {
+                from: "examtypes",
+                localField: "marks.exams.examType",
+                foreignField: "_id",
+                as: "examTypeDetails",
+            },
+        },
+        {
+            $unwind: {
+                path: "$marks",
+                preserveNullAndEmptyArrays: true,
+            },
+        },
+        {
+            $unwind: {
+                path: "$marks.exams",
+                preserveNullAndEmptyArrays: true,
+            },
+        },
+        {
+            $unwind: "$examTypeDetails",
+        },
+        {
+            $group: {
+                _id: {
+                    student: "$studentDetails._id",
+                    examType: "$examTypeDetails._id",
+                },
+                studentName: {
+                    $first: {
+                        $concat: [
+                            "$studentDetails.firstName",
+                            " ",
+                            "$studentDetails.lastName",
+                        ],
+                    },
+                },
+                rollno: { $first: "$studentDetails.rollNumber" },
+                examTypeName: { $first: "$examTypeDetails.name" },
+                totalMarksObtained: { $sum: "$marks.exams.marksObtained" },
+                totalMaxMarks: { $sum: "$examTypeDetails.maxMarks" },
+            },
+        },
+        {
+            $addFields: {
+                percentage: {
+                    $round: [
+                        {
+                            $multiply: [
+                                {
+                                    $divide: [
+                                        "$totalMarksObtained",
+                                        "$totalMaxMarks",
+                                    ],
+                                },
+                                100,
+                            ],
+                        },
+                        2,
+                    ],
+                },
+            },
+        },
+        {
+            $group: {
+                _id: "$_id.student",
+                studentName: { $first: "$studentName" },
+                rollno: { $first: "$rollno" },
+                exams: {
+                    $push: {
+                        _id: "$_id.examType",
+                        name: "$examTypeName",
+                        percentage: "$percentage",
+                    },
+                },
+                totalMarksObtained: { $sum: "$totalMarksObtained" },
+                totalMaxMarks: { $sum: "$totalMaxMarks" },
+            },
+        },
+        {
+            $addFields: {
+                overallPercentage: {
+                    $round: [
+                        {
+                            $multiply: [
+                                {
+                                    $divide: [
+                                        "$totalMarksObtained",
+                                        "$totalMaxMarks",
+                                    ],
+                                },
+                                100,
+                            ],
+                        },
+                        2,
+                    ],
+                },
+            },
+        },
+        {
+            $project: {
+                studentName: 1,
+                rollno: 1,
+                exams: 1,
+                overallPercentage: 1,
+            },
+        },
+    ]);
+
+    const processedResults = results.map((result) => ({
+        ...result,
+        grade: calculateGrade(result.overallPercentage),
+    }));
+
+    res.status(200).json(new ApiResponse(200, processedResults));
+});
