@@ -3,9 +3,7 @@ import wrapAsync from "../Utils/wrapAsync.js";
 import { ApiResponse } from "../Utils/responseHandler.js";
 import { ApiError } from "../Utils/errorHandler.js";
 import mongoose from "mongoose";
-
-
-
+import { Student } from "../Models/student.model.js";
 
 export const getStudentExamResultsByExamType = wrapAsync(async (req, res) => {
     const { studentId, examType } = req.body;
@@ -608,3 +606,514 @@ export const getExamResultsForTerm = wrapAsync(async (req, res) => {
 
     res.status(200).json(new ApiResponse(200, processedResults));
 });
+
+export const getTermResultforstudent = wrapAsync(async (req, res) => {
+    const studentId = req.user.id;
+    const { term } = req.body;
+    const results = await Marks.aggregate([
+        {
+            $match: {
+                student: new mongoose.Types.ObjectId(studentId),
+                term: new mongoose.Types.ObjectId(term),
+            },
+        },
+        {
+            $unwind: "$marks",
+        },
+        {
+            $unwind: "$marks.exams",
+        },
+        {
+            $lookup: {
+                from: "examtypes",
+                localField: "marks.exams.examType",
+                foreignField: "_id",
+                as: "examTypeDetails",
+            },
+        },
+        {
+            $unwind: "$examTypeDetails",
+        },
+        {
+            $lookup: {
+                from: "subjects",
+                localField: "marks.subject",
+                foreignField: "_id",
+                as: "subjectDetails",
+            },
+        },
+        {
+            $unwind: "$subjectDetails",
+        },
+        {
+            $group: {
+                _id: {
+                    student: "$student",
+                    subject: "$marks.subject",
+                },
+                exams: {
+                    $push: {
+                        examType: "$examTypeDetails.name",
+                        marksObtained: "$marks.exams.marksObtained",
+                        maxMarks: "$examTypeDetails.maxMarks",
+                    },
+                },
+                subjectName: { $first: "$subjectDetails.name" },
+                subjectTotalMarksObtained: {
+                    $sum: "$marks.exams.marksObtained",
+                },
+                subjectTotalPossibleMarks: {
+                    $sum: "$examTypeDetails.maxMarks",
+                },
+            },
+        },
+        {
+            $addFields: {
+                subjectGrade: {
+                    $switch: {
+                        branches: [
+                            {
+                                case: {
+                                    $gte: [
+                                        {
+                                            $multiply: [
+                                                {
+                                                    $divide: [
+                                                        "$subjectTotalMarksObtained",
+                                                        "$subjectTotalPossibleMarks",
+                                                    ],
+                                                },
+                                                100,
+                                            ],
+                                        },
+                                        90,
+                                    ],
+                                },
+                                then: "A+",
+                            },
+                            {
+                                case: {
+                                    $gte: [
+                                        {
+                                            $multiply: [
+                                                {
+                                                    $divide: [
+                                                        "$subjectTotalMarksObtained",
+                                                        "$subjectTotalPossibleMarks",
+                                                    ],
+                                                },
+                                                100,
+                                            ],
+                                        },
+                                        80,
+                                    ],
+                                },
+                                then: "A",
+                            },
+                            {
+                                case: {
+                                    $gte: [
+                                        {
+                                            $multiply: [
+                                                {
+                                                    $divide: [
+                                                        "$subjectTotalMarksObtained",
+                                                        "$subjectTotalPossibleMarks",
+                                                    ],
+                                                },
+                                                100,
+                                            ],
+                                        },
+                                        70,
+                                    ],
+                                },
+                                then: "B",
+                            },
+                            {
+                                case: {
+                                    $gte: [
+                                        {
+                                            $multiply: [
+                                                {
+                                                    $divide: [
+                                                        "$subjectTotalMarksObtained",
+                                                        "$subjectTotalPossibleMarks",
+                                                    ],
+                                                },
+                                                100,
+                                            ],
+                                        },
+                                        60,
+                                    ],
+                                },
+                                then: "C",
+                            },
+                            {
+                                case: {
+                                    $gte: [
+                                        {
+                                            $multiply: [
+                                                {
+                                                    $divide: [
+                                                        "$subjectTotalMarksObtained",
+                                                        "$subjectTotalPossibleMarks",
+                                                    ],
+                                                },
+                                                100,
+                                            ],
+                                        },
+                                        50,
+                                    ],
+                                },
+                                then: "D",
+                            },
+                            {
+                                case: {
+                                    $lt: [
+                                        {
+                                            $multiply: [
+                                                {
+                                                    $divide: [
+                                                        "$subjectTotalMarksObtained",
+                                                        "$subjectTotalPossibleMarks",
+                                                    ],
+                                                },
+                                                100,
+                                            ],
+                                        },
+                                        50,
+                                    ],
+                                },
+                                then: "F",
+                            },
+                        ],
+                        default: "F",
+                    },
+                },
+            },
+        },
+        {
+            $group: {
+                _id: "$_id.student",
+                subjects: {
+                    $push: {
+                        subject: "$subjectName",
+                        exams: "$exams",
+                        subjectTotalMarksObtained: "$subjectTotalMarksObtained",
+                        subjectTotalPossibleMarks: "$subjectTotalPossibleMarks",
+                        subjectGrade: "$subjectGrade",
+                    },
+                },
+                totalMarksObtained: { $sum: "$subjectTotalMarksObtained" },
+                totalPossibleMarks: { $sum: "$subjectTotalPossibleMarks" },
+            },
+        },
+        {
+            $addFields: {
+                percentage: {
+                    $round: [
+                        {
+                            $multiply: [
+                                {
+                                    $divide: [
+                                        "$totalMarksObtained",
+                                        "$totalPossibleMarks",
+                                    ],
+                                },
+                                100,
+                            ],
+                        },
+                        2,
+                    ],
+                },
+            },
+        },
+        {
+            $addFields: {
+                finalGrade: {
+                    $switch: {
+                        branches: [
+                            { case: { $gte: ["$percentage", 90] }, then: "A+" },
+                            { case: { $gte: ["$percentage", 80] }, then: "A" },
+                            { case: { $gte: ["$percentage", 70] }, then: "B" },
+                            { case: { $gte: ["$percentage", 60] }, then: "C" },
+                            { case: { $gte: ["$percentage", 50] }, then: "D" },
+                            { case: { $lt: ["$percentage", 50] }, then: "F" },
+                        ],
+                        default: "F",
+                    },
+                },
+            },
+        },
+        {
+            $project: {
+                subjects: 1,
+                totalMarksObtained: 1,
+                totalPossibleMarks: 1,
+                percentage: 1,
+                finalGrade: 1,
+            },
+        },
+    ]);
+
+    res.status(200).json(new ApiResponse(200, results));
+});
+
+export const getTermResultforParent = wrapAsync(async (req, res) => {
+    const parentId = req.user.id;
+    const { term } = req.body;
+
+    const studentId = await Student.find({ parent: parentId }).select("_id");
+    const studentObjectIds = studentId.map((student) => student._id);
+    const results = await Marks.aggregate([
+        {
+            $match: {
+                student: { $in: studentObjectIds },
+                term: new mongoose.Types.ObjectId(term),
+            },
+        },
+        {
+            $unwind: "$marks",
+        },
+        {
+            $unwind: "$marks.exams",
+        },
+        {
+            $lookup: {
+                from: "examtypes",
+                localField: "marks.exams.examType",
+                foreignField: "_id",
+                as: "examTypeDetails",
+            },
+        },
+        {
+            $unwind: "$examTypeDetails",
+        },
+        {
+            $lookup: {
+                from: "subjects",
+                localField: "marks.subject",
+                foreignField: "_id",
+                as: "subjectDetails",
+            },
+        },
+        {
+            $unwind: "$subjectDetails",
+        },
+        {
+            $group: {
+                _id: {
+                    student: "$student",
+                    subject: "$marks.subject",
+                },
+                exams: {
+                    $push: {
+                        examType: "$examTypeDetails.name",
+                        marksObtained: "$marks.exams.marksObtained",
+                        maxMarks: "$examTypeDetails.maxMarks",
+                    },
+                },
+                subjectName: { $first: "$subjectDetails.name" },
+                subjectTotalMarksObtained: {
+                    $sum: "$marks.exams.marksObtained",
+                },
+                subjectTotalPossibleMarks: {
+                    $sum: "$examTypeDetails.maxMarks",
+                },
+            },
+        },
+        {
+            $addFields: {
+                subjectGrade: {
+                    $switch: {
+                        branches: [
+                            {
+                                case: {
+                                    $gte: [
+                                        {
+                                            $multiply: [
+                                                {
+                                                    $divide: [
+                                                        "$subjectTotalMarksObtained",
+                                                        "$subjectTotalPossibleMarks",
+                                                    ],
+                                                },
+                                                100,
+                                            ],
+                                        },
+                                        90,
+                                    ],
+                                },
+                                then: "A+",
+                            },
+                            {
+                                case: {
+                                    $gte: [
+                                        {
+                                            $multiply: [
+                                                {
+                                                    $divide: [
+                                                        "$subjectTotalMarksObtained",
+                                                        "$subjectTotalPossibleMarks",
+                                                    ],
+                                                },
+                                                100,
+                                            ],
+                                        },
+                                        80,
+                                    ],
+                                },
+                                then: "A",
+                            },
+                            {
+                                case: {
+                                    $gte: [
+                                        {
+                                            $multiply: [
+                                                {
+                                                    $divide: [
+                                                        "$subjectTotalMarksObtained",
+                                                        "$subjectTotalPossibleMarks",
+                                                    ],
+                                                },
+                                                100,
+                                            ],
+                                        },
+                                        70,
+                                    ],
+                                },
+                                then: "B",
+                            },
+                            {
+                                case: {
+                                    $gte: [
+                                        {
+                                            $multiply: [
+                                                {
+                                                    $divide: [
+                                                        "$subjectTotalMarksObtained",
+                                                        "$subjectTotalPossibleMarks",
+                                                    ],
+                                                },
+                                                100,
+                                            ],
+                                        },
+                                        60,
+                                    ],
+                                },
+                                then: "C",
+                            },
+                            {
+                                case: {
+                                    $gte: [
+                                        {
+                                            $multiply: [
+                                                {
+                                                    $divide: [
+                                                        "$subjectTotalMarksObtained",
+                                                        "$subjectTotalPossibleMarks",
+                                                    ],
+                                                },
+                                                100,
+                                            ],
+                                        },
+                                        50,
+                                    ],
+                                },
+                                then: "D",
+                            },
+                            {
+                                case: {
+                                    $lt: [
+                                        {
+                                            $multiply: [
+                                                {
+                                                    $divide: [
+                                                        "$subjectTotalMarksObtained",
+                                                        "$subjectTotalPossibleMarks",
+                                                    ],
+                                                },
+                                                100,
+                                            ],
+                                        },
+                                        50,
+                                    ],
+                                },
+                                then: "F",
+                            },
+                        ],
+                        default: "F",
+                    },
+                },
+            },
+        },
+        {
+            $group: {
+                _id: "$_id.student",
+                subjects: {
+                    $push: {
+                        subject: "$subjectName",
+                        exams: "$exams",
+                        subjectTotalMarksObtained: "$subjectTotalMarksObtained",
+                        subjectTotalPossibleMarks: "$subjectTotalPossibleMarks",
+                        subjectGrade: "$subjectGrade",
+                    },
+                },
+                totalMarksObtained: { $sum: "$subjectTotalMarksObtained" },
+                totalPossibleMarks: { $sum: "$subjectTotalPossibleMarks" },
+            },
+        },
+        {
+            $addFields: {
+                percentage: {
+                    $round: [
+                        {
+                            $multiply: [
+                                {
+                                    $divide: [
+                                        "$totalMarksObtained",
+                                        "$totalPossibleMarks",
+                                    ],
+                                },
+                                100,
+                            ],
+                        },
+                        2,
+                    ],
+                },
+            },
+        },
+        {
+            $addFields: {
+                finalGrade: {
+                    $switch: {
+                        branches: [
+                            { case: { $gte: ["$percentage", 90] }, then: "A+" },
+                            { case: { $gte: ["$percentage", 80] }, then: "A" },
+                            { case: { $gte: ["$percentage", 70] }, then: "B" },
+                            { case: { $gte: ["$percentage", 60] }, then: "C" },
+                            { case: { $gte: ["$percentage", 50] }, then: "D" },
+                            { case: { $lt: ["$percentage", 50] }, then: "F" },
+                        ],
+                        default: "F",
+                    },
+                },
+            },
+        },
+        {
+            $project: {
+                subjects: 1,
+                totalMarksObtained: 1,
+                totalPossibleMarks: 1,
+                percentage: 1,
+                finalGrade: 1,
+            },
+        },
+    ]);
+
+    res.status(200).json(new ApiResponse(200, results));
+});
+
+
+
+

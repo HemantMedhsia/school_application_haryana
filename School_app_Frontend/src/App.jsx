@@ -44,6 +44,7 @@ import StaffAdd from "./pages/Staff/StaffAdd.jsx";
 import StaffInfo from "./pages/Staff/StaffInfo.jsx";
 import CommonClassTimeTable from "./pages/CommonClassTimeTable.jsx";
 import StudentsResults from "./pages/Results/StudentsResults.jsx";
+import ShowStudentResult from "./pages/Results/ShowStudentResult.jsx";
 
 const App = () => {
   const { userRole, authToken } = useAuth();
@@ -79,7 +80,7 @@ const App = () => {
           <Route path="parent-add/:Id" element={<ParentAdd />} />
           <Route path="student-information" element={<StudnetInfo />} />
           <Route path="staff-add" element={<StaffAdd />} />
-          <Route path="all-staffs" element={<StaffInfo/>} />
+          <Route path="all-staffs" element={<StaffInfo />} />
           <Route path="staff-update/:staffId" element={<StaffAdd />} />
 
           <Route path="parent-information" element={<ParentInfo />} />
@@ -110,7 +111,10 @@ const App = () => {
           <Route path="exam-type" element={<ExamType />} />
           <Route path="exam-schedule" element={<ExaminationSchedule />} />
           <Route path="class-timetable" element={<ClassTimetable />} />
-          <Route path ="class-timetable-user" element={<CommonClassTimeTable />} />
+          <Route
+            path="class-timetable-user"
+            element={<CommonClassTimeTable />}
+          />
           <Route path="teacher-timetable" element={<TeacherTimetable />} />
           <Route path="create-timetable" element={<CreateTimetabel />} />
           <Route path="assign-teacher" element={<AssingTeacher />} />
@@ -124,6 +128,7 @@ const App = () => {
             path="view-exam-schedule-student-and-parent"
             element={<ViewExaminationScheduleForStudentAndParent />}
           />
+          <Route path="view-result" element={<ShowStudentResult />} />
         </Route>
       </>
     )

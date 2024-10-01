@@ -134,7 +134,7 @@ export const navigation = [
     to: "#",
     icon: FaClock,
     current: false,
-    roles: ["Admin", "Teacher", "Parent","Student"],
+    roles: ["Admin", "Teacher", "Parent", "Student"],
     children: [
       {
         name: "Class TimeTable",
@@ -146,7 +146,7 @@ export const navigation = [
         name: "Class TimeTable",
         to: "/school/class-timetable-user",
         icon: FaUser,
-        roles: ["Student","Teacher","Parent"],
+        roles: ["Student", "Teacher", "Parent"],
       },
 
       {
@@ -280,6 +280,13 @@ export const navigation = [
         roles: ["Student", "Parent"],
       },
       {
+        name: "View Result",
+        to: "/school/view-result",
+        icon: FaCheckCircle,
+        roles: ["Student", "Parent"],
+      },
+
+      {
         name: "View Marks",
         to: "/school/view-marks",
         icon: FaCheckCircle,
@@ -292,14 +299,14 @@ export const navigation = [
     to: "/results",
     icon: FaBell,
     current: false,
-    roles: ["Admin", "Teacher", "Student"],
+    roles: ["Admin", "Teacher"],
     children: [
       {
         name: "All Students Result",
         to: "/school/students-results",
         icon: FaUser,
         roles: ["Admin"],
-      }
+      },
     ],
   },
   {
