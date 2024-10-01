@@ -27,7 +27,7 @@ const StudentsResults = () => {
       examTypes: ["Unit Test", "Internal, Halfyearly"],
       percentage: [100.0, 100.0, 100.0],
       overallPercentage: 100.0,
-        grade: "A+",
+      grade: "A+",
     },
     {
       name: "John Doe",
@@ -35,7 +35,7 @@ const StudentsResults = () => {
       examTypes: ["Halfyearly", "Unit Test", "Internal"],
       percentage: [41.67, 64.86, 93.33],
       overallPercentage: 66.29,
-        grade: "B",
+      grade: "B",
     },
     {
       name: "Jane Smith",
@@ -43,7 +43,7 @@ const StudentsResults = () => {
       examTypes: ["Halfyearly", "Unit Test", "Internal"],
       percentage: [75.0, 85.71, 80.0],
       overallPercentage: 80.36,
-        grade: "A++",
+      grade: "A++",
     },
     {
       name: "Sam Johnson",
@@ -51,7 +51,7 @@ const StudentsResults = () => {
       examTypes: ["Unit Test", "Internal, Halfyearly"],
       percentage: [100.0, 100.0, 100.0],
       overallPercentage: 100.0,
-        grade: "A+",
+      grade: "A+",
     },
     {
       name: "John Doe",
@@ -77,7 +77,7 @@ const StudentsResults = () => {
   ];
 
   const [term, setTerm] = useState("");
-  const [classId, setClassId] = useState("")
+  const [classId, setClassId] = useState("");
 
   // Action handlers
   const actions = {
@@ -105,22 +105,22 @@ const StudentsResults = () => {
       onChange: handleTeacherChange,
     },
     {
-        name: "class",
-        label: "Select Class",
-        placeholder: "Select Class",
-        required: true,
-        type: "select",
-        options: teachers?.map((teacherItem) => ({
-          label: teacherItem.name,
-          value: teacherItem._id,
-        })),
-        onChange: handleTeacherChange,
-      },
+      name: "class",
+      label: "Select Class",
+      placeholder: "Select Class",
+      required: true,
+      type: "select",
+      options: teachers?.map((teacherItem) => ({
+        label: teacherItem.name,
+        value: teacherItem._id,
+      })),
+      onChange: handleTeacherChange,
+    },
   ];
 
   return (
     <div className="">
-    <DynamicFilterBar filters={filterConfig} onSubmit={handleFilterSubmit} />
+      <DynamicFilterBar filters={filterConfig} onSubmit={handleFilterSubmit} />
       <h1 className="text-2xl font-bold mb-4 text-[#7367F0]">
         Students Results
       </h1>
