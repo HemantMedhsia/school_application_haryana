@@ -5,47 +5,59 @@ import { getAPI } from "../../utility/api/apiCall";
 import axios from "axios";
 
 const StudentsResults = () => {
-  const [filteredData, setFilteredData] = useState([]);
+  const [tabledata, setTableData] = useState([]);
   const [classes, setClasses] = useState([]);
   const [term, setTerm] = useState([]);
+  const [termId, setTermId] = useState("");
   const [section, setSection] = useState([]);
-  const [isPopupOpen, setIsPopupOpen] = useState(false); // State for popup visibility
-  const [selectedExamData, setSelectedExamData] = useState(null); // State for the selected exam data
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [selectedExamData, setSelectedExamData] = useState(null);
+
+  const fetchData = async () => {
+    try {
+      await Promise.all([
+        getAPI("getAllClasses", {}, setClasses),
+        getAPI("getAllExamCategories", {}, setTerm),
+        // getAPI("getAllSections", {}, setSection),
+      ]);
+    } catch (error) {
+      console.error("Error fetching data", error);
+    }
+  };
+
+  const studentTableData = async (termId,classId) => {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/get-student-result-info`,
+        {
+          termId,
+          classId,
+        }
+      );
+      const transformedData = response.data.data.map((student) => ({
+        name: student.studentName,
+        studentId: student._id,
+        rollNumber: student.rollno,
+        examTypes: student.exams.map((exam) => exam.name.trim()),
+        examTypeIds: student.exams.map((exam) => exam._id),
+        percentage: student.exams.map((exam) => exam.percentage),
+        overallPercentage: student.overallPercentage,
+        grade: student.grade,
+      }));
+      setTableData(transformedData);
+      console.log("Table Data", transformedData);
+    } catch (error) {
+      console.error("Error fetching data", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        await Promise.all([
-          getAPI("getAllClasses", {}, setClasses),
-          getAPI("getAllExamCategories", {}, setTerm),
-          getAPI("getAllSections", {}, setSection),
-        ]);
-      } catch (error) {
-        console.error("Error fetching data", error);
-      }
-    };
-
     fetchData();
   }, []);
 
-  const studentData = [
-    {
-      name: "John Doe",
-      rollNumber: "23312",
-      examTypes: ["Halfyearly", "Unit Test", "Internal"],
-      percentage: [41.67, 64.86, 93.33],
-      overallPercentage: 66.29,
-      grade: "B",
-    },
-    {
-      name: "Jane Smith",
-      rollNumber: "23313",
-      examTypes: ["Halfyearly", "Unit Test", "Internal"],
-      percentage: [75.0, 85.71, 80.0],
-      overallPercentage: 80.36,
-      grade: "A++",
-    },
-  ];
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const filters = [
     {
@@ -68,48 +80,41 @@ const StudentsResults = () => {
         value: classItem._id,
       })),
     },
-    {
-      name: "section",
-      type: "select",
-      placeholder: "Select Section",
-      options: section.map((sectionItem) => ({
-        label: sectionItem.name,
-        value: sectionItem._id,
-      })),
-    },
   ];
 
   const actions = {
     onViewExam: async (student, examType) => {
-      console.log(`Viewing exam ${examType} for ${student.name}`);
+      console.log(`Viewing exam ${examType} for ${student.studentId}`);
       await axios
         .post(
           `${
             import.meta.env.VITE_BACKEND_URL
           }/api/get-student-result-byexamtype`,
           {
-            studentId: "66f25c8e4e33b19084a099fe",
-            examType: "66ee69e06833db29446a6aed",
+            studentId: student.studentId,
+            examType
           }
         )
         .then((response) => {
           setSelectedExamData(response.data.data[0]);
-          setIsPopupOpen(true); // Open the popup
+          setIsPopupOpen(true);
         })
         .catch((error) => {
           console.error("Error fetching exam results", error);
         });
     },
-    onViewAll: (student) => {
-      console.log(`Viewing all results for ${student.name}`);
-      axios
+    onViewAll: async (student) => {
+      console.log(`Viewing all results for ${student.studentId} with term ${termId}`);
+      await axios
         .post(
-          `${import.meta.env.VITE_BACKEND_URL}/api/get-all-results/${
-            student._id
-          }`
+          `${import.meta.env.VITE_BACKEND_URL}/api/get-student-result-byterm`,{
+            studentId: student.studentId,
+            term: termId
+          }
         )
         .then((response) => {
-          setSelectedExamData(response.data.data[0]);
+          setSelectedExamData(response.data.data);
+          console.log("Selected Exam Data", response.data.data);
           setIsPopupOpen(true); // Open the popup
         })
         .catch((error) => {
@@ -119,12 +124,9 @@ const StudentsResults = () => {
   };
 
   const handleFilterSubmit = (filterValues) => {
-    console.log("Filter values:", filterValues);
-    const filteredResults = studentData.filter((student) => {
-      return true;
-    });
-
-    setFilteredData(filteredResults);
+    const { term: termId, class: classId } = filterValues;
+    setTermId(termId);
+    studentTableData(termId, classId);
   };
 
   const closePopup = () => {
@@ -136,10 +138,7 @@ const StudentsResults = () => {
     <div>
       <DynamicFilterBar filters={filters} onSubmit={handleFilterSubmit} />
       <div className="mt-4">
-        <MultiRowValuesDatatable
-          data={filteredData.length ? filteredData : studentData}
-          actions={actions}
-        />
+        <MultiRowValuesDatatable data={tabledata} actions={actions} />
       </div>
 
       {/* Custom Popup for displaying selected exam data */}
@@ -321,6 +320,7 @@ const StudentsResults = () => {
           </div>
         </div>
       )}
+      
     </div>
   );
 };

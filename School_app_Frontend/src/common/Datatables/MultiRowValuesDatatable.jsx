@@ -9,7 +9,7 @@ const MultiRowValuesDatatable = ({ data = [], actions = {} }) => {
 
   // Calculate the displayed items for the current page
   const offset = currentPage * itemsPerPage;
-  const currentPageData = data.slice(offset, offset + itemsPerPage);
+  const currentPageData = data?.slice(offset, offset + itemsPerPage);
   const pageCount = Math.ceil(data.length / itemsPerPage);
 
   const handlePageClick = ({ selected }) => {
@@ -62,7 +62,7 @@ const MultiRowValuesDatatable = ({ data = [], actions = {} }) => {
 
                 {/* Render individual action buttons next to each exam type */}
                 <td className="border-t-0 px-6 align-middle border-b-2 border-l-2 border-[#7367F0] border-r-0 text-xs font-semibold whitespace-nowrap text-left">
-                  {item.examTypes.map((examType, examIndex) => (
+                  {item.examTypeIds.map((examType, examIndex) => (
                     <div key={examIndex} className="my-7 ">
                       <button
                         onClick={() => actions.onViewExam(item, examType)}
