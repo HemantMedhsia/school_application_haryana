@@ -10,7 +10,6 @@ import {
     getMarksByClass,
     getMarksByClassAndExamType,
     getMarksByStudent,
-    getStudentExamResultsByExamType,
     studentMarkbytermandexamtype,
     updateMarks,
 } from "../Controller/mark.Controller.js";
@@ -42,7 +41,6 @@ router.get(
     "/get-allid/:termId/:classId/:examTypeId/:subjectId",
     getMarksByAllIds
 );
-router.post("/get-student-result-byexamtype", getStudentExamResultsByExamType);
 router.get("/get-student-result-byExamCategoryandMClass/:examCategoryId/:classId", getMarksByExamCategoryClassAndSection);
 
 export { router as markRoute };

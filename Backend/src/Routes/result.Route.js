@@ -1,12 +1,12 @@
 import express from "express";
 import {
-    getClassResults,
-    getStudentResult,
+    getStudentExamResultsByExamType,
+    getStudentExamResultsByTerm,
 } from "../Controller/result.Controller.js";
 
 const router = express.Router();
 
-router.post("/get-class-result", getClassResults);
-router.post("/get-result", getStudentResult);
+router.post("/get-student-result-byexamtype", getStudentExamResultsByExamType);
+router.post("/get-student-result-byterm", getStudentExamResultsByTerm);
 
 export { router as resultRoute };
