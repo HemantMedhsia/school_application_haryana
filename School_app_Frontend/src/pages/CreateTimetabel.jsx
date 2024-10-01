@@ -20,7 +20,7 @@ const CreateTimetable = () => {
   const [teachers, setTeachers] = useState([]);
   const [data, setData] = useState([]);
   const [classes, setClasses] = useState([]);
-  const [currentDay, setCurrentDay] = useState("");
+  const [currentDay , setCurrentDay] = useState("");
   const [loading, setLoading] = useState(false);
   const [subjectGroupId, setSubjectGroupId] = useState("");
 
@@ -71,25 +71,23 @@ const CreateTimetable = () => {
     setSubjectGroups(selectedClass?.subjectGroups || []);
   };
 
-  const handleSubjectGroupChange = async (selectedSubjectGroupId) => {
-    try {
-      // Check if teachers are already fetched for this subject group
-      if (!teachersBySubjectGroup[selectedSubjectGroupId]) {
-        // Fetch teachers for the selected subject group from the API
-        const { data: teachersResponse } = await axios.get(
-          `${
-            import.meta.env.VITE_BACKEND_URL
-          }/api/teachers?subjectGroup=${selectedSubjectGroupId}`
-        );
+  const handleSubjectGroupChange = (selectedSubjectGroupId) => {
+    const selectedSubjectGroup = subjectGroups.find(
+      (group) => group._id === selectedSubjectGroupId
+    );
 
-        // Store the teachers for the selected subject group
-        setTeachersBySubjectGroup((prevState) => ({
-          ...prevState,
-          [selectedSubjectGroupId]: teachersResponse.data || [],
-        }));
-      }
-    } catch (error) {
-      console.error("Error fetching teachers", error);
+    if (selectedSubjectGroup) {
+      console.log("Selected Subject Group:", selectedSubjectGroup);
+
+      // Set the subjects and data based on the selected subject group
+      setSubjects(selectedSubjectGroup.subjects);
+      setData(selectedSubjectGroup.subjects);
+
+      // Log the subjects to verify the state has been updated
+      console.log("Subjects:", selectedSubjectGroup.subjects);
+    } else {
+      setSubjects([]);
+      setData([]);
     }
   };
 
@@ -150,14 +148,7 @@ const CreateTimetable = () => {
     } else {
       setEntries((prevEntries) => [...prevEntries, newEntry]);
     }
-
-    if (entries.period !== "Lunch Break") {
-      const lastEntryPeriod =
-        entries.length > 0 ? entries[entries.length - 1].period : null;
-      console.log("p", lastEntryPeriod + 1);
-      if (lastEntryPeriod !== "Lunch Break") 
-        fetchAvailableTeachers(currentDay,   lastEntryPeriod + 1);
-    }
+    
   };
 
   const isValidTimeFormat = (time) => {
@@ -205,7 +196,7 @@ const CreateTimetable = () => {
     const timetable = {
       classId,
       dayOfWeek,
-      entries: filteredEntries,
+      entries: filteredEntries, // Use formatted entries
     };
 
     console.log("Submitted Timetable:", timetable);
