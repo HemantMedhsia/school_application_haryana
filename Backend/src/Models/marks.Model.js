@@ -49,34 +49,8 @@ const marksSchema = new mongoose.Schema({
                     },
                 },
             ],
-
-            // subjectTotalMarks: {
-            //     type: Number,
-            // },
-            // subjectGrade: {
-            //     type: String,
-            // },
         },
     ],
-    // totalMarkObtained: {
-    //     type: Number,
-    //     default: 0,
-    // },
-    // totalMarkPossible: {
-    //     type: Number,
-    //     default: 0,
-    // },
-    // percentage: {
-    //     type: Number,
-    //     default: 0,
-    // },
-    // finalGrade: {
-    //     type: String,
-    //     default: "F",
-    // },
-    // rank: {
-    //     type: Number,
-    // },
 });
 
 export const Marks = mongoose.model("Marks", marksSchema);

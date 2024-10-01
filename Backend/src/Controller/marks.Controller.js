@@ -114,3 +114,11 @@ export const getMarksByRank = wrapAsync(async (req, res) => {
     const marks = await Marks.find({ rank: req.params.rank });
     return res.status(200).json(new ApiResponse(200, marks));
 });
+
+export const getMarksByExamCategoryClassAndSection = wrapAsync(async (req, res) => {
+    const marks = await Marks.find({
+        "marks.exams.examType": req.params.examCategory,
+        class: req.params.class,
+    }).populate('student class marks.subject marks.teacher marks.exams.examType');
+    return res.status(200).json(new ApiResponse(200, marks));
+});

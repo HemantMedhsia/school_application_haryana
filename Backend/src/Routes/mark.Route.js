@@ -16,6 +16,7 @@ import {
 } from "../Controller/mark.Controller.js";
 import { authenticateToken } from "../Middlewares/authenticateToken.js";
 import { authorizeRoles } from "../Middlewares/authorizeRoles.js";
+import { getMarksByExamCategoryClassAndSection } from "../Controller/marks.Controller.js";
 
 const router = express.Router();
 
@@ -42,5 +43,6 @@ router.get(
     getMarksByAllIds
 );
 router.post("/get-student-result-byexamtype", getStudentExamResultsByExamType);
+router.get("/get-student-result-byExamCategoryandMClass/:examCategoryId/:classId", getMarksByExamCategoryClassAndSection);
 
 export { router as markRoute };
