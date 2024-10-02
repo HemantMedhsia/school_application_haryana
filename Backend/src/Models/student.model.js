@@ -157,8 +157,9 @@ studentSchema.methods.isValidPassword = async function (password) {
 };
 
 studentSchema.methods.getAttendanceStats = async function () {
-    const totalClasses = await StudentAttendance.countDocuments({ studentId: this._id });
-    console.log(totalClasses);
+    const totalClasses = await StudentAttendance.countDocuments({
+        studentId: this._id,
+    });
 
     const presentCount = await StudentAttendance.countDocuments({
         studentId: this._id,
