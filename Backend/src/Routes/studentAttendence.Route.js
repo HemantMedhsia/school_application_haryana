@@ -10,6 +10,7 @@ import {
     getAllStudentAttendance,
     getStudentAttendanceByStudentId,
     getStudentAttendanceByParentId,
+    getStudentAttendanceByStudentId_Admin,
 } from "../Controller/studentAttendence.Controller.js";
 import { authenticateToken } from "../Middlewares/authenticateToken.js";
 
@@ -47,5 +48,11 @@ router.get(
     authenticateToken,
     getStudentAttendanceByParentId
 );
+router.get(
+    "/get-student-attendance-bystudentid-admin/:studentId",
+    authenticateToken,
+    getStudentAttendanceByStudentId_Admin
+);
+
 
 export { router as studentAttendenceRoute };
