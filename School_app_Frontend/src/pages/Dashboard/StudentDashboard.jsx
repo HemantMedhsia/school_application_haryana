@@ -40,14 +40,19 @@ const complaints = [
 const StudentDashboard = () => {
   const [notices, setNotices] = useState([]);
   const [studentAttendanceInfo, setStudentAttendanceInfo] = useState([]);
+  const [studentComplaints, setStudentComplaints] = useState([]);
 
   useEffect(() => {
     const fetchNotices = async () => {
       await getAPI("getAllNotices", {}, setNotices);
-      const res = await getAPI("getStudentAttendanceInfo", {}, setStudentAttendanceInfo);
+      await getAPI("getStudentAttendanceInfo", {}, setStudentAttendanceInfo);
+      const res = await getAPI(
+        "getComplaintsByStudent",
+        {},
+        setStudentComplaints
+      );
 
-
-      console.log(studentAttendanceInfo);
+      console.log(studentComplaints);
     };
     fetchNotices();
   }, []);
@@ -95,7 +100,7 @@ const StudentDashboard = () => {
           <h1 className="text-[#7367F0] text-xl font-semibold my-8">
             Student complaints
           </h1>
-          <ComplaintShowingBlock complaints={complaints} />
+          <ComplaintShowingBlock complaints={studentComplaints} />
         </div>
       </div>
       <div className="w-1/3 h-1/3">
@@ -103,9 +108,11 @@ const StudentDashboard = () => {
           <div>
             <h1 className="text-[#7367F0] text-xl font-semibold">
               Attendance percentage
-              {/* heloo */}
             </h1>
-            <RadialBarChart height="500" series={[studentAttendanceInfo.percentage]} />
+            <RadialBarChart
+              height="500"
+              series={[studentAttendanceInfo.percentage]}
+            />
           </div>
         </div>
 

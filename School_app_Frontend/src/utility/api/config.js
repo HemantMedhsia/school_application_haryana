@@ -106,5 +106,13 @@ export const getApiConfig = {
   getStudentAttendanceInfo: {
     url: "/get-student-attendancedata",
     method: "GET",
-  }
+  },
+  getComplaintsByStudent: {
+    url: "/get-student-complaints",
+    method: "GET",
+  },
+  getStudentDashboardExamSchedule: {
+    url: "/get-examschedule-bystudent",
+    method: "GET",
+  },
 };
