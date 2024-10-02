@@ -20,7 +20,7 @@ export const navigation = [
     to: "/school/dashboard",
     icon: FaHome,
     current: true,
-    roles: ["Admin", "Teacher", "Student"],
+    roles: ["Admin", "Teacher", "Student", "Parent"],
   },
   // {
   //   name: "My Profile",
@@ -67,7 +67,7 @@ export const navigation = [
         name: "Teacher Attendance",
         to: "/school/attendance",
         icon: FaUser,
-        roles: ["Teacher", "Admin"],
+        roles: ["Admin"],
       },
     ],
   },
@@ -199,7 +199,7 @@ export const navigation = [
     to: "/Fees",
     icon: FaUserFriends,
     current: false,
-    roles: ["Student"],
+    roles: ["Student", "Parent"],
   },
   {
     name: "Class TimeTable",
@@ -213,28 +213,28 @@ export const navigation = [
     to: "/Lesson-Plan",
     icon: FaUserFriends,
     current: false,
-    roles: ["Student"],
+    roles: ["Student", "Parent"],
   },
   {
     name: "Syllabus Status",
     to: "/Syllabus-Status",
     icon: FaUserFriends,
     current: false,
-    roles: ["Student"],
+    roles: ["Student", "Parent"],
   },
   {
     name: "Homework",
     to: "/Homework",
     icon: FaUserFriends,
     current: false,
-    roles: ["Student"],
+    roles: ["Student", "Parent"],
   },
   {
     name: "Attendance",
     to: "/Attendance",
     icon: FaUserFriends,
     current: false,
-    roles: ["Student"],
+    roles: ["Student", "Parent"],
   },
   {
     name: "Examination",
@@ -295,11 +295,54 @@ export const navigation = [
     ],
   },
   {
+    name: "Home Work",
+    to: "#",
+    icon: FaChartLine,
+    current: false,
+    roles: ["Admin", "Teacher"],
+    children: [
+      {
+        name: "Add Home Work",
+        to: "/school/add-homework",
+        icon: FaUser,
+        roles: ["Admin", "Teacher"],
+      },
+      {
+        name: "View Home Work",
+        to: "/school/view-homework",
+        icon: FaBook,
+        roles: ["Admin", "Teacher"],
+      },
+    ],
+  },
+
+  {
+    name: "Lesson Plan",
+    to: "#",
+    icon: FaChartLine,
+    current: false,
+    roles: ["Admin", "Teacher"],
+    children: [
+      {
+        name: "Manage Lesson Plan",
+        to: "/school/add-homework",
+        icon: FaUser,
+        roles: ["Admin", "Teacher"],
+      },
+      {
+        name: "Syllabus Status",
+        to: "/school/view-homework",
+        icon: FaBook,
+        roles: ["Admin", "Teacher"],
+      },
+    ],
+  },
+  {
     name: "Results",
     to: "/results",
     icon: FaBell,
     current: false,
-    roles: ["Admin", "Teacher"],
+    roles: ["Admin"],
     children: [
       {
         name: "All Students Result",
@@ -314,7 +357,7 @@ export const navigation = [
     to: "/notice",
     icon: FaBell,
     current: false,
-    roles: ["Admin", "Teacher", "Student"],
+    roles: ["Admin", "Teacher", "Student", "Parent"],
     children: [
       {
         name: "Create Notice",
@@ -326,7 +369,7 @@ export const navigation = [
         name: "View All Notices",
         to: "/school/view-notice",
         icon: FaBook,
-        roles: ["Student", "Teacher", "Admin"],
+        roles: ["Student", "Teacher", "Admin", "Parent"],
       },
     ],
   },
