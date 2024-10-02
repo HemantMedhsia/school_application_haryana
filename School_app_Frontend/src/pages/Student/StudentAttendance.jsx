@@ -5,16 +5,19 @@ import './CustomCalendar.css'; // Import your custom styles
 
 const StudentAttendance = () => {
   const [attendance, setAttendance] = useState({
+    '2024-09-01': 'Present',
+    '2024-09-30': 'Present',
     '2024-10-01': 'Present',
     '2024-10-02': 'Absent',
     '2024-10-03': 'Present',
     // Add more attendance data here
   });
 
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState(new Date(Date.UTC(2024, 9, 2))); // Month is zero-indexed, so 9 = October
 
   const tileContent = ({ date, view }) => {
-    const formattedDate = date.toISOString().split('T')[0];
+    const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+    console.log(`Checking date: ${formattedDate}`); // Debugging line
     const status = attendance[formattedDate];
 
     if (view === 'month' && status) {
@@ -33,12 +36,18 @@ const StudentAttendance = () => {
     return null;
   };
 
+  const handleDateChange = (newDate) => {
+    setDate(newDate);
+    const formattedDate = `${newDate.getFullYear()}-${(newDate.getMonth() + 1).toString().padStart(2, '0')}-${newDate.getDate().toString().padStart(2, '0')}`;
+    console.log(`Selected date: ${formattedDate}`);
+  };
+
   return (
     <div className="flex justify-center items-center h-screen">
       <div className="w-full h-full lg:w-full p-1 bg-[#283046] rounded-md shadow-lg">
         <Calendar
           value={date}
-          onChange={setDate}
+          onChange={handleDateChange}
           tileContent={tileContent}
           className="custom-calendar pt-4 px-2 bg-gray-900 border w-full h-full border-[#65fa9e] rounded-md"
         />
