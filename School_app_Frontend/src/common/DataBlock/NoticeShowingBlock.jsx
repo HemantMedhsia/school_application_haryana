@@ -70,7 +70,7 @@ const NoticeShowingBlock = ({ notices }) => {
             const { text, bg, shadow } = getCategoryStyles(notice.category);
             return (
               <li
-                key={notice.id}
+                key={notice._id}
                 className={`p-4 rounded-lg shadow-lg cursor-pointer hover:shadow-xl transition-shadow duration-300 ${shadow}`}
                 onClick={() => handleNoticeClick(notice)}
               >
