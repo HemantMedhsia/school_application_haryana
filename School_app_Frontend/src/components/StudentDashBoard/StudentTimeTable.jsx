@@ -1,28 +1,41 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useAuth } from "../../context/AuthProvider";
 
 const StudentTimeTable = () => {
   const [timetableData, setTimetableData] = useState([]);
   const [selectedDay, setSelectedDay] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
+  const { userRole } = useAuth();
 
   const fetchTimetableForDay = async (day) => {
     setLoading(true);
-    setError('');
+    setError("");
+    let endpoint = "";
+    if (userRole === "Student") {
+      endpoint = `${
+        import.meta.env.VITE_BACKEND_URL
+      }/api/get-student-timetable-daywise?dayOfWeek=${day}`;
+    } else if (userRole === "Parent") {
+      endpoint = `${
+        import.meta.env.VITE_BACKEND_URL
+      }/api/get-student-timetable-daywise-by-parent?dayOfWeek=${day}`;
+    }
+
     try {
-      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/get-student-timetable-daywise?dayOfWeek=${day}`, {
+      const response = await axios.get(endpoint, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
         },
       });
       if (response.data.success) {
         setSelectedDay(response.data.data[0]); // Assuming data is an array with one day's schedule
       } else {
-        setError('Failed to fetch timetable');
+        setError("Failed to fetch timetable");
       }
     } catch (err) {
-      setError('An error occurred while fetching the timetable.');
+      setError("An error occurred while fetching the timetable.");
     } finally {
       setLoading(false);
     }
@@ -36,11 +49,20 @@ const StudentTimeTable = () => {
     setSelectedDay(null);
   };
 
-  const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const daysOfWeek = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
 
   return (
     <div className="w-full mx-auto p-6 shadow-md rounded-md bg-gray-900 text-gray-100">
-      <h1 className="text-2xl font-bold text-center text-[#7367F0] mb-6">Student Timetable</h1>
+      <h1 className="text-2xl font-bold text-center text-[#7367F0] mb-6">
+        Student Timetable
+      </h1>
       <div className="grid grid-cols-1 gap-4">
         {daysOfWeek.map((day) => (
           <button
@@ -60,7 +82,9 @@ const StudentTimeTable = () => {
       {selectedDay && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70">
           <div className="bg-gray-800 p-6 rounded-md shadow-lg w-11/12 max-w-md">
-            <h2 className="text-xl font-semibold mb-4 text-gray-100">{selectedDay._id} Schedule</h2>
+            <h2 className="text-xl font-semibold mb-4 text-gray-100">
+              {selectedDay._id} Schedule
+            </h2>
             <ul className="space-y-3">
               {selectedDay.periods.map((period, index) => (
                 <li
@@ -69,7 +93,15 @@ const StudentTimeTable = () => {
                 >
                   <div>
                     <p className="text-lg font-medium text-gray-100">
-                      {new Date(period.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {new Date(period.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      {new Date(period.startTime).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}{" "}
+                      -{" "}
+                      {new Date(period.endTime).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                     </p>
                     <p className="text-gray-300">
                       {period.subject} - {period.teacher}

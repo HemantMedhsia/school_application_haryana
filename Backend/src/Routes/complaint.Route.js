@@ -7,6 +7,7 @@ import {
     getComplaintsByCategory,
     getComplaintsByStatus,
     getComplaintsByStudent,
+    getComplaintsByStudentByParentId,
     getComplaintsByTeacherAndStatus,
     updateComplaint,
 } from "../Controller/complaint.Controller.js";
@@ -29,6 +30,13 @@ router.get(
     authorizeRoles("Student"),
     getComplaintsByStudent
 );
+router.get(
+    "/get-student-complaints-by-parent",
+    authenticateToken,
+    authorizeRoles("Parent"),
+    getComplaintsByStudentByParentId
+);
+
 router.get("/get-complaint-by-category/:category", getComplaintsByCategory);
 router.get(
     "/get-complaint-by-teacher-and-status/:teacherId/:status",
