@@ -69,6 +69,12 @@ export const navigation = [
         icon: FaUser,
         roles: ["Admin"],
       },
+      {
+        name: "Staff Attendance",
+        to: "/school/attendance",
+        icon: FaUser,
+        roles: ["Admin"],
+      },
     ],
   },
   {
@@ -351,7 +357,7 @@ export const navigation = [
     to: "/school/student-attendance-view",
     icon: FaBell,
     current: false,
-    roles: ["Student"],
+    roles: ["Student","Parent"],
   },
   {
     name: "Notice",

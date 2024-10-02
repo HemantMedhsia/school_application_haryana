@@ -99,6 +99,10 @@ export const getApiConfig = {
     url: "/get-student-attendance-byid",
     method: "GET",
   },
+  overallAttendanceParent: {
+    url: "/get-student-attendance-byparentid",
+    method: "GET",
+  },
   getAllNotices: {
     url: "/all-notice",
     method: "GET",
