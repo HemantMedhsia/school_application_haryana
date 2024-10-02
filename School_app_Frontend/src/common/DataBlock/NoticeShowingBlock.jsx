@@ -118,7 +118,7 @@ const NoticeShowingBlock = ({ notices }) => {
               </span>
             </div>
             <p className="text-sm text-gray-400">
-              {parseDate(selectedNotice.date).toLocaleDateString()}
+              {new Date(selectedNotice.date).toLocaleDateString()}
             </p>
             <p className="mt-4 text-gray-300">{selectedNotice.description}</p>
             <button

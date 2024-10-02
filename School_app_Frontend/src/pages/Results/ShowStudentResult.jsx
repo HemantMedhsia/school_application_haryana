@@ -3,12 +3,14 @@ import DynamicFilterBar from "../../common/FilterBar/DynamicFilterBar";
 import { getAPI } from "../../utility/api/apiCall";
 import ResultTable from "./ResultTable";
 import axios from "axios";
+import { useAuth } from "../../context/AuthProvider";
 
 const ShowStudentResult = () => {
   const [term, setTerm] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
   const [selectedTerm, setSelectedTerm] = useState(null);
+  const [selectedTermName, setSelectedTermName] = useState(null);
   const [result, setResult] = useState(null);
+  const { userRole } = useAuth();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -36,24 +38,37 @@ const ShowStudentResult = () => {
 
   const handleFilterSubmit = async (filterValues) => {
     console.log("Filter values:", filterValues);
-    setSelectedTerm(filterValues.term);
+    const selectedTermId = filterValues.term;
+
+    const selectedTermItem = term.find(
+      (termItem) => termItem._id === selectedTermId
+    );
+    const name = selectedTermItem ? selectedTermItem.name : null;
+
+    setSelectedTerm(selectedTermId);
+    setSelectedTermName(name);
 
     try {
       const authToken = localStorage.getItem("authToken");
+      const endpoint =
+        userRole === "Student"
+          ? `${import.meta.env.VITE_BACKEND_URL}/api/show-student-result-byterm`
+          : `${
+              import.meta.env.VITE_BACKEND_URL
+            }/api/show-student-result-byparent`;
 
       const resultResponse = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/show-student-result-byterm`,
-        {
-          term: filterValues.term,
-        },
+        endpoint,
+        { term: selectedTermId },
         {
           headers: {
-            Authorization: `Bearer ${authToken}`, // Include auth token in request header
+            Authorization: `Bearer ${authToken}`,
           },
         }
       );
+      console.log("Result response:", resultResponse.data);
 
-      setResult(resultResponse.data); // Set the fetched result data
+      setResult(resultResponse.data);
     } catch (error) {
       console.error("Error fetching student results", error);
     }
@@ -65,7 +80,7 @@ const ShowStudentResult = () => {
 
       {result && (
         <div className="mt-6">
-          <ResultTable result={result} />
+          <ResultTable result={result} termName={selectedTermName} />
         </div>
       )}
     </div>
