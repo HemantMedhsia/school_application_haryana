@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
+import { StudentAttendance } from "./studentAttendence.Model.js";
 
 const studentSchema = new mongoose.Schema({
     admissionNo: {
@@ -153,6 +154,27 @@ studentSchema.methods.isValidPassword = async function (password) {
     } catch (error) {
         throw new Error(error);
     }
+};
+
+studentSchema.methods.getAttendanceStats = async function () {
+    const totalClasses = await StudentAttendance.countDocuments({ studentId: this._id });
+    console.log(totalClasses);
+
+    const presentCount = await StudentAttendance.countDocuments({
+        studentId: this._id,
+        status: "Present",
+    });
+    console.log(presentCount);
+    const absentCount = totalClasses - presentCount;
+    const percentage =
+        totalClasses > 0 ? (presentCount / totalClasses) * 100 : 0;
+
+    return {
+        totalClasses,
+        present: presentCount,
+        absent: absentCount,
+        percentage: percentage.toFixed(2),
+    };
 };
 
 export const Student = mongoose.model("Student", studentSchema);

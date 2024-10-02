@@ -3,6 +3,7 @@ import {
     createStudent,
     deleteStudent,
     getStudent,
+    getStudentAttendanceData,
     getStudentByParent,
     getStudents,
     loginStudent,
@@ -18,7 +19,7 @@ router.post("/create-student/:schoolId", createStudent);
 router.get(
     "/get-all-students",
     authenticateToken,
-    authorizeRoles("Admin","Teacher"),
+    authorizeRoles("Admin", "Teacher"),
     getStudents
 );
 
@@ -28,5 +29,10 @@ router.patch("/update-student/:id", updateStudent);
 router.get("/get-student-by-parent/:parentId", getStudentByParent);
 router.post("/login-student", loginStudent);
 router.post("/refresh-token-student", refreshAccessTokenStudent);
+router.get(
+    "/get-student-attendancedata",
+    authenticateToken,
+    getStudentAttendanceData
+);
 
 export { router as studentRoute };
