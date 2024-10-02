@@ -3,6 +3,7 @@ import { Student } from "../Models/student.model.js";
 import { Teacher } from "../Models/teacher.model.js";
 import { StudentAttendance } from "../Models/studentAttendence.Model.js";
 import { attendanceValidationSchema } from "../Validation/studentAttendence.validation.js";
+import { ApiResponse } from "../Utils/responseHandler.js";
 
 export const createStudentAttendence = wrapAsync(async (req, res) => {
     const { studentId } = req.params;
@@ -188,7 +189,9 @@ export const createMultipleStudentAttendenceInBulk = wrapAsync(
             //     }
             // }
 
-            const savedAttendence = await StudentAttendance.insertMany(attendenceData);
+            const savedAttendence = await StudentAttendance.insertMany(
+                attendenceData
+            );
 
             for (const attendance of savedAttendence) {
                 await Student.findByIdAndUpdate(attendance.studentId, {
@@ -202,7 +205,6 @@ export const createMultipleStudentAttendenceInBulk = wrapAsync(
     }
 );
 
-
 export const getAllStudentAttendance = wrapAsync(async (req, res) => {
     const attendanceRecords = await StudentAttendance.find();
 
@@ -213,4 +215,50 @@ export const getAllStudentAttendance = wrapAsync(async (req, res) => {
     }
 
     res.status(200).json({ success: true, data: attendanceRecords });
+});
+
+export const getStudentAttendanceByStudentId = wrapAsync(async (req, res) => {
+    const studentId = req.user.id;
+
+    const student = await Student.findById(studentId)
+        .populate("StudentAttendance")
+        .lean();
+
+    if (!student) {
+        return res.status(404).json({ error: "Student not found." });
+    }
+
+    const attendanceResponse = {};
+    student.StudentAttendance.forEach((record) => {
+        const date = record.date.toISOString().split("T")[0];
+        attendanceResponse[date] = record.status;
+    });
+
+    res.status(200).json(new ApiResponse(200, attendanceResponse));
+});
+
+export const getStudentAttendanceByParentId = wrapAsync(async (req, res) => {
+    const parentId = req.user.id;
+
+    const students = await Student.find({ parent: parentId })
+        .populate("StudentAttendance")
+        .lean();
+    console.log(students);
+
+    if (!students || students.length === 0) {
+        return res
+            .status(404)
+            .json({ error: "No students found for this parent." });
+    }
+
+    const attendanceResponse = {};
+
+    students.forEach((student) => {
+        student.StudentAttendance.forEach((record) => {
+            const date = record.date.toISOString().split("T")[0];
+            attendanceResponse[date] = record.status;
+        });
+    });
+
+    res.status(200).json(new ApiResponse(200, attendanceResponse));
 });

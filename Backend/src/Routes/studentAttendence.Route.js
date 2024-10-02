@@ -6,8 +6,10 @@ import {
     updateStudentAttendance,
     getAttendanceSummary,
     getAttendanceByDateRange,
-    createMultipleStudentAttendenceInBulk,  
+    createMultipleStudentAttendenceInBulk,
     getAllStudentAttendance,
+    getStudentAttendanceByStudentId,
+    getStudentAttendanceByParentId,
 } from "../Controller/studentAttendence.Controller.js";
 import { authenticateToken } from "../Middlewares/authenticateToken.js";
 
@@ -29,7 +31,21 @@ router.get(
     "/get-student-attendance-daterange/:studentId",
     getAttendanceByDateRange
 );
-router.post("/insert-student-attendance-in-bulk",authenticateToken, createMultipleStudentAttendenceInBulk);
+router.post(
+    "/insert-student-attendance-in-bulk",
+    authenticateToken,
+    createMultipleStudentAttendenceInBulk
+);
 router.get("/get-all-attendance", getAllStudentAttendance);
+router.get(
+    "/get-student-attendance-byid",
+    authenticateToken,
+    getStudentAttendanceByStudentId
+);
+router.get(
+    "/get-student-attendance-byparentid",
+    authenticateToken,
+    getStudentAttendanceByParentId
+);
 
 export { router as studentAttendenceRoute };
