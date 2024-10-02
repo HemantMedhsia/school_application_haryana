@@ -103,4 +103,8 @@ export const getApiConfig = {
     url: "/all-notice",
     method: "GET",
   },
+  getStudentAttendanceInfo: {
+    url: "/get-student-attendancedata",
+    method: "GET",
+  }
 };
