@@ -1,0 +1,84 @@
+/* CustomCalendar.css */
+
+/* Target the day labels (Mon, Tue, etc.) */
+.react-calendar__month-view__weekdays__weekday {
+    font-size: 1.25rem; /* Increase font size for weekday labels */
+    height: 100px; /* Adjust the height of the weekday labels */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #7376f0; /* Change text color if needed */
+  }
+  
+  /* Target the date numbers (1, 2, 3, etc.) */
+  .react-calendar__tile {
+    font-size: 1.5rem; /* Increase font size for the dates */
+    height: 85px; /* Adjust the height of the date tiles */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    border-radius: 8px; /* Change text color if needed */
+  }
+  
+  /* Optional: You can style the hover effect or selected date */
+  .react-calendar__tile--active {
+    background-color: #65fa9e; /* Change active date background color */
+    color: #000000; /* Change active date text color */
+  }
+  
+  /* Optional: Style for hover effect */
+  .react-calendar__tile:hover {
+    background-color: #404040; /* Change hover background color */
+    color: #ffffff; /* Change hover text color */
+  }
+
+  .react-calendar__navigation__arrow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #65fa9e; /* Background color for the arrows */
+    color: #65fa9e; /* Arrow color */
+    border: none; /* Remove default borders */
+    font-size: 2.5rem; /* Increase the size of the arrow */
+    padding: 15px; /* Increase padding */
+    border-radius: 50%; /* Make it circular */
+    transition: background-color 0.3s ease;
+  }
+
+  .react-calendar__navigation__arrow:active {
+    background-color: #111827 !important;
+  }
+  
+  .react-calendar__navigation__arrow:hover {
+    background-color: #111827 !important;
+    color: #7376f0;
+    cursor: pointer;
+  }
+  
+  /* Style for the month and year label */
+  .react-calendar__navigation__label {
+    font-size: 1.75rem; /* Increase the font size */
+    font-weight: bold; /* Make the text bold */
+    color: #7376f0; /* Color of the month and year text */
+    padding: 15px;
+    text-align: center;
+  }
+  
+  .react-calendar__navigation__label:hover {
+    cursor: default; /* Prevent hover effects */
+    background-color: #111827 !important; /* Change background color */
+  }
+
+  .react-calendar__tile--now {
+    background-color: #2d3748 !important;
+    border: 1px solid #65fa9e !important;
+    color: red !important;
+    font-size: xx-large;
+
+  }
+
+  .react-calendar__tile:enabled:hover {
+    background-color: #2d3748;
+  }
+  

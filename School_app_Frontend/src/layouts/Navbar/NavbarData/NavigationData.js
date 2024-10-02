@@ -353,6 +353,13 @@ export const navigation = [
     ],
   },
   {
+    name: "Attendance",
+    to: "/school/student-attendance-view",
+    icon: FaBell,
+    current: false,
+    roles: ["Student"],
+  },
+  {
     name: "Notice",
     to: "/notice",
     icon: FaBell,
