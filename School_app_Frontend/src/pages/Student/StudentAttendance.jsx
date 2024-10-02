@@ -4,16 +4,23 @@ import "react-calendar/dist/Calendar.css"; // Basic calendar styles
 import "./CustomCalendar.css"; // Import your custom styles
 import axios from "axios";
 import { getAPI } from "../../utility/api/apiCall";
+import { useAuth } from "../../context/AuthProvider";
 
 const StudentAttendance = () => {
   const [attendance, setAttendance] = useState({});
+  const { userRole } = useAuth();
 
   useEffect(() => {
     const fetchAttendance = async () => {
-      getAPI("overallAttendanceStudent", {}, setAttendance);
+      if (userRole === "Student") {
+        getAPI("overallAttendanceStudent", {}, setAttendance);
+      } else if (userRole === "Parent") {
+        getAPI("overallAttendanceParent", {}, setAttendance);
+      }
     };
     fetchAttendance();
-  }, []);
+    console.log(attendance);
+  }, [userRole]);
 
   const [date, setDate] = useState(new Date(Date.UTC(2024, 9, 2))); // Month is zero-indexed, so 9 = October
 
