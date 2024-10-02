@@ -45,6 +45,7 @@ import StaffInfo from "./pages/Staff/StaffInfo.jsx";
 import CommonClassTimeTable from "./pages/CommonClassTimeTable.jsx";
 import StudentsResults from "./pages/Results/StudentsResults.jsx";
 import ShowStudentResult from "./pages/Results/ShowStudentResult.jsx";
+import StudentAttendance from "./pages/Student/StudentAttendance.jsx";
 
 const App = () => {
   const { userRole, authToken } = useAuth();
@@ -129,6 +130,7 @@ const App = () => {
             element={<ViewExaminationScheduleForStudentAndParent />}
           />
           <Route path="view-result" element={<ShowStudentResult />} />
+          <Route path="student-attendance-view" element={<StudentAttendance />} />
         </Route>
       </>
     )
