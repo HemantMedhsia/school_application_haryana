@@ -97,13 +97,13 @@ export const navigation = [
     to: "#",
     icon: FaUserFriends,
     current: false,
-    roles: ["Admin", "Teacher"],
+    roles: ["Admin"],
     children: [
       {
         name: "Parent Information",
         to: "/school/parent-information",
         icon: FaUser,
-        roles: ["Admin", "Teacher"],
+        roles: ["Admin"],
       },
     ],
   },
@@ -153,7 +153,7 @@ export const navigation = [
         name: "Teacher Timetable",
         to: "/school/teacher-timetable",
         icon: FaBook,
-        roles: ["Teacher", "Admin"],
+        roles: ["Admin"],
       },
       {
         name: "Create TimeTable",
@@ -247,13 +247,13 @@ export const navigation = [
         name: "Exam Group",
         to: "/school/exam-group",
         icon: FaUser,
-        roles: ["Teacher", "Admin"],
+        roles: ["Admin"],
       },
       {
         name: "Exam Type",
         to: "/school/exam-type",
         icon: FaBook,
-        roles: ["Teacher", "Admin"],
+        roles: ["Admin"],
       },
       {
         name: "Add Marks",
@@ -265,7 +265,7 @@ export const navigation = [
         name: "Exam Schedule",
         to: "/school/exam-schedule",
         icon: FaCheckCircle,
-        roles: ["Admin", "Teacher"],
+        roles: ["Admin"],
       },
       {
         name: "View Exam Schedule",
