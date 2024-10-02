@@ -1,45 +1,46 @@
 // Updated StudentDashboard.jsx
-import React from "react";
+import React, { useEffect, useState } from "react";
 import SmalldataBlock from "../../common/DataBlock/SmalldataBlock";
 import RadialBarChart from "../../common/Charts/RadialBarChart";
 import NoticeShowingBlock from "../../common/DataBlock/NoticeShowingBlock";
 import ComplaintShowingBlock from "../../common/DataBlock/ComplaintShowingBlock";
 import StudentTimeTable from "../../components/StudentDashBoard/StudentTimeTable";
+import { getAPI } from "../../utility/api/apiCall";
 
-const notices = [
-  {
-    id: "1",
-    title: "Annual Sports Day",
-    category: "Event",
-    date: "10-12-2024",
-    description:
-      "Join us for the Annual Sports Day at the school ground. Students from all classes are encouraged to participate in various events. Parents are welcome to attend.",
-  },
-  {
-    id: "2",
-    title: "Diwali Holidays",
-    category: "Holiday",
-    date: "01-11-2024",
-    description:
-      "The school will remain closed from November 1st to November 6th on account of Diwali. Classes will resume on November 7th. Happy Diwali to everyone!",
-  },
-  {
-    id: "3",
-    title: "PTM Scheduled",
-    category: "Announcement",
-    date: "20-12-2024",
-    description:
-      "A Parent-Teacher Meeting (PTM) is scheduled for September 20th. All parents are requested to attend the meeting to discuss their ward’s progress and areas of improvement.",
-  },
-  {
-    id: "4",
-    title: "Library Book Return Reminder",
-    category: "General",
-    date: "05-09-2024",
-    description:
-      "Students are reminded to return all library books by the end of this month. Late returns will incur a fine. Please check the due dates to avoid any penalties.",
-  },
-];
+// const notices = [
+//   {
+//     id: "1",
+//     title: "Annual Sports Day",
+//     category: "Event",
+//     date: "10-12-2024",
+//     description:
+//       "Join us for the Annual Sports Day at the school ground. Students from all classes are encouraged to participate in various events. Parents are welcome to attend.",
+//   },
+//   {
+//     id: "2",
+//     title: "Diwali Holidays",
+//     category: "Holiday",
+//     date: "01-11-2024",
+//     description:
+//       "The school will remain closed from November 1st to November 6th on account of Diwali. Classes will resume on November 7th. Happy Diwali to everyone!",
+//   },
+//   {
+//     id: "3",
+//     title: "PTM Scheduled",
+//     category: "Announcement",
+//     date: "20-12-2024",
+//     description:
+//       "A Parent-Teacher Meeting (PTM) is scheduled for September 20th. All parents are requested to attend the meeting to discuss their ward’s progress and areas of improvement.",
+//   },
+//   {
+//     id: "4",
+//     title: "Library Book Return Reminder",
+//     category: "General",
+//     date: "05-09-2024",
+//     description:
+//       "Students are reminded to return all library books by the end of this month. Late returns will incur a fine. Please check the due dates to avoid any penalties.",
+//   },
+// ];
 
 const complaints = [
   {
@@ -72,6 +73,19 @@ const complaints = [
 ];
 
 const StudentDashboard = () => {
+
+  const [notices, setNotices] = useState([]);
+  
+  useEffect(() => {
+    const fetchNotices = async () => {
+      const res = await getAPI("getAllNotices", {}, setNotices);
+      console.log(notices)
+    };
+    
+
+    fetchNotices();
+  }, []);
+
   return (
     <div className="flex justify-between w-full gap-6">
       <div className="w-4/6">
