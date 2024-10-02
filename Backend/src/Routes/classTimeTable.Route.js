@@ -9,6 +9,7 @@ import {
     getStudentTimetable,
     getStudentTimetableByParentId,
     getStudentTimetabledayWise,
+    getStudentTimetabledayWiseByParentId,
     getTeacherTimetable,
     getTeacherTimetableById,
     updateClassTimeTable,
@@ -36,6 +37,11 @@ router.get(
     "/get-student-timetable-daywise",
     authenticateToken,
     getStudentTimetabledayWise
+);
+router.get(
+    "/get-student-timetable-daywise-by-parent",
+    authenticateToken,
+    getStudentTimetabledayWiseByParentId
 );
 
 export { router as classTimeTableRoute };
