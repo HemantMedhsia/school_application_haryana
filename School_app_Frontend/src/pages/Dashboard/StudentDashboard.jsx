@@ -7,41 +7,6 @@ import ComplaintShowingBlock from "../../common/DataBlock/ComplaintShowingBlock"
 import StudentTimeTable from "../../components/StudentDashBoard/StudentTimeTable";
 import { getAPI } from "../../utility/api/apiCall";
 
-// const notices = [
-//   {
-//     id: "1",
-//     title: "Annual Sports Day",
-//     category: "Event",
-//     date: "10-12-2024",
-//     description:
-//       "Join us for the Annual Sports Day at the school ground. Students from all classes are encouraged to participate in various events. Parents are welcome to attend.",
-//   },
-//   {
-//     id: "2",
-//     title: "Diwali Holidays",
-//     category: "Holiday",
-//     date: "01-11-2024",
-//     description:
-//       "The school will remain closed from November 1st to November 6th on account of Diwali. Classes will resume on November 7th. Happy Diwali to everyone!",
-//   },
-//   {
-//     id: "3",
-//     title: "PTM Scheduled",
-//     category: "Announcement",
-//     date: "20-12-2024",
-//     description:
-//       "A Parent-Teacher Meeting (PTM) is scheduled for September 20th. All parents are requested to attend the meeting to discuss their ward’s progress and areas of improvement.",
-//   },
-//   {
-//     id: "4",
-//     title: "Library Book Return Reminder",
-//     category: "General",
-//     date: "05-09-2024",
-//     description:
-//       "Students are reminded to return all library books by the end of this month. Late returns will incur a fine. Please check the due dates to avoid any penalties.",
-//   },
-// ];
-
 const complaints = [
   {
     id: 1,
@@ -73,16 +38,17 @@ const complaints = [
 ];
 
 const StudentDashboard = () => {
-
   const [notices, setNotices] = useState([]);
-  
+  const [studentAttendanceInfo, setStudentAttendanceInfo] = useState([]);
+
   useEffect(() => {
     const fetchNotices = async () => {
-      const res = await getAPI("getAllNotices", {}, setNotices);
-      console.log(notices)
-    };
-    
+      await getAPI("getAllNotices", {}, setNotices);
+      const res = await getAPI("getStudentAttendanceInfo", {}, setStudentAttendanceInfo);
 
+
+      console.log(studentAttendanceInfo);
+    };
     fetchNotices();
   }, []);
 
@@ -95,14 +61,14 @@ const StudentDashboard = () => {
             description="Total number of classes"
             iconUrl="https://img.icons8.com/ios/50/000000/graduation-cap--v1.png"
             bgColor="bg-gray-900"
-            value={200}
+            value={studentAttendanceInfo.totalClasses}
           />
           <SmalldataBlock
             title="Present"
             description="Total number of Present"
             iconUrl="https://img.icons8.com/ios/50/000000/graduation-cap--v1.png"
             bgColor="bg-gray-900"
-            value={200}
+            value={studentAttendanceInfo.present}
           />
         </div>
         <div className="flex w-full gap-4">
@@ -111,14 +77,14 @@ const StudentDashboard = () => {
             description="Total number of absent"
             iconUrl="https://img.icons8.com/ios/50/000000/graduation-cap--v1.png"
             bgColor="bg-gray-900"
-            value={200}
+            value={studentAttendanceInfo.absent}
           />
           <SmalldataBlock
             title="Late"
             description="Total number of late"
             iconUrl="https://img.icons8.com/ios/50/000000/graduation-cap--v1.png"
             bgColor="bg-gray-900"
-            value={50}
+            value={0}
           />
         </div>
         <div className=" bg-[#283046] p-8 rounded-md">
@@ -138,12 +104,12 @@ const StudentDashboard = () => {
             <h1 className="text-[#7367F0] text-xl font-semibold">
               Attendance Percentage
             </h1>
-            <RadialBarChart height="500" />
+            <RadialBarChart height="500" series={[studentAttendanceInfo.percentage]} />
           </div>
         </div>
 
         <div className="w-full h-full p-2 mt-4 bg-[#283046] flex flex-col  items-center rounded-lg shadow-md">
-          <StudentTimeTable/>
+          <StudentTimeTable />
         </div>
       </div>
     </div>

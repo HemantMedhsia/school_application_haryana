@@ -10,6 +10,8 @@ import {
     getComplaintsByTeacherAndStatus,
     updateComplaint,
 } from "../Controller/complaint.Controller.js";
+import { authorizeRoles } from "../Middlewares/authorizeRoles.js";
+import { authenticateToken } from "../Middlewares/authenticateToken.js";
 
 const router = express.Router();
 
@@ -21,7 +23,12 @@ router.get(
     getComplaintById
 );
 router.get("/get-all-complaints", getComplaints);
-router.get("/get-student-complaints/:studentId", getComplaintsByStudent);
+router.get(
+    "/get-student-complaints",
+    authenticateToken,
+    authorizeRoles("Student"),
+    getComplaintsByStudent
+);
 router.get("/get-complaint-by-category/:category", getComplaintsByCategory);
 router.get(
     "/get-complaint-by-teacher-and-status/:teacherId/:status",
