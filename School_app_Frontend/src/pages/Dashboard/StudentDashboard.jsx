@@ -102,7 +102,8 @@ const StudentDashboard = () => {
         <div className="w-full h-full p-2 bg-[#283046] flex flex-col  items-center rounded-lg shadow-md">
           <div>
             <h1 className="text-[#7367F0] text-xl font-semibold">
-              Attendance Percentage
+              Attendance percentage
+              {/* heloo */}
             </h1>
             <RadialBarChart height="500" series={[studentAttendanceInfo.percentage]} />
           </div>
