@@ -63,7 +63,7 @@ export const getComplaints = wrapAsync(async (req, res) => {
 });
 
 export const getComplaintsByStudent = wrapAsync(async (req, res) => {
-    const student = await Student.findById(req.params.studentId).populate(
+    const student = await Student.findById(req.users.id).populate(
         "complaints"
     );
     if (!student) {
@@ -89,3 +89,4 @@ export const getComplaintsByTeacherAndStatus = wrapAsync(async (req, res) => {
     });
     return res.status(200).json(new ApiResponse(200, complaints));
 });
+
