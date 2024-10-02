@@ -284,11 +284,10 @@ export const getParentByStudent = wrapAsync(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, student.parent));
 });
 
-
 export const getStudentAttendanceData = wrapAsync(async (req, res) => {
     const studentId = req.user.id;
     const student = await Student.findById(studentId);
-        
+
     if (!student) {
         return res.status(404).json({ message: "Student not found" });
     }
@@ -296,3 +295,18 @@ export const getStudentAttendanceData = wrapAsync(async (req, res) => {
 
     return res.status(200).json(new ApiResponse(200, attendanceStats));
 });
+
+export const getStudentAttendanceDataByParentId = wrapAsync(
+    async (req, res) => {
+        const parentId = req.user.id;
+
+        const student = await Student.findOne({ parent: parentId });
+
+        if (!student) {
+            return res.status(404).json({ message: "Student not found" });
+        }
+
+        const attendanceStats = await student.getAttendanceStats();
+        return res.status(200).json(new ApiResponse(200, attendanceStats));
+    }
+);

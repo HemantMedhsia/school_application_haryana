@@ -4,6 +4,7 @@ import {
     deleteStudent,
     getStudent,
     getStudentAttendanceData,
+    getStudentAttendanceDataByParentId,
     getStudentByParent,
     getStudents,
     loginStudent,
@@ -33,6 +34,11 @@ router.get(
     "/get-student-attendancedata",
     authenticateToken,
     getStudentAttendanceData
+);
+router.get(
+    "/get-student-attendancedatabyparent",
+    authenticateToken,
+    getStudentAttendanceDataByParentId
 );
 
 export { router as studentRoute };
