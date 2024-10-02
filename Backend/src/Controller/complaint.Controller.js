@@ -63,7 +63,15 @@ export const getComplaints = wrapAsync(async (req, res) => {
 });
 
 export const getComplaintsByStudent = wrapAsync(async (req, res) => {
-    const student = await Student.findById(req.user.id).populate(
+    const student = await Student.findById(req.user.id).populate("complaints");
+    if (!student) {
+        return res.status(404).json({ message: "Student not found" });
+    }
+    return res.status(200).json(new ApiResponse(200, student.complaints));
+});
+
+export const getComplaintsByStudentByParentId = wrapAsync(async (req, res) => {
+    const student = await Student.findOne({ parent: req.user.id }).populate(
         "complaints"
     );
     if (!student) {
@@ -71,6 +79,7 @@ export const getComplaintsByStudent = wrapAsync(async (req, res) => {
     }
     return res.status(200).json(new ApiResponse(200, student.complaints));
 });
+
 
 export const getComplaintsByStatus = wrapAsync(async (req, res) => {
     const complaints = await Complaint.find({ status: req.params.status });
@@ -89,4 +98,3 @@ export const getComplaintsByTeacherAndStatus = wrapAsync(async (req, res) => {
     });
     return res.status(200).json(new ApiResponse(200, complaints));
 });
-

@@ -6,6 +6,7 @@ import NoticeShowingBlock from "../../common/DataBlock/NoticeShowingBlock";
 import ComplaintShowingBlock from "../../common/DataBlock/ComplaintShowingBlock";
 import StudentTimeTable from "../../components/StudentDashBoard/StudentTimeTable";
 import { getAPI } from "../../utility/api/apiCall";
+import { useAuth } from "../../context/AuthProvider";
 
 const complaints = [
   {
@@ -41,11 +42,20 @@ const StudentDashboard = () => {
   const [notices, setNotices] = useState([]);
   const [studentAttendanceInfo, setStudentAttendanceInfo] = useState([]);
   const [studentComplaints, setStudentComplaints] = useState([]);
+  const { userRole } = useAuth();
 
   useEffect(() => {
     const fetchNotices = async () => {
       await getAPI("getAllNotices", {}, setNotices);
-      await getAPI("getStudentAttendanceInfo", {}, setStudentAttendanceInfo);
+      if (userRole === "Student") {
+        await getAPI("getStudentAttendanceInfo", {}, setStudentAttendanceInfo);
+      } else if (userRole === "Parent") {
+        await getAPI(
+          "getStudentAttendanceInfoByParent",
+          {},
+          setStudentAttendanceInfo
+        );
+      }
       const res = await getAPI(
         "getComplaintsByStudent",
         {},
@@ -55,7 +65,7 @@ const StudentDashboard = () => {
       console.log(studentComplaints);
     };
     fetchNotices();
-  }, []);
+  }, [userRole]);
 
   return (
     <div className="flex justify-between w-full gap-6">

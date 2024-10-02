@@ -111,6 +111,10 @@ export const getApiConfig = {
     url: "/get-student-attendancedata",
     method: "GET",
   },
+  getStudentAttendanceInfoByParent: {
+    url: "/get-student-attendancedatabyparent",
+    method: "GET",
+  },
   getComplaintsByStudent: {
     url: "/get-student-complaints",
     method: "GET",
