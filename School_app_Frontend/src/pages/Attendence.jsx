@@ -240,6 +240,11 @@ const Attendence = () => {
     }
   };
 
+  const handleView = (item) => {
+    console.log("Viewing item:", item._id);
+  }
+
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -256,6 +261,7 @@ const Attendence = () => {
         columns={columns}
         data={filteredStudentData} // Use filtered data here
         actions={{
+          onView: (item) => handleView(item),
           onPresent: (item) => handleAttendance(item, "Present"),
           onAbsent: (item) => handleAttendance(item, "Absent"),
         }}

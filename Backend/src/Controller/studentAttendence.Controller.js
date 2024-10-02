@@ -263,3 +263,23 @@ export const getStudentAttendanceByParentId = wrapAsync(async (req, res) => {
     res.status(200).json(new ApiResponse(200, attendanceResponse));
 });
 
+export const getStudentAttendanceByStudentId_Admin = wrapAsync(async (req, res) => {
+    const studentId = req.params.studentId;
+
+    const student = await Student.findById(studentId)
+        .populate("StudentAttendance")
+        .lean();
+
+    if (!student) {
+        return res.status(404).json({ error: "Student not found." });
+    }
+
+    const attendanceResponse = {};
+    student.StudentAttendance.forEach((record) => {
+        const date = record.date.toISOString().split("T")[0];
+        attendanceResponse[date] = record.status;
+    });
+
+    res.status(200).json(new ApiResponse(200, attendanceResponse));
+});
+
