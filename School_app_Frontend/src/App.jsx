@@ -68,7 +68,6 @@ const App = () => {
             }
           />
           <Route path="testing" element={<Testing />} />
-
           <Route
             path="student-admission/:studentId?"
             element={
@@ -83,7 +82,6 @@ const App = () => {
           <Route path="staff-add" element={<StaffAdd />} />
           <Route path="all-staffs" element={<StaffInfo />} />
           <Route path="staff-update/:staffId" element={<StaffAdd />} />
-
           <Route path="parent-information" element={<ParentInfo />} />
           <Route path="calendar" element={<EventCalendar />} />
           <Route path="create-notice" element={<Notice />} />
@@ -130,7 +128,14 @@ const App = () => {
             element={<ViewExaminationScheduleForStudentAndParent />}
           />
           <Route path="view-result" element={<ShowStudentResult />} />
-          <Route path="student-attendance-view" element={<StudentAttendance />} />
+          <Route
+            path="student-attendance-view/:studentId?"
+            element={
+              <RoleBasedAccess allowedRoles={["Admin", "Student","Parent"]}>
+                <StudentAttendance />
+              </RoleBasedAccess>
+            }
+          />
         </Route>
       </>
     )

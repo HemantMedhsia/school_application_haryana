@@ -5,6 +5,7 @@ import { getAPI } from "../utility/api/apiCall";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
+import { Navigate, useNavigate } from "react-router-dom";
 
 const columns = [
   { header: "First Name", accessor: "firstName" },
@@ -58,6 +59,7 @@ const Attendence = () => {
   const [sectionItems, setSectionItems] = useState([]);
   const [selectedClass, setSelectedClass] = useState(null);
   const [searchText, setSearchText] = useState("");
+  const navigate = useNavigate();
 
   const fetchDropdownData = async () => {
     try {
@@ -240,10 +242,9 @@ const Attendence = () => {
     }
   };
 
-  const handleView = (item) => {
-    console.log("Viewing item:", item._id);
-  }
-
+  const handleView = async (item) => {
+   navigate(`/school/student-attendance-view/${item._id}`);
+  };
 
   useEffect(() => {
     fetchData();
