@@ -63,7 +63,7 @@ export const getComplaints = wrapAsync(async (req, res) => {
 });
 
 export const getComplaintsByStudent = wrapAsync(async (req, res) => {
-    const student = await Student.findById(req.users.id).populate(
+    const student = await Student.findById(req.user.id).populate(
         "complaints"
     );
     if (!student) {
