@@ -229,13 +229,7 @@ export const navigation = [
     current: false,
     roles: ["Student", "Parent"],
   },
-  {
-    name: "Attendance",
-    to: "/Attendance",
-    icon: FaUserFriends,
-    current: false,
-    roles: ["Student", "Parent"],
-  },
+
   {
     name: "Examination",
     to: "#",

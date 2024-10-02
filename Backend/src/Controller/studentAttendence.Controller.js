@@ -243,7 +243,6 @@ export const getStudentAttendanceByParentId = wrapAsync(async (req, res) => {
     const students = await Student.find({ parent: parentId })
         .populate("StudentAttendance")
         .lean();
-    console.log(students);
 
     if (!students || students.length === 0) {
         return res
@@ -254,6 +253,7 @@ export const getStudentAttendanceByParentId = wrapAsync(async (req, res) => {
     const attendanceResponse = {};
 
     students.forEach((student) => {
+        console.log(student.StudentAttendance);
         student.StudentAttendance.forEach((record) => {
             const date = record.date.toISOString().split("T")[0];
             attendanceResponse[date] = record.status;
@@ -262,3 +262,4 @@ export const getStudentAttendanceByParentId = wrapAsync(async (req, res) => {
 
     res.status(200).json(new ApiResponse(200, attendanceResponse));
 });
+
