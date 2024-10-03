@@ -117,6 +117,44 @@ export const updateStaffAttendance = wrapAsync(async (req, res) => {
         );
 });
 
+export const updateStaffAttendanceByStaffId = wrapAsync(
+    async (req, res) => {
+        const { staffId } = req.params;
+        const { date, status } = req.body;
+        const startOfDay = new Date(date);
+        startOfDay.setUTCHours(0, 0, 0, 0); // Start of the day (00:00:00)
+
+        const endOfDay = new Date(date);
+        endOfDay.setUTCHours(23, 59, 59, 999); // End of the day (23:59:59)
+
+        const staff = await Staff.findById(staffId);
+
+        if (!staff) {
+            return res.status(404).json({ message: "staff not found 404" });
+        }
+
+        // Find the attendance record between the start and end of the given day
+        const attendanceRecord = await StaffAttendance.findOne({
+            staffId: staffId,
+            date: {
+                $gte: startOfDay,
+                $lte: endOfDay,
+            },
+        });
+
+        if (attendanceRecord) {
+            attendanceRecord.status = status;
+            await attendanceRecord.save();
+            return res
+                .status(200)
+                .json(new ApiResponse(200, "Attendance updated successfully"));
+        }
+        return res
+            .status(404)
+            .json(new ApiResponse(404, "Attendance record not found"));
+    }
+);
+
 export const deleteStaffAttendance = wrapAsync(async (req, res) => {
     const staffAttendance = await StaffAttendance.findByIdAndDelete(
         req.params.attendanceId

@@ -8,6 +8,7 @@ import {
     getTeacherAttendanceByAdmin,
     getTeacherAttendanceByTeacherId,
     updateTeacherAttendance,
+    updateTeacherAttendanceByTeacherId,
 } from "../Controller/teacherAttendence.Controller.js";
 import { authenticateToken } from "../Middlewares/authenticateToken.js";
 import { authorizeRoles } from "../Middlewares/authorizeRoles.js";
@@ -38,6 +39,13 @@ router.get(
     authenticateToken,
     authorizeRoles("Admin"),
     getTeacherAttendanceByAdmin
+);
+
+router.put(
+    "/update-teacher-attendance-byadmin/:teacherId",
+    authenticateToken,
+    authorizeRoles("Admin"),
+    updateTeacherAttendanceByTeacherId
 );
 
 export { router as teacherAttendenceRoute };

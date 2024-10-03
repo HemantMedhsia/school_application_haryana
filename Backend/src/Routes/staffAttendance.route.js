@@ -7,6 +7,7 @@ import {
     getStaffAttendanceByAdmin,
     getStaffAttendanceSummary,
     updateStaffAttendance,
+    updateStaffAttendanceByStaffId,
 } from "../Controller/staffAttendance.Controller.js";
 import { authenticateToken } from "../Middlewares/authenticateToken.js";
 import { authorizeRoles } from "../Middlewares/authorizeRoles.js";
@@ -27,6 +28,12 @@ router.get(
     authenticateToken,
     authorizeRoles("Admin"),
     getStaffAttendanceByAdmin
+);
+router.put(
+    "/update-staff-attendance-byadmin/:staffId",
+    authenticateToken,
+    authorizeRoles("Admin"),
+    updateStaffAttendanceByStaffId
 );
 
 export { router as staffAttendanceRoute };
