@@ -41,7 +41,7 @@ const StudentAttendance = () => {
    studentId ? fetchParticularAttendance(studentId) : fetchAttendance();
   }, [userRole]);
 
-  const [date, setDate] = useState(new Date(Date.UTC(2024, 9, 2))); // Month is zero-indexed, so 9 = October
+  const [date, setDate] = useState(new Date(Date.UTC(2024, 9, 2)));
 
   const tileContent = ({ date, view }) => {
     const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1)
