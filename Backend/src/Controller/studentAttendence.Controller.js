@@ -77,7 +77,6 @@ export const updateStudentAttendance = wrapAsync(async (req, res) => {
 export const updateStudentAttendanceByStudentId = wrapAsync(
     async (req, res) => {
         const { studentId } = req.params;
-        console.log(studentId);
         const { date, status } = req.body;
         const startOfDay = new Date(date);
         startOfDay.setUTCHours(0, 0, 0, 0); // Start of the day (00:00:00)

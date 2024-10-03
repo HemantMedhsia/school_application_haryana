@@ -12,7 +12,8 @@ const StudentAttendance = () => {
   const [attendance, setAttendance] = useState({});
   const [selectedDate, setSelectedDate] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [attendanceStatus, setAttendanceStatus] = useState(null); // Set to null initially
+  const [attendanceStatus, setAttendanceStatus] = useState(null);// Set to null initially
+  const [roleAdmin, setRoleAdmin] = useState(false);
   const { userRole } = useAuth();
   const { studentId } = useParams();
 
@@ -23,7 +24,13 @@ const StudentAttendance = () => {
     } else if (userRole === "Parent") {
       getAPI("overallAttendanceParent", {}, setAttendance);
     }
+    else if (userRole === "Admin") {
+      setRoleAdmin(true);
+    }
+
   };
+
+  console.log("eggroll",userRole);
 
   const fetchParticularAttendance = async (studentId) => {
     try {
@@ -38,6 +45,7 @@ const StudentAttendance = () => {
         }
       );
       setAttendance(response.data.data);
+      setRoleAdmin(true);
     } catch (err) {
       console.error("Error fetching particular attendance for student:", err);
     }
@@ -67,7 +75,7 @@ const StudentAttendance = () => {
       await axios.put(
         `${
           import.meta.env.VITE_BACKEND_URL
-        }/api/update-student-attendance/${studentId}`,
+        }/api/update-student-attendance-admin/${studentId}`,
         {
           date: selectedDate,
           status: attendanceStatus,
@@ -122,7 +130,7 @@ const StudentAttendance = () => {
         />
       </div>
 
-      {showModal && (
+      {showModal && roleAdmin && (
         <div className="fixed inset-0 bg-[#7367f0] bg-opacity-30 flex items-center justify-center z-50">
           <div className="bg-gray-900 p-6 rounded-lg shadow-lg relative w-[400px] text-white">
             <h2 className="text-xl font-bold mb-4 text-[#7367f0]">
