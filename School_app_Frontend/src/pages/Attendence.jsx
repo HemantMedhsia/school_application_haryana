@@ -243,6 +243,7 @@ const Attendence = () => {
   };
 
   const handleView = async (item) => {
+  console.log("Viewing student attendance:", item);
    navigate(`/school/student-attendance-view/${item._id}`);
   };
 
