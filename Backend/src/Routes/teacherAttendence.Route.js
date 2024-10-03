@@ -5,6 +5,7 @@ import {
     deleteTeacherAttendance,
     getAttendanceSummary,
     getTeacherAttendance,
+    getTeacherAttendanceByAdmin,
     getTeacherAttendanceByTeacherId,
     updateTeacherAttendance,
 } from "../Controller/teacherAttendence.Controller.js";
@@ -26,7 +27,17 @@ router.post(
 );
 
 router.get("/get-teacher-attendance-summary/:teacherId", getAttendanceSummary);
-router.get("/get-teacher-attendance-byTeacherId",authenticateToken,
-    authorizeRoles("Admin", "Teacher"), getTeacherAttendanceByTeacherId);
+router.get(
+    "/get-teacher-attendance-byTeacherId",
+    authenticateToken,
+    authorizeRoles("Admin", "Teacher"),
+    getTeacherAttendanceByTeacherId
+);
+router.get(
+    "/get-teacher-attendance-byadmin/:teacherId",
+    authenticateToken,
+    authorizeRoles("Admin"),
+    getTeacherAttendanceByAdmin
+);
 
 export { router as teacherAttendenceRoute };

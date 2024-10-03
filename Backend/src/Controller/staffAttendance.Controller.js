@@ -134,3 +134,23 @@ export const deleteStaffAttendance = wrapAsync(async (req, res) => {
             )
         );
 });
+
+export const getStaffAttendanceByAdmin = wrapAsync(async (req, res) => {
+    const staffId = req.params.staffId;
+
+    const staff = await Staff.findById(staffId)
+        .populate("staffAttendance")
+        .lean();
+
+    if (!staff) {
+        return res.status(404).json({ error: "staff not found." });
+    }
+
+    const attendanceResponse = {};
+    staff.staffAttendance.forEach((record) => {
+        const date = record.date.toISOString().split("T")[0];
+        attendanceResponse[date] = record.status;
+    });
+
+    res.status(200).json(new ApiResponse(200, attendanceResponse));
+});

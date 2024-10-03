@@ -130,7 +130,6 @@ export const deleteTeacherAttendance = wrapAsync(async (req, res) => {
                 teacherAttendance,
                 "Teacher attendance deleted successfully"
             )
-
         );
 });
 
@@ -142,7 +141,7 @@ export const getTeacherAttendanceByTeacherId = wrapAsync(async (req, res) => {
         .lean();
 
     if (!teacher) {
-        return res.status(404).json({ error: "Student not found." });
+        return res.status(404).json({ error: "Teacher not found." });
     }
 
     const attendanceResponse = {};
@@ -151,6 +150,28 @@ export const getTeacherAttendanceByTeacherId = wrapAsync(async (req, res) => {
         attendanceResponse[date] = record.status;
     });
     // hello
+
+    res.status(200).json(new ApiResponse(200, attendanceResponse));
+});
+
+
+export const getTeacherAttendanceByAdmin = wrapAsync(async (req, res) => {
+    const teacherId = req.params.teacherId;
+
+    const teacher = await Teacher.findById(teacherId)
+        .populate("TeacherAttendance")
+        .lean();
+
+    if (!teacher) {
+        return res.status(404).json({ error: "Teacher not found." });
+    }
+
+    const attendanceResponse = {};
+    teacher.TeacherAttendance.forEach((record) => {
+        const date = record.date.toISOString().split("T")[0];
+        attendanceResponse[date] = record.status;
+    });
+    
 
     res.status(200).json(new ApiResponse(200, attendanceResponse));
 });
