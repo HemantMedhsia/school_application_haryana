@@ -11,9 +11,7 @@ export const teacherAttendanceValidationSchema = Joi.object({
         })
         .required(),
     date: Joi.date(),
-    status: Joi.string()
-        .valid("Present", "Absent", "Late", "Holiday")
-        .required(),
+    status: Joi.string().valid("Present", "Absent").required(),
     reason: Joi.string().allow(""),
     notes: Joi.string().allow(""),
 });

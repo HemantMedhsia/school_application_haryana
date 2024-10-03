@@ -26,6 +26,66 @@ export const createTeacherAttendance = wrapAsync(async (req, res) => {
     return res.status(201).json(new ApiResponse(201, teacherAttendance));
 });
 
+export const createMultipleTeacherAttendenceInBulk = wrapAsync(
+    async (req, res) => {
+        const attendenceData = req.body;
+
+        if (!Array.isArray(attendenceData) || attendenceData.length === 0) {
+            return res.status(400).json({ message: "Invalid data provided." });
+        }
+
+        const savedAttendence = await TeacherAttendance.insertMany(
+            attendenceData
+        );
+
+        for (const attendance of savedAttendence) {
+            await Teacher.findByIdAndUpdate(attendance.teacherId, {
+                $push: { TeacherAttendance: attendance._id },
+            });
+        }
+        res.status(201).json(new ApiResponse(201, savedAttendence));
+    }
+);
+
+export const getAttendanceSummary = wrapAsync(async (req, res) => {
+    const { teacherId } = req.params;
+
+    const teacher = await Teacher.findById(teacherId).populate(
+        "TeacherAttendance"
+    );
+
+    if (!teacher) {
+        return res.status(404).json({ message: "Student not found." });
+    }
+
+    const attendanceRecords = teacher.TeacherAttendance;
+
+    if (!attendanceRecords || attendanceRecords.length === 0) {
+        return res
+            .status(404)
+            .json({ message: "No attendance records found for this teacher." });
+    }
+
+    const totalRecords = attendanceRecords.length;
+
+    const presentCount = attendanceRecords.filter(
+        (record) => record.status === "Present"
+    ).length;
+    const absentCount = attendanceRecords.filter(
+        (record) => record.status === "Absent"
+    ).length;
+
+    const percentage = (presentCount / totalRecords) * 100;
+
+    const summary = {
+        total: totalRecords,
+        present: presentCount,
+        absent: absentCount,
+        percentage: percentage.toFixed(2),
+    };
+    res.status(201).json(new ApiResponse(201, summary));
+});
+
 export const getTeacherAttendance = wrapAsync(async (req, res) => {
     const teacher = await Teacher.findById(req.params.teacherId).populate(
         "teacherAttendance"

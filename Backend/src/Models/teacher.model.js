@@ -68,7 +68,7 @@ const teacherSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "School",
     },
-    teacherAttendance: [
+    TeacherAttendance: [
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: "TeacherAttendance",
