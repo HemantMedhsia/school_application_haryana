@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "../../context/AuthProvider";
+import { ToastContainer, toast } from "react-toastify";
 
 const StudentTimeTable = () => {
   const [timetableData, setTimetableData] = useState([]);
@@ -30,12 +31,20 @@ const StudentTimeTable = () => {
         },
       });
       if (response.data.success) {
-        setSelectedDay(response.data.data[0]); // Assuming data is an array with one day's schedule
+        if (response.data.data.length === 0) {
+          toast.info(`No timetable found for ${day}.`);
+        } else {
+          setSelectedDay(response.data.data[0]);
+        }
       } else {
         setError("Failed to fetch timetable");
       }
     } catch (err) {
-      setError("An error occurred while fetching the timetable.");
+      if (err.response && err.response.status === 404) {
+        toast.error("No timetable found for this day.");
+      } else {
+        toast.error("Error fetching timetable.");
+      }
     } finally {
       setLoading(false);
     }
@@ -119,6 +128,7 @@ const StudentTimeTable = () => {
           </div>
         </div>
       )}
+      <ToastContainer />
     </div>
   );
 };
