@@ -5,24 +5,43 @@ import "./CustomCalendar.css"; // Import your custom styles
 import axios from "axios";
 import { getAPI } from "../../utility/api/apiCall";
 import { useAuth } from "../../context/AuthProvider";
+import { useParams } from "react-router-dom";
 
 const StudentAttendance = () => {
   const [attendance, setAttendance] = useState({});
   const { userRole } = useAuth();
+  const {studentId} = useParams();
+
+  const fetchAttendance = async () => {
+    if (userRole === "Student") {
+      getAPI("overallAttendanceStudent", {}, setAttendance);
+    } else if (userRole === "Parent") {
+      getAPI("overallAttendanceParent", {}, setAttendance);
+    }
+  };
+  fetchAttendance();
+  console.log(attendance);
+
+  const fetchParticularAttendance = async (studentId) => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/get-student-attendance-bystudentid-admin/${studentId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`, 
+        },
+      });
+      console.log("Fetched particular attendance for student:", response.data.data);
+      setAttendance(response.data.data);
+    }
+    catch(err) {
+      console.error("Error fetching particular attendance for student:", err);
+    }
+  }
 
   useEffect(() => {
-    const fetchAttendance = async () => {
-      if (userRole === "Student") {
-        getAPI("overallAttendanceStudent", {}, setAttendance);
-      } else if (userRole === "Parent") {
-        getAPI("overallAttendanceParent", {}, setAttendance);
-      }
-    };
-    fetchAttendance();
-    console.log(attendance);
+   studentId ? fetchParticularAttendance(studentId) : fetchAttendance();
   }, [userRole]);
 
-  const [date, setDate] = useState(new Date(Date.UTC(2024, 9, 2))); // Month is zero-indexed, so 9 = October
+  const [date, setDate] = useState(new Date(Date.UTC(2024, 9, 2)));
 
   const tileContent = ({ date, view }) => {
     const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1)
