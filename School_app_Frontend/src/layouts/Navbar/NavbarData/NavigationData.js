@@ -65,13 +65,13 @@ export const navigation = [
       },
       {
         name: "Teacher Attendance",
-        to: "/school/attendance",
+        to: "/school/teacher-attendance",
         icon: FaUser,
         roles: ["Admin"],
       },
       {
         name: "Staff Attendance",
-        to: "/school/attendance",
+        to: "/school/staff-attendance",
         icon: FaUser,
         roles: ["Admin"],
       },
