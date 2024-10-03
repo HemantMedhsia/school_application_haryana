@@ -72,8 +72,6 @@ const TeacherAttendance = () => {
                 }/api/get-teacher-attendance-summary/${teacher._id}`
               );
 
-
-
               const attendancePercentage = data?.data?.percentage || 100;
               const present = data?.data?.present || 0;
               const absent = data?.data?.absent || 0;
@@ -162,9 +160,7 @@ const TeacherAttendance = () => {
   const handleSave = async () => {
     try {
       const response = await axios.post(
-        `${
-          import.meta.env.VITE_BACKEND_URL
-        }/api/create-multiple-attendance`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/create-multiple-attendance`,
         teacherAttendance,
         {
           headers: {
@@ -178,6 +174,10 @@ const TeacherAttendance = () => {
       console.error("Error saving attendance data:", error);
       toast.error("Error saving data!");
     }
+  };
+
+  const handleView = async (item) => {
+    console.log("item", item._id);
   };
 
   useEffect(() => {
@@ -195,6 +195,7 @@ const TeacherAttendance = () => {
         columns={columns}
         data={filteredTeacherData}
         actions={{
+          onView: (item) => handleView(item),
           onPresent: (item) => handleAttendance(item, "Present"),
           onAbsent: (item) => handleAttendance(item, "Absent"),
         }}
