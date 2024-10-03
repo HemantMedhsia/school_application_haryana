@@ -8,6 +8,8 @@ import {
     getTeacherAttendanceByTeacherId,
     updateTeacherAttendance,
 } from "../Controller/teacherAttendence.Controller.js";
+import { authenticateToken } from "../Middlewares/authenticateToken.js";
+import { authorizeRoles } from "../Middlewares/authorizeRoles.js";
 
 const router = express.Router();
 
@@ -24,6 +26,7 @@ router.post(
 );
 
 router.get("/get-teacher-attendance-summary/:teacherId", getAttendanceSummary);
-router.get("/get-teacher-attendance-byTeacherId", getTeacherAttendanceByTeacherId);
+router.get("/get-teacher-attendance-byTeacherId",authenticateToken,
+    authorizeRoles("Admin", "Teacher"), getTeacherAttendanceByTeacherId);
 
 export { router as teacherAttendenceRoute };
