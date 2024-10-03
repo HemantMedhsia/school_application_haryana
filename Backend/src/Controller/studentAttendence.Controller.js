@@ -78,19 +78,27 @@ export const updateStudentAttendanceByStudentId = wrapAsync(
     async (req, res) => {
         const { studentId } = req.params;
         const { date, status } = req.body;
+        const startOfDay = new Date(date);
+        startOfDay.setUTCHours(0, 0, 0, 0); // Start of the day (00:00:00)
 
-        const formattedDate = new Date(date);
-        console.log(formattedDate);
+        const endOfDay = new Date(date);
+        endOfDay.setUTCHours(23, 59, 59, 999); // End of the day (23:59:59)
+
+        console.log(startOfDay, endOfDay);
 
         const student = await Student.findById(studentId);
 
         if (!student) {
-            return res.status(404).json({ message: "Student not found" });
+            return res.status(404).json({ message: "Student not found 404" });
         }
 
+        // Find the attendance record between the start and end of the given day
         const attendanceRecord = await StudentAttendance.findOne({
             studentId: studentId,
-            date: date,
+            date: {
+                $gte: startOfDay,
+                $lte: endOfDay,
+            },
         });
         console.log("123", attendanceRecord);
 
@@ -104,6 +112,7 @@ export const updateStudentAttendanceByStudentId = wrapAsync(
         return res.status(404).json({ message: "Attendance record not found" });
     }
 );
+
 
 export const deleteStudentAttendance = wrapAsync(async (req, res) => {
     const { attendanceId } = req.params;
