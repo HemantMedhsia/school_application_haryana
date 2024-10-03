@@ -35,15 +35,14 @@ const StudentAttendance = () => {
   console.log("eggroll", userRole);
 
   const fetchParticularAttendance = async (id, ep) => {
+    const url = await `${import.meta.env.VITE_BACKEND_URL}/api/${ep}/${id}`;
+    console.log("url", url);
     try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/api/${ep}/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-          },
-        }
-      );
+      const response = await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+      });
       setAttendance(response.data.data);
       setRoleAdmin(true);
     } catch (err) {
@@ -57,16 +56,28 @@ const StudentAttendance = () => {
       setEndpoint("get-student-attendance-bystudentid-admin");
     } else if (teacherId) {
       setid(teacherId);
-      setEndpoint("get-teacher-attendance-byteacherid-admin");
+      setEndpoint("get-teacher-attendance-byadmin");
     } else if (staffId) {
       setid(staffId);
-      setEndpoint("get-staff-attendance-bystaffid-admin");
+      setEndpoint("get-staff-attendance-byadmin");
     } else {
       setid(null);
+      setEndpoint(null);
     }
-
-    id ? fetchParticularAttendance(id, endpoint) : fetchAttendance();
-  }, [userRole]);
+  }, [studentId, teacherId, staffId]);
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      if (id && endpoint) {
+        await fetchParticularAttendance(id, endpoint);
+      } else {
+        await fetchAttendance();
+      }
+    };
+  
+    fetchData();
+  }, [id, endpoint, userRole]);
+  
 
   const [date, setDate] = useState(new Date(Date.UTC(2024, 9, 2)));
 

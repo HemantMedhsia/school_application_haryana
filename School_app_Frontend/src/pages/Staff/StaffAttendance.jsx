@@ -178,7 +178,7 @@ const StaffAttendance = () => {
   };
 
   const handleView = async (item) => {
-    console.log("item", item._id);
+    navigate(`/school/staff-attendance-view/${item._id}`);
   };
 
   useEffect(() => {
