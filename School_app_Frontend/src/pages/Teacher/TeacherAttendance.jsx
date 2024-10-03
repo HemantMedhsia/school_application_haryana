@@ -72,6 +72,8 @@ const TeacherAttendance = () => {
                 }/api/get-teacher-attendance-summary/${teacher._id}`
               );
 
+
+
               const attendancePercentage = data?.data?.percentage || 100;
               const present = data?.data?.present || 0;
               const absent = data?.data?.absent || 0;
@@ -108,10 +110,10 @@ const TeacherAttendance = () => {
   const handleSearch = (searchText) => {
     setSearchText(searchText);
     const filteredData = teacherData.filter((teacher) => {
-      const fullName = `${teacher.firstName} ${teacher.lastName}`.toLowerCase();
+      const fullName = `${teacher.name}`.toLowerCase();
       return (
         fullName.includes(searchText.toLowerCase()) ||
-        teacher.employeeId.toLowerCase().includes(searchText.toLowerCase())
+        teacher.email.toLowerCase().includes(searchText.toLowerCase())
       );
     });
     setFilteredTeacherData(filteredData);
@@ -162,7 +164,7 @@ const TeacherAttendance = () => {
       const response = await axios.post(
         `${
           import.meta.env.VITE_BACKEND_URL
-        }/api/insert-teacher-attendance-in-bulk`,
+        }/api/create-multiple-attendance`,
         teacherAttendance,
         {
           headers: {

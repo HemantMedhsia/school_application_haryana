@@ -29,6 +29,64 @@ export const createStaffAttendance = wrapAsync(async (req, res) => {
         );
 });
 
+export const createMultipleStaffAttendenceInBulk = wrapAsync(
+    async (req, res) => {
+        const attendenceData = req.body;
+
+        if (!Array.isArray(attendenceData) || attendenceData.length === 0) {
+            return res.status(400).json({ message: "Invalid data provided." });
+        }
+
+        const savedAttendence = await StaffAttendance.insertMany(
+            attendenceData
+        );
+
+        for (const attendance of savedAttendence) {
+            await Staff.findByIdAndUpdate(attendance.staffId, {
+                $push: { staffAttendance: attendance._id },
+            });
+        }
+        res.status(201).json(new ApiResponse(201, savedAttendence));
+    }
+);
+
+export const getStaffAttendanceSummary = wrapAsync(async (req, res) => {
+    const { staffId } = req.params;
+
+    const staff = await Staff.findById(staffId).populate("staffAttendance");
+
+    if (!staff) {
+        return res.status(404).json({ message: "Staff not found." });
+    }
+
+    const attendanceRecords = staff.staffAttendance;
+
+    if (!attendanceRecords || attendanceRecords.length === 0) {
+        return res
+            .status(404)
+            .json({ message: "No attendance records found for this staff." });
+    }
+
+    const totalRecords = attendanceRecords.length;
+
+    const presentCount = attendanceRecords.filter(
+        (record) => record.status === "Present"
+    ).length;
+    const absentCount = attendanceRecords.filter(
+        (record) => record.status === "Absent"
+    ).length;
+
+    const percentage = (presentCount / totalRecords) * 100;
+
+    const summary = {
+        total: totalRecords,
+        present: presentCount,
+        absent: absentCount,
+        percentage: percentage.toFixed(2),
+    };
+    res.status(200).json(new ApiResponse(200, summary)); // Change 201 to 200 for successful responses
+});
+
 export const getStaffAttendance = wrapAsync(async (req, res) => {
     const staff = await Staff.findById(req.params.staffId).populate(
         "staffAttendance"
@@ -69,6 +127,10 @@ export const deleteStaffAttendance = wrapAsync(async (req, res) => {
     return res
         .status(200)
         .json(
-            new ApiResponse(200, staffAttendance, "Staff Attendance Deleted Successfully")
+            new ApiResponse(
+                200,
+                staffAttendance,
+                "Staff Attendance Deleted Successfully"
+            )
         );
 });
