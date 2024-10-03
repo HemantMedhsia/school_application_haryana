@@ -74,6 +74,37 @@ export const updateStudentAttendance = wrapAsync(async (req, res) => {
     res.status(200).json({ success: true, data: updatedAttendance });
 });
 
+export const updateStudentAttendanceByStudentId = wrapAsync(
+    async (req, res) => {
+        const { studentId } = req.params;
+        const { date, status } = req.body;
+
+        const formattedDate = new Date(date);
+        console.log(formattedDate);
+
+        const student = await Student.findById(studentId);
+
+        if (!student) {
+            return res.status(404).json({ message: "Student not found" });
+        }
+
+        const attendanceRecord = await StudentAttendance.findOne({
+            studentId: studentId,
+            date: date,
+        });
+        console.log("123", attendanceRecord);
+
+        if (attendanceRecord) {
+            attendanceRecord.status = status;
+            await attendanceRecord.save();
+            return res
+                .status(200)
+                .json({ message: "Attendance updated successfully" });
+        }
+        return res.status(404).json({ message: "Attendance record not found" });
+    }
+);
+
 export const deleteStudentAttendance = wrapAsync(async (req, res) => {
     const { attendanceId } = req.params;
 
