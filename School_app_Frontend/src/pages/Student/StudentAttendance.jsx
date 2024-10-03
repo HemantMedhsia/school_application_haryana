@@ -19,6 +19,7 @@ const StudentAttendance = () => {
   const fetchAttendance = async () => {
     if (userRole === "Student") {
       getAPI("overallAttendanceStudent", {}, setAttendance);
+      console.log(attendance);
     } else if (userRole === "Parent") {
       getAPI("overallAttendanceParent", {}, setAttendance);
     }
