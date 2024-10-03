@@ -11,6 +11,7 @@ import {
     getStudentAttendanceByStudentId,
     getStudentAttendanceByParentId,
     getStudentAttendanceByStudentId_Admin,
+    updateStudentAttendanceByStudentId,
 } from "../Controller/studentAttendence.Controller.js";
 import { authenticateToken } from "../Middlewares/authenticateToken.js";
 
@@ -54,5 +55,9 @@ router.get(
     getStudentAttendanceByStudentId_Admin
 );
 
+router.put(
+    "/update-student-attendance-admin/:studentId",
+    updateStudentAttendanceByStudentId
+);
 
 export { router as studentAttendenceRoute };
