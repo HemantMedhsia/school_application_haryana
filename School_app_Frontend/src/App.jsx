@@ -135,7 +135,29 @@ const App = () => {
           <Route
             path="student-attendance-view/:studentId?"
             element={
-              <RoleBasedAccess allowedRoles={["Admin", "Student", "Parent"]}>
+              <RoleBasedAccess
+                allowedRoles={["Admin", "Student", "Parent"]}
+              >
+                <StudentAttendance />
+              </RoleBasedAccess>
+            }
+          />
+          <Route
+            path="teacher-attendance-view/:teacherId?"
+            element={
+              <RoleBasedAccess
+                allowedRoles={["Admin","Teacher"]}
+              >
+                <StudentAttendance />
+              </RoleBasedAccess>
+            }
+          />
+          <Route
+            path="staff-attendance-view/:staffId?"
+            element={
+              <RoleBasedAccess
+                allowedRoles={["Admin","Staff"]}
+              >
                 <StudentAttendance />
               </RoleBasedAccess>
             }

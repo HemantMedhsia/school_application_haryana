@@ -360,6 +360,20 @@ export const navigation = [
     roles: ["Student","Parent"],
   },
   {
+    name: "Attendance",
+    to: "/school/teacher-attendance-view",
+    icon: FaBell,
+    current: false,
+    roles: ["Teacher"],
+  },
+  {
+    name: "Attendance",
+    to: "/school/staff-attendance-view",
+    icon: FaBell,
+    current: false,
+    roles: ["Staff"],
+  },
+  {
     name: "Notice",
     to: "/notice",
     icon: FaBell,

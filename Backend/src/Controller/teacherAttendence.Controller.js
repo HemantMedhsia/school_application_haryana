@@ -187,7 +187,6 @@ export const getTeacherAttendanceByTeacherId = wrapAsync(async (req, res) => {
         const date = record.date.toISOString().split("T")[0];
         attendanceResponse[date] = record.status;
     });
-    // hello
 
     res.status(200).json(new ApiResponse(200, attendanceResponse));
 });
