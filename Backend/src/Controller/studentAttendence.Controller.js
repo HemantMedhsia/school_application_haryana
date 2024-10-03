@@ -167,41 +167,16 @@ export const createMultipleStudentAttendenceInBulk = wrapAsync(
             return res.status(400).json({ message: "Invalid data provided." });
         }
 
-        try {
-            // for (const attendance of attendenceData) {
-            //     const attendanceDate = new Date(attendance.date);
-            //     const startOfDay = new Date(attendanceDate.setHours(0, 0, 0, 0));
-            //     const endOfDay = new Date(attendanceDate.setHours(23, 59, 59, 999));
+        const savedAttendence = await StudentAttendance.insertMany(
+            attendenceData
+        );
 
-            //     const existingAttendance = await StudentAttendance.findOne({
-            //         studentId: attendance.studentId,
-            //         date: {
-            //             $gte: startOfDay,
-            //             $lt: endOfDay,
-            //         },
-            //     });
-
-            //     if (existingAttendance) {
-            //         return res.status(400).json({
-            //             AttendenceErr: true,
-            //             message: `Attendance for student ${attendance.studentId} on date ${attendance.date} already exists.`,
-            //         });
-            //     }
-            // }
-
-            const savedAttendence = await StudentAttendance.insertMany(
-                attendenceData
-            );
-
-            for (const attendance of savedAttendence) {
-                await Student.findByIdAndUpdate(attendance.studentId, {
-                    $push: { StudentAttendance: attendance._id },
-                });
-            }
-            res.status(201).json({ success: true, data: savedAttendence });
-        } catch (error) {
-            res.status(400).json({ message: error.message });
+        for (const attendance of savedAttendence) {
+            await Student.findByIdAndUpdate(attendance.studentId, {
+                $push: { StudentAttendance: attendance._id },
+            });
         }
+        res.status(201).json({ success: true, data: savedAttendence });
     }
 );
 
@@ -275,12 +250,10 @@ export const getStudentAttendanceByStudentId_Admin = wrapAsync(
             return res.status(404).json({ error: "Student not found." });
         }
 
-        const attendanceResponse = student.StudentAttendance.map((record) => {
+        const attendanceResponse = {};
+        student.StudentAttendance.forEach((record) => {
             const date = record.date.toISOString().split("T")[0];
-            return {
-                _id: record._id,
-                [date]: record.status,
-            };
+            attendanceResponse[date] = record.status;
         });
 
         res.status(200).json(new ApiResponse(200, attendanceResponse));
