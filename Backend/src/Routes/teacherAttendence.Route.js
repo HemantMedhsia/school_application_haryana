@@ -5,6 +5,7 @@ import {
     deleteTeacherAttendance,
     getAttendanceSummary,
     getTeacherAttendance,
+    getTeacherAttendanceByTeacherId,
     updateTeacherAttendance,
 } from "../Controller/teacherAttendence.Controller.js";
 
@@ -23,5 +24,6 @@ router.post(
 );
 
 router.get("/get-teacher-attendance-summary/:teacherId", getAttendanceSummary);
+router.get("/get-teacher-attendance-byTeacherId", getTeacherAttendanceByTeacherId);
 
 export { router as teacherAttendenceRoute };
