@@ -56,11 +56,20 @@ const StudentDashboard = () => {
           setStudentAttendanceInfo
         );
       }
-      const res = await getAPI(
-        "getComplaintsByStudent",
-        {},
-        setStudentComplaints
-      );
+
+      if (userRole === "Student") {
+        const res = await getAPI(
+          "getComplaintsByStudent",
+          {},
+          setStudentComplaints
+        );
+      } else if (userRole === "Parent") {
+        const res = await getAPI(
+          "getComplaintsByStudentByParent",
+          {},
+          setStudentComplaints
+        );
+      }
 
       console.log(studentComplaints);
     };

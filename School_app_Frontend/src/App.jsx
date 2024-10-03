@@ -46,6 +46,8 @@ import CommonClassTimeTable from "./pages/CommonClassTimeTable.jsx";
 import StudentsResults from "./pages/Results/StudentsResults.jsx";
 import ShowStudentResult from "./pages/Results/ShowStudentResult.jsx";
 import StudentAttendance from "./pages/Student/StudentAttendance.jsx";
+import TeacherAttendance from "./pages/Teacher/TeacherAttendance.jsx";
+import StaffAttendance from "./pages/Staff/StaffAttendance.jsx";
 
 const App = () => {
   const { userRole, authToken } = useAuth();
@@ -87,6 +89,8 @@ const App = () => {
           <Route path="create-notice" element={<Notice />} />
           <Route path="profile/:studentId" element={<Profile />} />
           <Route path="attendance" element={<Attendence />} />
+          <Route path="teacher-attendance" element={<TeacherAttendance />} />
+          <Route path="staff-attendance" element={<StaffAttendance />} />
           <Route path="all-teachers" element={<TeacherInfo />} />
           <Route path="parent-profile/:parentId" element={<ParentProfile />} />
           <Route path="parent-update/:parentId" element={<ParentAdd />} />
@@ -131,7 +135,7 @@ const App = () => {
           <Route
             path="student-attendance-view/:studentId?"
             element={
-              <RoleBasedAccess allowedRoles={["Admin", "Student","Parent"]}>
+              <RoleBasedAccess allowedRoles={["Admin", "Student", "Parent"]}>
                 <StudentAttendance />
               </RoleBasedAccess>
             }
