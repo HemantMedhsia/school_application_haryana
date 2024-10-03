@@ -10,9 +10,10 @@ import Datatable from "../../common/Datatables/Datatable";
 const columns = [
   { header: "Name", accessor: "name" },
   { header: "Email", accessor: "email" },
-  { header: "Total Days", accessor: "total" },
-  { header: "Present Days", accessor: "present" },
-  { header: "Absent Days", accessor: "absent" },
+  { header: "Position", accessor: "type" },
+  { header: "Days", accessor: "total" },
+  { header: "Present", accessor: "present" },
+  { header: "Absent", accessor: "absent" },
   {
     header: "Attendance Percentage",
     accessor: "attendancePercentage",
@@ -158,7 +159,7 @@ const StaffAttendance = () => {
   const handleSave = async () => {
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/create-multiple-attendance`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/create-multiple-attendance-staff`,
         staffAttendance,
         {
           headers: {
