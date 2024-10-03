@@ -62,6 +62,7 @@ const StudentAttendance = () => {
   };
 
   const updateAttendanceStatus = async () => {
+    console.log(selectedDate, attendanceStatus); 
     try {
       await axios.put(
         `${
