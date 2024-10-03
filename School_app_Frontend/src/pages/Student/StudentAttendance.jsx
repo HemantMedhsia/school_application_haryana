@@ -12,10 +12,12 @@ const StudentAttendance = () => {
   const [attendance, setAttendance] = useState({});
   const [selectedDate, setSelectedDate] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [attendanceStatus, setAttendanceStatus] = useState(null);// Set to null initially
+  const [attendanceStatus, setAttendanceStatus] = useState(null); // Set to null initially
+  const [id, setid] = useState(null);
   const [roleAdmin, setRoleAdmin] = useState(false);
   const { userRole } = useAuth();
-  const { studentId } = useParams();
+  const { studentId, teacherId, staffId } = useParams();
+  const [endpoint, setEndpoint] = useState(null);
 
   const fetchAttendance = async () => {
     if (userRole === "Student") {
@@ -23,21 +25,19 @@ const StudentAttendance = () => {
       console.log(attendance);
     } else if (userRole === "Parent") {
       getAPI("overallAttendanceParent", {}, setAttendance);
-    }
-    else if (userRole === "Admin") {
+    } else if (userRole === "Teacher") {
+      getAPI("overallAttendanceTeacher", {}, setAttendance);
+    } else if (userRole === "Admin") {
       setRoleAdmin(true);
     }
-
   };
 
-  console.log("eggroll",userRole);
+  console.log("eggroll", userRole);
 
-  const fetchParticularAttendance = async (studentId) => {
+  const fetchParticularAttendance = async (id, ep) => {
     try {
       const response = await axios.get(
-        `${
-          import.meta.env.VITE_BACKEND_URL
-        }/api/get-student-attendance-bystudentid-admin/${studentId}`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/${ep}/${id}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -52,7 +52,20 @@ const StudentAttendance = () => {
   };
 
   useEffect(() => {
-    studentId ? fetchParticularAttendance(studentId) : fetchAttendance();
+    if (studentId) {
+      setid(studentId);
+      setEndpoint("get-student-attendance-bystudentid-admin");
+    } else if (teacherId) {
+      setid(teacherId);
+      setEndpoint("get-teacher-attendance-byteacherid-admin");
+    } else if (staffId) {
+      setid(staffId);
+      setEndpoint("get-staff-attendance-bystaffid-admin");
+    } else {
+      setid(null);
+    }
+
+    id ? fetchParticularAttendance(id, endpoint) : fetchAttendance();
   }, [userRole]);
 
   const [date, setDate] = useState(new Date(Date.UTC(2024, 9, 2)));
@@ -70,7 +83,7 @@ const StudentAttendance = () => {
   };
 
   const updateAttendanceStatus = async () => {
-    console.log(selectedDate, attendanceStatus); 
+    console.log(selectedDate, attendanceStatus);
     try {
       await axios.put(
         `${
@@ -139,7 +152,7 @@ const StudentAttendance = () => {
             <p className="mb-4 text-red-500">Date: {selectedDate}</p>
             {attendanceStatus === null ? (
               <p className="text-gray-400">
-               Oops!! No attendance available for this date.
+                Oops!! No attendance available for this date.
               </p>
             ) : (
               <div className="my-4">
