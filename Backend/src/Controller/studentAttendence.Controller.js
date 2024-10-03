@@ -113,7 +113,6 @@ export const updateStudentAttendanceByStudentId = wrapAsync(
     }
 );
 
-
 export const deleteStudentAttendance = wrapAsync(async (req, res) => {
     const { attendanceId } = req.params;
 
@@ -205,6 +204,26 @@ export const createMultipleStudentAttendenceInBulk = wrapAsync(
 
         if (!Array.isArray(attendenceData) || attendenceData.length === 0) {
             return res.status(400).json({ message: "Invalid data provided." });
+        }
+        for (const attendance of attendenceData) {
+            const attendanceDate = new Date(attendance.date);
+            const startOfDay = new Date(attendanceDate.setHours(0, 0, 0, 0));
+            const endOfDay = new Date(attendanceDate.setHours(23, 59, 59, 999));
+
+            const existingAttendance = await StudentAttendance.findOne({
+                studentId: attendance.studentId,
+                date: {
+                    $gte: startOfDay,
+                    $lt: endOfDay,
+                },
+            });
+
+            if (existingAttendance) {
+                return res.status(400).json({
+                    AttendenceErr: true,
+                    message: `Attendance for student ${attendance.studentId} on date ${attendance.date} already exists.`,
+                });
+            }
         }
 
         const savedAttendence = await StudentAttendance.insertMany(
