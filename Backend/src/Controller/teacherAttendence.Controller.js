@@ -113,6 +113,44 @@ export const updateTeacherAttendance = wrapAsync(async (req, res) => {
         .json(new ApiResponse(200, teacherAttendance, "Update Successfully"));
 });
 
+export const updateTeacherAttendanceByTeacherId = wrapAsync(
+    async (req, res) => {
+        const { teacherId } = req.params;
+        const { date, status } = req.body;
+        const startOfDay = new Date(date);
+        startOfDay.setUTCHours(0, 0, 0, 0); // Start of the day (00:00:00)
+
+        const endOfDay = new Date(date);
+        endOfDay.setUTCHours(23, 59, 59, 999); // End of the day (23:59:59)
+
+        const teacher = await Teacher.findById(teacherId);
+
+        if (!teacher) {
+            return res.status(404).json({ message: "teacher not found 404" });
+        }
+
+        // Find the attendance record between the start and end of the given day
+        const attendanceRecord = await TeacherAttendance.findOne({
+            teacherId: teacherId,
+            date: {
+                $gte: startOfDay,
+                $lte: endOfDay,
+            },
+        });
+
+        if (attendanceRecord) {
+            attendanceRecord.status = status;
+            await attendanceRecord.save();
+            return res
+                .status(200)
+                .json(new ApiResponse(200, "Attendance updated successfully"));
+        }
+        return res
+            .status(404)
+            .json(new ApiResponse(404, "Attendance record not found"));
+    }
+);
+
 export const deleteTeacherAttendance = wrapAsync(async (req, res) => {
     const teacherAttendance = await TeacherAttendance.findByIdAndDelete(
         req.params.attendanceId
@@ -154,7 +192,6 @@ export const getTeacherAttendanceByTeacherId = wrapAsync(async (req, res) => {
     res.status(200).json(new ApiResponse(200, attendanceResponse));
 });
 
-
 export const getTeacherAttendanceByAdmin = wrapAsync(async (req, res) => {
     const teacherId = req.params.teacherId;
 
@@ -171,7 +208,6 @@ export const getTeacherAttendanceByAdmin = wrapAsync(async (req, res) => {
         const date = record.date.toISOString().split("T")[0];
         attendanceResponse[date] = record.status;
     });
-    
 
     res.status(200).json(new ApiResponse(200, attendanceResponse));
 });
