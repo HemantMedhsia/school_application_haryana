@@ -250,12 +250,10 @@ export const getStudentAttendanceByStudentId_Admin = wrapAsync(
             return res.status(404).json({ error: "Student not found." });
         }
 
-        const attendanceResponse = student.StudentAttendance.map((record) => {
+        const attendanceResponse = {};
+        student.StudentAttendance.forEach((record) => {
             const date = record.date.toISOString().split("T")[0];
-            return {
-                _id: record._id,
-                [date]: record.status,
-            };
+            attendanceResponse[date] = record.status;
         });
 
         res.status(200).json(new ApiResponse(200, attendanceResponse));
