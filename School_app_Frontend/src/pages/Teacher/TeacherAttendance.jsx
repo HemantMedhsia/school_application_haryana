@@ -6,6 +6,7 @@ import { Navigate, useNavigate } from "react-router-dom";
 import { getAPI } from "../../utility/api/apiCall";
 import AttendenceSearchBar from "../../common/SearchBar/AttendenceSearchBar";
 import Datatable from "../../common/Datatables/Datatable";
+import TeacherAttendenceSearchBar from "../../components/TeacherAttendenceSearchBar/TeacherAttendenceSearchBar";
 
 const columns = [
   { header: "Name", accessor: "name" },
@@ -55,9 +56,11 @@ const TeacherAttendance = () => {
   const [teacherAttendance, setTeacherAttendance] = useState([]);
   const [attendanceStatus, setAttendanceStatus] = useState({});
   const [searchText, setSearchText] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const fetchTeacherData = async () => {
+    setLoading(true);
     try {
       const response = await getAPI("getAllTeachers", {}, setTeacherData);
       console.log("response", response);
@@ -92,6 +95,8 @@ const TeacherAttendance = () => {
                 ...teacher,
                 attendancePercentage: 0,
               };
+            } finally {
+              setLoading(false);
             }
           })
         );
@@ -188,20 +193,24 @@ const TeacherAttendance = () => {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">Teacher Attendance</h1>
-      <AttendenceSearchBar
-        onSearch={handleSearch}
-        placeholder="Search by teacher name or employee ID"
-      />
-      <Datatable
-        columns={columns}
-        data={filteredTeacherData}
-        actions={{
-          onView: (item) => handleView(item),
-          onPresent: (item) => handleAttendance(item, "Present"),
-          onAbsent: (item) => handleAttendance(item, "Absent"),
-        }}
-        attendanceStatus={attendanceStatus}
-      />
+      <TeacherAttendenceSearchBar onSearch={handleSearch} />
+      {loading ? (
+        <div className="loader-wrapper">
+          <span className="loader"></span>
+        </div>
+      ) : (
+        <Datatable
+          columns={columns}
+          data={filteredTeacherData}
+          actions={{
+            onView: (item) => handleView(item),
+            onPresent: (item) => handleAttendance(item, "Present"),
+            onAbsent: (item) => handleAttendance(item, "Absent"),
+          }}
+          attendanceStatus={attendanceStatus}
+        />
+      )}
+
       <div className="flex justify-end">
         <button
           onClick={handleSave}

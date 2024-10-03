@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { getAPI } from "../../utility/api/apiCall";
 import AttendenceSearchBar from "../../common/SearchBar/AttendenceSearchBar";
 import Datatable from "../../common/Datatables/Datatable";
+import StaffAttendanceSearchBar from "../../components/StaffAttendanceSearchBar/StaffAttendanceSearchBar";
 
 const columns = [
   { header: "Name", accessor: "name" },
@@ -56,9 +57,11 @@ const StaffAttendance = () => {
   const [staffAttendance, setStaffAttendance] = useState([]);
   const [attendanceStatus, setAttendanceStatus] = useState({});
   const [searchText, setSearchText] = useState("");
+  const [loading, setLoading] = useState(false); // Loader state
   const navigate = useNavigate();
 
   const fetchStaffData = async () => {
+    setLoading(true); // Start loading
     try {
       const response = await getAPI("getAllStaff", {}, setStaffData);
       console.log("response", response);
@@ -103,6 +106,8 @@ const StaffAttendance = () => {
     } catch (error) {
       console.error("Error fetching staff data:", error);
       toast.error("Error fetching staff data!");
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
 
@@ -188,20 +193,26 @@ const StaffAttendance = () => {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">Staff Attendance</h1>
-      <AttendenceSearchBar
+      <StaffAttendanceSearchBar
         onSearch={handleSearch}
         placeholder="Search by staff name or employee ID"
       />
-      <Datatable
-        columns={columns}
-        data={filteredStaffData}
-        actions={{
-          onView: (item) => handleView(item),
-          onPresent: (item) => handleAttendance(item, "Present"),
-          onAbsent: (item) => handleAttendance(item, "Absent"),
-        }}
-        attendanceStatus={attendanceStatus}
-      />
+      {loading ? (
+        <div className="loader-wrapper">
+          <span className="loader"></span>
+        </div>
+      ) : (
+        <Datatable
+          columns={columns}
+          data={filteredStaffData}
+          actions={{
+            onView: (item) => handleView(item),
+            onPresent: (item) => handleAttendance(item, "Present"),
+            onAbsent: (item) => handleAttendance(item, "Absent"),
+          }}
+          attendanceStatus={attendanceStatus}
+        />
+      )}
       <div className="flex justify-end">
         <button
           onClick={handleSave}

@@ -7,6 +7,8 @@ import { getAPI } from "../../utility/api/apiCall";
 import { useAuth } from "../../context/AuthProvider";
 import { useParams } from "react-router-dom";
 import { FaTimes, FaSave } from "react-icons/fa"; // Icons for close and save
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css'; // Import toastify CSS
 
 const StudentAttendance = () => {
   const [attendance, setAttendance] = useState({});
@@ -18,25 +20,27 @@ const StudentAttendance = () => {
   const { userRole } = useAuth();
   const { studentId, teacherId, staffId } = useParams();
   const [endpoint, setEndpoint] = useState(null);
+  const [updateEndpoint, setUpdateEndpoint] = useState(null);
 
   const fetchAttendance = async () => {
-    if (userRole === "Student") {
-      getAPI("overallAttendanceStudent", {}, setAttendance);
-      console.log(attendance);
-    } else if (userRole === "Parent") {
-      getAPI("overallAttendanceParent", {}, setAttendance);
-    } else if (userRole === "Teacher") {
-      getAPI("overallAttendanceTeacher", {}, setAttendance);
-    } else if (userRole === "Admin") {
-      setRoleAdmin(true);
+    try {
+      if (userRole === "Student") {
+        getAPI("overallAttendanceStudent", {}, setAttendance);
+      } else if (userRole === "Parent") {
+        getAPI("overallAttendanceParent", {}, setAttendance);
+      } else if (userRole === "Teacher") {
+        getAPI("overallAttendanceTeacher", {}, setAttendance);
+      } else if (userRole === "Admin") {
+        setRoleAdmin(true);
+      }
+    } catch (err) {
+      toast.error("Failed to fetch attendance!");
+      console.error(err);
     }
   };
 
-  console.log("eggroll", userRole);
-
   const fetchParticularAttendance = async (id, ep) => {
-    const url = await `${import.meta.env.VITE_BACKEND_URL}/api/${ep}/${id}`;
-    console.log("url", url);
+    const url = `${import.meta.env.VITE_BACKEND_URL}/api/${ep}/${id}`;
     try {
       const response = await axios.get(url, {
         headers: {
@@ -46,6 +50,7 @@ const StudentAttendance = () => {
       setAttendance(response.data.data);
       setRoleAdmin(true);
     } catch (err) {
+      toast.error("Failed to fetch specific attendance.");
       console.error("Error fetching particular attendance for student:", err);
     }
   };
@@ -54,18 +59,22 @@ const StudentAttendance = () => {
     if (studentId) {
       setid(studentId);
       setEndpoint("get-student-attendance-bystudentid-admin");
+      setUpdateEndpoint("update-student-attendance-admin");
     } else if (teacherId) {
       setid(teacherId);
       setEndpoint("get-teacher-attendance-byadmin");
+      setUpdateEndpoint("update-teacher-attendance-byadmin");
     } else if (staffId) {
       setid(staffId);
       setEndpoint("get-staff-attendance-byadmin");
+      setUpdateEndpoint("update-staff-attendance-byadmin");
     } else {
       setid(null);
       setEndpoint(null);
+      setUpdateEndpoint(null);
     }
   }, [studentId, teacherId, staffId]);
-  
+
   useEffect(() => {
     const fetchData = async () => {
       if (id && endpoint) {
@@ -74,10 +83,9 @@ const StudentAttendance = () => {
         await fetchAttendance();
       }
     };
-  
+
     fetchData();
   }, [id, endpoint, userRole]);
-  
 
   const [date, setDate] = useState(new Date(Date.UTC(2024, 9, 2)));
 
@@ -93,13 +101,11 @@ const StudentAttendance = () => {
     setShowModal(true);
   };
 
-  const updateAttendanceStatus = async () => {
-    console.log(selectedDate, attendanceStatus);
+  const updateAttendanceStatus = async (id, uep) => {
+    const url = `${import.meta.env.VITE_BACKEND_URL}/api/${uep}/${id}`;
     try {
       await axios.put(
-        `${
-          import.meta.env.VITE_BACKEND_URL
-        }/api/update-student-attendance-admin/${studentId}`,
+        url,
         {
           date: selectedDate,
           status: attendanceStatus,
@@ -110,13 +116,14 @@ const StudentAttendance = () => {
           },
         }
       );
-      // Update local state after successful update
       setAttendance({
         ...attendance,
         [selectedDate]: attendanceStatus,
       });
+      toast.success("Attendance updated successfully!"); // Success toast
       setShowModal(false);
     } catch (err) {
+      toast.error("Failed to update attendance."); // Error toast
       console.error("Error updating attendance:", err);
     }
   };
@@ -189,7 +196,7 @@ const StudentAttendance = () => {
               </button>
               {attendanceStatus !== null && (
                 <button
-                  onClick={updateAttendanceStatus}
+                  onClick={() => updateAttendanceStatus(id, updateEndpoint)} // Updated here
                   className="text-xs flex flex-col rounded-full mx-2 px-3 py-1 font-semibold text-center transition bg-green-500 text-white duration-200"
                 >
                   Update
@@ -199,8 +206,11 @@ const StudentAttendance = () => {
           </div>
         </div>
       )}
+
+      {/* Toast notification container */}
+      <ToastContainer position="top-right" autoClose={2000} hideProgressBar={false} newestOnTop={true} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
     </div>
   );
 };
 
-export default StudentAttendance;
+export default StudentAttendance
