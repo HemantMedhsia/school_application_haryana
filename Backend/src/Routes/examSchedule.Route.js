@@ -2,6 +2,7 @@ import express from "express";
 import {
     createExamSchedule,
     deleteExamSchedule,
+    getAdmitCards,
     getExamScheduleById,
     getExamScheduleBytcseId,
     getExamSchedules,
@@ -36,5 +37,7 @@ router.get(
     authorizeRoles("Parent"),
     getExamSchedulesByParentId
 );
+
+router.post("/print-admit-card/:classId/:examTypeId/:termId", getAdmitCards);
 
 export { router as examScheduleRoute };

@@ -5,6 +5,9 @@ import { ExamSchedule } from "../Models/examSchedule.model.js";
 import mongoose from "mongoose";
 import { examScheduleValidation } from "../Validation/examSchedule.Validation.js";
 import { Student } from "../Models/student.model.js";
+import { Term } from "../Models/term.Model.js";
+import { ExamType } from "../Models/examType.Model.js";
+import { Subject } from "../Models/subject.Model.js";
 
 export const createExamSchedule = wrapAsync(async (req, res) => {
     // const { error } = examScheduleValidation.validate(req.body);
@@ -208,8 +211,8 @@ export const getExamSchedulesBySubjectGroup = wrapAsync(async (req, res) => {
 });
 
 export const getExamSchedulesByStudentId = wrapAsync(async (req, res) => {
-   const studentId = req.user?.id;
-   console.log(studentId);
+    const studentId = req.user?.id;
+    console.log(studentId);
     const student = await Student.findById(studentId)
         .select("currentClass")
         .lean();
@@ -270,7 +273,7 @@ export const getExamSchedulesByStudentId = wrapAsync(async (req, res) => {
 });
 
 export const getExamSchedulesByParentId = wrapAsync(async (req, res) => {
-   const parentId = req.user?.id;
+    const parentId = req.user?.id;
     const student = await Student.findOne({ parent: parentId })
         .select("currentClass")
         .lean();
@@ -323,5 +326,92 @@ export const getExamSchedulesByParentId = wrapAsync(async (req, res) => {
             responseArray,
             "Exam Schedules fetched successfully"
         )
+    );
+});
+
+export const getAdmitCards = wrapAsync(async (req, res) => {
+    const { classId, examTypeId, termId } = req.params;
+    const { studentIds } = req.body;
+
+    let matchCondition = { currentClass: new mongoose.Types.ObjectId(classId) };
+
+    if (studentIds && studentIds.length > 0) {
+        matchCondition._id = {
+            $in: studentIds.map((id) => new mongoose.Types.ObjectId(id)),
+        };
+    }
+
+    const result = await Student.aggregate([
+        { $match: matchCondition },
+        {
+            $lookup: {
+                from: "examschedules",
+                let: { classId: "$currentClass" },
+                pipeline: [
+                    {
+                        $match: {
+                            examType: new mongoose.Types.ObjectId(examTypeId),
+                            term: new mongoose.Types.ObjectId(termId),
+                            class: new mongoose.Types.ObjectId(classId),
+                        },
+                    },
+                    { $project: { examDetails: 1 } },
+                ],
+                as: "examSchedule",
+            },
+        },
+        { $unwind: "$examSchedule" },
+        {
+            $project: {
+                studentName: { $concat: ["$firstName", " ", "$lastName"] },
+                studentPhoto: 1,
+                rollNumber: 1,
+                className: "$currentClass.name",
+                examDetails: "$examSchedule.examDetails",
+            },
+        },
+    ]);
+
+    const term = await Term.findById(termId).select("name").lean();
+    const examType = await ExamType.findById(examTypeId).select("name").lean();
+
+    if (result.length === 0) {
+        return res.status(404).json({ message: "No data found" });
+    }
+
+    const subjectMap = await Subject.find({}).lean();
+    const subjectIdToName = subjectMap.reduce((acc, subject) => {
+        acc[subject._id.toString()] = subject.name;
+        return acc;
+    }, {});
+
+    const response = {
+        commonInfo: {
+            schoolName: "Green Valley High School",
+            schoolLogo: "https://example.com/school-logo.png",
+            term: term ? term.name : "Unknown Term",
+            examType: examType ? examType.name : "Unknown Exam Type",
+            examDetails:
+                result.length > 0
+                    ? result[0].examDetails.map((detail) => ({
+                          subject:
+                              subjectIdToName[detail.subject] ||
+                              "Unknown Subject",
+                          examDate: detail.examDate,
+                          startTime: detail.startTime,
+                          endTime: detail.endTime,
+                      }))
+                    : [],
+        },
+        students: result.map((student) => ({
+            studentName: student.studentName,
+            studentPhoto: student.studentPhoto,
+            rollNumber: student.rollNumber,
+            className: student.className,
+        })),
+    };
+
+    res.status(200).json(
+        new ApiResponse(200, response, "Admit Cards Fetched Successfully")
     );
 });
