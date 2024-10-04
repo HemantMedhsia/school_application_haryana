@@ -183,7 +183,7 @@ const CreateSubjectGroup = () => {
     // Set form data for the subject group being edited
     setFormData({
       subjectGroupName: group.name, // Set subject group name
-      selectedClass: group.classes[0].id, // Set the selected class by accessing the first class's _id
+      selectedClass: group.classes[0]._id, // Set the selected class by accessing the first class's _id
       selectedSection: Array.isArray(group.sections)
         ? group.sections.map((section) => section._id) // Map section ids
         : [],
@@ -211,6 +211,8 @@ const CreateSubjectGroup = () => {
       }
     }
   };
+
+  console.log("Form data:", formData);
   return (
     <div className="mt-8">
       <Input
@@ -288,96 +290,97 @@ const CreateSubjectGroup = () => {
         <FormButton name="Save" onClick={handleSubmit} />
       </div>
 
-      <div className="container mx-auto p-4">
-        <h2 className="text-xl font-semibold mb-4">Subject Group List</h2>
-        <table className="min-w-full table-auto bg-[#203046]">
-          <thead>
-            <tr className="border-b">
-              <th className="px-4 py-2 text-left font text-gray-900">Name</th>
-              <th className="px-4 py-2 text-left text-gray-700">
-                Class (Section)
-              </th>
-              <th className="px-4 py-2 text-left text-gray-700">Subject</th>
-              <th className="px-4 py-2 text-center text-gray-700">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((group) => (
-              <tr key={group._id} className="border-b">
-                {/* Name Column */}
-                <td className="px-4 py-2 text-gray-800 font-medium">
-                  {group.name}
-                </td>
+      <div className="relative flex pt-6 mt-6 flex-col min-w-0 break-words w-full pb-6 shadow-lg rounded bg-[#283046]">
+        <div className="overflow-x-auto">
+          <table className="items-center w-full bg-[#283046] border-collapse text-white">
+            <thead>
+              <tr>
+                <th className="px-6 bg-[#2d3748] text-white align-middle border-b border-gray-700 py-3 text-s uppercase font-semibold text-left">
+                  Subject Group Name
+                </th>
+                <th className="px-6 bg-[#2d3748] text-white align-middle border-b border-gray-700 py-3 text-s uppercase font-semibold text-left">
+                  Class (Section)
+                </th>
+                <th className="px-6 bg-[#2d3748] text-white align-middle border-b border-gray-700 py-3 text-s uppercase font-semibold text-left">
+                  Subject
+                </th>
+                <th className="px-6 bg-[#2d3748] text-white align-middle border-b border-gray-700 py-3 text-s uppercase font-semibold text-left">
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.map((group) => (
+                <tr key={group._id} className="hover:bg-gray-900 duration-300">
+                  {/* Name Column */}
+                  <td className="border-t-0 px-6 align-middle text-md whitespace-nowrap p-4 text-left">
+                    {group.name}
+                  </td>
 
-                {/* Class (Section) Column */}
-                <td className="px-4 py-2">
-                  {group.classes && group.classes.length > 0 ? (
-                    <div>
-                      {group.classes.map((cls, index) => (
-                        <div key={cls._id}>
-                          {/* Class Name */}
-                          <p className="font-semibold">
-                            {index + 1}. {cls.name}
-                          </p>
-
-                          {/* Display Sections for this Class */}
+                  {/* Class (Section) Column */}
+                  <td className="border-t-0 px-6 align-middle text-md whitespace-nowrap p-4 text-left">
+                    {group.classes && group.classes.length > 0 ? (
+                      group.classes.map((cls, index) => (
+                        <div key={cls._id} className="my-2">
+                          <span className="text-xl">{cls.name}</span>
                           {group.sections && group.sections.length > 0 ? (
-                            <div className="ml-4">
-                              {group.sections.map(
-                                (section) =>
-                                  section.classIds &&
-                                  section.classIds.includes(cls._id) && (
-                                    <p key={section._id} className="text-sm">
-                                      Section: {section.name}
-                                    </p>
-                                  )
-                              )}
-                            </div>
+                            group.sections
+                              .filter((section) =>
+                                section.classIds.includes(cls._id)
+                              )
+                              .map((section) => (
+                                <p
+                                  key={section._id}
+                                  className="text-sm text-gray-400"
+                                >
+                                  Section: {section.name}
+                                </p>
+                              ))
                           ) : (
-                            <p className="ml-4 text-sm text-gray-500">
-                              No Sections
-                            </p>
+                            <p className="text-sm text-gray-500">No Sections</p>
                           )}
                         </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-gray-500 text-sm">No Classes</p>
-                  )}
-                </td>
+                      ))
+                    ) : (
+                      <p className="text-sm text-gray-500">No Classes</p>
+                    )}
+                  </td>
 
-                {/* Subject Column */}
-                <td className="px-4 py-2">
-                  {group.subjects && group.subjects.length > 0 ? (
-                    <div className="whitespace-pre-line">
-                      {group.subjects.map((subject) => (
-                        <p key={subject._id}>{subject.name}</p>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-gray-500 text-sm">No Subjects</p>
-                  )}
-                </td>
+                  {/* Subject Column */}
+                  <td className="border-t-0 px-6 align-middle text-md whitespace-nowrap p-4 text-left">
+                    {group.subjects && group.subjects.length > 0 ? (
+                      <div className="text-sm">
+                        {group.subjects.map((subject) => (
+                          <p key={subject._id} className="py-1">
+                            {subject.name}
+                          </p>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-gray-500">No Subjects</p>
+                    )}
+                  </td>
 
-                {/* Action Column */}
-                <td className="px-4 py-2 text-center">
-                  <button
-                    className="text-blue-500 hover:text-blue-700 mr-2"
-                    onClick={() => handleEdit(group)}
-                  >
-                    <FaEdit />
-                  </button>
-                  <button
-                    className="text-red-500 hover:text-red-700"
-                    onClick={() => handleDelete(group._id)}
-                  >
-                    <FaTrash />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                  {/* Action Column */}
+                  <td className="border-t-0 px-6 py-4 text-left">
+                    <button
+                      className="text-blue-500 hover:text-blue-700 transition-all mr-4"
+                      onClick={() => handleEdit(group)}
+                    >
+                      <FaEdit className="inline-block text-lg" />
+                    </button>
+                    <button
+                      className="text-red-500 hover:text-red-700 transition-all"
+                      onClick={() => handleDelete(group._id)}
+                    >
+                      <FaTrash className="inline-block text-lg" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <ToastContainer />

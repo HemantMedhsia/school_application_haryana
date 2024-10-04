@@ -7,9 +7,11 @@ import { BiSupport } from "react-icons/bi";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthProvider";
 import { jwtDecode } from "jwt-decode";
+import DarkModeToggle from "../../common/DarkModeToggle/DarkModeToggle";
+import logo from '../../assets/logo.png';
 
 const navigation = [
-  { name: "Happy Model English School", href: "#", current: false },
+  { name: "Vardhan International School", href: "#", current: false },
 ];
 
 function classNames(...classes) {
@@ -59,7 +61,7 @@ const TopNavbar = ({ isCollapsed }) => {
                 <div className="flex items-center">
                   <img
                     className="h-8 w-auto sm:mr-4 md:mr-4"
-                    src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
+                    src={logo}
                     alt="Your Company"
                   />
                 </div>
@@ -102,7 +104,9 @@ const TopNavbar = ({ isCollapsed }) => {
                     <IoLocationSharp />
                   </div>
                 </div>
+                
               </div>
+              
 
               {/* Mobile Menu Button */}
               <div className="flex sm:hidden">
@@ -116,10 +120,14 @@ const TopNavbar = ({ isCollapsed }) => {
                 </Disclosure.Button>
               </div>
             </div>
+            
 
             {/* User Section */}
             <div className="absolute w-full inset-y-0 right-0 flex justify-end items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-              <div className="flex flex-col justify-end items-center mx-1">
+            <div className="mr-4">
+            <DarkModeToggle />
+            </div>
+              <div className="flex flex-col justify-end items-center">
                 <div className="w-full text-sm text-gray-400">
                   {name ? name : "You login as Guest"}
                 </div>
