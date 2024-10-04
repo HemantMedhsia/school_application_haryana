@@ -33,6 +33,7 @@
     "react-paginate": "^8.2.0",
     "react-router-dom": "^6.26.1",
     "react-select": "^5.8.0",
+    "react-to-print": "^3.0.1",
     "react-toastify": "^10.0.5"
   },
   "devDependencies": {

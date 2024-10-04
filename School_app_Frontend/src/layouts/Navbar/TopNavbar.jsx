@@ -8,7 +8,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthProvider";
 import { jwtDecode } from "jwt-decode";
 import DarkModeToggle from "../../common/DarkModeToggle/DarkModeToggle";
-import logo from '../../assets/logo.png';
+import logo from "../../assets/logo.png";
 
 const navigation = [
   { name: "Vardhan International School", href: "#", current: false },
@@ -51,7 +51,7 @@ const TopNavbar = ({ isCollapsed }) => {
       as="nav"
       className={`fixed top-0 ${
         isCollapsed ? "left-20" : "left-64"
-      } mx-6 my-2 mt-4 rounded-md right-0 h-14 bg-[#283046] transition-all duration-300 shadow-md z-50`}
+      } mx-6 my-2 mt-4 rounded-md right-0 h-14 bg-[#283046] transition-all duration-300 shadow-md z-1`}
     >
       {({ open }) => (
         <>
@@ -67,25 +67,24 @@ const TopNavbar = ({ isCollapsed }) => {
                 </div>
 
                 <div className="hidden sm:flex">
-  <div className="flex flex-wrap">
-    {navigation.map((item) => (
-      <a
-        key={item.name}
-        href={item.href}
-        className={classNames(
-          item.current
-            ? "bg-gray-900 text-white"
-            : "text-gray-300 hover:bg-gray-700 hover:text-white",
-          "rounded-md px-3 py-2 text-auto font-medium"
-        )}
-        aria-current={item.current ? "page" : undefined}
-      >
-        {item.name}
-      </a>
-    ))}
-  </div>
-</div>
-
+                  <div className="flex flex-wrap">
+                    {navigation.map((item) => (
+                      <a
+                        key={item.name}
+                        href={item.href}
+                        className={classNames(
+                          item.current
+                            ? "bg-gray-900 text-white"
+                            : "text-gray-300 hover:bg-gray-700 hover:text-white",
+                          "rounded-md px-3 py-2 text-auto font-medium"
+                        )}
+                        aria-current={item.current ? "page" : undefined}
+                      >
+                        {item.name}
+                      </a>
+                    ))}
+                  </div>
+                </div>
 
                 {/* Icon buttons */}
                 <div className="hidden sm:flex">
@@ -104,9 +103,7 @@ const TopNavbar = ({ isCollapsed }) => {
                     <IoLocationSharp />
                   </div>
                 </div>
-                
               </div>
-              
 
               {/* Mobile Menu Button */}
               <div className="flex sm:hidden">
@@ -120,13 +117,12 @@ const TopNavbar = ({ isCollapsed }) => {
                 </Disclosure.Button>
               </div>
             </div>
-            
 
             {/* User Section */}
             <div className="absolute w-full inset-y-0 right-0 flex justify-end items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-            <div className="mr-4">
-            <DarkModeToggle />
-            </div>
+              <div className="mr-4">
+                <DarkModeToggle />
+              </div>
               <div className="flex flex-col justify-end items-center">
                 <div className="w-full text-sm text-gray-400">
                   {name ? name : "You login as Guest"}

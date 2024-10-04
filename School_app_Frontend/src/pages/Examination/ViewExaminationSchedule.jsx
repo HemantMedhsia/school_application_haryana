@@ -1,6 +1,7 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import DynamicTable from "../../common/Datatables/DynamicTable";
 import DynamicFilterBar from "../../common/FilterBar/DynamicFilterBar";
+import Modal from "react-modal";
 import axios from "axios";
 
 const ViewExaminationSchedule = () => {
@@ -11,14 +12,17 @@ const ViewExaminationSchedule = () => {
   const [classes, setClasses] = useState([]);
   const [subjectGroups, setSubjectGroups] = useState([]);
   const [examTypes, setExamTypes] = useState([]);
+  const [classId, setClassId] = useState(null);
   const [selectedFilters, setSelectedFilters] = useState({
     term: null,
     class: null,
     subjectGroup: null,
     examType: null,
   });
+  const [students, setStudents] = useState([]); // State to store students data
+  const [selectedStudents, setSelectedStudents] = useState([]); // State for selected students
+  const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
 
-  // Create a reference to the table section for printing
   const printRef = useRef();
 
   const columns = [
@@ -29,8 +33,8 @@ const ViewExaminationSchedule = () => {
   ];
 
   const handleClassChange = (selectedClassId) => {
+    setClassId(selectedClassId);
     const selectedClass = classes.find((cls) => cls._id === selectedClassId);
-
     if (selectedClass) {
       setSubjectGroups(selectedClass.subjectGroups || []);
     } else {
@@ -108,6 +112,8 @@ const ViewExaminationSchedule = () => {
             }))
           )
         );
+
+        // Fetch students data from API
       } catch (error) {
         console.error("Error fetching data", error);
       }
@@ -139,7 +145,7 @@ const ViewExaminationSchedule = () => {
         } else {
           const subjects = examDetails.map((detail) => ({
             subject: detail.subject.name,
-            examDate: new Date(detail.examDate).toISOString().split("T")[0], // Format the date
+            examDate: new Date(detail.examDate).toISOString().split("T")[0],
             startTime: detail.startTime,
             endTime: detail.endTime,
           }));
@@ -161,9 +167,32 @@ const ViewExaminationSchedule = () => {
     setSelectedFilters(filterValues);
   };
 
-  // Function to trigger print
-  const handlePrint = () => {
-    window.print();
+  // Function to trigger print for selected students
+  const handlePrintAdmitCards = () => {
+    // Here you can generate the admit cards for selected students
+    console.log("Selected students for admit cards:", selectedStudents);
+    window.print(); // Trigger print
+  };
+
+  // Function to handle checkbox change for selecting students
+  const handleStudentCheckboxChange = (studentId) => {
+    setSelectedStudents((prevSelected) =>
+      prevSelected.includes(studentId)
+        ? prevSelected.filter((id) => id !== studentId)
+        : [...prevSelected, studentId]
+    );
+  };
+
+  const fetchStudentInfo = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/getallstudentsinfo/${classId}`
+      );
+      setStudents(response.data.data || []);
+      setIsModalOpen(true);
+    } catch (error) {
+      console.error("Error fetching students", error);
+    }
   };
 
   return (
@@ -174,12 +203,18 @@ const ViewExaminationSchedule = () => {
 
       <DynamicFilterBar filters={filterConfig} onSubmit={handleFilterSubmit} />
 
-      {noDataMessage && <p className="flex justify-center items-center text-red-500 mt-4">{noDataMessage}</p>}
+      {noDataMessage && (
+        <p className="flex justify-center items-center text-red-500 mt-4">
+          {noDataMessage}
+        </p>
+      )}
 
       {showTable && (
         <div>
           <div className="mb-4">
-            <h2 className="text-[#7367F0] font-semibold mt-4 text-xl">Exam Schedule</h2>
+            <h2 className="text-[#7367F0] font-semibold mt-4 text-xl">
+              Exam Schedule
+            </h2>
           </div>
 
           {/* Printable Section */}
@@ -187,15 +222,52 @@ const ViewExaminationSchedule = () => {
             <DynamicTable columns={columns} data={examSubjects} />
           </div>
 
-          {/* Print Button */}
+          {/* Open Modal Button */}
           <div className="flex justify-end mt-4">
             <button
-              onClick={handlePrint}
+              onClick={() => fetchStudentInfo()}
               className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-all"
             >
-              Print Schedule
+              Select Students for Admit Cards
             </button>
           </div>
+
+          {/* Modal for selecting students */}
+          <Modal
+            isOpen={isModalOpen}
+            onRequestClose={() => setIsModalOpen(false)}
+            contentLabel="Select Students Modal"
+            className="relative w-full max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-6"
+            overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+          >
+            <h2 className="text-xl font-semibold">Select Students</h2>
+            <div className="mb-4 max-h-[50vh] overflow-y-auto">
+              {students.map((student) => (
+                <div key={student.id} className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    checked={selectedStudents.includes(student.id)}
+                    onChange={() => handleStudentCheckboxChange(student.id)}
+                  />
+                  <span>{student.name}</span>
+                </div>
+              ))}
+            </div>
+            <div className="flex justify-end mt-4 space-x-2">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handlePrintAdmitCards}
+                className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition-all"
+              >
+                Print Admit Cards
+              </button>
+            </div>
+          </Modal>
         </div>
       )}
     </div>
