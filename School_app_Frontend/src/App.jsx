@@ -48,9 +48,23 @@ import ShowStudentResult from "./pages/Results/ShowStudentResult.jsx";
 import StudentAttendance from "./pages/Student/StudentAttendance.jsx";
 import TeacherAttendance from "./pages/Teacher/TeacherAttendance.jsx";
 import StaffAttendance from "./pages/Staff/StaffAttendance.jsx";
+import StudentAdmitCard from "./pages/Print/StudentAdmitCard.jsx";
 
 const App = () => {
   const { userRole, authToken } = useAuth();
+  const student = {
+    name: 'John Doe',
+    rollNo: '12345',
+    className: '10th Grade',
+    photo: 'https://imresizer.com/_next/image?url=%2Fimages%2Fsample-photo-1.jpg&w=1920&q=75', // replace with actual photo URL
+  };
+
+  const exams = [
+    { subject: 'Mathematics', examDate: '2024-10-15', startTime: '09:00 AM', endTime: '12:00 PM' },
+    { subject: 'Science', examDate: '2024-10-17', startTime: '09:00 AM', endTime: '12:00 PM' },
+    { subject: 'English', examDate: '2024-10-19', startTime: '09:00 AM', endTime: '12:00 PM' },
+    { subject: 'History', examDate: '2024-10-21', startTime: '09:00 AM', endTime: '12:00 PM' },
+  ];
 
   const router = createBrowserRouter(
     createRoutesFromElements(
@@ -162,6 +176,7 @@ const App = () => {
               </RoleBasedAccess>
             }
           />
+          <Route path="/school/print" element={<StudentAdmitCard student={student} exams={exams}/>} />
         </Route>
       </>
     )

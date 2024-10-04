@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import DynamicTable from "../../common/Datatables/DynamicTable";
 import DynamicFilterBar from "../../common/FilterBar/DynamicFilterBar";
 import axios from "axios";
@@ -17,6 +17,9 @@ const ViewExaminationSchedule = () => {
     subjectGroup: null,
     examType: null,
   });
+
+  // Create a reference to the table section for printing
+  const printRef = useRef();
 
   const columns = [
     { header: "Subject", accessor: "subject", type: "text" },
@@ -158,6 +161,11 @@ const ViewExaminationSchedule = () => {
     setSelectedFilters(filterValues);
   };
 
+  // Function to trigger print
+  const handlePrint = () => {
+    window.print();
+  };
+
   return (
     <div className="rounded-md">
       <div className="mb-4">
@@ -166,17 +174,28 @@ const ViewExaminationSchedule = () => {
 
       <DynamicFilterBar filters={filterConfig} onSubmit={handleFilterSubmit} />
 
-      {noDataMessage && <p className=" flex justify-center items-center text-red-500 mt-4">{noDataMessage}</p>}
+      {noDataMessage && <p className="flex justify-center items-center text-red-500 mt-4">{noDataMessage}</p>}
 
       {showTable && (
         <div>
           <div className="mb-4">
-            <h2 className="text-[#7367F0] font-semibold mt-4 text-xl">
-              Exam Schedule
-            </h2>
+            <h2 className="text-[#7367F0] font-semibold mt-4 text-xl">Exam Schedule</h2>
           </div>
 
-          <DynamicTable columns={columns} data={examSubjects} />
+          {/* Printable Section */}
+          <div ref={printRef}>
+            <DynamicTable columns={columns} data={examSubjects} />
+          </div>
+
+          {/* Print Button */}
+          <div className="flex justify-end mt-4">
+            <button
+              onClick={handlePrint}
+              className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-all"
+            >
+              Print Schedule
+            </button>
+          </div>
         </div>
       )}
     </div>
