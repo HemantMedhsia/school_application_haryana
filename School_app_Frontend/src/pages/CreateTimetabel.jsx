@@ -20,9 +20,10 @@ const CreateTimetable = () => {
   const [teachers, setTeachers] = useState([]);
   const [data, setData] = useState([]);
   const [classes, setClasses] = useState([]);
-  const [currentDay , setCurrentDay] = useState("");
+  const [currentDay, setCurrentDay] = useState("");
   const [loading, setLoading] = useState(false);
   const [subjectGroupId, setSubjectGroupId] = useState("");
+  const [selectedTeachers, setSelectedTeachers] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -41,7 +42,7 @@ const CreateTimetable = () => {
 
   const fetchAvailableTeachers = async (dayOfWeek, periods) => {
     try {
-      console.log("dayofweek", dayOfWeek);
+      console.log("dayofweek", dayOfWeek, "periods", periods);
       const response = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/api/available-teachers`,
         {
@@ -51,8 +52,9 @@ const CreateTimetable = () => {
           },
         }
       );
-      setTeachers(response.data.data || []);
-      console.log("avl", teachers); // Adjust this based on your API response structure
+      // setTeachers(response.data.data || []);
+      return response.data.data || [];
+      console.log("avl", teachers);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -96,7 +98,7 @@ const CreateTimetable = () => {
     console.log("Current Subjects State:", subjects);
   }, [subjects]);
 
-  const handleAddPeriod = () => {
+  const handleAddPeriod = async () => {
     const intervalInMinutes = parseInt(classInterval);
     const periodDurationInMinutes = parseInt(periodRunningTime);
     const lunchBreakInMinutes = parseInt(lunchBreak);
@@ -121,10 +123,11 @@ const CreateTimetable = () => {
     }
 
     const newEndTime = calculateEndTime(nextStartTime, periodDurationInMinutes);
+    const newPeriodNumber =
+      entries.filter((entry) => entry.period !== "Lunch Break").length + 1;
 
     const newEntry = {
-      period:
-        entries.filter((entry) => entry.period !== "Lunch Break").length + 1,
+      period: newPeriodNumber,
       teacherId: "",
       subjectId: "",
       startTime: nextStartTime,
@@ -144,11 +147,28 @@ const CreateTimetable = () => {
         endTime: calculateEndTime(newEndTime, lunchBreakInMinutes),
       };
 
-      setEntries((prevEntries) => [...prevEntries, newEntry, lunchBreakEntry]);
+      setEntries((prevEntries) => [...prevEntries, newEntry,lunchBreakEntry]);
     } else {
       setEntries((prevEntries) => [...prevEntries, newEntry]);
     }
-    
+    console.log(
+      "Fetching available teachers for:",
+      currentDay,
+      newPeriodNumber
+    );
+    const availableTeachers = await fetchAvailableTeachers(
+      currentDay,
+      newPeriodNumber
+    );
+    console.log("Available teachers fetched:", availableTeachers);
+
+    setEntries((prevEntries) =>
+      prevEntries.map((entry, index) =>
+        index === prevEntries.length - 1
+          ? { ...entry, availableTeachers }
+          : entry
+      )
+    );
   };
 
   const isValidTimeFormat = (time) => {
@@ -401,11 +421,13 @@ const CreateTimetable = () => {
           <FormSection>
             <SearchableSelect
               placeholder="Select Teacher"
-              value={entries[index].teacherId}
-              options={teachers.map((teacher) => ({
-                id: teacher._id,
-                name: teacher.name,
-              }))}
+              value={entry.teacherId}
+              options={
+                entry.availableTeachers?.map((teacher) => ({
+                  id: teacher._id,
+                  name: teacher.name,
+                })) || []
+              }
               onChange={(value) => handleEntryChange(index, "teacherId", value)}
             />
             <SearchableSelect
