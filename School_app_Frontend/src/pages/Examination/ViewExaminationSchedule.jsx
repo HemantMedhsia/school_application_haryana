@@ -169,9 +169,18 @@ const ViewExaminationSchedule = () => {
 
   // Function to trigger print for selected students
   const handlePrintAdmitCards = () => {
-    // Here you can generate the admit cards for selected students
+
     console.log("Selected students for admit cards:", selectedStudents);
-    window.print(); // Trigger print
+    axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/printadmitcards`, {
+      students: selectedStudents,
+  })
+    .then((response) => {
+      console.log("Admit Cards printed successfully", response.data);
+    })
+    .catch((error) => {
+      console.error("Error printing admit cards", error);
+    });
+  };
   };
 
   // Function to handle checkbox change for selecting students
