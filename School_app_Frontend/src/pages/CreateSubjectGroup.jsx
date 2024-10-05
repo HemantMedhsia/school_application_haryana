@@ -73,23 +73,19 @@ const CreateSubjectGroup = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
-    // When the selected class changes, update the sections based on the selected class
     if (name === "selectedClass") {
       const selectedClass = classSectionOptions.find(
         (option) => option.id === value
       );
 
       if (selectedClass && selectedClass.sections) {
-        setSectionOptions(selectedClass.sections); // Set the sections from the selected class
+        setSectionOptions(selectedClass.sections);
       } else {
         setSectionOptions([]);
       }
     }
 
-    // Ensure only valid inputs are processed
-    if (value.trim() !== "") {
-      setFormData({ ...formData, [name]: value });
-    }
+    setFormData({ ...formData, [name]: value.trim() });
   };
 
   const handleCheckboxChange = (e) => {
@@ -138,13 +134,23 @@ const CreateSubjectGroup = () => {
     }
 
     try {
-      await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/create-subject-group`,
-        subjectGroupData
-      );
-      toast.success("Subject Group added successfully!");
+      if (editingGroup) {
+        console.log("subjectGroupData:", subjectGroupData);
+        await axios.put(
+          `${
+            import.meta.env.VITE_BACKEND_URL
+          }/api/update-subject-group/${editingGroup}`,
+          subjectGroupData
+        );
+        toast.success("Subject Group updated successfully!");
+      } else {
+        await axios.post(
+          `${import.meta.env.VITE_BACKEND_URL}/api/create-subject-group`,
+          subjectGroupData
+        );
+        toast.success("Subject Group added successfully!");
+      }
 
-      // Refetch the data after adding the subject group
       const response = await getAPI("getSubjectGroup", {}, setData);
       setData(response.data || []);
       setFormData({
@@ -169,8 +175,9 @@ const CreateSubjectGroup = () => {
     setEditingGroup(group._id);
     console.log("Editing group:", group);
 
+    console.log("classSectionOptions:", classSectionOptions);
     const selectedClass = classSectionOptions.find(
-      (option) => option._id === group.classes[0].id
+      (option) => option.id === group.classes[0]._id
     );
     console.log("Selected class:", selectedClass);
 
@@ -180,15 +187,14 @@ const CreateSubjectGroup = () => {
       setSectionOptions([]);
     }
 
-    // Set form data for the subject group being edited
     setFormData({
-      subjectGroupName: group.name, // Set subject group name
-      selectedClass: group.classes[0]._id, // Set the selected class by accessing the first class's _id
+      subjectGroupName: group.name,
+      selectedClass: group.classes[0]._id,
       selectedSection: Array.isArray(group.sections)
-        ? group.sections.map((section) => section._id) // Map section ids
+        ? group.sections.map((section) => section._id)
         : [],
       selectedSubjects: Array.isArray(group.subjects)
-        ? group.subjects.map((subject) => subject._id) // Map subject ids
+        ? group.subjects.map((subject) => subject._id)
         : [],
     });
   };
@@ -230,7 +236,7 @@ const CreateSubjectGroup = () => {
         options={classSectionOptions.map((option) => ({
           id: option.id,
           name: option.className,
-        }))} // Dynamically populate class options
+        }))}
       />
       {sectionOptions.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">

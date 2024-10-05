@@ -14,6 +14,10 @@ const AdmitCardPrint = ({ students, commonInfo }) => {
     onPrintError: (error) => console.error("Print error:", error),
   });
 
+  console.log("Student Data:", student); // Log student data
+  console.log("Exams Data:", exams); // Log exams data
+  console.log("Admit Card Ref:", admitCardRef["current"]); // Log admit card ref
+
   return (
     <div>
       <div ref={admitCardRef}>
