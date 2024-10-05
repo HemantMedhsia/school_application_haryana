@@ -14,6 +14,7 @@ export const createClassTimeTable = wrapAsync(async (req, res) => {
             dayOfWeek,
             "entries.period": entry.period,
             "entries.teacherId": entry.teacherId,
+            classId: { $ne: classId }
         });
 
         if (existingTimetable) {
