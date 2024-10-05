@@ -48,6 +48,7 @@ timetableSchema.pre("save", async function (next) {
                     dayOfWeek: this.dayOfWeek,
                     "entries.period": entry.period,
                     "entries.teacherId": entry.teacherId,
+                    classId: { $ne: this.classId }
                 });
 
             if (existingTimetable) {
