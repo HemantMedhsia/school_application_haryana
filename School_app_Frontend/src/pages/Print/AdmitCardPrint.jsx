@@ -1,30 +1,17 @@
 import React, { useRef } from "react";
 import { useReactToPrint } from "react-to-print";
-import StudentAdmitCard from "./StudentAdmitCard"; // Ensure this path is correct
+import StudentAdmitCard from "./StudentAdmitCard";
+import AdmitCardList from "./StudentAdmitCard";
 
-const AdmitCardPrint = ({ student, exams }) => {
-  const admitCardRef = useRef();
-
-  // const handlePrint = useReactToPrint({
-  //   contentRef: () => {
-  //     if (!admitCardRef.current) {
-  //       console.error("Admit card ref is not set."); // Log if ref is not set
-  //       alert("No content to print!"); // Alert the user
-  //       return null; // Return null if no content
-  //     }
-  //     console.log(admitCardRef.current);
-  //     return admitCardRef.current;
-  //   },
-  //   documentTitle: `HemantAdmitCard`,
-  //   onAfterPrint: () => alert("Admit Card printed successfully!"),
-  // });
-
-  // const handlePrint = useReactToPrint({contentRef:admitCardRef,    documentTitle: `HemantAdmitCard`,  });
+const AdmitCardPrint = ({ students, commonInfo }) => {
+  const admitCardRef = useRef(null);
 
   const handlePrint = useReactToPrint({
-    contentRef: admitCardRef,
-    documentTitle: `HemantAdmitCard`,
-    onAfterPrint: () => alert("Admit Card printed successfully!"),
+    contentRef: admitCardRef, // Using contentRef instead of content
+    documentTitle: `Admit Card - ${commonInfo?.schoolName}`,
+    onBeforeGetContent: () => console.log("Preparing content for print..."),
+    onAfterPrint: () => console.log("Print completed"),
+    onPrintError: (error) => console.error("Print error:", error),
   });
 
   console.log("Student Data:", student); // Log student data
@@ -33,13 +20,9 @@ const AdmitCardPrint = ({ student, exams }) => {
 
   return (
     <div>
-      {/* Render the Admit Card */}
       <div ref={admitCardRef}>
-        {student && exams ? (
-          <StudentAdmitCard student={student} exams={exams} />
-        ) : (
-          <p>No student or exam data available.</p>
-        )}
+        {/* Admit Card Content */}
+       <AdmitCardList students={students} commonInfo={commonInfo} />
       </div>
 
       {/* Print Button */}

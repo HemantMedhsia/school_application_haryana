@@ -53,19 +53,45 @@ import AdmitCardPrint from "./pages/Print/AdmitCardPrint.jsx";
 
 const App = () => {
   const { userRole, authToken } = useAuth();
-  const student = {
-    name: 'John Doe',
-    rollNo: '12345',
-    className: '10th Grade',
-    photo: 'https://imresizer.com/_next/image?url=%2Fimages%2Fsample-photo-1.jpg&w=1920&q=75', // replace with actual photo URL
-  };
-
-  const exams = [
-    { subject: 'Mathematics', examDate: '2024-10-15', startTime: '09:00 AM', endTime: '12:00 PM' },
-    { subject: 'Science', examDate: '2024-10-17', startTime: '09:00 AM', endTime: '12:00 PM' },
-    { subject: 'English', examDate: '2024-10-19', startTime: '09:00 AM', endTime: '12:00 PM' },
-    { subject: 'History', examDate: '2024-10-21', startTime: '09:00 AM', endTime: '12:00 PM' },
-  ];
+  const data = {
+    "commonInfo": {
+        "schoolName": "Green Valley High School",
+        "schoolLogo": "https://example.com/school-logo.png",
+        "term": "Term 1",
+        "examType": "Unit Test",
+        "examDetails": [
+            {
+                "subject": "Science 101",
+                "examDate": "2024-01-01T00:00:00.000Z",
+                "startTime": "08:20",
+                "endTime": "10:20"
+            },
+            {
+                "subject": "Hindi",
+                "examDate": "2024-01-01T00:00:00.000Z",
+                "startTime": "08:20",
+                "endTime": "10:20"
+            }
+        ]
+    },
+    "students": [
+        {
+            "studentName": "Vedansh Tiwari",
+            "studentPhoto": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+            "rollNumber": "12"
+        },
+        {
+            "studentName": "Hemant Medhsia",
+            "studentPhoto": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+            "rollNumber": "122"
+        },
+        {
+            "studentName": "Aditya M",
+            "studentPhoto": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+            "rollNumber": "12df"
+        }
+    ]
+};
 
   const router = createBrowserRouter(
     createRoutesFromElements(
@@ -177,7 +203,7 @@ const App = () => {
               </RoleBasedAccess>
             }
           />
-          <Route path="/school/print" element={<AdmitCardPrint student={student} exams={exams}/>} />
+          <Route path="/school/print" element={<AdmitCardPrint students={data.students} commonInfo={data.commonInfo}/>} />
         </Route>
       </>
     )
