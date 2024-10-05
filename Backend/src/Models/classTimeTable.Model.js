@@ -4,7 +4,7 @@ const timetableEntrySchema = new mongoose.Schema({
     period: {
         type: String,
         required: true,
-        set: (value) => value.trim(),
+        trim: true,
     },
     teacherId: {
         type: mongoose.Schema.Types.ObjectId,
