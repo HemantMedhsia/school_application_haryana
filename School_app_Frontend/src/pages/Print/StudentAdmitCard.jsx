@@ -1,11 +1,13 @@
 import React from "react";
 import logo from '../../assets/logo.png';
+import { forwardRef } from "react";
 
-const StudentAdmitCard = ({ student, exams }) => {
+const StudentAdmitCard = forwardRef (({ student, exams },ref) => {
   return (
     <div
       className="max-w-3xl mx-auto p-8 border border-gray-300 shadow-xl bg-white"
       style={{ height: "1123px", width: "794px" }}
+      ref={ref}
     >
       {/* School Header */}
       <div className="text-center mb-8">
@@ -110,6 +112,6 @@ const StudentAdmitCard = ({ student, exams }) => {
       </div>
     </div>
   );
-};
+});
 
 export default StudentAdmitCard;
