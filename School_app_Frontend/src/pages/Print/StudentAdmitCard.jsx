@@ -1,8 +1,7 @@
 import React, { forwardRef } from "react";
 import logo from '../../assets/logo.png';
-import { forwardRef } from "react";
 
-// Single Admit Card Component
+
 const StudentAdmitCard = forwardRef(({ student, commonInfo }, ref) => {
   const { schoolName, schoolLogo, term, examType, examDetails } = commonInfo;
 

@@ -53,6 +53,7 @@ import AdmitCardPrint from "./pages/Print/AdmitCardPrint.jsx";
 
 const App = () => {
   const { userRole, authToken } = useAuth();
+  
   const data = {
     "commonInfo": {
         "schoolName": "Green Valley High School",
