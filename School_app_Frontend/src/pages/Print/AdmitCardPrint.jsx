@@ -1,20 +1,24 @@
-import React, { useRef } from 'react';
-import { useReactToPrint } from 'react-to-print';
-import StudentAdmitCard from './StudentAdmitCard';  // Import your component
+import React, { useRef } from "react";
+import { useReactToPrint } from "react-to-print";
+import StudentAdmitCard from "./StudentAdmitCard";
+import AdmitCardList from "./StudentAdmitCard";
 
-const AdmitCardPrint = ({ student, exams }) => {
-  const admitCardRef = useRef();
+const AdmitCardPrint = ({ students, commonInfo }) => {
+  const admitCardRef = useRef(null);
 
   const handlePrint = useReactToPrint({
-    content: () => admitCardRef.current,
-    documentTitle: `Hemant Admit Card`,
+    contentRef: admitCardRef, // Using contentRef instead of content
+    documentTitle: `Admit Card - ${commonInfo?.schoolName}`,
+    onBeforeGetContent: () => console.log("Preparing content for print..."),
+    onAfterPrint: () => console.log("Print completed"),
+    onPrintError: (error) => console.error("Print error:", error),
   });
 
   return (
     <div>
-      {/* Render the Admit Card */}
       <div ref={admitCardRef}>
-        <StudentAdmitCard student={student} exams={exams} />
+        {/* Admit Card Content */}
+       <AdmitCardList students={students} commonInfo={commonInfo} />
       </div>
 
       {/* Print Button */}
