@@ -133,7 +133,9 @@ const ClassTimetable = () => {
                             </p>
                           </div>
                           <div className="flex item-center gap-1">
-                            <div className="text-md"><GiTeacher /></div>
+                            <div className="text-md">
+                              <GiTeacher />
+                            </div>
                             <p className="text-sm">{subjectData.teacher}</p>
                           </div>
                         </div>
