@@ -9,7 +9,7 @@ const timetableEntrySchema = new mongoose.Schema({
     teacherId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Teacher",
-        required: true,  // required field
+        required: true, // required field
     },
     subjectId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -47,14 +47,22 @@ timetableSchema.pre("save", async function (next) {
                 .findOne({
                     dayOfWeek: this.dayOfWeek,
                     "entries.period": entry.period,
-                    "entries.teacherId": entry.teacherId,
-                    classId: { $ne: this.classId }
                 });
 
+            console.log("Existing Timetable Found:", existingTimetable);
+
             if (existingTimetable) {
-                throw new Error(
-                    `Teacher is already assigned to another class at period ${entry.period} on ${this.dayOfWeek}.`
+                const conflictingEntry = existingTimetable.entries.find(
+                    (e) =>
+                        e.teacherId.toString() === entry.teacherId.toString() &&
+                        e.period === entry.period
                 );
+
+                if (conflictingEntry) {
+                    throw new Error(
+                        `Teacher ${entry.teacherId} is already assigned to another class at period ${entry.period} on ${this.dayOfWeek}.`
+                    );
+                }
             }
         }
         next();
