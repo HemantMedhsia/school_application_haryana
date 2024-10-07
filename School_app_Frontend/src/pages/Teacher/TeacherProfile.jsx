@@ -37,7 +37,12 @@ const TeacherProfile = () => {
     ref.current.scrollIntoView({ behavior: "smooth" });
   };
 
-  if (loading) return <span className="loader">Loading...</span>;
+  if (loading)
+    return (
+      <div className="loader-wrapper">
+        <span className="loader"></span>
+      </div>
+    );
   if (error) return <span className="text-red-500">{error}</span>;
 
   return (

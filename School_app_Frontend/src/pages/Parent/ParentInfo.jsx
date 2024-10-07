@@ -11,6 +11,7 @@ const ParentInfo = () => {
   const [allParentData, setAllParentData] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [parentToDelete, setparentToDelete] = useState(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const columns = [
@@ -38,6 +39,7 @@ const ParentInfo = () => {
   ];
 
   const fetchData = async () => {
+    setLoading(true);
     try {
       const [AllParentResponse] = await Promise.all([
         getAPI("getAllParents", {}, setAllParentData),
@@ -45,6 +47,8 @@ const ParentInfo = () => {
       console.log(AllParentResponse);
     } catch (error) {
       console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -89,15 +93,21 @@ const ParentInfo = () => {
   return (
     <div className="">
       <SearchBar />
-      <Datatable
-        data={allParentData}
-        columns={columns}
-        actions={{
-          onView: handleView,
-          onEdit: handleEdit,
-          onDelete: openModal,
-        }}
-      />
+      {loading ? (
+        <div className="loader-wrapper">
+          <span className="loader"></span>
+        </div>
+      ) : (
+        <Datatable
+          data={allParentData}
+          columns={columns}
+          actions={{
+            onView: handleView,
+            onEdit: handleEdit,
+            onDelete: openModal,
+          }}
+        />
+      )}
       <ConfirmationModal
         isOpen={isModalOpen}
         onClose={closeModal}

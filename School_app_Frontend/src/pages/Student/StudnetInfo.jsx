@@ -21,6 +21,7 @@ const StudentInfo = () => {
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [searchText, setSearchText] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const fetchDropdownData = async () => {
@@ -39,13 +40,11 @@ const StudentInfo = () => {
   }, []);
 
   const fetchData = async () => {
+    setLoading(true);
     try {
       const response = await getAPI("getAllStudents", {}, setAllStudentData);
 
       if (response.data && Array.isArray(response.data)) {
-        console.log("Fetching student attendance summaries...");
-
-        // Use Promise.all to handle the asynchronous calls inside map
         const updatedResponse = await Promise.all(
           response.data.map(async (student) => {
             try {
@@ -54,8 +53,6 @@ const StudentInfo = () => {
                   import.meta.env.VITE_BACKEND_URL
                 }/api/get-student-attendance-summary/${student._id}`
               );
-
-              console.log("data", data.data.percentage);
 
               const attendancePercentage = data?.data?.percentage;
               return {
@@ -73,6 +70,8 @@ const StudentInfo = () => {
                 attendancePercentage: 0, // Default in case of error
                 grade: "A", // Example grade
               };
+            } finally {
+              setLoading(false);
             }
           })
         );
@@ -249,15 +248,21 @@ const StudentInfo = () => {
         onFilter={handleFilter}
         onSearch={handleSearch}
       />
-      <Datatable
-        data={filteredStudentData}
-        columns={columns}
-        actions={{
-          onView: handleView,
-          onEdit: handleEdit,
-          onDelete: handleDelete,
-        }}
-      />
+      {loading ? (
+        <div className="loader-wrapper">
+          <span className="loader"></span>
+        </div>
+      ) : (
+        <Datatable
+          data={filteredStudentData}
+          columns={columns}
+          actions={{
+            onView: handleView,
+            onEdit: handleEdit,
+            onDelete: handleDelete,
+          }}
+        />
+      )}
       <ConfirmationModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

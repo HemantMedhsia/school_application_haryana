@@ -9,6 +9,12 @@ import { Student } from "../Models/student.model.js";
 export const createClassTimeTable = wrapAsync(async (req, res) => {
     const { classId, dayOfWeek, entries } = req.body;
 
+    const timetableExists = await Timetable.findOne({ classId, dayOfWeek });
+
+    if (timetableExists) {
+        return res.status(401).json(ApiError(401, "Timetable already exists"));
+    }
+
     for (const entry of entries) {
         const existingTimetable = await Timetable.findOne({
             dayOfWeek,

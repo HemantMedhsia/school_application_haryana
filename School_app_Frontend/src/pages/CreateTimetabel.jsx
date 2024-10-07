@@ -4,7 +4,9 @@ import SearchableSelect from "../components/Form/Select";
 import TimeInput from "../common/TimeInput/TimeInput";
 import FormButton from "../components/Form/FormButton";
 import DynamicFilterBar2 from "../common/FilterBar/SelectDropDownFilterTimeTable";
+import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
+import { FaEdit } from "react-icons/fa";
 
 const CreateTimetable = () => {
   const [classId, setClassId] = useState("");
@@ -98,6 +100,79 @@ const CreateTimetable = () => {
     console.log("Current Subjects State:", subjects);
   }, [subjects]);
 
+  // const handleAddPeriod = async () => {
+  //   const intervalInMinutes = parseInt(classInterval);
+  //   const periodDurationInMinutes = parseInt(periodRunningTime);
+  //   const lunchBreakInMinutes = parseInt(lunchBreak);
+  //   const lunchBreakAfterPeriodInt = parseInt(lunchBreakAfterPeriod);
+
+  //   let nextStartTime;
+
+  //   if (entries.length === 0) {
+  //     nextStartTime = periodStartTiming;
+  //   } else {
+  //     const lastEntry = entries[entries.length - 1];
+  //     nextStartTime = lastEntry.endTime;
+
+  //     if (lastEntry.period !== "Lunch Break") {
+  //       nextStartTime = calculateEndTime(nextStartTime, intervalInMinutes);
+  //     }
+  //   }
+
+  //   if (!isValidTimeFormat(nextStartTime)) {
+  //     console.error("Invalid start time format:", nextStartTime);
+  //     return;
+  //   }
+
+  //   const newEndTime = calculateEndTime(nextStartTime, periodDurationInMinutes);
+  //   const newPeriodNumber =
+  //     entries.filter((entry) => entry.period !== "Lunch Break").length + 1;
+
+  //   const newEntry = {
+  //     period: newPeriodNumber,
+  //     teacherId: "",
+  //     subjectId: "",
+  //     startTime: nextStartTime,
+  //     endTime: newEndTime,
+  //   };
+
+  //   if (
+  //     lunchBreakAfterPeriodInt &&
+  //     entries.filter((entry) => entry.period !== "Lunch Break").length + 1 ===
+  //       lunchBreakAfterPeriodInt
+  //   ) {
+  //     const lunchBreakEntry = {
+  //       period: "Lunch Break",
+  //       teacherId: "",
+  //       subjectId: "",
+  //       startTime: newEndTime,
+  //       endTime: calculateEndTime(newEndTime, lunchBreakInMinutes),
+  //     };
+
+  //     setEntries((prevEntries) => [...prevEntries, newEntry,lunchBreakEntry]);
+  //   } else {
+  //     setEntries((prevEntries) => [...prevEntries, newEntry]);
+  //   }
+  //   console.log(
+  //     "Fetching available teachers for:",
+  //     currentDay,
+  //     newPeriodNumber
+  //   );
+  //   const availableTeachers = await fetchAvailableTeachers(
+  //     currentDay,
+  //     newPeriodNumber
+  //   );
+  //   console.log("Available teachers fetched:", availableTeachers);
+
+  //   setEntries((prevEntries) =>
+  //     prevEntries.map((entry, index) =>
+  //       index === prevEntries.length - 1
+  //         ? { ...entry, availableTeachers }
+  //         : entry
+  //     )
+  //   );
+  // };
+
   const handleAddPeriod = async () => {
     const intervalInMinutes = parseInt(classInterval);
     const periodDurationInMinutes = parseInt(periodRunningTime);
@@ -106,17 +181,20 @@ const CreateTimetable = () => {
 
     let nextStartTime;
 
+    // Determine the start time for the next period
     if (entries.length === 0) {
       nextStartTime = periodStartTiming;
     } else {
       const lastEntry = entries[entries.length - 1];
       nextStartTime = lastEntry.endTime;
 
+      // Only add interval if the last period is not lunch break
       if (lastEntry.period !== "Lunch Break") {
         nextStartTime = calculateEndTime(nextStartTime, intervalInMinutes);
       }
     }
 
+    // Validate start time format
     if (!isValidTimeFormat(nextStartTime)) {
       console.error("Invalid start time format:", nextStartTime);
       return;
@@ -132,12 +210,32 @@ const CreateTimetable = () => {
       subjectId: "",
       startTime: nextStartTime,
       endTime: newEndTime,
+      availableTeachers: [],
     };
 
+    // Prepare new entries array
+    let newEntries = [...entries, newEntry];
+
+    // Fetch available teachers for the new period
+    try {
+      setLoading(true);
+      const availableTeachers = await fetchAvailableTeachers(
+        currentDay,
+        newPeriodNumber
+      );
+      console.log("Available teachers fetched:", availableTeachers);
+
+      newEntries[newEntries.length - 1].availableTeachers = availableTeachers;
+    } catch (error) {
+      console.error("Error fetching available teachers:", error);
+    } finally {
+      setLoading(false);
+    }
+
+    // If this period matches the lunch break schedule, add a lunch break entry
     if (
       lunchBreakAfterPeriodInt &&
-      entries.filter((entry) => entry.period !== "Lunch Break").length + 1 ===
-        lunchBreakAfterPeriodInt
+      newPeriodNumber === lunchBreakAfterPeriodInt
     ) {
       const lunchBreakEntry = {
         period: "Lunch Break",
@@ -147,28 +245,11 @@ const CreateTimetable = () => {
         endTime: calculateEndTime(newEndTime, lunchBreakInMinutes),
       };
 
-      setEntries((prevEntries) => [...prevEntries, newEntry,lunchBreakEntry]);
-    } else {
-      setEntries((prevEntries) => [...prevEntries, newEntry]);
+      newEntries.push(lunchBreakEntry);
     }
-    console.log(
-      "Fetching available teachers for:",
-      currentDay,
-      newPeriodNumber
-    );
-    const availableTeachers = await fetchAvailableTeachers(
-      currentDay,
-      newPeriodNumber
-    );
-    console.log("Available teachers fetched:", availableTeachers);
 
-    setEntries((prevEntries) =>
-      prevEntries.map((entry, index) =>
-        index === prevEntries.length - 1
-          ? { ...entry, availableTeachers }
-          : entry
-      )
-    );
+    // Update the entries state with the new entries
+    setEntries(newEntries);
   };
 
   const isValidTimeFormat = (time) => {
@@ -216,10 +297,8 @@ const CreateTimetable = () => {
     const timetable = {
       classId,
       dayOfWeek,
-      entries: filteredEntries, // Use formatted entries
+      entries: filteredEntries,
     };
-
-    console.log("Submitted Timetable:", timetable);
 
     axios
       .post(
@@ -233,11 +312,25 @@ const CreateTimetable = () => {
         }
       )
       .then((response) => {
-        console.log("Timetable created successfully:", response.data);
+        toast.success("Timetable created successfully!");
       })
       .catch((error) => {
-        console.error("Error creating timetable:", error);
+        if (
+          error.response &&
+          error.response.data &&
+          error.response.data.message
+        ) {
+          toast.error(`Error: ${error.response.data.message}`);
+        } else {
+          toast.error("Error creating timetable. Please try again.");
+        }
       });
+  };
+
+  const handleDeletePeriod = (index) => {
+    const updatedEntries = entries.filter((_, i) => i !== index);
+    setEntries(updatedEntries);
+    console.log("Updated Entries after deletion:", updatedEntries);
   };
 
   const filterConfig = [
@@ -404,6 +497,10 @@ const CreateTimetable = () => {
           setPeriodRunningTime(periodRunningTime);
           setLunchBreak(lunchBreak);
           setLunchBreakAfterPeriod(lunchBreakAfterPeriod);
+
+          toast.info(
+            "Filter submitted successfully! Add period and create timetable now."
+          );
         }}
       />
 
@@ -418,34 +515,51 @@ const CreateTimetable = () => {
               ? "Lunch Break"
               : `Period ${entry.period}`}
           </h4>
+
           <FormSection>
-            <SearchableSelect
-              placeholder="Select Teacher"
-              value={entry.teacherId}
-              options={
-                entry.availableTeachers?.map((teacher) => ({
-                  id: teacher._id,
-                  name: teacher.name,
-                })) || []
-              }
-              onChange={(value) => handleEntryChange(index, "teacherId", value)}
-            />
-            <SearchableSelect
-              labelName={""}
-              placeholder="Select Subject"
-              value={entries[index].subjectId}
-              options={subjects.map((subject) => ({
-                id: subject._id,
-                name: subject.name,
-              }))}
-              onChange={(value) => handleEntryChange(index, "subjectId", value)}
-            />
+            {entry.period !== "Lunch Break" && (
+              <>
+                <SearchableSelect
+                  placeholder="Select Teacher"
+                  value={entry.teacherId}
+                  options={
+                    entry.availableTeachers?.map((teacher) => ({
+                      id: teacher._id,
+                      name: teacher.name,
+                    })) || []
+                  }
+                  onChange={(value) =>
+                    handleEntryChange(index, "teacherId", value)
+                  }
+                />
+                <SearchableSelect
+                  labelName={""}
+                  placeholder="Select Subject"
+                  value={entries[index].subjectId}
+                  options={subjects.map((subject) => ({
+                    id: subject._id,
+                    name: subject.name,
+                  }))}
+                  onChange={(value) =>
+                    handleEntryChange(index, "subjectId", value)
+                  }
+                />
+              </>
+            )}
+
             <TimeInput
               value={entry.startTime}
               onChange={(value) => handleEntryChange(index, "startTime", value)}
               placeholder="Start Time"
             />
             <TimeInput value={entry.endTime} readOnly placeholder="End Time" />
+
+            <button
+              className="bg-red-500 text-white p-2 rounded-lg"
+              onClick={() => handleDeletePeriod(index)}
+            >
+              <FaEdit size={18} color="black" />
+            </button>
           </FormSection>
         </div>
       ))}
@@ -454,6 +568,12 @@ const CreateTimetable = () => {
         <FormButton onClick={handleAddPeriod} name="Add Period" />
         <FormButton onClick={handleSubmit} name="Submit Timetable" />
       </div>
+
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+      />
     </div>
   );
 };

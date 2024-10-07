@@ -49,9 +49,9 @@ const StaffInfo = () => {
     setFilteredStaffData(filteredData);
   }, [searchText, allStaffData]);
 
-//   const handleView = (staffData) => {
-//     navigate(`/school/staff-profile/${staffData._id}`);
-//   };
+  //   const handleView = (staffData) => {
+  //     navigate(`/school/staff-profile/${staffData._id}`);
+  //   };
 
   const handleEdit = (staffData) => {
     navigate(`/school/staff-update/${staffData._id}`);
@@ -98,8 +98,8 @@ const StaffInfo = () => {
       <ToastContainer />
       {/* <StaffSearchBar searchText={searchText} setSearchText={setSearchText} /> */}
       {loading ? (
-        <div className="text-center mt-4">
-          <h3>Loading...</h3>
+        <div className="loader-wrapper">
+          <span className="loader"></span>
         </div>
       ) : formattedData.length > 0 ? (
         <Datatable

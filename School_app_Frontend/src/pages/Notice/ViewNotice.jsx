@@ -9,6 +9,7 @@ const ViewNotice = () => {
 
   useEffect(() => {
     const fetchNotices = async () => {
+      setLoading(true);
       try {
         const response = await getAPI("getAllNotice", {}, setNotices);
         console.log(response.data);
@@ -25,7 +26,11 @@ const ViewNotice = () => {
   }, []);
 
   if (loading) {
-    return <div>Loading notices...</div>;
+    return (
+      <div className="loader-wrapper">
+        <span className="loader"></span>
+      </div>
+    );
   }
 
   if (error) {
