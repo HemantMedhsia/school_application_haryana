@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import FormButton from '../../components/Form/FormButton';
+import React, { useState } from "react";
+import FormButton from "../../components/Form/FormButton";
 
 // Custom Dropdown with Checkbox Group Component
 const CheckboxGroupDropdown = ({ filter, selectedValues, onChange }) => {
@@ -12,11 +12,13 @@ const CheckboxGroupDropdown = ({ filter, selectedValues, onChange }) => {
 
   return (
     <div className="relative w-full">
-      <div 
-        className="p-3 bg-gray-700 text-white rounded-md border border-gray-600 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#7367F0]" 
+      <div
+        className="p-3 bg-gray-700 text-white rounded-md border border-gray-600 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#7367F0]"
         onClick={toggleDropdown}
       >
-        {selectedValues.length > 0 ? selectedValues.join(', ') : filter.placeholder}
+        {selectedValues.length > 0
+          ? selectedValues.join(", ")
+          : filter.placeholder}
       </div>
 
       {isOpen && (
@@ -40,53 +42,58 @@ const CheckboxGroupDropdown = ({ filter, selectedValues, onChange }) => {
 };
 
 const DynamicFilterBar = ({ filters, onSubmit }) => {
-    const [filterValues, setFilterValues] = useState({});
-  
-    const handleChange = (e, filter) => {
-      const value = e.target.value;
-      setFilterValues({
-        ...filterValues,
-        [filter.name]: value,
-      });
-  
-      // Call the onChange function if it exists for the filter
-      if (filter.onChange) {
-        filter.onChange(value);
-      }
-    };
-  
-    const handleSubmit = (e) => {
-      e.preventDefault();
-      onSubmit(filterValues);
-    };
-  
-    return (
-      <form onSubmit={handleSubmit} className="flex items-center gap-6 flex-wrap p-4 bg-[#283046] rounded-lg shadow-md">
-        {filters.map((filter, index) => (
-          <div key={index} className="flex items-center flex-col w-fit">
-            {filter.type === 'select' ? (
-              <select
-                value={filterValues[filter.name] || ''}
-                onChange={(e) => handleChange(e, filter)}  // Pass the filter object along with the event
-                className="p-3 bg-gray-700 text-white rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-[#7367F0]"
-                required={filter.required}
-              >
-                <option value="">{filter.placeholder}</option>
-                {filter.options.map((option, idx) => (
-                  <option key={idx} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            ) : null}
-          </div>
-        ))}
-  
-        <div className="flex items-center justify-center">
-          <FormButton name="Submit" />
-        </div>
-      </form>
-    );
+  const [filterValues, setFilterValues] = useState({});
+
+  const handleChange = (e, filter) => {
+    const value = e.target.value;
+    setFilterValues({
+      ...filterValues,
+      [filter.name]: value,
+    });
+
+    // Call the onChange function if it exists for the filter
+    if (filter.onChange) {
+      filter.onChange(value);
+    }
   };
-  
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSubmit(filterValues);
+  };
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="flex items-center gap-6 flex-wrap p-4 bg-[#283046] rounded-lg shadow-md"
+    >
+      {filters.map((filter, index) => (
+        <div key={index} className="flex items-center flex-col w-fit">
+          {filter.type === "select" ? (
+            <select
+              value={filterValues[filter.name] || ""}
+              onChange={(e) => handleChange(e, filter)} // Pass the filter object along with the event
+              className="p-3 bg-gray-700 text-white rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-[#7367F0]"
+              required={filter.required}
+            >
+              <option value="">{filter.placeholder}</option>
+              {filter.options.map((option, idx) => (
+                <option key={idx} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          ) : null}
+        </div>
+      ))}
+
+      <div className="flex items-center justify-center">
+        <FormButton name="Submit" />
+      </div>
+
+      
+    </form>
+  );
+};
+
 export default DynamicFilterBar;
