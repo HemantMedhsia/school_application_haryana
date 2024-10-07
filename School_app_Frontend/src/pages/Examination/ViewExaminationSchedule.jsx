@@ -194,42 +194,33 @@ const ViewExaminationSchedule = () => {
   const handlePrintAdmitCards = async () => {
     try {
       const response = await axios.post(
-        `${
-          import.meta.env.VITE_BACKEND_URL
-        }/api/print-admit-card/${classId}/${examTypeId}/${termId}`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/print-admit-card/${classId}/${examTypeId}/${termId}`,
         { studentIds: selectedStudents }
       );
-
+  
       console.log("Print Response:", response.data); // Log the response
-
+  
       if (response.data && response.data.success) {
         setPrintResponse(response.data.data); // Ensure this structure is correct
         handlePrintAdmitCards2(); // Call printing function
       } else {
-        console.error(
-          "Printing failed:",
-          response.data.message || "Unknown error"
-        );
+        console.error("Printing failed:", response.data.message || "Unknown error");
         alert("No data available for printing");
       }
     } catch (error) {
-      console.error(
-        "Error printing admit cards",
-        error.response?.data || error.message
-      );
+      console.error("Error printing admit cards", error.response?.data || error.message);
       alert("Error printing admit cards");
     }
   };
-
-  // useEffect(() => {
-  //   if (printResponse && printResponse.students.length > 0) {
-  //     setTimeout(() => {
-  //       handlePrintAdmitCards2();
-  //     }, 2000);
-  //   }
-  // }, [printResponse]);
-
   
+
+  useEffect(() => {
+    if (printResponse && printResponse.students.length > 0) {
+      setTimeout(() => {
+        handlePrintAdmitCards2();
+      }, 2000);
+    }
+  }, [printResponse]);
 
   // Function to handle checkbox change for selecting students
   const handleStudentCheckboxChange = (studentId) => {
@@ -279,16 +270,14 @@ const ViewExaminationSchedule = () => {
             <DynamicTable columns={columns} data={examSubjects} />
           </div>
 
-          <div className="hidden">
+          {printResponse && printResponse.students.length > 0 && (
             <div ref={printRef}>
-              {printResponse && printResponse.students.length > 0 && (
-                <AdmitCardList
-                  students={printResponse.students}
-                  commonInfo={printResponse.commonInfo}
-                />
-              )}
+              <AdmitCardList
+                students={printResponse.students}
+                commonInfo={printResponse.commonInfo}
+              />
             </div>
-          </div>
+          )}
           {/* Open Modal Button */}
           <div className="flex justify-end mt-4">
             <button
