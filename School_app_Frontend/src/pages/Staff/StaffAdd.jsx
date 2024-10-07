@@ -10,7 +10,7 @@ import FormButton from "../../components/Form/FormButton";
 
 const StaffAdd = () => {
   const { staffId } = useParams();
-  
+
   const initialFormData = {
     name: "",
     age: "",
@@ -21,6 +21,7 @@ const StaffAdd = () => {
     address: "",
     staffAttendance: [],
     dateJoined: "",
+    gender: "",
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -69,6 +70,7 @@ const StaffAdd = () => {
       "phoneNumber",
       "address",
       "dateJoined",
+       "gender",
     ];
     const isEmpty = requiredFields.some((field) => !formData[field]);
 
@@ -128,6 +130,17 @@ const StaffAdd = () => {
           onChange={handleChange}
           placeholder="Enter Name"
         />
+        <Select
+          labelName="Gender"
+          name="gender"
+          value={formData.gender}
+          onChange={handleChange}
+          options={[
+            { id: "Male", name: "Male" },
+            { id: "Female", name: "Female" },
+          ]}
+          placeholder="Select"
+        />
         <Input
           labelName="Age"
           name="age"
@@ -135,22 +148,6 @@ const StaffAdd = () => {
           onChange={handleChange}
           placeholder="Enter Age"
           type="number"
-        />
-        <Select
-          labelName="Staff Type"
-          name="type"
-          value={formData.type}
-          onChange={handleChange}
-          options={[
-            { id: "Cleaning", name: "Cleaning" },
-            { id: "Security", name: "Security" },
-            { id: "Care Taker", name: "Care Taker" },
-            { id: "Peon", name: "Peon" },
-            { id: "Office Staff", name: "Office Staff" },
-            { id: "Librarian", name: "Librarian" },
-            { id: "Other", name: "Other" },
-          ]}
-          placeholder="Select Staff Type"
         />
 
         <Input
@@ -185,6 +182,22 @@ const StaffAdd = () => {
           value={formData.address}
           onChange={handleChange}
           placeholder="Enter Address"
+        />
+        <Select
+          labelName="Staff Type"
+          name="type"
+          value={formData.type}
+          onChange={handleChange}
+          options={[
+            { id: "Cleaning", name: "Cleaning" },
+            { id: "Security", name: "Security" },
+            { id: "Care Taker", name: "Care Taker" },
+            { id: "Peon", name: "Peon" },
+            { id: "Office Staff", name: "Office Staff" },
+            { id: "Librarian", name: "Librarian" },
+            { id: "Other", name: "Other" },
+          ]}
+          placeholder="Select Staff Type"
         />
         {!staffId ? (
           <Input

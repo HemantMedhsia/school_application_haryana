@@ -1,52 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import TrafficChart from "../../common/Charts/TrafficChart";
 import BarChart from "../../common/Charts/BarChart";
 import SmalldataBlock from "../../common/DataBlock/SmalldataBlock";
 import StackedBarChart from "../../common/Charts/StackedBarChart";
-
-const trafficChartData = {
-  series: [200, 250],
-  colors: ["#65FA9E", "#286C56"],
-  labels: ["Male", "Female"],
-  title: "Total Students",
-  height: 320,
-  width: "100%",
-  containerId: "custom-donut-chart",
-  innerLable: "Total Students",
-};
-
-const trafficChartData2 = {
-  series: [200, 250],
-  colors: ["#65FA9E", "#286C56"],
-  labels: ["Male", "Female"],
-  title: "Total Teachers",
-  height: 320,
-  width: "100%",
-  containerId: "custom-donut-chart2",
-  innerLable: "Total Teachers",
-};
-
-const trafficChartData3 = {
-  series: [200, 250],
-  colors: ["#65FA9E", "#286C56"],
-  labels: ["Male", "Female"],
-  title: "Total Staffs",
-  height: 320,
-  width: "100%",
-  containerId: "custom-donut-chart3",
-  innerLable: "Total Staffs",
-};
-
-const barChartData = [
-  {
-    name: "Male",
-    data: [30, 40, 35, 50, 49, 60, 0],
-  },
-  {
-    name: "Female",
-    data: [12, 40, 16, 50, 49, 60, 0],
-  },
-];
+import { getAPI } from "../../utility/api/apiCall";
 
 const seriesData = [
   {
@@ -65,9 +22,112 @@ const seriesData = [
 
 const categoriesData = ["Paid", "Unpaid", "Partial Paid"];
 
+const trafficChartColors = ["#65FA9E", "#286C56"];
 const barChartColors = ["#FF4560", "#00E396"];
+const stackedBarChartColors = [
+  "#FF4560",
+  "#00E396",
+  "#775DD0",
+  "#008FFB",
+  "#FEB019",
+];
 
 const AdminDashboard = () => {
+  const [loading, setLoading] = useState(false);
+
+  const [studentData, setStudentData] = useState({
+    trafficChart: {
+      series: [0, 0],
+      labels: ["Male", "Female"],
+      innerLable: "Total Students",
+    },
+    barChart: [],
+  });
+
+  const [teacherData, setTeacherData] = useState({
+    trafficChart: {
+      series: [0, 0],
+      labels: ["Male", "Female"],
+      innerLable: "Total Teachers",
+    },
+    barChart: [],
+  });
+
+  const [staffData, setStaffData] = useState({
+    trafficChart: {
+      series: [0, 0],
+      labels: ["Male", "Female"],
+      innerLable: "Total Staff",
+    },
+    barChart: [],
+  });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const [studentResult, teacherResult, staffResult] = await Promise.all([
+          getAPI("getAllStudentWithAttendance", {}, (result) => result),
+          getAPI("getAllTeacherWithAttendance", {}, (result) => result),
+          getAPI("getAllStaffWithAttendance", {}, (result) => result),
+        ]);
+
+        if (studentResult.success) {
+          const { attendanceData, totalMaleStudents, totalFemaleStudents } =
+            studentResult.data;
+          setStudentData({
+            trafficChart: {
+              series: [totalMaleStudents, totalFemaleStudents],
+              labels: ["Male", "Female"],
+              innerLable: "Total Students",
+            },
+            barChart: attendanceData,
+          });
+        }
+
+        if (teacherResult.success) {
+          const { attendanceData, totalMaleTeachers, totalFemaleTeachers } =
+            teacherResult.data;
+          setTeacherData({
+            trafficChart: {
+              series: [totalMaleTeachers, totalFemaleTeachers],
+              labels: ["Male", "Female"],
+              innerLable: "Total Teachers",
+            },
+            barChart: attendanceData,
+          });
+        }
+
+        if (staffResult.success) {
+          const { attendanceData, totalMaleStaffs, totalFemaleStaffs } =
+            staffResult.data;
+          setStaffData({
+            trafficChart: {
+              series: [totalMaleStaffs, totalFemaleStaffs],
+              labels: ["Male", "Female"],
+              innerLable: "Total Staff",
+            },
+            barChart: attendanceData,
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="loader-wrapper">
+        <span className="loader"></span>
+      </div>
+    );
+  }
+
   return (
     <div className=" lg:p-0">
       <div className="sm:flex">
@@ -112,32 +172,59 @@ const AdminDashboard = () => {
       </div>
       <div className="flex flex-wrap gap-4 mb-4">
         <div className="flex-1 min-w-[300px] border-4 border-[#283046] rounded-md">
-          <TrafficChart {...trafficChartData} />
+          <TrafficChart
+            series={studentData.trafficChart.series}
+            colors={trafficChartColors}
+            labels={studentData.trafficChart.labels}
+            title="Total Students"
+            height={320}
+            width="100%"
+            containerId="custom-donut-chart"
+            innerLable={studentData.trafficChart.innerLable}
+          />
           <BarChart
-            label={"Student Weekly Attendance"}
-            series={barChartData}
+            label="Student Weekly Attendance"
+            series={studentData.barChart}
             colors={barChartColors}
-            height={"100%"}
+            height="100%"
             width="100%"
           />
         </div>
         <div className="flex-1 min-w-[300px] border-4 border-[#283046] rounded-md">
-          <TrafficChart {...trafficChartData2} />
+          <TrafficChart
+            series={teacherData.trafficChart.series}
+            colors={trafficChartColors}
+            labels={teacherData.trafficChart.labels}
+            title="Total Teachers"
+            height={320}
+            width="100%"
+            containerId="custom-donut-chart2"
+            innerLable={teacherData.trafficChart.innerLable}
+          />
           <BarChart
-            label={"Teacher Weekly Attendance"}
-            series={barChartData}
+            label="Teacher Weekly Attendance"
+            series={teacherData.barChart}
             colors={barChartColors}
-            height={"100%"}
+            height="100%"
             width="100%"
           />
         </div>
         <div className="flex-1 min-w-[300px] border-4 border-[#283046] rounded-md">
-          <TrafficChart {...trafficChartData3} />
+          <TrafficChart
+            series={staffData.trafficChart.series}
+            colors={trafficChartColors}
+            labels={staffData.trafficChart.labels}
+            title="Total Staff"
+            height={320}
+            width="100%"
+            containerId="custom-donut-chart3"
+            innerLable={staffData.trafficChart.innerLable}
+          />
           <BarChart
-            label={"Staff Weekly Attendance"}
-            series={barChartData}
+            label="Staff Weekly Attendance"
+            series={staffData.barChart}
             colors={barChartColors}
-            height={"100%"}
+            height="100%"
             width="100%"
           />
         </div>

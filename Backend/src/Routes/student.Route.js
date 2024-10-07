@@ -42,6 +42,6 @@ router.get(
     getStudentAttendanceDataByParentId
 );
 
-router.get("/student/weekly/attendance", getAttendanceAndStudentCount);
+router.get("/student-weekly-attendance", getAttendanceAndStudentCount);
 
 export { router as studentRoute };

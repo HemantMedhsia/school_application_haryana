@@ -29,6 +29,6 @@ router.get("/get-teacher-attendance/:teacherId", getTeacherAttendance);
 
 router.post("/login-teacher", loginTeacher);
 router.post("/refresh-token-teacher", refreshAccessTokenTeacher);
-router.get("/teacher/weekly/attendance", getAttendanceAndTeacherCount);
+router.get("/teacher-weekly-attendance", getAttendanceAndTeacherCount);
 
 export { router as teacherRoute };

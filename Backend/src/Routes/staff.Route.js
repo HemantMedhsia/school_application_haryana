@@ -22,5 +22,5 @@ router.delete("/delete-staff/:id", deleteStaff);
 router.post("/login-staff", loginStaff);
 router.post("/refresh-token-staff", refreshAccessTokenStaff);
 
-router.get("/staff/weekly/attendance", getAttendanceAndStaffCount);
+router.get("/staff-weekly-attendance", getAttendanceAndStaffCount);
 export { router as staffRoute };

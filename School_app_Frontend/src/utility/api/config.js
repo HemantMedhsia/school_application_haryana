@@ -131,4 +131,16 @@ export const getApiConfig = {
     url: "/get-examschedule-bystudent",
     method: "GET",
   },
+  getAllStudentWithAttendance: {
+    url: "/student-weekly-attendance",
+    method: "GET",
+  },
+  getAllTeacherWithAttendance: {
+    url: "/teacher-weekly-attendance",
+    method: "GET",
+  },
+  getAllStaffWithAttendance: {
+    url: "/staff-weekly-attendance",
+    method: "GET",
+  },
 };
