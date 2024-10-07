@@ -6,6 +6,7 @@ import { generateRefreshToken } from "../Utils/generateRefreshToken.js";
 import { ApiResponse } from "../Utils/responseHandler.js";
 import wrapAsync from "../Utils/wrapAsync.js";
 import jwt from "jsonwebtoken";
+import { StaffAttendance } from "../Models/staffAttendence.Model.js";
 
 const generateAccessAndRefreshTokens = async (staffId, next) => {
     const staff = await Staff.findById(staffId);
@@ -187,4 +188,69 @@ export const deleteStaff = wrapAsync(async (req, res) => {
     return res
         .status(200)
         .json(new ApiResponse(200, staff, "Staff Deleted Successfully"));
+});
+
+export const getAttendanceAndStaffCount = wrapAsync(async (req, res) => {
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(endDate.getDate() - 7);
+
+    const attendanceRecords = await StaffAttendance.find({
+        date: {
+            $gte: startDate,
+            $lte: endDate,
+        },
+    }).populate({
+        path: "staffId",
+        select: "gender",
+    });
+
+    const maleAttendance = Array(7).fill(0);
+    const femaleAttendance = Array(7).fill(0);
+
+    attendanceRecords.forEach((record) => {
+        const dayOfWeek = record.date.getDay();
+        if (record.status === "Present") {
+            if (record.staffId.gender === "Male") {
+                maleAttendance[dayOfWeek]++;
+            } else if (record.staffId.gender === "Female") {
+                femaleAttendance[dayOfWeek]++;
+            }
+        }
+    });
+
+    const barChartData = [
+        {
+            name: "Male",
+            data: maleAttendance,
+        },
+        {
+            name: "Female",
+            data: femaleAttendance,
+        },
+    ];
+
+    const totalCounts = await Staff.aggregate([
+        {
+            $group: {
+                _id: "$gender",
+                count: { $sum: 1 },
+            },
+        },
+    ]);
+
+    const totalStaff = totalCounts.reduce((acc, curr) => acc + curr.count, 0);
+    const totalMaleStaffs =
+        totalCounts.find((g) => g._id === "Male")?.count || 0;
+    const totalFemaleStaffs =
+        totalCounts.find((g) => g._id === "Female")?.count || 0;
+
+    const response = {
+        attendanceData: barChartData,
+        totalStaff,
+        totalMaleStaffs,
+        totalFemaleStaffs,
+    };
+
+    return res.status(200).json(new ApiResponse(200, response));
 });

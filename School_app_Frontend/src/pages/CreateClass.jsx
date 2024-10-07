@@ -15,11 +15,10 @@ const CreateClass = ({ onCreate }) => {
   const [classes, setClasses] = useState([]);
   const [options, setOptions] = useState([]);
   const [editingClassId, setEditingClassId] = useState(null);
-  const [loadingClasses, setLoadingClasses] = useState(false);
-  const [loadingSections, setLoadingSections] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const fetchClasses = async () => {
-    setLoadingClasses(true);
+    setLoading(true);
     try {
       const response = await getAPI(
         "getAllClassesWithSections",
@@ -37,12 +36,12 @@ const CreateClass = ({ onCreate }) => {
     } catch (error) {
       console.error("Error fetching classes:", error);
     } finally {
-      setLoadingClasses(false);
+      setLoading(false);
     }
   };
 
   const fetchSections = async () => {
-    setLoadingSections(true);
+    setLoading(true);
     try {
       const response = await getAPI("getAllSections", {}, setOptions);
       console.log(response.data);
@@ -50,7 +49,7 @@ const CreateClass = ({ onCreate }) => {
     } catch (error) {
       console.error("Error fetching sections:", error);
     } finally {
-      setLoadingSections(false);
+      SetLoading(false);
     }
   };
 
@@ -133,6 +132,14 @@ const CreateClass = ({ onCreate }) => {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="loader-wrapper">
+        <span className="loader"></span>
+      </div>
+    );
+  }
+
   return (
     <div className="mt-4 flex">
       <div className="w-2/3 p-4 bg-[#283046] rounded-md">
@@ -164,69 +171,62 @@ const CreateClass = ({ onCreate }) => {
           <h3 className="text-2xl font-semibold mb-6 text-[#7367F0]">
             Created Classes
           </h3>
-          {loadingClasses || loadingSections ? ( // Show loader while loading
-            <div className="flex justify-center items-center">
-              <div className="loader-wrapper">
-                <span className="loader"></span>
-              </div>
-            </div>
-          ) : (
-            <ul>
-              {classes.length > 0 ? (
-                classes.map((classItem, index) => (
-                  <li
-                    key={index}
-                    className="mb-4 p-4 bg-gray-700 rounded-lg shadow hover:bg-gray-600 transition duration-200"
-                  >
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0">
-                        <svg
-                          className="h-6 w-6 text-[#7367F0]"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M12 14l9-5-9-5-9 5 9 5z"
-                          />
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M12 14l6.16-3.422A12.083 12.083 0 0112 21.5a12.083 12.083 0 01-6.16-10.922L12 14z"
-                          />
-                        </svg>
-                      </div>
-                      <div className="ml-4">
-                        <strong className="text-lg">
-                          Class: {classItem.name}
-                        </strong>
-                        <p className="text-sm text-gray-400">
-                          Sections: {classItem.sections.join(", ")}
-                        </p>
-                        <div className="flex space-x-4 mt-2">
-                          <FaEdit
-                            className="text-yellow-400 cursor-pointer"
-                            onClick={() => handleEdit(classItem)}
-                          />
-                          <FaTrash
-                            className="text-red-500 cursor-pointer"
-                            onClick={() => handleDelete(classItem.id)}
-                          />
-                        </div>
+
+          <ul>
+            {classes.length > 0 ? (
+              classes.map((classItem, index) => (
+                <li
+                  key={index}
+                  className="mb-4 p-4 bg-gray-700 rounded-lg shadow hover:bg-gray-600 transition duration-200"
+                >
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0">
+                      <svg
+                        className="h-6 w-6 text-[#7367F0]"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M12 14l9-5-9-5-9 5 9 5z"
+                        />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M12 14l6.16-3.422A12.083 12.083 0 0112 21.5a12.083 12.083 0 01-6.16-10.922L12 14z"
+                        />
+                      </svg>
+                    </div>
+                    <div className="ml-4">
+                      <strong className="text-lg">
+                        Class: {classItem.name}
+                      </strong>
+                      <p className="text-sm text-gray-400">
+                        Sections: {classItem.sections.join(", ")}
+                      </p>
+                      <div className="flex space-x-4 mt-2">
+                        <FaEdit
+                          className="text-yellow-400 cursor-pointer"
+                          onClick={() => handleEdit(classItem)}
+                        />
+                        <FaTrash
+                          className="text-red-500 cursor-pointer"
+                          onClick={() => handleDelete(classItem.id)}
+                        />
                       </div>
                     </div>
-                  </li>
-                ))
-              ) : (
-                <li className="text-gray-400">No classes created yet.</li>
-              )}
-            </ul>
-          )}
+                  </div>
+                </li>
+              ))
+            ) : (
+              <li className="text-gray-400">No classes created yet.</li>
+            )}
+          </ul>
         </div>
       </div>
       <ToastContainer />

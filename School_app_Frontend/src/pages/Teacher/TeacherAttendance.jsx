@@ -190,6 +190,14 @@ const TeacherAttendance = () => {
     fetchTeacherData();
   }, []);
 
+  if (loading) {
+    return (
+      <div className="loader-wrapper">
+        <span className="loader"></span>
+      </div>
+    );
+  }
+
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">Teacher Attendance</h1>
