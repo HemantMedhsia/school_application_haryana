@@ -461,3 +461,14 @@ body {
   }
 }
 
+/* Printing Modules */
+
+@media print {
+  .no-print {
+    display: block !important; /* Ensure it's visible in print mode */
+  }
+}
+
+.no-print {
+  display: none; /* Hide in regular view */
+}
