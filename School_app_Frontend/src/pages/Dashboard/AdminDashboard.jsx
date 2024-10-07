@@ -180,7 +180,7 @@ const AdminDashboard = () => {
             height={320}
             width="100%"
             containerId="custom-donut-chart"
-            innerLable={studentData.trafficChart.innerLable}
+            innerTextOfDonut={"Total Students"}
           />
           <BarChart
             label="Student Weekly Attendance"
@@ -199,7 +199,7 @@ const AdminDashboard = () => {
             height={320}
             width="100%"
             containerId="custom-donut-chart2"
-            innerLable={teacherData.trafficChart.innerLable}
+            innerTextOfDonut={"Total Teachers"}
           />
           <BarChart
             label="Teacher Weekly Attendance"
@@ -218,7 +218,7 @@ const AdminDashboard = () => {
             height={320}
             width="100%"
             containerId="custom-donut-chart3"
-            innerLable={staffData.trafficChart.innerLable}
+            innerTextOfDonut={"Total Staff"}
           />
           <BarChart
             label="Staff Weekly Attendance"
