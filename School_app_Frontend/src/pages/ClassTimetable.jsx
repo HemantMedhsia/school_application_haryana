@@ -1,16 +1,21 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import DynamicFilterBar from "../common/FilterBar/DynamicFilterBar";
 import { LuTimer } from "react-icons/lu";
 import { MdSubject } from "react-icons/md";
 import { getAPI } from "../utility/api/apiCall";
 import { GiTeacher } from "react-icons/gi";
 import axios from "axios";
+import { useReactToPrint } from "react-to-print";
+import FormButton from "../components/Form/FormButton";
 
 const ClassTimetable = () => {
   const [classes, setClasses] = useState([]);
   const [selectedClass, setSelectedClass] = useState("");
   const [timetable, setTimetable] = useState(null);
   const [showTable, setShowTable] = useState(false);
+  const printRef = useRef();
+
+  const handlePrint = useReactToPrint({ contentRef: printRef });
 
   useEffect(() => {
     const fetchClasses = async () => {
@@ -95,7 +100,15 @@ const ClassTimetable = () => {
   return (
     <>
       {/* Filter Bar */}
-      <DynamicFilterBar filters={filterConfig} onSubmit={handleFilterSubmit} />
+      <div className="flex items-center justify-between gap-6 flex-wrap bg-[#283046] rounded-lg shadow-md">
+        <DynamicFilterBar
+          filters={filterConfig}
+          onSubmit={handleFilterSubmit}
+        />
+        <div className="flex items-center mr-4 justify-center">
+          <FormButton name="Print" onClick={handlePrint} />
+        </div>
+      </div>
 
       {/* Timetable Section */}
       <div className="mt-6">
@@ -157,6 +170,59 @@ const ClassTimetable = () => {
               : "Please select a class to view the timetable."}
           </p>
         )}
+
+        <div ref={printRef} className="no-prin">
+          <div>
+            <table className="min-w-full table-auto border-collapse border border-gray-500">
+              <thead className="bg-gray-200">
+                <tr>
+                  <th className="px-4 py-2 border border-gray-500 text-center text-xl font-bold"></th>
+                  {daysOfWeek.map((day, index) => (
+                    <th
+                      key={index}
+                      className="px-4 py-2 border border-gray-500 text-gray-700 text-xl font-bold text-center"
+                    >
+                      {day}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {/* Generate table rows without time slots, each subject in a block */}
+                {timetable &&
+                  timetable[daysOfWeek[0]]?.map((_, rowIndex) => (
+                    <tr key={rowIndex} className="bg-white">
+                      <td className="px-4 py-2 border border-gray-500 text-center font-bold text-gray-800">
+                        Period {rowIndex + 1}
+                      </td>
+                      {daysOfWeek.map((day) => (
+                        <td
+                          key={day}
+                          className="border border-gray-500 text-center"
+                        >
+                          {timetable[day]?.[rowIndex] ? (
+                            <div className="p-4 text-gray-900 bg-gray-100">
+                              <p className="font-bold my-2">
+                                {timetable[day][rowIndex].subject}
+                              </p>
+                              <p className="text-sm text-gray-600">
+                                {timetable[day][rowIndex].teacher}
+                              </p>
+                              <p className="text-md font-semibold my-2">
+                              {formatTime(timetable[day][rowIndex].time)}
+                            </p>
+                            </div>
+                          ) : (
+                            <p className="text-gray-500">No class</p>
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </>
   );
