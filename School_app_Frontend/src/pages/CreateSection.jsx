@@ -12,6 +12,7 @@ const CreateSection = () => {
   const [sections, setSections] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [editingIndex, setEditingIndex] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchSections();
@@ -53,14 +54,17 @@ const CreateSection = () => {
       toast.warning("Section name is empty");
     }
   };
-  
+
   const fetchSections = async () => {
+    setLoading(true);
     try {
       const response = await getAPI("getAllSections", {}, setSections);
       setSections(response.data);
     } catch (error) {
       console.error("Error fetching sections", error);
       toast.error("Error fetching sections");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -111,30 +115,39 @@ const CreateSection = () => {
           <h2 className="text-2xl font-semibold text-[#7367F0] mb-6">
             Sections
           </h2>
-          <ul className="flex flex-col w-[25%] ">
-            {sections.map((section, index) => (
-              <li
-                key={section._id}
-                className="mb-4 py-2 px-3.5 text-[#65FA9E] flex justify-between bg-gray-900 border border-[#65FA9E] w-auto rounded-3xl "
-              >
-                {section.name}
-                <div>
-                <button
-                  className="ml-4  text-blue-500"
-                  onClick={() => handleEditSection(index)}
+          {loading ? (
+            // Display the loader when loading is true
+            <div className="flex justify-center items-center">
+              <div className="loader-wrapper">
+                <span className="loader"></span>
+              </div>
+            </div>
+          ) : (
+            <ul className="flex flex-col w-[25%] ">
+              {sections.map((section, index) => (
+                <li
+                  key={section._id}
+                  className="mb-4 py-2 px-3.5 text-[#65FA9E] flex justify-between bg-gray-900 border border-[#65FA9E] w-auto rounded-3xl "
                 >
-                  <FaEdit />
-                </button>
-                <button
-                  className="ml-2 text-red-700"
-                  onClick={() => handleDeleteSection(index)}
-                >
-                  <FaTrash />
-                </button>
-                </div>
-              </li>
-            ))}
-          </ul>
+                  {section.name}
+                  <div>
+                    <button
+                      className="ml-4  text-blue-500"
+                      onClick={() => handleEditSection(index)}
+                    >
+                      <FaEdit />
+                    </button>
+                    <button
+                      className="ml-2 text-red-700"
+                      onClick={() => handleDeleteSection(index)}
+                    >
+                      <FaTrash />
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
       <ToastContainer

@@ -61,6 +61,7 @@ const Attendence = () => {
   const [selectedClass, setSelectedClass] = useState(null);
   const [searchText, setSearchText] = useState("");
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const fetchDropdownData = async () => {
     try {
@@ -179,6 +180,7 @@ const Attendence = () => {
   };
 
   const fetchData = async (filters = {}) => {
+    setLoading(true);
     try {
       const params = {
         ...filters,
@@ -226,6 +228,8 @@ const Attendence = () => {
                 attendancePercentage: 0, // Default in case of error
                 grade: "A", // Example grade
               };
+            } finally {
+              setLoading(false);
             }
           })
         );
@@ -244,8 +248,8 @@ const Attendence = () => {
   };
 
   const handleView = async (item) => {
-  console.log("Viewing student attendance:", item);
-   navigate(`/school/student-attendance-view/${item._id}`);
+    console.log("Viewing student attendance:", item);
+    navigate(`/school/student-attendance-view/${item._id}`);
   };
 
   useEffect(() => {
@@ -260,16 +264,22 @@ const Attendence = () => {
         onFilter={handleFilter}
         onSearch={handleSearch}
       />
-      <Datatable
-        columns={columns}
-        data={filteredStudentData} // Use filtered data here
-        actions={{
-          onView: (item) => handleView(item),
-          onPresent: (item) => handleAttendance(item, "Present"),
-          onAbsent: (item) => handleAttendance(item, "Absent"),
-        }}
-        attendanceStatus={attendanceStatus}
-      />
+      {loading ? (
+        <div className="loader-wrapper">
+          <span className="loader"></span>
+        </div>
+      ) : (
+        <Datatable
+          columns={columns}
+          data={filteredStudentData} // Use filtered data here
+          actions={{
+            onView: (item) => handleView(item),
+            onPresent: (item) => handleAttendance(item, "Present"),
+            onAbsent: (item) => handleAttendance(item, "Absent"),
+          }}
+          attendanceStatus={attendanceStatus}
+        />
+      )}
       <div className="flex justify-end">
         <button
           onClick={handleSave}
@@ -278,7 +288,7 @@ const Attendence = () => {
           Save
         </button>
       </div>
-      <DarkModeToggle/>
+      <DarkModeToggle />
       <ToastContainer />
     </div>
   );

@@ -150,7 +150,9 @@ const Profile = () => {
           </div>
         </>
       ) : (
-        <span class="loader"></span>
+        <div className="loader-wrapper">
+          <span className="loader"></span>
+        </div>
       )}
     </div>
   );

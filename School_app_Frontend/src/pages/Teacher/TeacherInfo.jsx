@@ -23,13 +23,17 @@ const TeacherInfo = () => {
   const [searchText, setSearchText] = useState(""); // For search input
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [teacherToDelete, setTeacherToDelete] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const fetchData = async () => {
+    setLoading(true);
     try {
       const response = await getAPI("getAllTeachers", {}, setAllTeacherData);
       setFilteredTeacherData(response.data); // Initialize filtered data
     } catch (error) {
       console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -39,9 +43,10 @@ const TeacherInfo = () => {
 
   useEffect(() => {
     // Filter the teacher data based on the search text
-    const filteredData = allTeacherData.filter((teacher) =>
-      teacher.name.toLowerCase().includes(searchText.toLowerCase()) ||
-      teacher.subject.toLowerCase().includes(searchText.toLowerCase()) // Add more fields as needed
+    const filteredData = allTeacherData.filter(
+      (teacher) =>
+        teacher.name.toLowerCase().includes(searchText.toLowerCase()) ||
+        teacher.subject.toLowerCase().includes(searchText.toLowerCase()) // Add more fields as needed
     );
     setFilteredTeacherData(filteredData);
   }, [searchText, allTeacherData]);
@@ -83,16 +88,22 @@ const TeacherInfo = () => {
   return (
     <div>
       <ToastContainer />
-      <TeacherSearchBar searchText={searchText} setSearchText={setSearchText} /> 
-      <Datatable
-        columns={columns}
-        data={filteredTeacherData} // Pass filtered data to Datatable
-        actions={{
-          onView: handleView,
-          onEdit: handleEdit,
-          onDelete: openModal,
-        }}
-      />
+      <TeacherSearchBar searchText={searchText} setSearchText={setSearchText} />
+      {loading ? (
+        <div className="loader-wrapper">
+          <span className="loader"></span>
+        </div>
+      ) : (
+        <Datatable
+          columns={columns}
+          data={filteredTeacherData} // Pass filtered data to Datatable
+          actions={{
+            onView: handleView,
+            onEdit: handleEdit,
+            onDelete: openModal,
+          }}
+        />
+      )}
       <ConfirmationModal
         isOpen={isModalOpen}
         onClose={closeModal}
