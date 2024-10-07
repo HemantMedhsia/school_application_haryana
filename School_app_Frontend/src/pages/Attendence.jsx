@@ -6,7 +6,6 @@ import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import { Navigate, useNavigate } from "react-router-dom";
-import DarkModeToggle from "../common/DarkModeToggle/DarkModeToggle";
 
 const columns = [
   { header: "First Name", accessor: "firstName" },
@@ -288,7 +287,6 @@ const Attendence = () => {
           Save
         </button>
       </div>
-      <DarkModeToggle />
       <ToastContainer />
     </div>
   );

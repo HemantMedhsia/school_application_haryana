@@ -17,14 +17,18 @@ const ExamGroup = () => {
   const [totalMarks, setTotalMarks] = useState("");
   const [passingMarks, setPassingMarks] = useState("");
   const [examCategories, setExamCategories] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const fetchExamCategories = async () => {
+    setLoading(true);
     await getAPI("getAllExamCategories", {}, setExamCategories);
+    setLoading(false);
   };
 
   const fetchExamTypes = async () => {
+    setLoading(true);
     await getAPI("getAllExamTypes", {}, setExamGroups);
-    // console.log("Exam Types", examGroups);
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -128,6 +132,14 @@ const ExamGroup = () => {
       toast.error("Failed to delete exam type.");
     }
   };
+
+  if (loading) {
+    return (
+      <div className="loader-wrapper">
+        <span className="loader"></span>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col md:flex-row md:space-y-0">

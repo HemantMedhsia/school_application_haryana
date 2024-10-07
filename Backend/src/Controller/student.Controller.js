@@ -9,6 +9,7 @@ import wrapAsync from "../Utils/wrapAsync.js";
 import { studentValidationSchema } from "../Validation/student.Validation.js";
 import { StudentHistory } from "../Models/studentHistory.Model.js";
 import jwt from "jsonwebtoken";
+import { StudentAttendance } from "../Models/studentAttendence.Model.js";
 
 const generateAccessAndRefreshTokens = async (studentId, next) => {
     const student = await Student.findById(studentId);
@@ -310,3 +311,71 @@ export const getStudentAttendanceDataByParentId = wrapAsync(
         return res.status(200).json(new ApiResponse(200, attendanceStats));
     }
 );
+
+export const getAttendanceAndStudentCount = wrapAsync(async (req, res) => {
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(endDate.getDate() - 7);
+
+    const attendanceRecords = await StudentAttendance.find({
+        date: {
+            $gte: startDate,
+            $lte: endDate,
+        },
+    }).populate({
+        path: "studentId",
+        select: "gender", // Select only gender field
+    });
+
+    const maleAttendance = Array(7).fill(0);
+    const femaleAttendance = Array(7).fill(0);
+
+    attendanceRecords.forEach((record) => {
+        const dayOfWeek = record.date.getDay();
+        if (record.status === "Present") {
+            if (record.studentId.gender === "Male") {
+                maleAttendance[dayOfWeek]++;
+            } else if (record.studentId.gender === "Female") {
+                femaleAttendance[dayOfWeek]++;
+            }
+        }
+    });
+
+    const barChartData = [
+        {
+            name: "Male",
+            data: maleAttendance,
+        },
+        {
+            name: "Female",
+            data: femaleAttendance,
+        },
+    ];
+
+    const totalCounts = await Student.aggregate([
+        {
+            $group: {
+                _id: "$gender",
+                count: { $sum: 1 },
+            },
+        },
+    ]);
+
+    const totalStudents = totalCounts.reduce(
+        (acc, curr) => acc + curr.count,
+        0
+    );
+    const totalMaleStudents =
+        totalCounts.find((g) => g._id === "Male")?.count || 0;
+    const totalFemaleStudents =
+        totalCounts.find((g) => g._id === "Female")?.count || 0;
+
+    const response = {
+        attendanceData: barChartData,
+        totalStudents,
+        totalMaleStudents,
+        totalFemaleStudents,
+    };
+
+    return res.status(200).json(new ApiResponse(200, response));
+});

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import "react-toastify/dist/ReactToastify.css";
 import FormSection from "../../components/Form/FormSection";
 import Input from "../../components/Form/Input";
 import FormButton from "../../components/Form/FormButton";
@@ -11,6 +11,7 @@ const ExamGroup = () => {
   const [examGroupName, setExamGroupName] = useState("");
   const [examGroups, setExamGroups] = useState([]);
   const [editingGroupId, setEditingGroupId] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handleSave = async () => {
     if (examGroupName.trim()) {
@@ -41,7 +42,9 @@ const ExamGroup = () => {
     if (editingGroupId && examGroupName.trim()) {
       try {
         const response = await axios.put(
-          `${import.meta.env.VITE_BACKEND_URL}/api/update-examgroup/${editingGroupId}`,
+          `${
+            import.meta.env.VITE_BACKEND_URL
+          }/api/update-examgroup/${editingGroupId}`,
           { name: examGroupName }
         );
         if (response.status === 200) {
@@ -76,6 +79,7 @@ const ExamGroup = () => {
 
   useEffect(() => {
     const fetchExamGroups = async () => {
+      setLoading(true);
       try {
         const response = await axios.get(
           `${import.meta.env.VITE_BACKEND_URL}/api/get-examgroup`
@@ -83,6 +87,8 @@ const ExamGroup = () => {
         setExamGroups(response.data.data);
       } catch (error) {
         toast.error("Error fetching exam groups.");
+      } finally {
+        setLoading(false);
       }
     };
     fetchExamGroups();
@@ -93,6 +99,14 @@ const ExamGroup = () => {
     setExamGroupName(group.name);
     setEditingGroupId(id);
   };
+
+  if (loading) {
+    return (
+      <div className="loader-wrapper">
+        <span className="loader"></span>
+      </div>
+    );
+  }
 
   return (
     <div className="flex">

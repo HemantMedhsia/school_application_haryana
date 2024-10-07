@@ -43,38 +43,56 @@ const StudentDashboard = () => {
   const [studentAttendanceInfo, setStudentAttendanceInfo] = useState([]);
   const [studentComplaints, setStudentComplaints] = useState([]);
   const { userRole } = useAuth();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchNotices = async () => {
-      await getAPI("getAllNotices", {}, setNotices);
-      if (userRole === "Student") {
-        await getAPI("getStudentAttendanceInfo", {}, setStudentAttendanceInfo);
-      } else if (userRole === "Parent") {
-        await getAPI(
-          "getStudentAttendanceInfoByParent",
-          {},
-          setStudentAttendanceInfo
-        );
-      }
+    const fetchData = async () => {
+      try {
+        // Fetch notices
+        await getAPI("getAllNotices", {}, setNotices);
 
-      if (userRole === "Student") {
-        const res = await getAPI(
-          "getComplaintsByStudent",
-          {},
-          setStudentComplaints
-        );
-      } else if (userRole === "Parent") {
-        const res = await getAPI(
-          "getComplaintsByStudentByParent",
-          {},
-          setStudentComplaints
-        );
-      }
+        // Fetch attendance info based on user role
+        if (userRole === "Student") {
+          await getAPI(
+            "getStudentAttendanceInfo",
+            {},
+            setStudentAttendanceInfo
+          );
+        } else if (userRole === "Parent") {
+          await getAPI(
+            "getStudentAttendanceInfoByParent",
+            {},
+            setStudentAttendanceInfo
+          );
+        }
 
-      console.log(studentComplaints);
+        // Fetch complaints based on user role
+        if (userRole === "Student") {
+          await getAPI("getComplaintsByStudent", {}, setStudentComplaints);
+        } else if (userRole === "Parent") {
+          await getAPI(
+            "getComplaintsByStudentByParent",
+            {},
+            setStudentComplaints
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false); // Set loading to false only after all data is fetched
+      }
     };
-    fetchNotices();
+
+    fetchData();
   }, [userRole]);
+
+  if (loading) {
+    return (
+      <div className="loader-wrapper">
+        <span className="loader"></span>
+      </div>
+    );
+  }
 
   return (
     <div className="flex justify-between w-full gap-6">

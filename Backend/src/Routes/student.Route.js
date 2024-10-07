@@ -2,6 +2,7 @@ import express from "express";
 import {
     createStudent,
     deleteStudent,
+    getAttendanceAndStudentCount,
     getStudent,
     getStudentAttendanceData,
     getStudentAttendanceDataByParentId,
@@ -40,5 +41,7 @@ router.get(
     authenticateToken,
     getStudentAttendanceDataByParentId
 );
+
+router.get("/student/weekly/attendance", getAttendanceAndStudentCount);
 
 export { router as studentRoute };
