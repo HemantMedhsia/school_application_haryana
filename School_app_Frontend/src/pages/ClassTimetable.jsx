@@ -7,12 +7,14 @@ import { GiTeacher } from "react-icons/gi";
 import axios from "axios";
 import { useReactToPrint } from "react-to-print";
 import FormButton from "../components/Form/FormButton";
+import TimeTablePrintClasswise from "./Print/TimeTablePrintClasswise";
 
 const ClassTimetable = () => {
   const [classes, setClasses] = useState([]);
   const [selectedClass, setSelectedClass] = useState("");
   const [timetable, setTimetable] = useState(null);
   const [showTable, setShowTable] = useState(false);
+  const [className, setClassName] = useState("");
   const printRef = useRef();
 
   const handlePrint = useReactToPrint({ contentRef: printRef });
@@ -27,10 +29,23 @@ const ClassTimetable = () => {
     };
 
     fetchClasses();
+    
   }, []);
+
+  const fetchClassByClassid = async (classId) => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/single-class/${classId}`
+      );
+      setClassName(response.data.data.name);
+    } catch (error) {
+      console.error("Error fetching timetable:", error);
+    }
+  };
 
   const handleClassChange = (selectedClass) => {
     setSelectedClass(selectedClass);
+    fetchClassByClassid(selectedClass);
     setShowTable(false);
   };
 
@@ -171,57 +186,12 @@ const ClassTimetable = () => {
           </p>
         )}
 
-        <div ref={printRef} className="no-prin">
-          <div>
-            <table className="min-w-full table-auto border-collapse border border-gray-500">
-              <thead className="bg-gray-200">
-                <tr>
-                  <th className="px-4 py-2 border border-gray-500 text-center text-xl font-bold"></th>
-                  {daysOfWeek.map((day, index) => (
-                    <th
-                      key={index}
-                      className="px-4 py-2 border border-gray-500 text-gray-700 text-xl font-bold text-center"
-                    >
-                      {day}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {/* Generate table rows without time slots, each subject in a block */}
-                {timetable &&
-                  timetable[daysOfWeek[0]]?.map((_, rowIndex) => (
-                    <tr key={rowIndex} className="bg-white">
-                      <td className="px-4 py-2 border border-gray-500 text-center font-bold text-gray-800">
-                        Period {rowIndex + 1}
-                      </td>
-                      {daysOfWeek.map((day) => (
-                        <td
-                          key={day}
-                          className="border border-gray-500 text-center"
-                        >
-                          {timetable[day]?.[rowIndex] ? (
-                            <div className="p-4 text-gray-900 bg-gray-100">
-                              <p className="font-bold my-2">
-                                {timetable[day][rowIndex].subject}
-                              </p>
-                              <p className="text-sm text-gray-600">
-                                {timetable[day][rowIndex].teacher}
-                              </p>
-                              <p className="text-md font-semibold my-2">
-                              {formatTime(timetable[day][rowIndex].time)}
-                            </p>
-                            </div>
-                          ) : (
-                            <p className="text-gray-500">No class</p>
-                          )}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
-          </div>
+        <div ref={printRef} className="no-print">
+          <TimeTablePrintClasswise
+            timetable={timetable}
+            daysOfWeek={daysOfWeek}
+            className={className}
+          />
         </div>
       </div>
     </>
