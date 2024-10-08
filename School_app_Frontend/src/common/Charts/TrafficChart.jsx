@@ -9,7 +9,7 @@ const TrafficChart = ({
   height = "300px", // Default height for better mobile visibility
   width = "100%", // Full width for responsive design
   containerId = "donut-chart",
-  innerLabel = "Unique visitors",
+  innerTextOfDonut = "Traffic Sources",
 }) => {
   const adjustedColors = Array(series.length).fill().map((_, i) => colors[i % colors.length]);
 
@@ -72,7 +72,7 @@ const TrafficChart = ({
             total: {
               showAlways: true,
               show: true,
-              label: innerLabel,
+              label: innerTextOfDonut,
               fontFamily: "Inter, sans-serif",
               color: "white",
               formatter: function (w) {

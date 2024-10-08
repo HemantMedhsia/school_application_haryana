@@ -12,6 +12,7 @@ import {
     getStudentTimetabledayWiseByParentId,
     getTeacherTimetable,
     getTeacherTimetableById,
+    getTeacherTimetabledayWise,
     updateClassTimeTable,
 } from "../Controller/classTimeTable.Controller.js";
 import { authenticateToken } from "../Middlewares/authenticateToken.js";
@@ -42,6 +43,12 @@ router.get(
     "/get-student-timetable-daywise-by-parent",
     authenticateToken,
     getStudentTimetabledayWiseByParentId
+);
+
+router.get(
+    "/get-teacher-timetable-daywise",
+    authenticateToken,
+    getTeacherTimetabledayWise
 );
 
 export { router as classTimeTableRoute };

@@ -827,3 +827,85 @@ export const getStudentTimetabledayWiseByParentId = wrapAsync(
         );
     }
 );
+
+export const getTeacherTimetabledayWise = wrapAsync(async (req, res) => {
+    const teacherId = new mongoose.Types.ObjectId(req.user?.id);
+    const { dayOfWeek } = req.query;
+
+    const timetable = await Timetable.aggregate([
+        { $unwind: "$entries" },
+        { $match: { "entries.teacherId": teacherId, dayOfWeek } },
+        {
+            $lookup: {
+                from: "classes",
+                localField: "classId",
+                foreignField: "_id",
+                as: "classDetails",
+            },
+        },
+        { $unwind: "$classDetails" },
+        {
+            $lookup: {
+                from: "teachers",
+                localField: "entries.teacherId",
+                foreignField: "_id",
+                as: "teacherDetails",
+            },
+        },
+        { $unwind: "$teacherDetails" },
+        {
+            $lookup: {
+                from: "subjects",
+                localField: "entries.subjectId",
+                foreignField: "_id",
+                as: "subjectDetails",
+            },
+        },
+        { $unwind: "$subjectDetails" },
+        {
+            $project: {
+                dayOfWeek: 1,
+                "entries.period": 1,
+                "entries.startTime": 1,
+                "entries.endTime": 1,
+                "subjectDetails.name": 1,
+                "teacherDetails.name": 1,
+                "classDetails.name": 1,
+            },
+        },
+        {
+            $group: {
+                _id: "$dayOfWeek",
+                periods: {
+                    $push: {
+                        period: "$entries.period",
+                        subject: "$subjectDetails.name",
+                        startTime: "$entries.startTime",
+                        endTime: "$entries.endTime",
+                        className: "$classDetails.name",
+                    },
+                },
+            },
+        },
+    ]);
+
+    if (!timetable || timetable.length === 0) {
+        return res
+            .status(404)
+            .json(
+                new ApiResponse(
+                    404,
+                    null,
+                    "No timetable found for this teacher"
+                )
+            );
+    }
+
+    res.status(200).json(
+        new ApiResponse(
+            200,
+            timetable,
+            "Teacher's Timetable fetched successfully"
+        )
+    );
+});

@@ -22,6 +22,10 @@ const StudentTimeTable = () => {
       endpoint = `${
         import.meta.env.VITE_BACKEND_URL
       }/api/get-student-timetable-daywise-by-parent?dayOfWeek=${day}`;
+    } else if (userRole === "Teacher") {
+      endpoint = `${
+        import.meta.env.VITE_BACKEND_URL
+      }/api/get-teacher-timetable-daywise?dayOfWeek=${day}`;
     }
 
     try {
@@ -70,7 +74,7 @@ const StudentTimeTable = () => {
   return (
     <div className="w-full mx-auto p-6 shadow-md rounded-md bg-gray-900 text-gray-100">
       <h1 className="text-2xl font-bold text-center text-[#7367F0] mb-6">
-        Student Timetable
+        Timetable
       </h1>
       <div className="grid grid-cols-1 gap-4">
         {daysOfWeek.map((day) => (
