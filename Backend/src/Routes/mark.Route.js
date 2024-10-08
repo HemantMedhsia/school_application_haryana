@@ -4,6 +4,7 @@ import {
     addMultipleStudentMarks,
     deleteMarks,
     getAllMarks,
+    getClassResults,
     getExistingMarks,
     getMarkById,
     getMarksByAllIds,
@@ -39,5 +40,7 @@ router.get(
     "/get-allid/:termId/:classId/:examTypeId/:subjectId",
     getMarksByAllIds
 );
+
+router.post("/print-result-byclass", getClassResults);
 
 export { router as markRoute };
