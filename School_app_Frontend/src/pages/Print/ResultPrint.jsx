@@ -1,51 +1,65 @@
 import React from "react";
+import logo from "../../assets/logo.png";
+import { dateFnsLocalizer } from "react-big-calendar";
 
 const ResultPrint = () => {
   // Hard-coded data (replace with your API response data)
   const data = {
+    commonData: {
+      schoolName: "Vardhan International School",
+      address:
+        "Plot No. 30, Nibiya Lathiya, Bypass, Varanasi, Uttar Pradesh 221011",
+      affiliation: "Affiliated to CBSE(10+2), New Delhi",
+      website: "http://www.imperialpublicschool.com",
+      email: "ips.vns@yahoo.co.in",
+      logo: "/path/to/your/logo.png",
+      secondLogo: "/path/to/your/second_logo.png",
+      session: "2023-24",
+    },
     studentProfile: {
-      name: "AMISH SRIVASTAVA",
-      fatherName: "JYOTI PRAKASH SRIVASTAVA",
-      motherName: "SMRITI SRIVASTAVA",
-      admNo: "20170009",
-      class: "XI",
-      section: "(SCIENCE)",
-      dob: "05-Jan-2008",
-      rollNo: "10",
+      Name: "AMISH SRIVASTAVA",
+      FatherName: "JYOTI PRAKASH SRIVASTAVA",
+      MotherName: "SMRITI SRIVASTAVA",
+      AdmissionNo: "20170009",
+      Class: "XI",
+      Section: "A (SCIENCE)",
+      Dob: "05-Jan-2008",
+      RollNo: "10",
+      profilePicture: "/path/to/student/profile/picture.jpg",
     },
     subjects: [
       {
         name: "English Core",
-        term1: { unitTest: 8, internal: 57, halfYearly: 73 },
-        term2: { unitTest: 9, internal: 55, annual: 71 },
+        term1: { unitTest: 8, internal: 57, halfYearly: 73, total: 138 },
+        term2: { unitTest: 9, internal: 55, annual: 71, total: 135 },
         overallTotal: 318,
         grade: "A2",
       },
       {
         name: "Physics",
-        term1: { unitTest: 7, internal: 17, halfYearly: 27 },
-        term2: { unitTest: 3, internal: 39, annual: 50 },
+        term1: { unitTest: 7, internal: 17, halfYearly: 27, total: 51 },
+        term2: { unitTest: 3, internal: 39, annual: 50, total: 92 },
         overallTotal: 143,
         grade: "C2",
       },
       {
         name: "Chemistry",
-        term1: { unitTest: 3, internal: 26, halfYearly: 38 },
-        term2: { unitTest: 3, internal: 34, annual: 46 },
+        term1: { unitTest: 3, internal: 26, halfYearly: 38, total: 67 },
+        term2: { unitTest: 3, internal: 34, annual: 46, total: 83 },
         overallTotal: 148,
         grade: "C2",
       },
       {
         name: "Maths",
-        term1: { unitTest: 5, internal: 27, halfYearly: 37 },
-        term2: { unitTest: 8, internal: 35, annual: 48 },
+        term1: { unitTest: 5, internal: 27, halfYearly: 37, total: 69 },
+        term2: { unitTest: 8, internal: 35, annual: 48, total: 91 },
         overallTotal: 160,
         grade: "C1",
       },
       {
         name: "Computer",
-        term1: { unitTest: 10, internal: 35, halfYearly: 75 },
-        term2: { unitTest: 9, internal: 50, annual: 69 },
+        term1: { unitTest: 10, internal: 35, halfYearly: 75, total: 120 },
+        term2: { unitTest: 9, internal: 50, annual: 69, total: 128 },
         overallTotal: 248,
         grade: "B1",
       },
@@ -62,103 +76,230 @@ const ResultPrint = () => {
   };
 
   return (
-    <div className="p-8 text-sm bg-white text-black">
+    <div className="relative p-8 text-sm bg-indigo-100 text-black overflow-auto">
+      <div className="absolute  top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-20 z-10">
+        {/* Watermark container with absolute positioning */}
+        <img
+          src={logo} // Update this path to your watermark logo's actual location
+          alt="Watermark"
+          className="w-[1000px] h-auto" // Adjust size as needed
+        />
+      </div>
+
       {/* School Header */}
-      <div className="text-center font-bold text-lg mb-6">
-        <p className="text-xl">IMPERIAL PUBLIC SCHOOL, ASSI, VARANASI</p>
-        <p className="text-sm font-medium">
-          Affiliated to CBSE (10+2), New Delhi
-        </p>
-        <p className="text-sm">
-          Website: www.imperialpublicschool.com | Email: ips.vns@yahoo.co.in
-        </p>
-        <p className="mt-4 font-semibold text-lg">
-          REPORT CARD (SESSION: 2023-24)
-        </p>
-        <p className="mt-2">(Issued by School as per Directives of CBSE)</p>
+      <div className="flex justify-between items-center mb-4">
+        {/* Left Logo */}
+        <img
+          src={logo} // Update this path to your school logo's actual location
+          alt="School Logo"
+          className="w-52 h-52" // Adjust width and height as needed
+        />
+
+        <div className="text-center">
+          <h1 className="text-5xl font-extrabold text-black leading-tight">
+            {data.commonData.schoolName}
+          </h1>
+          <p className="text-lg mt-1  text-black">{data.commonData.address}</p>
+          <p className="text-lg  text-black">{data.commonData.affiliation}</p>
+          <p className="text-md mt-2 text-gray-700">
+            Website:{" "}
+            <a
+              href="http://www.imperialpublicschool.com"
+              className="underline text-blue-600"
+            >
+              {data.commonData.website}
+            </a>{" "}
+            | Email:{" "}
+            <a
+              href="mailto:ips.vns@yahoo.co.in"
+              className="underline text-blue-600"
+            >
+              {data.commonData.email}
+            </a>
+          </p>
+        </div>
+
+        {/* Right Logo */}
+        <img
+          src={logo} // Update this path to your school logo's actual location
+          alt="School Logo"
+          className="w-52 h-52" // Adjust width and height as needed
+        />
+      </div>
+
+      <div className="text-center">
+        <h2 className=" font-extrabold text-2xl text-red-500 leading-tight">
+          REPORT CARD (SESSION : 2023-24)
+        </h2>
       </div>
 
       {/* Student Profile */}
-      <div className="grid grid-cols-2 gap-4 mt-6 border p-6 rounded-lg shadow">
-        {Object.entries(data.studentProfile).map(([key, value]) => (
-          <div key={key}>
-            <strong>{key.replace(/([A-Z])/g, ' $1')}: </strong> {value}
+      <div className="border rounded-lg p-6 mt-6">
+        <div className="flex justify-between items-center mb-4">
+          <div className="flex-1">
+            <div className="grid grid-cols-2 gap-2 mt-4">
+              {Object.entries(data.studentProfile).map(
+                ([key, value]) =>
+                  key !== "profilePicture" && ( // Exclude profile picture key
+                    <div key={key} className="border-b border-black pb-2">
+                      <strong className="text-gray-900">
+                        {key.replace(/([A-Z])/g, " $1")}:{" "}
+                      </strong>
+                      <span className="text-gray-600 text-md font-semibold">
+                        {value}
+                      </span>
+                    </div>
+                  )
+              )}
+            </div>
           </div>
-        ))}
+          <img
+            src={
+              "https://www.bing.com/th?id=OIP.2qc6aY9hwuxfyxFTFf9GdAAAAA&w=150&h=178&c=8&rs=1&qlt=90&o=6&dpr=1.3&pid=3.1&rm=2"
+            } // Adjust the path based on your data structure
+            alt="Profile Picture"
+            className="w-40 h-44 rounded-md border-2 border-indigo-300 ml-4"
+          />
+        </div>
       </div>
 
       {/* Scholastic Area */}
-      <table className="table-auto w-full mt-6 border text-center text-sm shadow-md">
-        <thead className="bg-gray-300 text-sm">
+      <table className="table-auto w-full mt-6 border-black border-2  text-center text-sm shadow-md">
+        <thead className="bg-yellow-200 text-sm ">
           <tr>
-            <th rowSpan="2" className="border">Subject</th>
-            <th colSpan="3" className="border">Term-I</th>
-            <th colSpan="3" className="border">Term-II</th>
-            <th rowSpan="2" className="border">Overall Marks</th>
-            <th rowSpan="2" className="border">Grade</th>
+            <th rowSpan="2" className="border border-black ">
+              Subject
+            </th>
+            <th colSpan="4" className="border border-black">
+              Term-I
+            </th>
+            <th colSpan="4" className="border border-black">
+              Term-II
+            </th>
+            <th rowSpan="2" className="border border-black">
+              Overall Marks
+            </th>
           </tr>
           <tr>
-            <th className="border">Unit Test</th>
-            <th className="border">Internal</th>
-            <th className="border">Half Yearly</th>
-            <th className="border">Unit Test</th>
-            <th className="border">Internal</th>
-            <th className="border">Annual</th>
+            <th className="border border-black ">Unit Test</th>
+            <th className="border border-black">Internal</th>
+            <th className="border border-black">Half Yearly</th>
+            <th className="border border-black">Total</th>
+            <th className="border border-black">Unit Test</th>
+            <th className="border border-black">Internal</th>
+            <th className="border border-black">Annual</th>
+            <th className="border border-black">Total</th>
           </tr>
         </thead>
         <tbody>
           {data.subjects.map((subject, idx) => (
             <tr key={idx} className="border-t">
-              <td className="border">{subject.name}</td>
-              <td className="border">{subject.term1.unitTest}</td>
-              <td className="border">{subject.term1.internal}</td>
-              <td className="border">{subject.term1.halfYearly}</td>
-              <td className="border">{subject.term2.unitTest}</td>
-              <td className="border">{subject.term2.internal}</td>
-              <td className="border">{subject.term2.annual}</td>
-              <td className="border">{subject.overallTotal}</td>
-              <td className="border">{subject.grade}</td>
+              <td className="border border-black py-1">{subject.name}</td>
+              <td className="border border-black">{subject.term1.unitTest}</td>
+              <td className="border border-black">{subject.term1.internal}</td>
+              <td className="border border-black">
+                {subject.term1.halfYearly}
+              </td>
+              <td className="border border-black">{subject.term1.total}</td>
+              <td className="border border-black">{subject.term2.unitTest}</td>
+              <td className="border border-black">{subject.term2.internal}</td>
+              <td className="border border-black">{subject.term2.annual}</td>
+              <td className="border border-black">{subject.term2.total}</td>
+              <td className="border border-black">{subject.overallTotal}</td>
             </tr>
           ))}
         </tbody>
       </table>
 
       {/* Term-wise and Overall Summary */}
-      <div className="mt-6 p-6 border rounded-lg shadow">
-        <h3 className="font-bold text-lg text-center">Term-wise and Overall Summary</h3>
-        <table className="table-auto w-full text-center mt-4">
-          <thead className="bg-gray-300 text-sm">
+      <div className="mt-2 border rounded-lg shadow">
+        <h3 className="font-bold text-xl text-center">
+          Term-wise and Overall Summary
+        </h3>
+        <table className="table-auto w-full text-center border-black border-2 mt-4">
+          <thead className="bg-yellow-200 text-sm">
             <tr>
-              <th className="border">Subject</th>
-              <th className="border">Term-I Total (50%)</th>
-              <th className="border">Term-II Total (50%)</th>
-              <th className="border">Grand Total (100%)</th>
-              <th className="border">Grade</th>
+              <th className="border-2 border-black">Subject</th>
+              <th className="border-2 border-black">Term-I Total (50%)</th>
+              <th className="border-2 border-black">Term-II Total (50%)</th>
+              <th className="border-2 border-black">Grand Total (100%)</th>
+              <th className="border-2 border-black">Grade</th>
             </tr>
           </thead>
           <tbody>
             {data.subjects.map((subject, idx) => (
               <tr key={idx} className="border-t">
-                <td className="border">{subject.name}</td>
-                <td className="border">{(subject.term1.unitTest + subject.term1.internal + subject.term1.halfYearly) / 2}</td>
-                <td className="border">{(subject.term2.unitTest + subject.term2.internal + subject.term2.annual) / 2}</td>
-                <td className="border">{subject.overallTotal}</td>
-                <td className="border">{subject.grade}</td>
+                <td className="border border-black py-1">{subject.name}</td>
+                <td className="border border-black">
+                  {(subject.term1.unitTest +
+                    subject.term1.internal +
+                    subject.term1.halfYearly) /
+                    2}
+                </td>
+                <td className="border border-black">
+                  {(subject.term2.unitTest +
+                    subject.term2.internal +
+                    subject.term2.annual) /
+                    2}
+                </td>
+                <td className="border border-black">{subject.overallTotal}</td>
+                <td className="border border-black font-semibold text-green-700">{subject.grade}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      {/* Overall Performance Summary */}
-      <div className="mt-6 p-6 border rounded-lg shadow">
-        <h3 className="font-bold text-lg text-center">Overall Performance</h3>
-        <p className="text-center mt-4">
-          Overall Percentage: 60%
-        </p>
-        <p className="text-center mt-2">
-          Overall Grade: C1
-        </p>
+      <div className="mt-12 p-6 border-2 border-black">
+        <div className="flex justify-between mt-8">
+          {/* Class Teacher Signature */}
+          <div className="flex flex-col items-center">
+            <div className="w-48 border-b-2 border-gray-500 mb-2"></div>
+            <p className="text-sm font-semibold">Class Teacher's Signature</p>
+          </div>
+
+          {/* Teacher Signature */}
+          <div className="flex flex-col items-center">
+            <div className="w-48 border-b-2 border-gray-500 mb-2"></div>
+            <p className="text-sm font-semibold">Teacher's Signature</p>
+          </div>
+
+          {/* Principal Signature */}
+          <div className="flex flex-col items-center">
+            <div className="w-48 border-b-2 border-gray-500 mb-2"></div>
+            <p className="text-sm font-semibold">Principal's Signature</p>
+          </div>
+        </div>
+        <div className="flex justify-between border border-black px-2 mt-8">
+          {/* Class Teacher Signature */}
+          <div className="flex w-1/3 items-center justify-start border-black">
+            <p className="text-sm font-semibold">Attendence: </p>
+          </div>
+
+          <div className="border-r-2 border-black "></div>
+
+          {/* Teacher Signature */}
+          <div className="flex w-1/3 ml-2 justify-start items-center">
+            <p className="text-sm font-semibold">Rank: </p>
+          </div>
+
+          <div className="border-r-2 border-black "></div>
+
+          {/* Principal Signature */}
+          <div className="flex w-1/3 items-center justify-end">
+            <p className="text-sm font-semibold">Result: Passed / Promoted / E.R.</p>
+          </div>
+        </div>
+
+        {/* Date */}
+        <div className="flex justify-start mt-8">
+          <div className="flex flex-col items-center">
+            <p className="text-sm font-semibold">
+              {" "}
+              Date Of Issue: {new Date().toLocaleDateString()}
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Grade Scale */}

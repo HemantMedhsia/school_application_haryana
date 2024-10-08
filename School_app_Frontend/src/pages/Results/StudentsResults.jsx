@@ -3,6 +3,7 @@ import MultiRowValuesDatatable from "../../common/Datatables/MultiRowValuesDatat
 import DynamicFilterBar from "../../common/FilterBar/DynamicFilterBar";
 import { getAPI } from "../../utility/api/apiCall";
 import axios from "axios";
+import FormButton from "../../components/Form/FormButton";
 
 const StudentsResults = () => {
   const [tabledata, setTableData] = useState([]);
@@ -14,6 +15,11 @@ const StudentsResults = () => {
   const [selectedExamData, setSelectedExamData] = useState(null);
   const [selectedViewAllexamData, setSelectedViewAllexamData] = useState(null);
   const [isViewAllPopupOpen, setIsViewAllPopupOpen] = useState(false);
+  const [printResultPopup, setPrintResultPopup] = useState(false);
+  const [selectedTermId, setSelectedTermIds] = useState([]);
+  const [selectedStudents, setSelectedStudents] = useState([]);
+  const [students, setStudents] = useState([]);
+  const [selectedClassId, setSelectedClassId] = useState("");
 
   const fetchData = async () => {
     try {
@@ -130,8 +136,45 @@ const StudentsResults = () => {
 
   const handleFilterSubmit = (filterValues) => {
     const { term: termId, class: classId } = filterValues;
+    setSelectedClassId(classId);
     setTermId(termId);
     studentTableData(termId, classId);
+    console.log("term", term);
+  };
+
+  const handlePrintPopup = async () => {
+    console.log("classId", selectedClassId);
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/getallstudentsinfo/${selectedClassId}`
+      );
+      setStudents(response.data.data || []);
+      setSelectedStudents([]); // Clear previous selection
+    } catch (error) {
+      console.error("Error fetching students", error);
+    }
+    setPrintResultPopup(true);
+    // generatePDF();
+  };
+
+  const handleStudentCheckboxChange = (studentId) => {
+    console.log("studentId", studentId);
+    
+    setSelectedStudents((prevSelected) =>
+      prevSelected.includes(studentId)
+        ? prevSelected.filter((id) => id !== studentId)
+        : [...prevSelected, studentId]
+    );
+  };
+  const handleCheckboxChange = (e, termId) => {
+    if (e.target.checked) {
+      // Add the term ID to the selectedTermIds array
+      setSelectedTermIds((prev) => [...prev, termId]);
+      console.log("selectedTermIds", selectedTermId);
+    } else {
+      // Remove the term ID from the selectedTermIds array
+      setSelectedTermIds((prev) => prev.filter((id) => id !== termId));
+    }
   };
 
   const closePopup = () => {
@@ -141,7 +184,13 @@ const StudentsResults = () => {
 
   return (
     <div>
-      <DynamicFilterBar filters={filters} onSubmit={handleFilterSubmit} />
+      <div className="flex items-center justify-between gap-6 flex-wrap bg-[#283046] rounded-lg shadow-md">
+        <DynamicFilterBar filters={filters} onSubmit={handleFilterSubmit} />
+        <div className="flex items-center mr-4 justify-center">
+          <FormButton name="Print Results" onClick={handlePrintPopup} />
+        </div>
+      </div>
+
       <div className="mt-4">
         <MultiRowValuesDatatable data={tabledata} actions={actions} />
       </div>
@@ -505,6 +554,55 @@ const StudentsResults = () => {
                   ? "Your performance needs improvement. Consider reviewing the material and seeking help in areas where you're struggling."
                   : "Significant improvement is needed. Please revisit the material and work closely with your teachers to improve."}
               </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {printResultPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-4 rounded-lg">
+            <h2 className="text-xl font-bold mb-4">
+              Select Students For Printing Results
+            </h2>
+            <div className="flex justify-center">
+              {term.map((terms, index) => (
+                <div key={terms._id}>
+                  <input
+                    id={terms._id}
+                    type="checkbox"
+                    onChange={(e) => handleCheckboxChange(e, terms._id)}
+                  />
+                  <label htmlFor={terms._id}>{terms.name}</label>
+                </div>
+              ))}
+            </div>
+            <div className="flex flex-col">
+              {students.map((student) => (
+                <div key={student.id} className="flex items-center mb-2">
+                  <input
+                    type="checkbox"
+                    checked={selectedStudents.includes(student.id)}
+                    onChange={() => handleStudentCheckboxChange(student.id)}
+                    className="mr-2"
+                  />
+                  <label>{student.name}</label>
+                </div>
+              ))}
+            </div>
+            <div className="flex justify-end mt-4">
+              <button
+                className="bg-blue-500 text-white px-4 py-2 rounded-md mr-2"
+                onClick={handlePrintPopup}
+              >
+                Print
+              </button>
+              <button
+                className="bg-red-500 text-white px-4 py-2 rounded-md"
+                onClick={() => setPrintResultPopup(false)}
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>
