@@ -117,7 +117,10 @@ const StudentTimeTable = () => {
                       })}
                     </p>
                     <p className="text-gray-300">
-                      {period.subject} - {period.teacher}
+                      {period.subject} -{" "}
+                      {userRole === "Teacher"
+                        ? period.className
+                        : period.teacher}
                     </p>
                   </div>
                 </li>

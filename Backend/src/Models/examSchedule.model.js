@@ -5,21 +5,25 @@ const examScheduleSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Term",
         required: true,
+        index: true,
     },
     class: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Class",
         required: true,
+        index: true,
     },
     examType: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "ExamType",
         required: true,
+        index: true,
     },
     subjectGroup: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "SubjectGroup",
         required: true,
+        index: true,
     },
     examDetails: [
         {

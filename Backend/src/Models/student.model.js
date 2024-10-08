@@ -19,6 +19,7 @@ const studentSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Class",
         required: true,
+        index: true,
     },
     currentSection: {
         type: mongoose.Schema.Types.ObjectId,

@@ -341,49 +341,63 @@ export const getAdmitCards = wrapAsync(async (req, res) => {
         };
     }
 
-    const result = await Student.aggregate([
-        { $match: matchCondition },
-        {
-            $lookup: {
-                from: "examschedules",
-                let: { classId: "$currentClass" },
-                pipeline: [
-                    {
-                        $match: {
-                            examType: new mongoose.Types.ObjectId(examTypeId),
-                            term: new mongoose.Types.ObjectId(termId),
-                            class: new mongoose.Types.ObjectId(classId),
+    const [result, term, examType, subjectMap] = await Promise.all([
+        Student.aggregate([
+            { $match: matchCondition },
+            {
+                $lookup: {
+                    from: "examschedules",
+                    let: { classId: "$currentClass" },
+                    pipeline: [
+                        {
+                            $match: {
+                                examType: new mongoose.Types.ObjectId(
+                                    examTypeId
+                                ),
+                                term: new mongoose.Types.ObjectId(termId),
+                                class: new mongoose.Types.ObjectId(classId),
+                            },
                         },
-                    },
-                    { $project: { examDetails: 1 } },
-                ],
-                as: "examSchedule",
+                        { $project: { examDetails: 1 } },
+                    ],
+                    as: "examSchedule",
+                },
             },
-        },
-        { $unwind: "$examSchedule" },
-        {
-            $project: {
-                studentName: { $concat: ["$firstName", " ", "$lastName"] },
-                studentPhoto: 1,
-                rollNumber: 1,
-                className: "$currentClass.name",
-                examDetails: "$examSchedule.examDetails",
+            {
+                $lookup: {
+                    from: "classes",
+                    localField: "currentClass",
+                    foreignField: "_id",
+                    as: "classDetails",
+                },
             },
-        },
+            { $unwind: "$examSchedule" },
+            { $unwind: "$classDetails" },
+            {
+                $project: {
+                    studentName: { $concat: ["$firstName", " ", "$lastName"] },
+                    studentPhoto: 1,
+                    rollNumber: 1,
+                    className: "$classDetails.name",
+                    examDetails: "$examSchedule.examDetails",
+                },
+            },
+        ]),
+        Term.findById(termId).select("name").lean(),
+        ExamType.findById(examTypeId).select("name").lean(),
+        Subject.find({}).lean(),
     ]);
-
-    const term = await Term.findById(termId).select("name").lean();
-    const examType = await ExamType.findById(examTypeId).select("name").lean();
 
     if (result.length === 0) {
         return res.status(404).json({ message: "No data found" });
     }
 
-    const subjectMap = await Subject.find({}).lean();
     const subjectIdToName = subjectMap.reduce((acc, subject) => {
         acc[subject._id.toString()] = subject.name;
         return acc;
     }, {});
+
+    const className = result[0]?.className || "Unknown Class";
 
     const response = {
         commonInfo: {
@@ -391,6 +405,7 @@ export const getAdmitCards = wrapAsync(async (req, res) => {
             schoolLogo: "https://example.com/school-logo.png",
             term: term ? term.name : "Unknown Term",
             examType: examType ? examType.name : "Unknown Exam Type",
+            className: className,
             examDetails:
                 result.length > 0
                     ? result[0].examDetails.map((detail) => ({
@@ -407,7 +422,6 @@ export const getAdmitCards = wrapAsync(async (req, res) => {
             studentName: student.studentName,
             studentPhoto: student.studentPhoto,
             rollNumber: student.rollNumber,
-            className: student.className,
         })),
     };
 
