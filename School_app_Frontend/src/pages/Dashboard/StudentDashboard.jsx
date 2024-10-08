@@ -135,7 +135,7 @@ const StudentDashboard = () => {
         </div>
         <div className=" mt-4 bg-[#283046] p-8 rounded-md">
           <h1 className="text-[#7367F0] text-xl font-semibold my-8">
-            Student complaints
+           Complaints
           </h1>
           <ComplaintShowingBlock complaints={studentComplaints} />
         </div>
