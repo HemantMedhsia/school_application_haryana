@@ -50,6 +50,7 @@ import TeacherAttendance from "./pages/Teacher/TeacherAttendance.jsx";
 import StaffAttendance from "./pages/Staff/StaffAttendance.jsx";
 import StudentAdmitCard from "./pages/Print/StudentAdmitCard.jsx";
 import AdmitCardPrint from "./pages/Print/AdmitCardPrint.jsx";
+import ResultPrint from "./pages/Print/ResultPrint.jsx";
 
 const App = () => {
   const { userRole, authToken } = useAuth();
@@ -205,6 +206,7 @@ const App = () => {
             }
           />
           <Route path="/school/print" element={<AdmitCardPrint students={data.students} commonInfo={data.commonInfo}/>} />
+          <Route path="/school/resultp" element={<ResultPrint/>} />
         </Route>
       </>
     )
