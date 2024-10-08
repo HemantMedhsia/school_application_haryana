@@ -1,14 +1,10 @@
-import React, { forwardRef } from "react";
-import logo from '../../assets/logo.png';
-
+import logo from "../../assets/logo.png";
 
 const StudentAdmitCard = ({ student, commonInfo }) => {
-  const { schoolName, schoolLogo, term, examType, examDetails } = commonInfo;
-
+  const { schoolName, schoolLogo, term, examType, examDetails, classNamex: className } =
+    commonInfo;
   return (
-    <div
-      className="max-w-3xl mx-auto p-8 border border-gray-300 shadow-xl bg-white mb-12"
-    >
+    <div className="max-w-3xl mx-auto p-8 border border-gray-300 shadow-xl bg-white mb-12">
       {/* School Header */}
       <div className="text-center mb-6">
         <div className="flex justify-start gap-10 items-center mb-4">
@@ -22,7 +18,8 @@ const StudentAdmitCard = ({ student, commonInfo }) => {
               {schoolName || "Vardhan International School"}
             </h1>
             <p className="text-sm text-gray-600">
-              Plot No. 30, Nibiya Lathiya, Bypass, Varanasi, Uttar Pradesh 221011
+              Plot No. 30, Nibiya Lathiya, Bypass, Varanasi, Uttar Pradesh
+              221011
             </p>
             <p className="text-sm text-gray-600">Phone: 123-456-7890</p>
           </div>
@@ -46,6 +43,9 @@ const StudentAdmitCard = ({ student, commonInfo }) => {
           <p className="text-lg text-gray-700">
             <span className="font-semibold">Roll No:</span> {student.rollNumber}
           </p>
+          <p className="text-lg text-gray-700">
+            <span className="font-semibold">Class:</span> {classNamex}
+          </p>
         </div>
 
         {/* Right: Student Photo */}
@@ -63,21 +63,35 @@ const StudentAdmitCard = ({ student, commonInfo }) => {
         <table className="min-w-full table-auto border-collapse border border-gray-400">
           <thead>
             <tr className="bg-blue-200 text-gray-900">
-              <th className="border border-gray-300 px-4 py-2 text-left">Subject</th>
-              <th className="border border-gray-300 px-4 py-2 text-left">Exam Date</th>
-              <th className="border border-gray-300 px-4 py-2 text-left">Start Time</th>
-              <th className="border border-gray-300 px-4 py-2 text-left">End Time</th>
+              <th className="border border-gray-300 px-4 py-2 text-left">
+                Subject
+              </th>
+              <th className="border border-gray-300 px-4 py-2 text-left">
+                Exam Date
+              </th>
+              <th className="border border-gray-300 px-4 py-2 text-left">
+                Start Time
+              </th>
+              <th className="border border-gray-300 px-4 py-2 text-left">
+                End Time
+              </th>
             </tr>
           </thead>
           <tbody>
             {examDetails.map((exam, index) => (
               <tr key={index} className="hover:bg-gray-50 text-gray-700">
-                <td className="border border-gray-300 px-4 py-2">{exam.subject}</td>
                 <td className="border border-gray-300 px-4 py-2">
-                  {new Date(exam.examDate).toLocaleDateString('en-GB')}
+                  {exam.subject}
                 </td>
-                <td className="border border-gray-300 px-4 py-2">{exam.startTime}</td>
-                <td className="border border-gray-300 px-4 py-2">{exam.endTime}</td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {new Date(exam.examDate).toLocaleDateString("en-GB")}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {exam.startTime}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {exam.endTime}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -99,7 +113,6 @@ const StudentAdmitCard = ({ student, commonInfo }) => {
 const AdmitCardList = ({ students, commonInfo }) => {
   return (
     <div>
-
       {students?.map((student, index) => (
         <StudentAdmitCard
           key={index}

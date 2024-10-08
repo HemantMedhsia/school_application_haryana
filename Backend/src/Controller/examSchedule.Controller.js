@@ -405,7 +405,7 @@ export const getAdmitCards = wrapAsync(async (req, res) => {
             schoolLogo: "https://example.com/school-logo.png",
             term: term ? term.name : "Unknown Term",
             examType: examType ? examType.name : "Unknown Exam Type",
-            className: className,
+            standard: className,
             examDetails:
                 result.length > 0
                     ? result[0].examDetails.map((detail) => ({
