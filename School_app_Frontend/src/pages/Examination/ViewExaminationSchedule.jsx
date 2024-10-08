@@ -172,6 +172,7 @@ const ViewExaminationSchedule = () => {
     } catch (error) {
       console.error("Error fetching students", error);
     }
+    // 
   };
 
   const handleStudentCheckboxChange = (studentId) => {
