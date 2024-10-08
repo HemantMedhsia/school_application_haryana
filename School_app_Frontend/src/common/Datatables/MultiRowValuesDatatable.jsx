@@ -131,6 +131,7 @@ const MultiRowValuesDatatable = ({ data = [], actions = {} }) => {
           nextLabel={<IoChevronForwardOutline />}
           breakLabel={"..."}
           pageCount={pageCount}
+          
           onPageChange={handlePageClick}
           marginPagesDisplayed={2}
           pageRangeDisplayed={3}
