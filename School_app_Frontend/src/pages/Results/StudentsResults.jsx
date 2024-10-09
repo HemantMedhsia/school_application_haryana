@@ -4,6 +4,7 @@ import DynamicFilterBar from "../../common/FilterBar/DynamicFilterBar";
 import { getAPI } from "../../utility/api/apiCall";
 import axios from "axios";
 import FormButton from "../../components/Form/FormButton";
+import ResultPrint from "../Print/ResultPrint";
 
 const StudentsResults = () => {
   const [tabledata, setTableData] = useState([]);
@@ -20,6 +21,11 @@ const StudentsResults = () => {
   const [selectedStudents, setSelectedStudents] = useState([]);
   const [students, setStudents] = useState([]);
   const [selectedClassId, setSelectedClassId] = useState("");
+  const [searchText, setSearchText] = useState("");
+
+  const filteredStudents = students.filter((student) =>
+    student.name.toLowerCase().includes(searchText.toLowerCase())
+  );
 
   const fetchData = async () => {
     try {
@@ -28,6 +34,26 @@ const StudentsResults = () => {
         getAPI("getAllExamCategories", {}, setTerm),
         // getAPI("getAllSections", {}, setSection),
       ]);
+    } catch (error) {
+      console.error("Error fetching data", error);
+    }
+  };
+
+  const fetchResultData = async () => {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/print-result-byclass`,
+        {
+          classId: "66eab293d46b2fb3b37f1334",
+          studentIds: [
+            "66f25c8e4e33b19084a099fe",
+            "66f3a68a7548325c6722012a",
+            "66f67844b23a67c92074b881",
+          ],
+          termIds: ["66ec0460b45bdea1571d6a1b", "66ebb0cf461f67df6bdafcfc"],
+        }
+      );
+      console.log("Response", response);
     } catch (error) {
       console.error("Error fetching data", error);
     }
@@ -146,10 +172,13 @@ const StudentsResults = () => {
     console.log("classId", selectedClassId);
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/api/getallstudentsinfo/${selectedClassId}`
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/api/getallstudentsinfo/${selectedClassId}`
       );
       setStudents(response.data.data || []);
       setSelectedStudents([]); // Clear previous selection
+      fetchResultData();
     } catch (error) {
       console.error("Error fetching students", error);
     }
@@ -159,22 +188,26 @@ const StudentsResults = () => {
 
   const handleStudentCheckboxChange = (studentId) => {
     console.log("studentId", studentId);
-    
+
     setSelectedStudents((prevSelected) =>
       prevSelected.includes(studentId)
         ? prevSelected.filter((id) => id !== studentId)
         : [...prevSelected, studentId]
     );
   };
-  const handleCheckboxChange = (e, termId) => {
-    if (e.target.checked) {
-      // Add the term ID to the selectedTermIds array
-      setSelectedTermIds((prev) => [...prev, termId]);
-      console.log("selectedTermIds", selectedTermId);
-    } else {
-      // Remove the term ID from the selectedTermIds array
-      setSelectedTermIds((prev) => prev.filter((id) => id !== termId));
-    }
+
+  useEffect(() => {
+    console.log("selectedTermIds", selectedTermId);
+    console.log("selectedStudents", selectedStudents);
+  }, [selectedStudents]);
+
+  const handleCheckboxChange = (termId) => {
+    console.log("termId", termId);
+    setSelectedTermIds((prevSelected) =>
+      prevSelected.includes(termId)
+        ? prevSelected.filter((id) => id !== termId)
+        : [...prevSelected, termId]
+    );
   };
 
   const closePopup = () => {
@@ -560,53 +593,104 @@ const StudentsResults = () => {
       )}
 
       {printResultPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-4 rounded-lg">
-            <h2 className="text-xl font-bold mb-4">
-              Select Students For Printing Results
-            </h2>
-            <div className="flex justify-center">
-              {term.map((terms, index) => (
-                <div key={terms._id}>
-                  <input
-                    id={terms._id}
-                    type="checkbox"
-                    onChange={(e) => handleCheckboxChange(e, terms._id)}
-                  />
-                  <label htmlFor={terms._id}>{terms.name}</label>
-                </div>
-              ))}
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+          <div className="bg-gray-900 border-[#65FA9E] border-2 w-full max-w-lg p-6 rounded-lg shadow-lg relative">
+            {/* Term Selection */}
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold text-[#7367F0] mb-3">
+                Select Term
+              </h3>
+              <div className="flex flex-wrap justify-start gap-4">
+                {term.map((terms) => (
+                  <div key={terms._id} className="flex items-center">
+                    <input
+                      id={terms._id}
+                      type="checkbox"
+                      checked={selectedTermId.includes(terms._id)}
+                      onChange={(e) => handleCheckboxChange(terms._id)}
+                      className="form-checkbox h-5 w-5 text-blue-600 focus:ring-2 focus:ring-blue-400"
+                    />
+                    <label
+                      htmlFor={terms._id}
+                      className="ml-2 text-[#65FA9E] font-medium"
+                    >
+                      {terms.name}
+                    </label>
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="flex flex-col">
-              {students.map((student) => (
-                <div key={student.id} className="flex items-center mb-2">
-                  <input
-                    type="checkbox"
-                    checked={selectedStudents.includes(student.id)}
-                    onChange={() => handleStudentCheckboxChange(student.id)}
-                    className="mr-2"
-                  />
-                  <label>{student.name}</label>
-                </div>
-              ))}
-            </div>
-            <div className="flex justify-end mt-4">
-              <button
-                className="bg-blue-500 text-white px-4 py-2 rounded-md mr-2"
-                onClick={handlePrintPopup}
+
+            {/* Search Students */}
+            <div className="mb-4">
+              <label
+                htmlFor="search-student"
+                className="block text-lg font-semibold text-[#7367F0] mb-2"
               >
-                Print
-              </button>
-              <button
-                className="bg-red-500 text-white px-4 py-2 rounded-md"
-                onClick={() => setPrintResultPopup(false)}
-              >
-                Close
-              </button>
+                Search Students
+              </label>
+              <input
+                id="search-student"
+                type="text"
+                placeholder="Type to search..."
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                className="w-full px-4 py-2 border text-gray-300 bg-gray-800 border-[#7367F0] rounded-lg focus:ring-2 focus:ring-[#65fa9e] focus:outline-none"
+              />
             </div>
+
+            {/* Filtered Students Selection */}
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold text-[#7367F0] mb-3">
+                Select Students
+              </h3>
+              <div className="h-56 overflow-y-auto border border-[#7367F0] rounded-lg p-4">
+                {filteredStudents.map((student) => (
+                  <div key={student.id} className="flex items-center mb-2">
+                    <input
+                      type="checkbox"
+                      checked={selectedStudents.includes(student.id)}
+                      onChange={() => handleStudentCheckboxChange(student.id)}
+                      className="form-checkbox h-5 w-5 text-green-500 focus:ring-2 focus:ring-green-400 mr-3"
+                    />
+                    <label className=" text-[#65fa9e] font-medium">
+                      {student.name}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex justify-end gap-3">
+              <FormButton name={"Print Results"} onClick={handlePrintPopup} />
+            </div>
+
+            {/* Close Icon */}
+            <button
+              className="absolute top-4 right-4 text-gray-600 hover:text-red-500"
+              onClick={() => setPrintResultPopup(false)}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
           </div>
         </div>
       )}
+
+      <ResultPrint />
     </div>
   );
 };
