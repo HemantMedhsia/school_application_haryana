@@ -22,6 +22,7 @@ const StudentsResults = () => {
   const [students, setStudents] = useState([]);
   const [selectedClassId, setSelectedClassId] = useState("");
   const [searchText, setSearchText] = useState("");
+  const [resultPrintData, setResultPrintData] = useState();
 
   const filteredStudents = students.filter((student) =>
     student.name.toLowerCase().includes(searchText.toLowerCase())
@@ -53,7 +54,8 @@ const StudentsResults = () => {
           termIds: ["66ec0460b45bdea1571d6a1b", "66ebb0cf461f67df6bdafcfc"],
         }
       );
-      console.log("Response", response);
+      console.log("Response", response.data.data);
+      setResultPrintData(response.data.data);
     } catch (error) {
       console.error("Error fetching data", error);
     }
@@ -689,8 +691,10 @@ const StudentsResults = () => {
           </div>
         </div>
       )}
-
-      <ResultPrint />
+      {resultPrintData &&
+        resultPrintData.studentRecords.map((studentRecord, index) => (
+          <ResultPrint key={index} data2={studentRecord} />
+        ))}
     </div>
   );
 };
