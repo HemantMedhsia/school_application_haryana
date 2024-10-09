@@ -357,7 +357,7 @@ export const navigation = [
     to: "/school/student-attendance-view",
     icon: FaBell,
     current: false,
-    roles: ["Student","Parent"],
+    roles: ["Student", "Parent"],
   },
   {
     name: "Attendance",
@@ -391,6 +391,21 @@ export const navigation = [
         to: "/school/view-notice",
         icon: FaBook,
         roles: ["Student", "Teacher", "Admin", "Parent"],
+      },
+    ],
+  },
+  {
+    name: "Setting",
+    to: "/setting",
+    icon: FaBell,
+    current: false,
+    roles: ["Admin"],
+    children: [
+      {
+        name: "Contact Information",
+        to: "/school/add-conatct-information",
+        icon: FaBook,
+        roles: ["Admin"],
       },
     ],
   },

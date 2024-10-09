@@ -28,6 +28,7 @@ import { examScheduleRoute } from "./Routes/examSchedule.Route.js";
 import { markRoute } from "./Routes/mark.Route.js";
 import { classTimeTableRoute } from "./Routes/classTimeTable.Route.js";
 import { resultRoute } from "./Routes/result.Route.js";
+import { ContactRoute } from "./Routes/Contact.Route.js";
 
 const app = express();
 
@@ -79,6 +80,7 @@ app.use("/api", examScheduleRoute);
 app.use("/api", markRoute);
 app.use("/api", classTimeTableRoute);
 app.use("/api", resultRoute);
+app.use("/api", ContactRoute);
 
 // Global error handling middleware
 app.use((err, req, res, next) => {

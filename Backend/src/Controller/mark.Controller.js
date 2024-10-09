@@ -513,6 +513,14 @@ export const getClassResults = wrapAsync(async (req, res) => {
 
     const studentRecordsMap = {};
 
+    const toCamelCase = (str) => {
+        return str
+            .replace(/(?:^\w|[A-Z]|\b\w|\s+)/g, (match, index) =>
+                index === 0 ? match.toLowerCase() : match.toUpperCase()
+            )
+            .replace(/\s+/g, "");
+    };
+
     marksData.forEach((mark) => {
         const student = mark.student;
 
@@ -548,16 +556,20 @@ export const getClassResults = wrapAsync(async (req, res) => {
             };
 
             termIds.forEach((termId) => {
-                const termName = termNames[termId.toString()];
+                const termName = toCamelCase(termNames[termId.toString()]); // Original term name
                 if (!subjectRecord[termName]) {
                     subjectRecord[termName] = { total: 0 };
                 }
 
                 exams.forEach((exam) => {
                     if (exam.examType.term.toString() === termId) {
-                        const examTypeName = exam.examType.name;
-                        subjectRecord[termName][examTypeName] =
-                            (subjectRecord[termName][examTypeName] || 0) +
+                        const examTypeName = exam.examType.name; // Original exam type name
+
+                        // Convert specific keys to camelCase if they match
+                        const camelCaseKey = toCamelCase(examTypeName);
+
+                        subjectRecord[termName][camelCaseKey] =
+                            (subjectRecord[termName][camelCaseKey] || 0) +
                             exam.marksObtained;
 
                         subjectRecord[termName].total += exam.marksObtained;
@@ -569,7 +581,7 @@ export const getClassResults = wrapAsync(async (req, res) => {
             subjectRecord.overallTotal = termIds.reduce(
                 (sum, termId) =>
                     sum +
-                    (subjectRecord[termNames[termId.toString()]]?.total || 0),
+                    (subjectRecord[toCamelCase(termNames[termId.toString()])]?.total || 0),
                 0
             );
 

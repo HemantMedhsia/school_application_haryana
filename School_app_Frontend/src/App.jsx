@@ -51,49 +51,54 @@ import StaffAttendance from "./pages/Staff/StaffAttendance.jsx";
 import StudentAdmitCard from "./pages/Print/StudentAdmitCard.jsx";
 import AdmitCardPrint from "./pages/Print/AdmitCardPrint.jsx";
 import ResultPrint from "./pages/Print/ResultPrint.jsx";
+import ContactDetails from "./pages/ContactDetails.jsx";
+import ViewContact from "./pages/ViewContact.jsx";
 
 const App = () => {
   const { userRole, authToken } = useAuth();
-  
+
   const data = {
-    "commonInfo": {
-        "schoolName": "Green Valley High School",
-        "schoolLogo": "https://example.com/school-logo.png",
-        "term": "Term 1",
-        "examType": "Unit Test",
-        "examDetails": [
-            {
-                "subject": "Science 101",
-                "examDate": "2024-01-01T00:00:00.000Z",
-                "startTime": "08:20",
-                "endTime": "10:20"
-            },
-            {
-                "subject": "Hindi",
-                "examDate": "2024-01-01T00:00:00.000Z",
-                "startTime": "08:20",
-                "endTime": "10:20"
-            }
-        ]
+    commonInfo: {
+      schoolName: "Green Valley High School",
+      schoolLogo: "https://example.com/school-logo.png",
+      term: "Term 1",
+      examType: "Unit Test",
+      examDetails: [
+        {
+          subject: "Science 101",
+          examDate: "2024-01-01T00:00:00.000Z",
+          startTime: "08:20",
+          endTime: "10:20",
+        },
+        {
+          subject: "Hindi",
+          examDate: "2024-01-01T00:00:00.000Z",
+          startTime: "08:20",
+          endTime: "10:20",
+        },
+      ],
     },
-    "students": [
-        {
-            "studentName": "Vedansh Tiwari",
-            "studentPhoto": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            "rollNumber": "12"
-        },
-        {
-            "studentName": "Hemant Medhsia",
-            "studentPhoto": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            "rollNumber": "122"
-        },
-        {
-            "studentName": "Aditya M",
-            "studentPhoto": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            "rollNumber": "12df"
-        }
-    ]
-};
+    students: [
+      {
+        studentName: "Vedansh Tiwari",
+        studentPhoto:
+          "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        rollNumber: "12",
+      },
+      {
+        studentName: "Hemant Medhsia",
+        studentPhoto:
+          "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        rollNumber: "122",
+      },
+      {
+        studentName: "Aditya M",
+        studentPhoto:
+          "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        rollNumber: "12df",
+      },
+    ],
+  };
 
   const router = createBrowserRouter(
     createRoutesFromElements(
@@ -141,6 +146,7 @@ const App = () => {
             path="parent-update-student/:studentId"
             element={<ParentAdd />}
           />
+          <Route path="add-conatct-information" element={<ContactDetails />} />
           <Route
             path="teacher-profile/:teacherId"
             element={<TeacherProfile />}
@@ -157,6 +163,8 @@ const App = () => {
           <Route path="exam-type" element={<ExamType />} />
           <Route path="exam-schedule" element={<ExaminationSchedule />} />
           <Route path="class-timetable" element={<ClassTimetable />} />
+          <Route path="view-contact" element={<ViewContact />} />
+
           <Route
             path="class-timetable-user"
             element={<CommonClassTimeTable />}
@@ -178,9 +186,7 @@ const App = () => {
           <Route
             path="student-attendance-view/:studentId?"
             element={
-              <RoleBasedAccess
-                allowedRoles={["Admin", "Student", "Parent"]}
-              >
+              <RoleBasedAccess allowedRoles={["Admin", "Student", "Parent"]}>
                 <StudentAttendance />
               </RoleBasedAccess>
             }
@@ -188,9 +194,7 @@ const App = () => {
           <Route
             path="teacher-attendance-view/:teacherId?"
             element={
-              <RoleBasedAccess
-                allowedRoles={["Admin","Teacher"]}
-              >
+              <RoleBasedAccess allowedRoles={["Admin", "Teacher"]}>
                 <StudentAttendance />
               </RoleBasedAccess>
             }
@@ -198,15 +202,21 @@ const App = () => {
           <Route
             path="staff-attendance-view/:staffId?"
             element={
-              <RoleBasedAccess
-                allowedRoles={["Admin","Staff"]}
-              >
+              <RoleBasedAccess allowedRoles={["Admin", "Staff"]}>
                 <StudentAttendance />
               </RoleBasedAccess>
             }
           />
-          <Route path="/school/print" element={<AdmitCardPrint students={data.students} commonInfo={data.commonInfo}/>} />
-          <Route path="/school/resultp" element={<ResultPrint/>} />
+          <Route
+            path="/school/print"
+            element={
+              <AdmitCardPrint
+                students={data.students}
+                commonInfo={data.commonInfo}
+              />
+            }
+          />
+          <Route path="/school/resultp" element={<ResultPrint />} />
         </Route>
       </>
     )
