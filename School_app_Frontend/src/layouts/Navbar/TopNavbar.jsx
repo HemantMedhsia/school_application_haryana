@@ -97,10 +97,9 @@ const TopNavbar = ({ isCollapsed }) => {
                     <MdOutlineMarkEmailUnread />
                   </div>
                   <div className="flex px-3 py-2 hover:bg-gray-700 rounded-md font-bold cursor-pointer text-[#65FA9E] text-2xl items-center">
-                    <BiSupport />
-                  </div>
-                  <div className="flex px-3 py-2 hover:bg-gray-700 rounded-md font-bold cursor-pointer text-[#65FA9E] text-2xl items-center">
-                    <IoLocationSharp />
+                    <Link to="/school/view-contact">
+                      <BiSupport />
+                    </Link>
                   </div>
                 </div>
               </div>
