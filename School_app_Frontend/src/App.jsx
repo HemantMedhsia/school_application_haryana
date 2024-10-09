@@ -14,7 +14,7 @@ import RoleBasedAccess from "./pages/RoleBase/RoleBasedAccess.jsx";
 import { useAuth } from "./context/AuthProvider.jsx";
 import StudentAdd from "./pages/Student/StudentAdd.jsx";
 import StudnetInfo from "./pages/Student/StudnetInfo.jsx";
-import EventCalendar from "./pages/Dashboard/EventCalendar.jsx";
+import EventCalendar from "./pages/Calender/EventCalendar.jsx";
 import Notice from "./pages/Notice/Notice.jsx";
 import Profile from "./pages/Student/Profile.jsx";
 import ParentAdd from "./pages/Parent/ParentAdd.jsx";

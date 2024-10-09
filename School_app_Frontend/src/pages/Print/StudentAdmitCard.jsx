@@ -96,11 +96,10 @@ const StudentAdmitCard = ({ student, commonInfo }) => {
   );
 };
 
-// Wrapper Component to print multiple Admit Cards
+  
 const AdmitCardList = ({ students, commonInfo }) => {
   return (
     <div>
-
       {students?.map((student, index) => (
         <StudentAdmitCard
           key={index}
