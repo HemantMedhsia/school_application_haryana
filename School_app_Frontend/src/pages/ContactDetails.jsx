@@ -1,47 +1,75 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import FormSection from "../components/Form/FormSection";
-import Select from "../components/Form/Select";
+import Select from "../components/Form/Select"; // Not used in your current code
 import Input from "../components/Form/Input";
 import FormButton from "../components/Form/FormButton";
 import { toast, ToastContainer } from "react-toastify";
 import ContactCard from "../components/Form/ContactCard";
+import axios from "axios";
+import { getAPI } from "../utility/api/apiCall";
 
 const ContactDetails = () => {
   const [formData, setFormData] = useState({
     name: "",
-    role: "",
+    post: "",
     email: "",
-    mobileNumber: "",
+    phone: "",
   });
   const [contacts, setContacts] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    fetchContacts();
+  }, []);
+
+  const fetchContacts = async () => {
+    await getAPI("getAllContactDetails", {}, setContacts);
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (isEditing) {
-      const updatedContacts = [...contacts];
-      updatedContacts[editIndex] = formData;
-      setContacts(updatedContacts);
-      toast.success("Contact information updated successfully!");
+    try {
+      if (isEditing) {
+        await axios.put(
+          `${import.meta.env.VITE_BACKEND_URL}/api/update-contact/${
+            contacts[editIndex]._id
+          }`,
+          formData
+        ); // Update endpoint
+        const updatedContacts = [...contacts];
+        updatedContacts[editIndex] = formData;
+        setContacts(updatedContacts);
+        toast.success("Contact information updated successfully!");
+      } else {
+        const response = await axios.post(
+          `${import.meta.env.VITE_BACKEND_URL}/api/add-contact`,
+          formData
+        );
+        setContacts([...contacts, response.data]);
+        toast.success("Contact information added successfully!");
+      }
+
+      fetchContacts();
+
+      setFormData({
+        name: "",
+        post: "",
+        email: "",
+        phone: "",
+      });
       setIsEditing(false);
       setEditIndex(null);
-    } else {
-      setContacts([...contacts, formData]);
-      toast.success("Contact information added successfully!");
+    } catch (error) {
+      console.error("Error saving contact:", error);
+      toast.error("Failed to save contact.");
     }
-
-    setFormData({
-      name: "",
-      role: "",
-      email: "",
-      mobileNumber: "",
-    });
   };
 
   const handleEdit = (index) => {
@@ -50,10 +78,21 @@ const ContactDetails = () => {
     setEditIndex(index);
   };
 
-  const handleDelete = (index) => {
-    const updatedContacts = contacts.filter((_, i) => i !== index);
-    setContacts(updatedContacts);
-    toast.success("Contact information deleted successfully!");
+  const handleDelete = async (index) => {
+    console.log(contacts[index]._id);
+    try {
+      await axios.delete(
+        `${import.meta.env.VITE_BACKEND_URL}/api/delete-contact/${
+          contacts[index]._id
+        }`
+      );
+      const updatedContacts = contacts.filter((_, i) => i !== index);
+      setContacts(updatedContacts);
+      toast.success("Contact information deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting contact:", error);
+      toast.error("Failed to delete contact.");
+    }
   };
 
   return (
@@ -77,11 +116,11 @@ const ContactDetails = () => {
           />
 
           <Input
-            labelName="Role"
-            name="role"
-            value={formData.role}
+            labelName="Post"
+            name="post"
+            value={formData.post}
             onChange={handleChange}
-            placeholder="Enter Role"
+            placeholder="Enter Post"
           />
         </FormSection>
 
@@ -96,12 +135,12 @@ const ContactDetails = () => {
           />
 
           <Input
-            labelName="Mobile Number"
-            name="mobileNumber"
-            value={formData.mobileNumber}
+            labelName="Phone Number"
+            name="phone"
+            value={formData.phone}
             onChange={handleChange}
-            placeholder="Enter Mobile Number"
-            type="tel"
+            placeholder="Enter Phone Number"
+            type="Phone"
           />
         </FormSection>
 

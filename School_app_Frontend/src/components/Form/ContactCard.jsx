@@ -10,13 +10,13 @@ const ContactCard = ({ contact, onEdit, onDelete }) => {
         <strong>Name:</strong> {contact.name}
       </p>
       <p>
-        <strong>Role:</strong> {contact.role}
+        <strong>Post:</strong> {contact.post}
       </p>
       <p>
         <strong>Email:</strong> {contact.email}
       </p>
       <p>
-        <strong>Phone Number:</strong> {contact.mobileNumber}
+        <strong>Phone Number:</strong> {contact.phone}
       </p>
       <div className="mt-4 flex justify-between">
         {onEdit && (

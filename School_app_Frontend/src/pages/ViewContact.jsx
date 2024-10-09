@@ -1,55 +1,41 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ContactCard from "../components/Form/ContactCard";
+import { getAPI } from "../utility/api/apiCall";
 
 const ViewContact = () => {
-  const contacts = [
-    {
-      name: "John Doe",
-      role: "Developer",
-      email: "john.doe@example.com",
-      mobileNumber: "+1234567890",
-    },
-    {
-      name: "Jane Smith",
-      role: "Designer",
-      email: "jane.smith@example.com",
-      mobileNumber: "+0987654321",
-    },
-    {
-      name: "Michael Johnson",
-      role: "Project Manager",
-      email: "michael.johnson@example.com",
-      mobileNumber: "+1122334455",
-    },
-    {
-      name: "Emily Davis",
-      role: "QA Engineer",
-      email: "emily.davis@example.com",
-      mobileNumber: "+5566778899",
-    },
-    {
-      name: "Chris Brown",
-      role: "DevOps Engineer",
-      email: "chris.brown@example.com",
-      mobileNumber: "+2233445566",
-    },
-  ];
+  const [contacts, setContacts] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const handleEdit = (index) => {
-    // Edit logic here
-    console.log("Edit contact at index:", index);
-  };
+  useEffect(() => {
+    const fetchContact = async () => {
+      setLoading(true);
+      await getAPI("getAllContactDetails", {}, setContacts);
+      setLoading(false);
+    };
+    fetchContact();
+  }, []);
 
-  const handleDelete = (index) => {
-    // Delete logic here
-    console.log("Delete contact at index:", index);
-  };
+  if (loading) {
+    return (
+      <div className="loader-wrapper">
+        <span className="loader"></span>
+      </div>
+    );
+  }
 
   return (
     <div>
       <div className="mt-6 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-        {contacts.map((contact, index) => (
-          <ContactCard key={index} contact={contact} />
+        {contacts.map((contact) => (
+          <ContactCard
+            key={contact._id}
+            contact={{
+              name: contact.name,
+              post: contact.post,
+              email: contact.email,
+              phone: `+91${contact.phone}`, // Formatting phone number as needed
+            }}
+          />
         ))}
       </div>
     </div>
