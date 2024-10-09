@@ -16,7 +16,7 @@ const contactSchema = new mongoose.Schema({
         required: true,
         trim: true,
     },
-    Post: {
+    post: {
         type: String,
         required: true,
         trim: true,
