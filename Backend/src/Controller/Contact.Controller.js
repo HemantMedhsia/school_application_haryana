@@ -13,13 +13,15 @@ export const addContact = wrapAsync(async (req, res, next) => {
     const contact = new Contact(req.body);
 
     await contact.save();
-    res.status(201).send(ApiResponse("Contact added successfully", contact));
+    res.status(201).send(
+        new ApiResponse("Contact added successfully", contact)
+    );
 });
 
 export const getContacts = wrapAsync(async (req, res, next) => {
     const contacts = await Contact.find();
     res.status(200).send(
-        ApiResponse("Contacts retrieved successfully", contacts)
+        new ApiResponse("Contacts retrieved successfully", contacts)
     );
 });
 
@@ -29,7 +31,7 @@ export const getContact = wrapAsync(async (req, res, next) => {
         return next(new ApiError(404, "Contact not found"));
     }
     res.status(200).send(
-        ApiResponse("Contact retrieved successfully", contact)
+        new ApiResponse("Contact retrieved successfully", contact)
     );
 });
 
@@ -40,7 +42,7 @@ export const updateContact = wrapAsync(async (req, res, next) => {
     if (!contact) {
         return next(new ApiError(404, "Contact not found"));
     }
-    res.status(200).send(ApiResponse("Contact updated successfully", contact));
+    res.status(200).send(new ApiResponse("Contact updated successfully", contact));
 });
 
 export const deleteContact = wrapAsync(async (req, res, next) => {
@@ -48,5 +50,5 @@ export const deleteContact = wrapAsync(async (req, res, next) => {
     if (!contact) {
         return next(new ApiError(404, "Contact not found"));
     }
-    res.status(200).send(ApiResponse("Contact deleted successfully", contact));
+    res.status(200).send( new ApiResponse("Contact deleted successfully", contact));
 });
