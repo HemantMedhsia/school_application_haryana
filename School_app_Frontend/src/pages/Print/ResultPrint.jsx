@@ -2,8 +2,13 @@ import React from "react";
 import logo from "../../assets/logo.png";
 import { dateFnsLocalizer } from "react-big-calendar";
 
-const ResultPrint = () => {
+const ResultPrint = ({data2}) => {
   // Hard-coded data (replace with your API response data)
+  const {studentProfile, subjects} = data2;
+
+  
+
+  console.log(subjects);
   const data = {
     commonData: {
       schoolName: "Vardhan International School",
@@ -16,17 +21,7 @@ const ResultPrint = () => {
       secondLogo: "/path/to/your/second_logo.png",
       session: "2023-24",
     },
-    studentProfile: {
-      Name: "AMISH SRIVASTAVA",
-      FatherName: "JYOTI PRAKASH SRIVASTAVA",
-      MotherName: "SMRITI SRIVASTAVA",
-      AdmissionNo: "20170009",
-      Class: "XI",
-      Section: "A (SCIENCE)",
-      Dob: "05-Jan-2008",
-      RollNo: "10",
-      profilePicture: "/path/to/student/profile/picture.jpg",
-    },
+    studentProfile: studentProfile,
     subjects: [
       {
         name: "English Core",
