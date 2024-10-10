@@ -224,7 +224,7 @@ const ViewExaminationSchedule = () => {
       <DynamicFilterBar filters={filterConfig} onSubmit={handleFilterSubmit} />
 
       {noDataMessage && (
-        <p className="flex justify-center items-center text-red-500 mt-4">
+        <p className="flex justify-center items-center text-2xl text-red-500 mt-4">
           {noDataMessage}
         </p>
       )}

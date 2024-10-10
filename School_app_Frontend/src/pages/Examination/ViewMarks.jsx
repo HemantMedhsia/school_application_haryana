@@ -52,7 +52,7 @@ const ViewMarks = () => {
 
       console.log("Filtered data:", filteredData);
 
-      if(filteredData.length === 0) {
+      if (filteredData.length === 0) {
         toast.error("No data found for the selected subject");
 
         setShowTable(false);
@@ -169,6 +169,7 @@ const ViewMarks = () => {
       <ToastContainer />
       <h2 className="text-[#7367F0] text-xl font-semibold">View Marks</h2>
       <DynamicFilterBar filters={filterConfig} onSubmit={handleFilterSubmit} />
+
       {showTable && (
         <div>
           <h2 className="text-[#7367F0] font-semibold mt-4 text-xl">

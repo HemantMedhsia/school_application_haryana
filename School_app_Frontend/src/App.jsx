@@ -53,6 +53,14 @@ import AdmitCardPrint from "./pages/Print/AdmitCardPrint.jsx";
 import ResultPrint from "./pages/Print/ResultPrint.jsx";
 import ContactDetails from "./pages/ContactDetails.jsx";
 import ViewContact from "./pages/ViewContact.jsx";
+import AddHomeWork from "./pages/HomeWork/AddHomeWork.jsx";
+import ViewHomeWork from "./pages/HomeWork/ViewHomeWork.jsx";
+import ManageLessonPlan from "./pages/LessonPlan/ManageLessonPlan.jsx";
+import SyallabusStatus from "./pages/LessonPlan/SyallabusStatus.jsx";
+import LessonPlanStudent from "./pages/LessonPlan/LessonPlanStudent.jsx";
+import HomeWorkStudent from "./pages/HomeWork/HomeWorkStudent.jsx";
+import SyallabusStatusStudent from "./pages/LessonPlan/SyallabusStatusStudent.jsx";
+import StudentFees from "./pages/Fees/StudentFees.jsx";
 
 const App = () => {
   const { userRole, authToken } = useAuth();
@@ -155,7 +163,14 @@ const App = () => {
           <Route path="teacher-add" element={<TeacherAdd />} />
           <Route path="add-marks" element={<AddMarks />} />
           <Route path="create-section" element={<CreateSection />} />
-          <Route path="create-class" element={<CreateClass />} />
+          <Route
+            path="create-class"
+            element={
+              <RoleBasedAccess allowedRoles={["Admin"]}>
+                <CreateClass />
+              </RoleBasedAccess>
+            }
+          />
           <Route path="add-subjects" element={<AddSubjects />} />
           <Route path="create-subject-group" element={<CreateSubjectGroup />} />
           <Route path="view-notice" element={<ViewNotice />} />
@@ -164,6 +179,17 @@ const App = () => {
           <Route path="exam-schedule" element={<ExaminationSchedule />} />
           <Route path="class-timetable" element={<ClassTimetable />} />
           <Route path="view-contact" element={<ViewContact />} />
+          <Route path="add-home-work" element={<AddHomeWork />} />
+          <Route path="view-home-work" element={<ViewHomeWork />} />
+          <Route path="manage-lesson-plan" element={<ManageLessonPlan />} />
+          <Route path="syallabus-status" element={<SyallabusStatus />} />
+          <Route path="student-lesson-Plan" element={<LessonPlanStudent />} />
+          <Route path="student-homework" element={<HomeWorkStudent />} />
+          <Route
+            path="student-syallabus-status"
+            element={<SyallabusStatusStudent />}
+          />
+          <Route path="student-fees" element={<StudentFees />} />
 
           <Route
             path="class-timetable-user"
