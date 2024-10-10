@@ -143,4 +143,8 @@ export const getApiConfig = {
     url: "/staff-weekly-attendance",
     method: "GET",
   },
+  getAllContactDetails: {
+    url: "/get-contacts",
+    method: "GET",
+  },
 };

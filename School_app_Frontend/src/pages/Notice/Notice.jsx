@@ -25,7 +25,7 @@ const Notice = () => {
   };
 
   const handleSubmit = async (e) => {
-    const schoolId = "66d1c1175fb4969242d7f896";
+    const schoolId = import.meta.env.SchoolId;
     e.preventDefault();
     try {
       const response = await axios.post(
@@ -42,7 +42,7 @@ const Notice = () => {
       toast.success("Notice created successfully!");
     } catch (error) {
       console.error("Error creating notice:", error);
-      toast.error("Error creating notice! Please try again."); 
+      toast.error("Error creating notice! Please try again.");
     }
   };
 
