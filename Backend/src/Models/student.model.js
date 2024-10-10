@@ -56,7 +56,7 @@ const studentSchema = new mongoose.Schema({
         type: String,
     },
     age: {
-        type: String,
+        type: Number,
         required: true,
     },
     address: {
@@ -64,7 +64,7 @@ const studentSchema = new mongoose.Schema({
         required: true,
     },
     mobileNumber: {
-        type: String,
+        type: Number,
         required: true,
     },
     email: {

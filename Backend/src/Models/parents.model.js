@@ -7,7 +7,7 @@ const parentSchema = new mongoose.Schema({
         required: true,
     },
     fatherPhone: {
-        type: String,
+        type: Number,
         required: true,
     },
     fatherOccupation: {
@@ -23,7 +23,7 @@ const parentSchema = new mongoose.Schema({
     },
 
     motherPhone: {
-        type: String,
+        type: Number,
         required: true,
     },
     motherOccupation: {
@@ -45,7 +45,7 @@ const parentSchema = new mongoose.Schema({
         type: String,
     },
     guardianPhone: {
-        type: String,
+        type: Number,
         required: true,
     },
     guardianOccupation: {

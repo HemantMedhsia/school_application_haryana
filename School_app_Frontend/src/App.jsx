@@ -119,10 +119,11 @@ const App = () => {
           <Route
             path="dashboard"
             element={
-              // Uncomment to use RoleBasedAccess
-              // <RoleBasedAccess allowedRoles={["admin", "student"]}>
-              <Dashboard role={userRole} />
-              // </RoleBasedAccess>
+              <RoleBasedAccess
+                allowedRoles={["Admin", "Student", "Parent", "Teacher"]}
+              >
+                <Dashboard role={userRole} />
+              </RoleBasedAccess>
             }
           />
           <Route path="testing" element={<Testing />} />

@@ -55,12 +55,19 @@ const StaffAdd = () => {
   }, [staffId]);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    if (name === "phoneNumber" && value.length > 10) {
+      toast.error("Phone number must be exactly 10 digits.");
+      return;
+    }
+
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const schoolId = import.meta.env.VITE_SchoolId; 
+    const schoolId = import.meta.env.VITE_SchoolId;
     const requiredFields = [
       "name",
       "age",
@@ -175,6 +182,7 @@ const StaffAdd = () => {
           onChange={handleChange}
           placeholder="Enter Phone Number"
           type="tel"
+          maxLength="10"
         />
         <Input
           labelName="Address"
