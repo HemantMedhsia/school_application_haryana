@@ -60,7 +60,7 @@ const StaffAdd = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const schoolId = "66d1c1175fb4969242d7f896";
+    const schoolId = import.meta.env.SchoolId;
     const requiredFields = [
       "name",
       "age",
@@ -70,7 +70,7 @@ const StaffAdd = () => {
       "phoneNumber",
       "address",
       "dateJoined",
-       "gender",
+      "gender",
     ];
     const isEmpty = requiredFields.some((field) => !formData[field]);
 

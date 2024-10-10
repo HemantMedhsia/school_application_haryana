@@ -31,7 +31,7 @@ const AddSubjects = () => {
   };
 
   const handleSubmit = async (e) => {
-    const schoolId = "66d1c1175fb4969242d7f896";
+    const schoolId = import.meta.env.SchoolId;
     e.preventDefault();
     try {
       if (editingSubject) {
