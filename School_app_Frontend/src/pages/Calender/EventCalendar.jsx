@@ -83,7 +83,7 @@ const EventCalendar = () => {
       <ReactCalendar
         onChange={setValue}
         value={value}
-        className="custom-calendar"
+        className="custom-calendar2"
       />
 
       {/* Main Calendar */}

@@ -92,7 +92,9 @@ const NoticeShowingBlock = ({ notices }) => {
           })}
         </ul>
       ) : (
-        <p className="text-gray-500">No notices available.</p>
+        <div className="no-data-message text-xl flex mt-4 justify-center text-red-500">
+          No Notice Available !
+        </div>
       )}
 
       {/* Modal for showing full notice details */}

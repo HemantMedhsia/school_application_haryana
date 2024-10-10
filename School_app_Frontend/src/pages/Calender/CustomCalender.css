@@ -6,7 +6,7 @@
 }
 
 /* Small React Calendar Styles */
-.custom-calendar {
+.custom-calendar2 {
     background-color: #111827;
     border: none;
     color: white;
@@ -17,7 +17,7 @@
 }
 
 /* Month and Year Navigation */
-.custom-calendar .react-calendar__navigation {
+.custom-calendar2 .react-calendar__navigation {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -25,20 +25,20 @@
     /* background-color: #283046; */
 }
 
-.custom-calendar .react-calendar__navigation button {
+.custom-calendar2 .react-calendar__navigation button {
     background: none;
     color: #cbd5e0;
     font-size: 1.1rem; /* Reduced font size */
 }
 
-.custom-calendar .react-calendar__navigation__label {
+.custom-calendar2 .react-calendar__navigation__label {
     font-size: 1rem; /* Reduced month/year font size */
     color: #ffffff;
     font-weight: bold;
 }
 
 /* Weekdays */
-.custom-calendar .react-calendar__month-view__weekdays {
+.custom-calendar2 .react-calendar__month-view__weekdays {
     display: grid;
     grid-template-columns: repeat(7, 2fr); /* Ensure correct spacing */
     font-weight: bold;
@@ -50,7 +50,7 @@
 }
 
 /* Weekday Cell with abbreviation */
-.custom-calendar .react-calendar__month-view__weekdays__weekday abbr {
+.custom-calendar2 .react-calendar__month-view__weekdays__weekday abbr {
     display: block;
     font-weight: bold;
     font-size: 0.6rem; /* Adjusted font size */
@@ -61,14 +61,14 @@
 }
 
 /* Day Tiles */
-.custom-calendar .react-calendar__tile {
+.custom-calendar2 .react-calendar__tile {
     font-size: 0.85rem; /* Slightly reduced day number font size */
     padding: 5px 0; /* Reduced padding for day tiles */
     height: 40px;
 }
 
 /* Selected Day */
-.custom-calendar .react-calendar__tile--active {
+.custom-calendar2 .react-calendar__tile--active {
     background-color: #6b46c1;
     color: white;
     font-weight: bold;
@@ -76,7 +76,7 @@
 }
 
 /* Today's Date */
-.custom-calendar .react-calendar__tile--now {
+.custom-calendar2 .react-calendar__tile--now {
     background-color: #68d391;
     color: black;
     font-weight: bold;
@@ -84,7 +84,7 @@
 }
 
 /* Out-of-Range Dates */
-.custom-calendar .react-calendar__month-view__days__day--neighboringMonth {
+.custom-calendar2 .react-calendar__month-view__days__day--neighboringMonth {
     color: #4a5568;
 }
 
@@ -95,33 +95,33 @@
     color: #9f86ff;
 }
 
-.rbc-header {
+.custom-calendar2 .rbc-header {
     font-weight: bold;
     font-size: 14px;
     text-transform: uppercase;
     color: #7c3aed;
 }
 
-.rbc-event {
+.custom-calendar2 .rbc-event {
     background-color: #3b82f6;
     border-radius: 0.375rem;
     color: white;
 }
 
-.rbc-date-cell.today {
+.custom-calendar2 .rbc-date-cell.today {
     background-color: #22c55e;
     color: black;
 }
 
-.rbc-date-cell.past {
+.custom-calendar2 .rbc-date-cell.past {
     background-color: #ff4d4f;
 }
 
-.rbc-day-bg {
+.custom-calendar2 .rbc-day-bg {
     background-color: #2a2a3b;
 }
 
-.react-calendar__month-view__weekdays__weekday {
+.custom-calendar2 .react-calendar__month-view__weekdays__weekday {
     height: 10px !important;
 }
 
@@ -129,18 +129,18 @@
     border: 1px solid #7367F0;
 }
 
-.rbc-month-row + .rbc-month-row {
+ .rbc-month-row + .rbc-month-row {
     border-top: 1px solid #7367F0;
     background-color: #111827;
 }
 
-.rbc-month-view {
+.custom-calendar2 .rbc-month-view {
     border: 4px solid #1e293b ;
     background-color: #111827;
 
 }
 
-.rbc-calendar {
+.custom-calendar2 .rbc-calendar {
     background-color: #1e1e2e; /* Dark background */
     color: white; /* Adjust text color accordingly */
 }
