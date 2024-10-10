@@ -120,13 +120,18 @@ const StudentAdd = () => {
   }, [studentId]);
 
   const handleChange = (e) => {
-    console.log(e.target.name, e.target.value);
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const schoolId = import.meta.env.VITE_SchoolId;
+
+    const phoneRegex = /^\d{10}$/;
+    if (!phoneRegex.test(formData.mobileNumber)) {
+      toast.error("Phone number must be exactly 10 digits.");
+      return;
+    }
 
     try {
       const response = studentId
