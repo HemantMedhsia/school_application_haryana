@@ -12,7 +12,9 @@ export const createClassTimeTable = wrapAsync(async (req, res) => {
     const timetableExists = await Timetable.findOne({ classId, dayOfWeek });
 
     if (timetableExists) {
-        return res.status(401).json(new ApiError(401, "Timetable already exists"));
+        return res
+            .status(401)
+            .json(new ApiResponse(401, "Timetable already exists"));
     }
 
     for (const entry of entries) {
