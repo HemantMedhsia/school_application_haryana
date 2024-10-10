@@ -35,6 +35,12 @@ const ContactDetails = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const phoneRegex = /^\d{10}$/;
+    if (!phoneRegex.test(formData.phone)) {
+      toast.error("Phone number must be exactly 10 digits.");
+      return;
+    }
+
     try {
       if (isEditing) {
         await axios.put(

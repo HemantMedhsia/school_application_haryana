@@ -123,7 +123,6 @@ const AddMarks = () => {
         axios.get(
           `${import.meta.env.VITE_BACKEND_URL}/api/max-marks/${examType}`
         ),
-
       ]);
 
       setStudentsData(studentsResponse.data.data);
@@ -154,7 +153,6 @@ const AddMarks = () => {
     setSelectedExamTypeId(examType);
 
     const subjectsData = subjects.find((sub) => sub._id === subject);
-
     await fetchStudentData(classId, examType);
   };
 

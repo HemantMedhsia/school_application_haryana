@@ -35,7 +35,6 @@ const parentSchema = new mongoose.Schema({
     },
     guardianIs: {
         type: String,
-        enum: ["Father", "Mother", "Other"],
         required: true,
     },
     guardianName: {
@@ -93,7 +92,6 @@ parentSchema.pre("save", async function (next) {
         next(error);
     }
 });
-
 
 // Method to validate the password
 parentSchema.methods.isValidPassword = async function (password) {

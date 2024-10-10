@@ -202,7 +202,7 @@ export const navigation = [
 
   {
     name: "Fees",
-    to: "/Fees",
+    to: "/school/student-fees",
     icon: FaUserFriends,
     current: false,
     roles: ["Student", "Parent"],
@@ -216,21 +216,21 @@ export const navigation = [
   },
   {
     name: "Lesson Plan",
-    to: "/Lesson-Plan",
+    to: "/school/student-lesson-Plan",
     icon: FaUserFriends,
     current: false,
     roles: ["Student", "Parent"],
   },
   {
     name: "Syllabus Status",
-    to: "/Syllabus-Status",
+    to: "/school/student-syallabus-status",
     icon: FaUserFriends,
     current: false,
     roles: ["Student", "Parent"],
   },
   {
     name: "Homework",
-    to: "/Homework",
+    to: "/school/student-homework",
     icon: FaUserFriends,
     current: false,
     roles: ["Student", "Parent"],
@@ -303,13 +303,13 @@ export const navigation = [
     children: [
       {
         name: "Add Home Work",
-        to: "/school/add-homework",
+        to: "/school/add-home-work",
         icon: FaUser,
         roles: ["Admin", "Teacher"],
       },
       {
         name: "View Home Work",
-        to: "/school/view-homework",
+        to: "/school/view-home-work",
         icon: FaBook,
         roles: ["Admin", "Teacher"],
       },
@@ -325,13 +325,13 @@ export const navigation = [
     children: [
       {
         name: "Manage Lesson Plan",
-        to: "/school/add-homework",
+        to: "/school/manage-lesson-Plan",
         icon: FaUser,
         roles: ["Admin", "Teacher"],
       },
       {
         name: "Syllabus Status",
-        to: "/school/view-homework",
+        to: "/school/syallabus-status",
         icon: FaBook,
         roles: ["Admin", "Teacher"],
       },
