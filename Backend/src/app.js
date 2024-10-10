@@ -32,9 +32,33 @@ import { ContactRoute } from "./Routes/Contact.Route.js";
 
 const app = express();
 
-app.use(
-    cors()
-);
+// Whitelist localhost and local network IP addresses
+const whitelist = [
+    "http://localhost:5174",
+    /^http:\/\/192\.168\.\d{1,3}\.\d{1,3}:5174$/, // This allows IPs like 192.168.x.x:5174
+];
+
+// Dynamic CORS origin function to check if the request origin is in the whitelist
+const corsOptions = {
+    origin: function (origin, callback) {
+        if (
+            !origin ||
+            whitelist.some((allowedOrigin) =>
+                allowedOrigin instanceof RegExp
+                    ? allowedOrigin.test(origin)
+                    : allowedOrigin === origin
+            )
+        ) {
+            callback(null, true);
+        } else {
+            callback(new Error("Not allowed by CORS"));
+        }
+    },
+    methods: "GET,POST,PUT,DELETE,PATCH,OPTIONS",
+    allowedHeaders: "Content-Type,Authorization",
+};
+
+app.use(cors(corsOptions));
 
 app.use(express.json({ limit: "16kb" }));
 
