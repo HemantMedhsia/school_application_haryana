@@ -2,11 +2,9 @@ import React from "react";
 import logo from "../../assets/logo.png";
 import { dateFnsLocalizer } from "react-big-calendar";
 
-const ResultPrint = ({data2}) => {
+const ResultPrint = ({ data2 }) => {
   // Hard-coded data (replace with your API response data)
-  const {studentProfile, subjects} = data2;
-
-  
+  const { studentProfile, subjects } = data2;
 
   console.log(subjects);
   const data = {
@@ -22,43 +20,7 @@ const ResultPrint = ({data2}) => {
       session: "2023-24",
     },
     studentProfile: studentProfile,
-    subjects: [
-      {
-        name: "English Core",
-        term1: { unitTest: 8, internal: 57, halfYearly: 73, total: 138 },
-        term2: { unitTest: 9, internal: 55, annual: 71, total: 135 },
-        overallTotal: 318,
-        grade: "A2",
-      },
-      {
-        name: "Physics",
-        term1: { unitTest: 7, internal: 17, halfYearly: 27, total: 51 },
-        term2: { unitTest: 3, internal: 39, annual: 50, total: 92 },
-        overallTotal: 143,
-        grade: "C2",
-      },
-      {
-        name: "Chemistry",
-        term1: { unitTest: 3, internal: 26, halfYearly: 38, total: 67 },
-        term2: { unitTest: 3, internal: 34, annual: 46, total: 83 },
-        overallTotal: 148,
-        grade: "C2",
-      },
-      {
-        name: "Maths",
-        term1: { unitTest: 5, internal: 27, halfYearly: 37, total: 69 },
-        term2: { unitTest: 8, internal: 35, annual: 48, total: 91 },
-        overallTotal: 160,
-        grade: "C1",
-      },
-      {
-        name: "Computer",
-        term1: { unitTest: 10, internal: 35, halfYearly: 75, total: 120 },
-        term2: { unitTest: 9, internal: 50, annual: 69, total: 128 },
-        overallTotal: 248,
-        grade: "B1",
-      },
-    ],
+    subjects: subjects,
     gradeScale: [
       { range: "91-100", grade: "A1", points: 10 },
       { range: "81-90", grade: "A2", points: 9 },
@@ -196,8 +158,8 @@ const ResultPrint = ({data2}) => {
                 {subject.term1.halfYearly}
               </td>
               <td className="border border-black">{subject.term1.total}</td>
-              <td className="border border-black">{subject.term2.unitTest}</td>
-              <td className="border border-black">{subject.term2.internal}</td>
+              <td className="border border-black">{subject.term2.unitTest2}</td>
+              <td className="border border-black">{subject.term2.internal2}</td>
               <td className="border border-black">{subject.term2.annual}</td>
               <td className="border border-black">{subject.term2.total}</td>
               <td className="border border-black">{subject.overallTotal}</td>
@@ -232,13 +194,24 @@ const ResultPrint = ({data2}) => {
                     2}
                 </td>
                 <td className="border border-black">
-                  {(subject.term2.unitTest +
-                    subject.term2.internal +
+                  {(subject.term2.unitTest2 +
+                    subject.term2.internal2 +
                     subject.term2.annual) /
                     2}
                 </td>
-                <td className="border border-black">{subject.overallTotal}</td>
-                <td className="border border-black font-semibold text-green-700">{subject.grade}</td>
+                <td className="border border-black">
+                  {(subject.term1.unitTest +
+                    subject.term1.internal +
+                    subject.term1.halfYearly) /
+                    2 +
+                    (subject.term2.unitTest2 +
+                      subject.term2.internal2 +
+                      subject.term2.annual) /
+                      2}
+                </td>
+                <td className="border border-black font-semibold text-green-700">
+                  {subject.grade}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -282,7 +255,9 @@ const ResultPrint = ({data2}) => {
 
           {/* Principal Signature */}
           <div className="flex w-1/3 items-center justify-end">
-            <p className="text-sm font-semibold">Result: Passed / Promoted / E.R.</p>
+            <p className="text-sm font-semibold">
+              Result: Passed / Promoted / E.R.
+            </p>
           </div>
         </div>
 

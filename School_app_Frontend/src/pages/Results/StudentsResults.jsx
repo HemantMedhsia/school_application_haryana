@@ -691,10 +691,12 @@ const StudentsResults = () => {
           </div>
         </div>
       )}
-      {resultPrintData &&
-        resultPrintData.studentRecords.map((studentRecord, index) => (
-          <ResultPrint key={index} data2={studentRecord} />
-        ))}
+      <div>
+        {resultPrintData &&
+          resultPrintData.studentRecords.map((studentRecord, index) => (
+            <ResultPrint key={index} data2={studentRecord} />
+          ))}
+      </div>
     </div>
   );
 };
