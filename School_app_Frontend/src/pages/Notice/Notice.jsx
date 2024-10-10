@@ -25,7 +25,7 @@ const Notice = () => {
   };
 
   const handleSubmit = async (e) => {
-    const schoolId = import.meta.env.SchoolId;
+    const schoolId = import.meta.env.VITE_SchoolId;
     e.preventDefault();
     try {
       const response = await axios.post(

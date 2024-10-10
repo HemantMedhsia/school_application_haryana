@@ -60,7 +60,7 @@ const StaffAdd = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const schoolId = import.meta.env.SchoolId;
+    const schoolId = import.meta.env.VITE_SchoolId; 
     const requiredFields = [
       "name",
       "age",

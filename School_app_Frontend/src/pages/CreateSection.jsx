@@ -56,8 +56,8 @@ const CreateSection = () => {
   };
 
   const fetchSections = async () => {
-    setLoading(true);
     try {
+      setLoading(true);
       const response = await getAPI("getAllSections", {}, setSections);
       setSections(response.data);
     } catch (error) {
@@ -85,14 +85,6 @@ const CreateSection = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="loader-wrapper">
-        <span className="loader"></span>
-      </div>
-    );
-  }
-
   return (
     <div className="flex">
       {/* Left Side: Form */}
@@ -118,11 +110,22 @@ const CreateSection = () => {
       </div>
 
       {/* Right Side: Display Sections */}
+
       <div className="w-1/2 mt-8 ml-4">
         <div className="w-full p-4 rounded-lg shadow-md">
           <h2 className="text-2xl font-semibold text-[#7367F0] mb-6">
             Sections
           </h2>
+
+          {loading ? (
+            <div className="flex ">
+              <span className="loader"></span>
+            </div>
+          ) : (
+            sections.length === 0 && (
+              <p className="text-red-700">No sections found</p>
+            )
+          )}
 
           <ul className="flex flex-col w-[25%] ">
             {sections.map((section, index) => (
