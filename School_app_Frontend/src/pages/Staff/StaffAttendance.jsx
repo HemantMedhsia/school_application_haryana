@@ -192,7 +192,6 @@ const StaffAttendance = () => {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Staff Attendance</h1>
       <StaffAttendanceSearchBar
         onSearch={handleSearch}
         placeholder="Search by staff name or employee ID"
@@ -200,6 +199,10 @@ const StaffAttendance = () => {
       {loading ? (
         <div className="loader-wrapper">
           <span className="loader"></span>
+        </div>
+      ) : filteredStaffData.length === 0 ? (
+        <div className="no-data-message text-xl flex justify-center text-red-500">
+          Oops! No Staff Attendance Records Found.
         </div>
       ) : (
         <Datatable
@@ -213,14 +216,16 @@ const StaffAttendance = () => {
           attendanceStatus={attendanceStatus}
         />
       )}
-      <div className="flex justify-end">
-        <button
-          onClick={handleSave}
-          className="bg-[#283046] hover:bg-gray-900 hover:border border-[#65FA9E] text-[#65FA9E] font-bold py-1 px-6 rounded"
-        >
-          Save
-        </button>
-      </div>
+      {staffAttendance.length > 0 && (
+        <div className="flex justify-end">
+          <button
+            onClick={handleSave}
+            className="bg-[#283046] hover:bg-gray-900 hover:border border-[#65FA9E] text-[#65FA9E] font-bold py-1 px-6 rounded"
+          >
+            Save
+          </button>
+        </div>
+      )}
       <ToastContainer />
     </div>
   );

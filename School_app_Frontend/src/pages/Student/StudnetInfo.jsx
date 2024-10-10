@@ -70,8 +70,6 @@ const StudentInfo = () => {
                 attendancePercentage: 0, // Default in case of error
                 grade: "A", // Example grade
               };
-            } finally {
-              setLoading(false);
             }
           })
         );
@@ -85,6 +83,9 @@ const StudentInfo = () => {
       }
     } catch (error) {
       console.error("Error fetching student data:", error);
+    } finally {
+      // Move setLoading(false) here to ensure it's called after all operations
+      setLoading(false);
     }
   };
 
@@ -249,8 +250,13 @@ const StudentInfo = () => {
         onSearch={handleSearch}
       />
       {loading ? (
-        <div className="loader-wrapper">
-          <span className="loader"></span>
+          <div className="loader-wrapper">
+            <span className="loader"></span>
+          
+        </div>
+      ) : filteredStudentData.length === 0 ? (
+        <div className="no-data-message text-xl flex justify-center text-red-500">
+          Oops! No Students Records Found.
         </div>
       ) : (
         <Datatable
@@ -263,6 +269,7 @@ const StudentInfo = () => {
           }}
         />
       )}
+
       <ConfirmationModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

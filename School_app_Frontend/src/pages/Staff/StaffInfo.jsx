@@ -112,8 +112,8 @@ const StaffInfo = () => {
           }}
         />
       ) : (
-        <div className="text-center mt-4 text-red-600">
-          <h3>No staff members found.</h3>
+        <div className="text-center text-xl mt-4 text-red-600">
+          <h3>Oops! No Staff Records Found.</h3>
         </div>
       )}
       <ConfirmationModal

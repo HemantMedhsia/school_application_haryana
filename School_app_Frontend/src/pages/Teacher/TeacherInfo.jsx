@@ -43,12 +43,16 @@ const TeacherInfo = () => {
 
   useEffect(() => {
     // Filter the teacher data based on the search text
-    const filteredData = allTeacherData.filter(
-      (teacher) =>
-        teacher.name.toLowerCase().includes(searchText.toLowerCase()) ||
-        teacher.subject.toLowerCase().includes(searchText.toLowerCase()) // Add more fields as needed
-    );
-    setFilteredTeacherData(filteredData);
+    try {
+      const filteredData = allTeacherData?.filter(
+        (teacher) =>
+          teacher.name.toLowerCase().includes(searchText.toLowerCase()) ||
+          teacher.subject.toLowerCase().includes(searchText.toLowerCase()) // Add more fields as needed
+      );
+      setFilteredTeacherData(filteredData);
+    } catch (error) {
+      toast.error("Something went wrong while filtering data.");
+    }
   }, [searchText, allTeacherData]);
 
   const handleView = (teacherData) => {
@@ -92,6 +96,10 @@ const TeacherInfo = () => {
       {loading ? (
         <div className="loader-wrapper">
           <span className="loader"></span>
+        </div>
+      ) : filteredTeacherData.length === 0 ? (
+        <div className="no-data-message text-xl flex justify-center text-red-500">
+          Oops! No Teacher Records Found.
         </div>
       ) : (
         <Datatable

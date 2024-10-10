@@ -97,6 +97,10 @@ const ParentInfo = () => {
         <div className="loader-wrapper">
           <span className="loader"></span>
         </div>
+      ) : allParentData.length === 0 ? (
+        <div className="no-data-message text-xl flex justify-center text-red-500">
+          Oops! No Parents Records Found.
+        </div>
       ) : (
         <Datatable
           data={allParentData}

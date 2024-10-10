@@ -95,8 +95,6 @@ const TeacherAttendance = () => {
                 ...teacher,
                 attendancePercentage: 0,
               };
-            } finally {
-              setLoading(false);
             }
           })
         );
@@ -107,6 +105,8 @@ const TeacherAttendance = () => {
     } catch (error) {
       console.error("Error fetching teacher data:", error);
       toast.error("Error fetching teacher data!");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -200,11 +200,14 @@ const TeacherAttendance = () => {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Teacher Attendance</h1>
       <TeacherAttendenceSearchBar onSearch={handleSearch} />
       {loading ? (
         <div className="loader-wrapper">
           <span className="loader"></span>
+        </div>
+      ) : filteredTeacherData.length === 0 ? (
+        <div className="no-data-message text-xl flex justify-center text-red-500">
+          Oops! No Teacher Attendance Records Found.
         </div>
       ) : (
         <Datatable
@@ -219,14 +222,16 @@ const TeacherAttendance = () => {
         />
       )}
 
-      <div className="flex justify-end">
-        <button
-          onClick={handleSave}
-          className="bg-[#283046] hover:bg-gray-900 hover:border border-[#65FA9E] text-[#65FA9E] font-bold py-1 px-6 rounded"
-        >
-          Save
-        </button>
-      </div>
+      {teacherAttendance.length > 0 && (
+        <div className="flex justify-end">
+          <button
+            onClick={handleSave}
+            className="bg-[#283046] hover:bg-gray-900 hover:border border-[#65FA9E] text-[#65FA9E] font-bold py-1 px-6 rounded"
+          >
+            Save
+          </button>
+        </div>
+      )}
       <ToastContainer />
     </div>
   );

@@ -407,7 +407,9 @@ body {
 .loader-wrapper {
   display: flex;
   justify-content: center;
-  height: 100vh; /* Full screen height */
+  align-items: center;
+  height: 40vh; /* Full screen height */
+  padding-right: 40px;
 }
 
 .loader {
@@ -472,4 +474,4 @@ body {
 .no-print {
   display: none; /* Hide in regular view */
 }
-  
+
