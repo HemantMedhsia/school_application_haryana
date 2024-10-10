@@ -50,7 +50,7 @@ const studentSchema = new mongoose.Schema({
         type: String,
     },
     religion: {
-        type: String,   //relogion
+        type: String,  
     },
     caste: {
         type: String,
