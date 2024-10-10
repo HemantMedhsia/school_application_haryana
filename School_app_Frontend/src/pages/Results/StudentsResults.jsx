@@ -6,6 +6,7 @@ import axios from "axios";
 import FormButton from "../../components/Form/FormButton";
 import ResultPrint from "../Print/ResultPrint";
 import { useReactToPrint } from "react-to-print";
+import { toast, ToastContainer } from "react-toastify";
 
 const StudentsResults = () => {
   const [tabledata, setTableData] = useState([]);
@@ -53,6 +54,13 @@ const StudentsResults = () => {
           termIds: selectedTermId,
         }
       );
+      if (response.data.data.length === 0) {
+        toast.error("No data found for selected students");
+        console.log("No data found for selected students");
+        return;
+      } else {
+        toast.success("Data fetched successfully");
+      }
       console.log("Response", response.data.data);
       setResultPrintData(response.data.data);
     } catch (error) {
@@ -81,14 +89,15 @@ const StudentsResults = () => {
       }));
       setTableData(transformedData);
       console.log("Table Data", transformedData);
+      if (transformedData.length === 0) {
+        toast.error("No data found for selected class and term");
+      } else {
+        toast.success("Data fetched successfully");
+      }
     } catch (error) {
       console.error("Error fetching data", error);
     }
   };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
 
   useEffect(() => {
     fetchData();
@@ -169,7 +178,7 @@ const StudentsResults = () => {
     console.log("term", term);
   };
 
-  const handlePrint = useReactToPrint({contentRef: printRef});
+  const handlePrint = useReactToPrint({ contentRef: printRef });
 
   const handlePrintPopup = async () => {
     console.log("classId", selectedClassId);
@@ -185,8 +194,8 @@ const StudentsResults = () => {
       handlePrint();
     } catch (error) {
       console.error("Error fetching students", error);
+      toast.error("Error fetching students!");
     }
-    setPrintResultPopup(true);
   };
 
   const handleStudentCheckboxChange = (studentId) => {
@@ -222,14 +231,25 @@ const StudentsResults = () => {
     <div>
       <div className="flex items-center justify-between gap-6 flex-wrap bg-[#283046] rounded-lg shadow-md">
         <DynamicFilterBar filters={filters} onSubmit={handleFilterSubmit} />
-        <div className="flex items-center mr-4 justify-center">
-          <FormButton name="Print Results" onClick={handlePrintPopup} />
-        </div>
+        {tabledata.length > 0 && (
+          <div className="flex items-center mr-4 justify-center">
+            <FormButton
+              name="Print Results"
+              onClick={() => setPrintResultPopup(true)}
+            />
+          </div>
+        )}
       </div>
 
-      <div className="mt-4">
-        <MultiRowValuesDatatable data={tabledata} actions={actions} />
-      </div>
+      {tabledata.length === 0 ? (
+        <div className="no-data-message text-xl flex mt-4 justify-center text-red-500">
+          Select class and term to view results
+        </div>
+      ) : (
+        <div className="mt-4">
+          <MultiRowValuesDatatable data={tabledata} actions={actions} />
+        </div>
+      )}
 
       {/* Custom Popup for displaying selected exam data */}
       {isPopupOpen && selectedExamData && (
@@ -698,6 +718,7 @@ const StudentsResults = () => {
             <ResultPrint key={index} data2={studentRecord} />
           ))}
       </div>
+      <ToastContainer />
     </div>
   );
 };
