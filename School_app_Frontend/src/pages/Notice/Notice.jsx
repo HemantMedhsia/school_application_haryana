@@ -80,8 +80,8 @@ const Notice = () => {
             onChange={handleChange}
             options={[
               { id: "Student", name: "Student" },
-              { id: "Teacher", name: "Teacher" },
-              { id: "Parent", name: "Parent" },
+              { id: "Teachers", name: "Teachers" },
+              { id: "Parents", name: "Parents" },
               { id: "All", name: "All" },
             ]}
           />
