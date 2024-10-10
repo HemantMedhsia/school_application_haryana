@@ -317,10 +317,10 @@ const CreateTimetable = () => {
       .catch((error) => {
         if (
           error.response &&
-          error.response.data &&
+          error.response.data.data &&
           error.response.data.message
         ) {
-          toast.error(`Error: ${error.response.data.message}`);
+          toast.error(` ${error.response.data.data}`);
         } else {
           toast.error("Error creating timetable. Please try again.");
         }
