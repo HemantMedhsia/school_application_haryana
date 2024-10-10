@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import MultiRowValuesDatatable from "../../common/Datatables/MultiRowValuesDatatable";
 import DynamicFilterBar from "../../common/FilterBar/DynamicFilterBar";
 import { getAPI } from "../../utility/api/apiCall";
 import axios from "axios";
 import FormButton from "../../components/Form/FormButton";
 import ResultPrint from "../Print/ResultPrint";
+import { useReactToPrint } from "react-to-print";
 
 const StudentsResults = () => {
   const [tabledata, setTableData] = useState([]);
@@ -23,6 +24,8 @@ const StudentsResults = () => {
   const [selectedClassId, setSelectedClassId] = useState("");
   const [searchText, setSearchText] = useState("");
   const [resultPrintData, setResultPrintData] = useState();
+
+  const printRef = useRef();
 
   const filteredStudents = students.filter((student) =>
     student.name.toLowerCase().includes(searchText.toLowerCase())
@@ -45,13 +48,9 @@ const StudentsResults = () => {
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/print-result-byclass`,
         {
-          classId: "66eab293d46b2fb3b37f1334",
-          studentIds: [
-            "66f25c8e4e33b19084a099fe",
-            "66f3a68a7548325c6722012a",
-            "66f67844b23a67c92074b881",
-          ],
-          termIds: ["66ec0460b45bdea1571d6a1b", "66ebb0cf461f67df6bdafcfc"],
+          classId: selectedClassId,
+          studentIds: selectedStudents,
+          termIds: selectedTermId,
         }
       );
       console.log("Response", response.data.data);
@@ -170,6 +169,8 @@ const StudentsResults = () => {
     console.log("term", term);
   };
 
+  const handlePrint = useReactToPrint({contentRef: printRef});
+
   const handlePrintPopup = async () => {
     console.log("classId", selectedClassId);
     try {
@@ -181,11 +182,11 @@ const StudentsResults = () => {
       setStudents(response.data.data || []);
       setSelectedStudents([]); // Clear previous selection
       fetchResultData();
+      handlePrint();
     } catch (error) {
       console.error("Error fetching students", error);
     }
     setPrintResultPopup(true);
-    // generatePDF();
   };
 
   const handleStudentCheckboxChange = (studentId) => {
@@ -691,7 +692,7 @@ const StudentsResults = () => {
           </div>
         </div>
       )}
-      <div>
+      <div ref={printRef}>
         {resultPrintData &&
           resultPrintData.studentRecords.map((studentRecord, index) => (
             <ResultPrint key={index} data2={studentRecord} />
