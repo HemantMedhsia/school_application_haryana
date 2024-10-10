@@ -31,7 +31,9 @@ const AddSubjects = () => {
   };
 
   const handleSubmit = async (e) => {
-    const schoolId = import.meta.env.SchoolId;
+    const schoolId = import.meta.env.VITE_SchoolId;
+    console.log("schoolId", schoolId);
+    console.log("envireonment", import.meta.env);
     e.preventDefault();
     try {
       if (editingSubject) {
@@ -49,6 +51,7 @@ const AddSubjects = () => {
         );
         toast.success("Subject updated successfully");
       } else {
+        console.log("schoolId", schoolId);
         const newSubject = { name: subjectName, code: subjectCode };
         await axios.post(
           `${import.meta.env.VITE_BACKEND_URL}/api/create-subject/${schoolId}`,

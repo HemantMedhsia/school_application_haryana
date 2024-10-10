@@ -126,7 +126,7 @@ const StudentAdd = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const schoolId = import.meta.env.SchoolId;
+    const schoolId = import.meta.env.VITE_SchoolId;
 
     try {
       const response = studentId

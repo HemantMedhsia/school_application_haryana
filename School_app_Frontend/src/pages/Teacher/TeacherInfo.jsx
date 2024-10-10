@@ -93,6 +93,10 @@ const TeacherInfo = () => {
         <div className="loader-wrapper">
           <span className="loader"></span>
         </div>
+      ) : filteredTeacherData.length === 0 ? (
+        <div className="flex justify-center items-center h-[80vh]">
+          <h1 className="text-xl text-red-600">No Teacher Data Found</h1>
+        </div>
       ) : (
         <Datatable
           columns={columns}

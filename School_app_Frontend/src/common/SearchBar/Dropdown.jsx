@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const Dropdown = ({ label, items, onSelect }) => {
+const Dropdown = ({ label, items=[], onSelect }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(label);
 
