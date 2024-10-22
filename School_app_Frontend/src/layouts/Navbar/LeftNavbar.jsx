@@ -7,7 +7,7 @@ import { navigation } from "./NavbarData/NavigationData.js";
 
 const LeftNavbar = ({ role, onToggle }) => {
   const [dropdownOpen, setDropdownOpen] = useState({});
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
   const location = useLocation();
 
   const handleDropdownClick = (name) => {
@@ -27,11 +27,24 @@ const LeftNavbar = ({ role, onToggle }) => {
   };
 
   return (
-    <div className={`fixed top-0 left-0 h-full bg-[#283046] transition-width duration-300   ${isCollapsed ? "w-20" : "w-64"}`}>
+    <div
+      className={`fixed top-0 left-0 h-full bg-[#283046] transition-width duration-300   ${
+        isCollapsed ? "w-20" : "w-64"
+      }`}
+    >
       <div className="flex flex-col h-full text-white">
         <div className="flex items-center justify-between h-16 p-2 bg-[#283046]">
-          <img src={aradhyaTechLogo} alt="Logo" className={`h-16 mt-2 transition-all duration-300 ${isCollapsed ? "hidden" : "block"}`} />
-          <button onClick={handleToggleCollapse} className="text-white focus:outline-none">
+          <img
+            src={aradhyaTechLogo}
+            alt="Logo"
+            className={`h-16 mt-2 transition-all duration-300 ${
+              isCollapsed ? "hidden" : "block"
+            }`}
+          />
+          <button
+            onClick={handleToggleCollapse}
+            className="text-white focus:outline-none"
+          >
             {isCollapsed ? "➔" : "←"}
           </button>
         </div>
