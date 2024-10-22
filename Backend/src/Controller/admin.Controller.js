@@ -58,7 +58,7 @@ export const loginAdmin = wrapAsync(async (req, res, next) => {
         return next(
             new ApiError(400, "Email , password and role are required")
         );
-    }
+    }   
 
     const admin = await Admin.findOne({ email });
 
