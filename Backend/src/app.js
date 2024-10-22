@@ -106,7 +106,7 @@ app.use("/api", ContactRoute);
 
 // Global error handling middleware
 app.use((err, req, res, next) => {
-    let { statusCode, message } = err;
+    let { statusCode, message } = err;a
     res.status(statusCode).json(message);
 });
 

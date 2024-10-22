@@ -50,7 +50,7 @@ export const AuthProvider = ({ children }) => {
     const handleTokenRefresh = async () => {
       if (authToken) {
         const decodedToken = jwtDecode(authToken);
-        const currentTime = Date.now() / 1000;
+        const currentTime = Date.now() / 1000;  
 
         if (decodedToken.exp < currentTime + 60) {
           if (refreshToken) {
