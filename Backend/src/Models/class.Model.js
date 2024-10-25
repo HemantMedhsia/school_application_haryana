@@ -12,9 +12,14 @@ const classSchema = new mongoose.Schema({
     subjectGroups: [
         {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "SubjectGroup", 
+            ref: "SubjectGroup",
         },
     ],
+                                                                                                                                                                                    
+    discount: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "FessDiscount",
+    },
 });
 
 export const Class = mongoose.model("Class", classSchema);

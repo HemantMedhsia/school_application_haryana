@@ -77,14 +77,14 @@ const parentSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Student",
     },
+
+    
 });
 
 parentSchema.pre("save", async function (next) {
     try {
-        // Hash the password only if it has been modified or is new
         if (!this.isModified("password")) return next();
 
-        // Generate a salt and hash the password
         const salt = await bcrypt.genSalt(10);
         this.password = await bcrypt.hash(this.password, salt);
         next();
@@ -93,7 +93,6 @@ parentSchema.pre("save", async function (next) {
     }
 });
 
-// Method to validate the password
 parentSchema.methods.isValidPassword = async function (password) {
     try {
         return await bcrypt.compare(password, this.password);
