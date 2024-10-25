@@ -353,6 +353,27 @@ export const navigation = [
     ],
   },
   {
+    name: "Fees Management",
+    to: "/fees",
+    icon: FaBell,
+    current: false,
+    roles: ["Admin"],
+    children: [
+      {
+        name: "Fees Discount",
+        to: "/school/fees-discount",
+        icon: FaUser,
+        roles: ["Admin"],
+      },
+      {
+        name: "Fees Discount",
+        to: "/school/fees-discount",
+        icon: FaUser,
+        roles: ["Admin"],
+      },
+    ],
+  },
+  {
     name: "Attendance",
     to: "/school/student-attendance-view",
     icon: FaBell,

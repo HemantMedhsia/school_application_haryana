@@ -7,7 +7,7 @@ import { navigation } from "./NavbarData/NavigationData.js";
 
 const LeftNavbar = ({ role, onToggle }) => {
   const [dropdownOpen, setDropdownOpen] = useState({});
-  const [isCollapsed, setIsCollapsed] = useState(true);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const location = useLocation();
 
   const handleDropdownClick = (name) => {
