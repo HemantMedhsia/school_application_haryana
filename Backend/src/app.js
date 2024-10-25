@@ -29,6 +29,10 @@ import { markRoute } from "./Routes/mark.Route.js";
 import { classTimeTableRoute } from "./Routes/classTimeTable.Route.js";
 import { resultRoute } from "./Routes/result.Route.js";
 import { ContactRoute } from "./Routes/Contact.Route.js";
+import { feesDiscountRouter } from "./Routes/feesDiscount.Route.js";
+import { feesTypeRouter } from "./Routes/feesType.Route.js";
+import { feesGroupRouter } from "./Routes/feesGroup.Route.js";
+import { feesMasterRouter } from "./Routes/feesMaster.Route.js";
 
 const app = express();
 
@@ -103,10 +107,14 @@ app.use("/api", markRoute);
 app.use("/api", classTimeTableRoute);
 app.use("/api", resultRoute);
 app.use("/api", ContactRoute);
+app.use("/api", feesDiscountRouter);
+app.use("/api", feesTypeRouter);
+app.use("/api", feesGroupRouter);
+app.use("/api", feesMasterRouter);
 
 // Global error handling middleware
 app.use((err, req, res, next) => {
-    let { statusCode, message } = err;a
+    let { statusCode, message } = err;
     res.status(statusCode).json(message);
 });
 
