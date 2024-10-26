@@ -5,6 +5,7 @@ import { deleteAPI, getAPI } from "../../utility/api/apiCall";
 import { useNavigate } from "react-router-dom";
 import ConfirmationModal from "../../common/ConfirmationModal/ConfirmationModal";
 import DetailsSelectionModal from "../../common/ConfirmationModal/DetailsSelectionModal";
+import StudentSearchPopup from "./StudentPopup"; // Import the new popup component
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 
@@ -22,6 +23,9 @@ const StudentInfo = () => {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [searchText, setSearchText] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isStudentSearchOpen, setIsStudentSearchOpen] = useState(false); // State for the popup
+  const [currentStudentId, setCurrentStudentId] = useState(null); // State for current student ID
+  const [currentParentId, setCurrentParentId] = useState(null); // State for current parent ID
   const navigate = useNavigate();
 
   const fetchDropdownData = async () => {
@@ -74,17 +78,12 @@ const StudentInfo = () => {
           })
         );
 
-        console.log(
-          "Updated student data with attendance percentage:",
-          updatedResponse
-        );
         setAllStudentData(updatedResponse);
         setFilteredStudentData(updatedResponse);
       }
     } catch (error) {
       console.error("Error fetching student data:", error);
     } finally {
-      // Move setLoading(false) here to ensure it's called after all operations
       setLoading(false);
     }
   };
@@ -92,15 +91,13 @@ const StudentInfo = () => {
   // Handle filter logic
   const handleFilter = ({ type, value }) => {
     let filteredData = allStudentData;
-    console.log("filteredData", filteredData);
 
     if (type === "class" && value) {
-      setSelectedClass(value); // Store selected class
+      setSelectedClass(value);
       filteredData = filteredData.filter(
         (student) => student.currentClass._id === value._id
       );
     } else if (type === "section" && value && selectedClass) {
-      // Check if a class is selected
       filteredData = filteredData.filter(
         (student) => student.currentSection._id === value._id
       );
@@ -128,7 +125,6 @@ const StudentInfo = () => {
     if (type === "student") {
       navigate(`/school/student-admission/${selectedStudent._id}`);
     } else if (type === "parent") {
-      console.log("selected", selectedStudent._id);
       navigate(`/school/parent-update-student/${selectedStudent._id}`);
     }
   };
@@ -166,9 +162,9 @@ const StudentInfo = () => {
     },
     {
       header: "Attendance Percentage",
-      accessor: "attendancePercentage", // Corrected the field name
+      accessor: "attendancePercentage",
       render: (rowData) => {
-        const attendanceValue = parseFloat(rowData.attendancePercentage); // Using the correct field
+        const attendanceValue = parseFloat(rowData.attendancePercentage);
         return (
           <div className="flex items-center">
             <span className="mr-2">{attendanceValue}%</span>
@@ -179,16 +175,16 @@ const StudentInfo = () => {
                     width: `${attendanceValue}%`,
                     backgroundColor:
                       attendanceValue >= 90
-                        ? "#00e676" // Bright green for 90% and above
+                        ? "#00e676"
                         : attendanceValue >= 80
-                        ? "#66bb6a" // Green for 80% to 89%
+                        ? "#66bb6a"
                         : attendanceValue >= 70
-                        ? "#ffeb3b" // Yellow for 70% to 79%
+                        ? "#ffeb3b"
                         : attendanceValue >= 60
-                        ? "#ffa726" // Orange for 60% to 69%
+                        ? "#ffa726"
                         : attendanceValue >= 50
-                        ? "#ff7043" // Dark orange for 50% to 59%
-                        : "#f44336", // Red for below 50%
+                        ? "#ff7043"
+                        : "#f44336",
                   }}
                   className="h-2 shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center"
                 />
@@ -215,8 +211,10 @@ const StudentInfo = () => {
     setIsModalOpen(true);
   };
 
-  const handleCustomAction = () => {
-    
+  const handleCustomAction = (studentData) => {
+    setCurrentStudentId(studentData._id); // Set the current student ID
+    setCurrentParentId(studentData.parent); // Set the current parent ID (assume parentId is available in studentData)
+    setIsStudentSearchOpen(true); // Open the popup for custom action
   };
 
   const confirmDelete = async () => {
@@ -242,6 +240,12 @@ const StudentInfo = () => {
         setStudentToDelete(null);
       }
     }
+  };
+
+  const handleAddStudent = (student) => {
+    console.log("Student added:", student);
+    toast.success(`${student.firstName} has been added successfully.`);
+    setIsStudentSearchOpen(false); // Close the popup after adding
   };
 
   return (
@@ -286,6 +290,13 @@ const StudentInfo = () => {
         isOpen={isDetailsModalOpen}
         onClose={closeDetailsModal}
         onSelect={handleDetailsSelect}
+      />
+      <StudentSearchPopup
+        isOpen={isStudentSearchOpen}
+        onClose={() => setIsStudentSearchOpen(false)}
+        onAddStudent={handleAddStudent}
+        studentId={currentStudentId}
+        parentId={currentParentId}
       />
       <ToastContainer />
     </div>

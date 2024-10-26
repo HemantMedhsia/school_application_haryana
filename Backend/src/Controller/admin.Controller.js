@@ -14,7 +14,7 @@ const generateAccessAndRefreshTokens = async (adminId, next) => {
     if (!admin) {
         return next(new ApiError(404, "Admin not found"));
     }
-
+// helo
     const accessToken = generateAccessToken(admin);
     const refreshToken = generateRefreshToken(admin);
 
