@@ -5,96 +5,6 @@ import { Parent } from "../Models/parents.model.js";
 import { ApiResponse } from "../Utils/responseHandler.js";
 import { ApiError } from "../Utils/errorHandler.js";
 
-// export const addOrCreateSiblingGroup = wrapAsync(async (req, res, next) => {
-//     const { primaryStudentId, studentIds, parentId } = req.body;
-
-//     const primaryStudent = await Student.findById(primaryStudentId);
-
-//     if (!primaryStudent) {
-//         return res
-//             .status(404)
-//             .json(new ApiResponse(404, "Primary student not found"));
-//     }
-
-//     // Check if the primary student already belongs to another sibling group
-//     if (primaryStudent.siblingGroupId) {
-//         return res
-//             .status(400)
-//             .json(
-//                 new ApiResponse(
-//                     400,
-//                     "Primary student already belongs to another sibling group"
-//                 )
-//             );
-//     }
-
-//     let siblingGroup;
-
-//     if (primaryStudent.siblingGroupId) {
-//         siblingGroup = await SiblingGroup.findById(
-//             primaryStudent.siblingGroupId
-//         );
-
-//         if (!siblingGroup) {
-//             return res
-//                 .status(404)
-//                 .json(new ApiResponse(404, "Sibling group not found"));
-//         }
-//     } else {
-//         siblingGroup = new SiblingGroup({
-//             students: [primaryStudentId],
-//             parentId,
-//         });
-//         await siblingGroup.save();
-
-//         primaryStudent.siblingGroupId = siblingGroup._id;
-//         await primaryStudent.save();
-//     }
-
-//     for (const studentId of studentIds) {
-//         const student = await Student.findById(studentId);
-
-//         if (!student) {
-//             return res
-//                 .status(404)
-//                 .json(
-//                     new ApiResponse(
-//                         404,
-//                         `Student with ID ${studentId} not found`
-//                     )
-//                 );
-//         }
-
-//         // Check if the student already belongs to another sibling group
-//         if (student.siblingGroupId) {
-//             return res
-//                 .status(400)
-//                 .json(
-//                     new ApiResponse(
-//                         400,
-//                         `Student with ID ${studentId} already belongs to another sibling group`
-//                     )
-//                 );
-//         }
-//     }
-
-//     for (const studentId of studentIds) {
-//         const student = await Student.findById(studentId);
-
-//         if (!siblingGroup.students.includes(studentId)) {
-//             siblingGroup.students.push(studentId);
-//             await siblingGroup.save();
-
-//             student.siblingGroupId = siblingGroup._id;
-//             await student.save();
-//         }
-//     }
-
-//     return res
-//         .status(200)
-//         .json(new ApiResponse(200, siblingGroup, "Sibling group updated"));
-// });
-
 export const addOrCreateSiblingGroup = wrapAsync(async (req, res, next) => {
     const { primaryStudentId, studentIds, parentId } = req.body;
 
@@ -266,4 +176,21 @@ export const deleteSiblingGroup = wrapAsync(async (req, res, next) => {
     res.status(200).json({
         message: "Sibling group deleted successfully!",
     });
+});
+
+export const getAllSiblingGroup = wrapAsync(async (req, res, next) => {
+    const siblingGroups = await SiblingGroup.find().populate(
+        "students",
+        "firstName lastName currentClass"
+    );
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                siblingGroups,
+                "Sibling groups fetched successfully!"
+            )
+        );
 });

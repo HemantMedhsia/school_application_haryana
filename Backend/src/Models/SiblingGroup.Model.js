@@ -9,6 +9,7 @@ const siblingGroupSchema = new mongoose.Schema({
     parentId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Parent",
+        required: true,
     },
 });
 
