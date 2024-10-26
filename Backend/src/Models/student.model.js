@@ -132,6 +132,11 @@ const studentSchema = new mongoose.Schema({
         type: String,
         default: "Student",
     },
+    siblingGroupId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "SiblingGroup",
+        index: true,
+    },
 });
 
 studentSchema.pre("save", async function (next) {
