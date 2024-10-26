@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { getAPI } from "../../utility/api/apiCall";
 import axios from "axios";
 
-const StudentSearchPopup = ({ isOpen, onClose, onAddStudent, studentId, parentId }) => {
+const StudentSearchPopup = ({ isOpen, onClose, onAddStudent, studentId, parent }) => {
   const [searchText, setSearchText] = useState("");
   const [students, setStudents] = useState([]);
   const [filteredStudents, setFilteredStudents] = useState([]);
@@ -15,7 +15,7 @@ const StudentSearchPopup = ({ isOpen, onClose, onAddStudent, studentId, parentId
 
   const fetchStudents = async () => {
     try {
-      console.log("Fetching siblings for student:", studentId, "and parent:", parentId);
+      console.log("Fetching siblings for student:", studentId, "and parent:", parent);
       const response = await getAPI("getAllStudents", {}, setStudents);
       if (response.data && Array.isArray(response.data)) {
         setStudents(response.data);
@@ -44,6 +44,7 @@ const StudentSearchPopup = ({ isOpen, onClose, onAddStudent, studentId, parentId
 
   const handleAddSibling = async (selectedStudentId) => {
     if (!studentId || !parent) {
+        console.log(parent._id)
       console.error("Student ID or Parent ID is missing!");
       return;
     }
@@ -114,9 +115,9 @@ const StudentSearchPopup = ({ isOpen, onClose, onAddStudent, studentId, parentId
                     <p className="text-gray-500 text-sm">Roll No: {student.rollNumber}</p>
                   </div>
                 </div>
-                {/* <p className="text-gray-600 mb-4">
+                <p className="text-gray-600 mb-4">
                   <strong>Father's Name:</strong> {student.parent?.fatherName || "N/A"}
-                </p> */}
+                </p>
                 <button
                   onClick={() => handleAddSibling(student._id)}
                   className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition-colors duration-200"

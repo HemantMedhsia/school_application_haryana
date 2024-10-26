@@ -244,7 +244,7 @@ const StudentInfo = () => {
 
   const handleAddStudent = (student) => {
     console.log("Student added:", student);
-    toast.success(`${student.firstName} has been added successfully.`);
+    toast.success(`Added successfully.`);
     setIsStudentSearchOpen(false); // Close the popup after adding
   };
 
@@ -296,7 +296,7 @@ const StudentInfo = () => {
         onClose={() => setIsStudentSearchOpen(false)}
         onAddStudent={handleAddStudent}
         studentId={currentStudentId}
-        parentId={currentParentId}
+        parent={currentParentId}
       />
       <ToastContainer />
     </div>
