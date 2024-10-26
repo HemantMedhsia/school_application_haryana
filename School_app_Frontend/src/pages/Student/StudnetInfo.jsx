@@ -27,6 +27,7 @@ const StudentInfo = () => {
   const [currentStudentId, setCurrentStudentId] = useState(null); // State for current student ID
   const [currentParentId, setCurrentParentId] = useState(null); // State for current parent ID
   const [siblingsData, setSiblingsData] = useState([]); // State for siblings data
+  const [siblingGroupId, setSiblingGroupId] = useState([]);
   const [isSiblingsModalOpen, setIsSiblingsModalOpen] = useState(false); // State for siblings modal
   const navigate = useNavigate();
 
@@ -55,7 +56,9 @@ const StudentInfo = () => {
           response.data.map(async (student) => {
             try {
               const { data } = await axios.get(
-                `${import.meta.env.VITE_BACKEND_URL}/api/get-student-attendance-summary/${student._id}`
+                `${
+                  import.meta.env.VITE_BACKEND_URL
+                }/api/get-student-attendance-summary/${student._id}`
               );
 
               const attendancePercentage = data?.data?.percentage;
@@ -249,20 +252,31 @@ const StudentInfo = () => {
   };
 
   const handleViewSiblings = async (studentData) => {
+    setSiblingGroupId(studentData.siblingGroupId);
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/api/get-sibling-group-studentid/${studentData._id}`
+        `${import.meta.env.VITE_BACKEND_URL}/api/get-sibling-group-studentid/${
+          studentData._id
+        }`
       );
+      console.log("this is response", response);
       if (response.status === 200) {
         setSiblingsData(response.data.data);
         setIsSiblingsModalOpen(true); // Open the modal with siblings data
-      } else {
-        toast.error("Failed to fetch siblings.");
+      } else if (response.status === 404) {
+        toast.error("No Siblings Available");
       }
     } catch (error) {
       console.error("Error fetching siblings:", error);
-      toast.error("Failed to fetch siblings.");
+      toast.error(error.message);
     }
+  };
+
+  const handleSiblingRemoved = (studentId) => {
+    setSiblingsData((prevData) =>
+      prevData.filter((sibling) => sibling._id !== studentId)
+    );
+    toast.success("Sibling removed successfully.");
   };
 
   return (
@@ -320,45 +334,87 @@ const StudentInfo = () => {
         isOpen={isSiblingsModalOpen}
         onClose={() => setIsSiblingsModalOpen(false)}
         siblings={siblingsData}
+        siblingGroupId={siblingGroupId}
+        onSiblingRemoved={handleSiblingRemoved}
       />
       <ToastContainer />
     </div>
   );
 };
 
-const SiblingModal = ({ isOpen, onClose, siblings }) => {
+const SiblingModal = ({
+  isOpen,
+  onClose,
+  siblings,
+  siblingGroupId,
+  onSiblingRemoved,
+}) => {
+  const handleRemoveSibling = async (studentId) => {
+    try {
+      const response = await axios.put(
+        `${import.meta.env.VITE_BACKEND_URL}/api/remove-sibling-from-group`,
+        {
+          siblingGroupId,
+          studentId,
+        }
+      );
+      if (response.status === 200) {
+        onSiblingRemoved(studentId);
+      } else {
+        console.error("Failed to remove sibling.");
+      }
+    } catch (error) {
+      console.error("Error removing sibling:", error);
+    }
+  };
+
   return (
     <div
-      className={`fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center ${
+      className={`fixed inset-0 bg-gray-900 bg-opacity-90 flex justify-center items-center ${
         isOpen ? "" : "hidden"
       }`}
       style={{ zIndex: 1000 }}
     >
-      <div className="bg-white p-8 rounded-lg w-4/5 max-h-[85%] overflow-y-auto shadow-xl">
+      <div className="bg-gradient-to-br from-[#283046] to-gray-800 p-8 rounded-xl w-3/4 max-h-[85%] overflow-y-auto shadow-2xl transform transition-all duration-500 ease-in-out scale-100 hover:scale-105">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold text-gray-800">Siblings</h2>
-          <button onClick={onClose} className="text-red-500 text-xl font-bold">
+          <h2 className="text-4xl font-extrabold text-[#65fa9e] tracking-wide">
+            Siblings Information
+          </h2>
+          <button
+            onClick={onClose}
+            className="text-red-500 text-3xl font-bold focus:outline-none hover:text-red-700 transition duration-300"
+          >
             &times;
           </button>
         </div>
         {siblings.length === 0 ? (
-          <div className="text-center text-gray-500 text-lg">No siblings found.</div>
+          <div className="text-center text-gray-400 text-xl italic">
+            No siblings found.
+          </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {siblings.map((sibling) => (
               <div
                 key={sibling._id}
-                className="p-6 bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
+                className="p-6 bg-gray-800 border border-gray-700 rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-2 hover:scale-105"
               >
                 <img
                   src={sibling.studentPhoto || "default-image-url.jpg"}
                   alt={`${sibling.firstName} ${sibling.lastName}`}
-                  className="w-full h-32 object-cover rounded-md mb-4"
+                  className="w-full h-48 object-cover rounded-lg mb-4 shadow-md hover:shadow-xl transition-shadow duration-300"
                 />
-                <h3 className="text-xl font-semibold text-gray-700">
+                <h3 className="text-2xl font-semibold text-[#65fa9e] mb-2 text-center">
                   {`${sibling.firstName} ${sibling.lastName}`}
                 </h3>
-                <p className="text-gray-500 text-sm">Class: {sibling.currentClass.name}</p>
+                <p className="text-gray-300 text-base font-medium text-center">
+                  Class: {sibling.currentClass.name}
+                </p>
+                <button
+                  onClick={() => handleRemoveSibling(sibling._id)}
+                  className="mt-4 w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 transition duration-300"
+                >
+                  Remove Sibling
+                </button>
               </div>
             ))}
           </div>
