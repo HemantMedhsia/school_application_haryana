@@ -30,6 +30,8 @@ import { classTimeTableRoute } from "./Routes/classTimeTable.Route.js";
 import { resultRoute } from "./Routes/result.Route.js";
 import { ContactRoute } from "./Routes/Contact.Route.js";
 import { siblingRouter } from "./Routes/sibling.Route.js";
+import { feeGroupRouter } from "./Routes/feeGroup.Route.js";
+import { studentFeesRouter } from "./Routes/studentFees.Route.js";
 
 const app = express();
 
@@ -105,6 +107,8 @@ app.use("/api", classTimeTableRoute);
 app.use("/api", resultRoute);
 app.use("/api", ContactRoute);
 app.use("/api", siblingRouter);
+app.use("/api", feeGroupRouter);
+app.use("/api", studentFeesRouter);
 
 // Global error handling middleware
 app.use((err, req, res, next) => {
