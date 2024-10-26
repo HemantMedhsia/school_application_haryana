@@ -215,6 +215,10 @@ const StudentInfo = () => {
     setIsModalOpen(true);
   };
 
+  const handleCustomAction = () => {
+    
+  };
+
   const confirmDelete = async () => {
     if (studentToDelete) {
       try {
@@ -250,9 +254,8 @@ const StudentInfo = () => {
         onSearch={handleSearch}
       />
       {loading ? (
-          <div className="loader-wrapper">
-            <span className="loader"></span>
-          
+        <div className="loader-wrapper">
+          <span className="loader"></span>
         </div>
       ) : filteredStudentData.length === 0 ? (
         <div className="no-data-message text-xl flex justify-center text-red-500">
@@ -266,6 +269,7 @@ const StudentInfo = () => {
             onView: handleView,
             onEdit: handleEdit,
             onDelete: handleDelete,
+            onCustomAction: handleCustomAction,
           }}
         />
       )}

@@ -9,7 +9,12 @@ import {
 } from "react-icons/io5";
 import { BsPersonFillCheck, BsPersonFillSlash } from "react-icons/bs";
 
-const Datatable = ({ data = [], columns = [], actions = {}, attendanceStatus }) => {
+const Datatable = ({
+  data = [],
+  columns = [],
+  actions = {},
+  attendanceStatus,
+}) => {
   const [currentPage, setCurrentPage] = useState(0);
   const itemsPerPage = 8; // Number of rows per page
 
@@ -67,6 +72,17 @@ const Datatable = ({ data = [], columns = [], actions = {}, attendanceStatus }) 
                 {Object.keys(actions).length > 0 && (
                   <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xl whitespace-nowrap p-4 text-left">
                     <div className="flex space-x-2 gap-2">
+                      {actions.onCustomAction && (
+                        <button
+                          className={`flex items-center gap-2 px-3 py-1 rounded-full font-semibold text-sm text-[#65fa9e] 
+                drop-shadow-[0_0_10px_rgba(34,197,94,0.8)] hover:drop-shadow-[0_0_20px_rgba(34,197,94,1)] hover:border
+                transition duration-300 ease-in-out`}
+                          onClick={() => actions.onCustomAction(item)}
+                        >
+                          Add Siblings
+                        </button>
+                      )}
+
                       {actions.onView && (
                         <button onClick={() => actions.onView(item)}>
                           <IoEyeOutline className="text-blue-500 hover:text-blue-700" />
@@ -85,7 +101,9 @@ const Datatable = ({ data = [], columns = [], actions = {}, attendanceStatus }) 
                       {actions.onPresent && (
                         <button
                           className={`flex hover:bg-gray-800 hover:-translate-y-1 duration-200 gap-2 border px-2 shadow-sm shadow-[#65FA9E] py-1 rounded-lg bg-gray-900 border-gray-900 text-md font-mono justify-center items-center ${
-                            attendanceStatus[item._id] === "Present" ? "opacity-50" : ""
+                            attendanceStatus[item._id] === "Present"
+                              ? "opacity-50"
+                              : ""
                           }`}
                           onClick={() => actions.onPresent(item)}
                           disabled={attendanceStatus[item._id] === "Present"}
@@ -97,7 +115,9 @@ const Datatable = ({ data = [], columns = [], actions = {}, attendanceStatus }) 
                       {actions.onAbsent && (
                         <button
                           className={`flex gap-2 hover:bg-gray-800 hover:-translate-y-1 duration-200 border px-2 py-1 shadow-sm shadow-[#F87171] rounded-lg bg-gray-900 border-gray-900 justify-center font-mono items-center ${
-                            attendanceStatus[item._id] === "Absent" ? "opacity-50" : ""
+                            attendanceStatus[item._id] === "Absent"
+                              ? "opacity-50"
+                              : ""
                           }`}
                           onClick={() => actions.onAbsent(item)}
                           disabled={attendanceStatus[item._id] === "Absent"}
