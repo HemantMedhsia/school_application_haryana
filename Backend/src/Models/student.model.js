@@ -132,18 +132,6 @@ const studentSchema = new mongoose.Schema({
         type: String,
         default: "Student",
     },
-
-    discount: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "FessDiscount",
-    },
-
-    fees: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "FeesMaster",
-        },
-    ],
 });
 
 studentSchema.pre("save", async function (next) {
