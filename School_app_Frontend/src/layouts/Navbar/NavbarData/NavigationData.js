@@ -366,8 +366,20 @@ export const navigation = [
         roles: ["Admin"],
       },
       {
-        name: "Fees Discount",
+        name: "Fees Payment",
         to: "/school/fees-discount",
+        icon: FaUser,
+        roles: ["Admin"],
+      },
+      {
+        name: "Fees Group",
+        to: "/school/fees-group",
+        icon: FaUser,
+        roles: ["Admin"],
+      },
+      {
+        name: "Fees Type",
+        to: "/school/fees-type",
         icon: FaUser,
         roles: ["Admin"],
       },
