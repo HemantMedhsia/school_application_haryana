@@ -208,7 +208,7 @@ export const getAllSiblingBystudentId = wrapAsync(async (req, res, next) => {
 
     const siblingGroup = await SiblingGroup.findById(
         student.siblingGroupId
-    ).populate("students", "firstName lastName currentClass");
+    ).populate("students", "firstName lastName currentClass").populate("currentClass");
 
     if (!siblingGroup) {
         return res

@@ -75,11 +75,22 @@ const Datatable = ({
                       {actions.onCustomAction && (
                         <button
                           className={`flex items-center gap-2 px-3 py-1 rounded-full font-semibold text-sm text-[#65fa9e] 
-                drop-shadow-[0_0_10px_rgba(34,197,94,0.8)] hover:drop-shadow-[0_0_20px_rgba(34,197,94,1)] hover:border
-                transition duration-300 ease-in-out`}
+                            drop-shadow-[0_0_10px_rgba(34,197,94,0.8)] hover:drop-shadow-[0_0_20px_rgba(34,197,94,1)] hover:border
+                            transition duration-300 ease-in-out`}
                           onClick={() => actions.onCustomAction(item)}
                         >
                           Add Siblings
+                        </button>
+                      )}
+
+                      {actions.onViewSibblings && (
+                        <button
+                          className={`flex items-center gap-2 px-3 py-1 rounded-full font-semibold text-sm text-[#65fa9e] 
+                            drop-shadow-[0_0_10px_rgba(34,197,94,0.8)] hover:drop-shadow-[0_0_20px_rgba(34,197,94,1)] hover:border
+                            transition duration-300 ease-in-out`}
+                          onClick={() => actions.onViewSibblings(item)}
+                        >
+                          View Siblings
                         </button>
                       )}
 

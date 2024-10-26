@@ -26,6 +26,8 @@ const StudentInfo = () => {
   const [isStudentSearchOpen, setIsStudentSearchOpen] = useState(false); // State for the popup
   const [currentStudentId, setCurrentStudentId] = useState(null); // State for current student ID
   const [currentParentId, setCurrentParentId] = useState(null); // State for current parent ID
+  const [siblingsData, setSiblingsData] = useState([]); // State for siblings data
+  const [isSiblingsModalOpen, setIsSiblingsModalOpen] = useState(false); // State for siblings modal
   const navigate = useNavigate();
 
   const fetchDropdownData = async () => {
@@ -53,9 +55,7 @@ const StudentInfo = () => {
           response.data.map(async (student) => {
             try {
               const { data } = await axios.get(
-                `${
-                  import.meta.env.VITE_BACKEND_URL
-                }/api/get-student-attendance-summary/${student._id}`
+                `${import.meta.env.VITE_BACKEND_URL}/api/get-student-attendance-summary/${student._id}`
               );
 
               const attendancePercentage = data?.data?.percentage;
@@ -248,6 +248,23 @@ const StudentInfo = () => {
     setIsStudentSearchOpen(false); // Close the popup after adding
   };
 
+  const handleViewSiblings = async (studentData) => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/get-sibling-group-studentid/${studentData._id}`
+      );
+      if (response.status === 200) {
+        setSiblingsData(response.data.data);
+        setIsSiblingsModalOpen(true); // Open the modal with siblings data
+      } else {
+        toast.error("Failed to fetch siblings.");
+      }
+    } catch (error) {
+      console.error("Error fetching siblings:", error);
+      toast.error("Failed to fetch siblings.");
+    }
+  };
+
   return (
     <div>
       <SearchBar
@@ -274,6 +291,7 @@ const StudentInfo = () => {
             onEdit: handleEdit,
             onDelete: handleDelete,
             onCustomAction: handleCustomAction,
+            onViewSibblings: handleViewSiblings,
           }}
         />
       )}
@@ -298,7 +316,54 @@ const StudentInfo = () => {
         studentId={currentStudentId}
         parent={currentParentId}
       />
+      <SiblingModal
+        isOpen={isSiblingsModalOpen}
+        onClose={() => setIsSiblingsModalOpen(false)}
+        siblings={siblingsData}
+      />
       <ToastContainer />
+    </div>
+  );
+};
+
+const SiblingModal = ({ isOpen, onClose, siblings }) => {
+  return (
+    <div
+      className={`fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center ${
+        isOpen ? "" : "hidden"
+      }`}
+      style={{ zIndex: 1000 }}
+    >
+      <div className="bg-white p-8 rounded-lg w-4/5 max-h-[85%] overflow-y-auto shadow-xl">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-semibold text-gray-800">Siblings</h2>
+          <button onClick={onClose} className="text-red-500 text-xl font-bold">
+            &times;
+          </button>
+        </div>
+        {siblings.length === 0 ? (
+          <div className="text-center text-gray-500 text-lg">No siblings found.</div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {siblings.map((sibling) => (
+              <div
+                key={sibling._id}
+                className="p-6 bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
+              >
+                <img
+                  src={sibling.studentPhoto || "default-image-url.jpg"}
+                  alt={`${sibling.firstName} ${sibling.lastName}`}
+                  className="w-full h-32 object-cover rounded-md mb-4"
+                />
+                <h3 className="text-xl font-semibold text-gray-700">
+                  {`${sibling.firstName} ${sibling.lastName}`}
+                </h3>
+                <p className="text-gray-500 text-sm">Class: {sibling.currentClass}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
