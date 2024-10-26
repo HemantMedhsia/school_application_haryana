@@ -15,6 +15,6 @@ router.put("/remove-sibling-from-group", removeSiblingFromGroup);
 router.get("/get-sibling-group/:siblingGroupId", getSiblingGroup);
 router.delete("/delete-sibling-group/:siblingGroupId", deleteSiblingGroup);
 router.get("/get-sibling-group", getAllSiblingGroup);
-router.get("/get-sibling-group/:siblingGroupId", getAllSiblingBystudentId);
+router.get("/get-sibling-group-studentid/:studentId", getAllSiblingBystudentId);
 
 export { router as siblingRouter };
