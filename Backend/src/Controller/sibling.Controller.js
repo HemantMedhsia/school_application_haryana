@@ -213,7 +213,8 @@ export const getAllSiblingBystudentId = wrapAsync(async (req, res, next) => {
         select: "firstName lastName currentClass",
         populate: {
             path: "currentClass",
-            select: "className"
+            model: "Class", // Ensure you specify the model name here
+            select: "name"
         }
     });
 
