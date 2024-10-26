@@ -2,6 +2,7 @@ import express from "express";
 import {
     addOrCreateSiblingGroup,
     deleteSiblingGroup,
+    getAllSiblingBystudentId,
     getAllSiblingGroup,
     getSiblingGroup,
     removeSiblingFromGroup,
@@ -14,5 +15,6 @@ router.put("/remove-sibling-from-group", removeSiblingFromGroup);
 router.get("/get-sibling-group/:siblingGroupId", getSiblingGroup);
 router.delete("/delete-sibling-group/:siblingGroupId", deleteSiblingGroup);
 router.get("/get-sibling-group", getAllSiblingGroup);
+router.get("/get-sibling-group/:siblingGroupId", getAllSiblingBystudentId);
 
 export { router as siblingRouter };

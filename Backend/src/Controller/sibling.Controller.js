@@ -195,5 +195,34 @@ export const getAllSiblingGroup = wrapAsync(async (req, res, next) => {
         );
 });
 
+export const getAllSiblingBystudentId = wrapAsync(async (req, res, next) => {
+    const { studentId } = req.params;
 
+    const student = await Student.findById(studentId);
 
+    if (!student) {
+        return res
+            .status(404)
+            .json(new ApiResponse(404, null, "Student not found", false));
+    }
+
+    const siblingGroup = await SiblingGroup.findById(
+        student.siblingGroupId
+    ).populate("students", "firstName lastName currentClass");
+
+    if (!siblingGroup) {
+        return res
+            .status(404)
+            .json(new ApiResponse(404, null, "Sibling group not found", false));
+    }
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                siblingGroup.students,
+                "Siblings fetched successfully!"
+            )
+        );
+});
