@@ -268,7 +268,7 @@ const StudentInfo = () => {
       }
     } catch (error) {
       console.error("Error fetching siblings:", error);
-      toast.error(error.message);
+      toast.error(error.response.data.message);
     }
   };
 
