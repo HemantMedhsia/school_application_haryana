@@ -210,7 +210,7 @@ export const getAllSiblingBystudentId = wrapAsync(async (req, res, next) => {
         student.siblingGroupId
     ).populate({
         path: "students",
-        select: "firstName lastName currentClass",
+        select: "firstName lastName currentClass studentPhoto",
         populate: {
             path: "currentClass",
             model: "Class", // Ensure you specify the model name here

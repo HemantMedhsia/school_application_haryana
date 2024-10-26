@@ -358,7 +358,7 @@ const SiblingModal = ({ isOpen, onClose, siblings }) => {
                 <h3 className="text-xl font-semibold text-gray-700">
                   {`${sibling.firstName} ${sibling.lastName}`}
                 </h3>
-                <p className="text-gray-500 text-sm">Class: {sibling.currentClass}</p>
+                <p className="text-gray-500 text-sm">Class: {sibling.currentClass.name}</p>
               </div>
             ))}
           </div>
