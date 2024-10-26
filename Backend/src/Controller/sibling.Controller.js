@@ -16,6 +16,18 @@ export const addOrCreateSiblingGroup = wrapAsync(async (req, res, next) => {
             .json(new ApiResponse(404, "Primary student not found"));
     }
 
+    // Check if the primary student already belongs to another sibling group
+    if (primaryStudent.siblingGroupId) {
+        return res
+            .status(400)
+            .json(
+                new ApiResponse(
+                    400,
+                    "Primary student already belongs to another sibling group"
+                )
+            );
+    }
+
     let siblingGroup;
 
     if (primaryStudent.siblingGroupId) {
@@ -53,10 +65,8 @@ export const addOrCreateSiblingGroup = wrapAsync(async (req, res, next) => {
                 );
         }
 
-        if (
-            student.siblingGroupId &&
-            student.siblingGroupId.toString() !== siblingGroup._id.toString()
-        ) {
+        // Check if the student already belongs to another sibling group
+        if (student.siblingGroupId) {
             return res
                 .status(400)
                 .json(
@@ -66,6 +76,10 @@ export const addOrCreateSiblingGroup = wrapAsync(async (req, res, next) => {
                     )
                 );
         }
+    }
+
+    for (const studentId of studentIds) {
+        const student = await Student.findById(studentId);
 
         if (!siblingGroup.students.includes(studentId)) {
             siblingGroup.students.push(studentId);
