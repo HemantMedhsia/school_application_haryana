@@ -1,19 +1,14 @@
 import mongoose from "mongoose";
-
 const siblingGroupSchema = new mongoose.Schema({
-    familyName: {
-        type: String,
-        required: true,
-    },
     students: [
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Student",
-            required: true,
         },
     ],
-    notes: {
-        type: String,
+    parentId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Parent",
     },
 });
 
