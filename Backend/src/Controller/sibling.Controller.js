@@ -208,12 +208,20 @@ export const getAllSiblingBystudentId = wrapAsync(async (req, res, next) => {
 
     const siblingGroup = await SiblingGroup.findById(
         student.siblingGroupId
-    ).populate("students", "firstName lastName currentClass");
+    ).populate({
+        path: "students",
+        select: "firstName lastName currentClass studentPhoto",
+        populate: {
+            path: "currentClass",
+            model: "Class", // Ensure you specify the model name here
+            select: "name"
+        }
+    });
 
     if (!siblingGroup) {
         return res
             .status(404)
-            .json(new ApiResponse(404, null, "Sibling group not found", false));
+            .json(new ApiResponse(404, null, "Sibling group not found || no sibling available for the student", true));
     }
 
     return res
