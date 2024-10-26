@@ -134,4 +134,3 @@ const StudentSearchPopup = ({ isOpen, onClose, onAddStudent, studentId, parent }
 };
 
 export default StudentSearchPopup; 
-// d
