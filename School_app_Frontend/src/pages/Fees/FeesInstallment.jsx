@@ -100,7 +100,7 @@ const FeesInstallment = () => {
     <div className="p-6">
       <h2 className="text-2xl font-bold mb-4">Fees Installment Management</h2>
 
-      {/* Add Installment Form */}
+      {/* Add Installment Form -- */}
       <form className="mb-6 p-4 bg-[#283046] rounded shadow-sm" onSubmit={handleSubmit}>
         <div className="flex flex-wrap">
           <SearchableSelect
