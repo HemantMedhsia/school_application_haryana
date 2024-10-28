@@ -62,6 +62,17 @@ export const addFeeGroup = wrapAsync(async (req, res, next) => {
     }));
 
     const createdFeeGroups = await FeeGroup.insertMany(feeGroupData);
+    for (let fee of feeData) {
+        await Class.findByIdAndUpdate(
+            fee.class,
+            {
+                feeGroup: createdFeeGroups.find((group) =>
+                    group.class.equals(fee.class)
+                )._id,
+            },
+            { new: true }
+        );
+    }
 
     return res
         .status(201)
@@ -140,6 +151,12 @@ export const updateFeeGroup = wrapAsync(async (req, res, next) => {
                 .status(404)
                 .json(new ApiResponse(404, "Fee group not found."));
         }
+
+        await Class.findByIdAndUpdate(
+            updatedFeeGroup.class,
+            { feeGroup: updatedFeeGroup._id },
+            { new: true }
+        );
 
         updatedFeeGroups.push(updatedFeeGroup);
     }
@@ -476,4 +493,38 @@ export const getInstallments = wrapAsync(async (req, res, next) => {
     return res
         .status(200)
         .json(new ApiResponse(200, "Installments fetched.", installments));
+});
+
+export const getInstallmentById = wrapAsync(async (req, res, next) => {
+    const { installmentId } = req.params;
+
+    // Fetch all fee groups and populate the class
+    const feeGroups = await FeeGroup.find().populate("class");
+
+    let foundInstallment = null;
+
+    // Iterate through each fee group to find the installment
+    for (const group of feeGroups) {
+        const installment = group.installmentDates.find(
+            (inst) => inst._id.toString() === installmentId
+        );
+
+        if (installment) {
+            foundInstallment = {
+                class: group.class,
+                installment,
+            };
+            break;
+        }
+    }
+
+    if (!foundInstallment) {
+        return res
+            .status(404)
+            .json(new ApiResponse(404, "Installment not found."));
+    }
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, "Installment fetched.", foundInstallment));
 });

@@ -15,10 +15,10 @@ const classSchema = new mongoose.Schema({
             ref: "SubjectGroup",
         },
     ],
-                                                                                                                                                                                    
-    discount: {
+
+    feeGroup: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "FessDiscount",
+        ref: "FeeGroup",
     },
 });
 
