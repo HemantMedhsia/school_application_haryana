@@ -295,12 +295,17 @@ export const manageInstallment = wrapAsync(async (req, res, next) => {
 });
 
 export const deleteInstallment = wrapAsync(async (req, res, next) => {
-    const { classId, installmentId } = req.body;
+    const { classId, installmentId, month, dueDate } = req.body;
 
-    if (!installmentId) {
+    if (!installmentId && (!month || !dueDate)) {
         return res
             .status(400)
-            .json(new ApiResponse(400, "Installment ID is required."));
+            .json(
+                new ApiResponse(
+                    400,
+                    "Either Installment ID or both month and due date are required."
+                )
+            );
     }
 
     try {
@@ -317,7 +322,7 @@ export const deleteInstallment = wrapAsync(async (req, res, next) => {
                     )
                 );
         } else {
-            result = await deleteInstallmentFromAllClasses(installmentId);
+            result = await deleteInstallmentFromAllClasses(month, dueDate);
             return res
                 .status(200)
                 .json(
@@ -340,18 +345,121 @@ export const deleteInstallment = wrapAsync(async (req, res, next) => {
     }
 });
 
-const deleteInstallmentForClass = async (classId, installmentId) => {
-    return await Class.findOneAndUpdate(
-        { _id: classId },
-        { $pull: { installments: { _id: installmentId } } },
+export const deleteInstallmentForClass = async (classId, installmentId) => {
+    return await FeeGroup.findOneAndUpdate(
+        { class: classId },
+        { $pull: { installmentDates: { _id: installmentId } } },
         { new: true }
     );
 };
 
-const deleteInstallmentFromAllClasses = async (installmentId) => {
-    return await Class.updateMany(
+export const deleteInstallmentFromAllClasses = async (month, dueDate) => {
+    return await FeeGroup.updateMany(
         {},
-        { $pull: { installments: { _id: installmentId } } },
+        {
+            $pull: {
+                installmentDates: { month: month, dueDate: new Date(dueDate) },
+            },
+        },
+        { new: true }
+    );
+};
+
+export const updateInstallment = wrapAsync(async (req, res, next) => {
+    const { classId, installmentId, month, dueDate, existingMonth } = req.body;
+
+    if (!month || !dueDate) {
+        return res
+            .status(400)
+            .json(new ApiResponse(400, "Month and due date are required."));
+    }
+
+    try {
+        let result;
+        if (classId && installmentId) {
+            result = await updateInstallmentForClass(
+                classId,
+                installmentId,
+                month,
+                dueDate
+            );
+            return res
+                .status(200)
+                .json(
+                    new ApiResponse(
+                        200,
+                        "Installment updated for the specified class.",
+                        result
+                    )
+                );
+        } else if (existingMonth) {
+            result = await updateInstallmentForAllClasses(
+                existingMonth,
+                month,
+                dueDate
+            );
+            return res
+                .status(200)
+                .json(
+                    new ApiResponse(
+                        200,
+                        "Installment updated for all classes successfully.",
+                        result
+                    )
+                );
+        } else {
+            return res
+                .status(400)
+                .json(
+                    new ApiResponse(
+                        400,
+                        "Either classId and installmentId, or existingMonth are required."
+                    )
+                );
+        }
+    } catch (error) {
+        return res
+            .status(500)
+            .json(
+                new ApiResponse(
+                    500,
+                    error.message || "Failed to update the installment."
+                )
+            );
+    }
+});
+
+const updateInstallmentForClass = async (
+    classId,
+    installmentId,
+    month,
+    dueDate
+) => {
+    return await FeeGroup.findOneAndUpdate(
+        { class: classId, "installmentDates._id": installmentId },
+        {
+            $set: {
+                "installmentDates.$.month": month,
+                "installmentDates.$.dueDate": new Date(dueDate),
+            },
+        },
+        { new: true }
+    );
+};
+
+const updateInstallmentForAllClasses = async (
+    existingMonth,
+    newMonth,
+    dueDate
+) => {
+    return await FeeGroup.updateMany(
+        { "installmentDates.month": existingMonth },
+        {
+            $set: {
+                "installmentDates.$.month": newMonth,
+                "installmentDates.$.dueDate": new Date(dueDate),
+            },
+        },
         { new: true }
     );
 };

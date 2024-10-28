@@ -7,6 +7,7 @@ import {
     getFeeGroups,
     manageInstallment,
     updateFeeGroup,
+    updateInstallment,
 } from "../Controller/feeGroup.Controller.js";
 
 const router = express.Router();
@@ -18,5 +19,6 @@ router.get("/get-fee-group", getFeeGroups);
 router.get("/get-fee-group/:feeGroupId", getFeeGroupById);
 router.post("/add-installment", manageInstallment);
 router.delete("/delete-installment", deleteInstallment);
+router.put("/update-installment", updateInstallment);
 
 export { router as feeGroupRouter };
