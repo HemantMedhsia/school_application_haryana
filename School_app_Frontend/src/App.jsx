@@ -63,6 +63,7 @@ import SyallabusStatusStudent from "./pages/LessonPlan/SyallabusStatusStudent.js
 import StudentFees from "./pages/Fees/StudentFees.jsx";
 import FeesDiscount from "./pages/Fees/FeesDiscount.jsx";
 import AssignDiscount from "./pages/Fees/AssignDiscount.jsx";
+import CreateFees_h from "./pages/Fees/CreateFees_h.jsx";
 
 const App = () => {
   const { userRole, authToken } = useAuth();
@@ -248,6 +249,7 @@ const App = () => {
           <Route path="/school/resultp" element={<ResultPrint />} />
           <Route path="/school/fees-discount" element={<FeesDiscount />} />
           <Route path="/school/assign-discount/:discount_id" element={<AssignDiscount />} />
+          <Route path="/school/create-fees" element={<CreateFees_h />} />
         </Route>
       </>
     )

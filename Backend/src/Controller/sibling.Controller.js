@@ -221,7 +221,7 @@ export const getAllSiblingBystudentId = wrapAsync(async (req, res, next) => {
     if (!siblingGroup) {
         return res
             .status(404)
-            .json(new ApiResponse(404, null, "Sibling group not found || no sibling available for the student", true));
+            .json(new ApiResponse(404, null, "Sibling group not found || no sibling available for the student", false));
     }
 
     return res
