@@ -15,7 +15,7 @@ const studentFeeSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "FeeGroup",
         required: true,
-    },
+    },  
     installments: [
         {
             month: {
@@ -44,7 +44,7 @@ const studentFeeSchema = new mongoose.Schema({
             },
             status: {
                 type: String,
-                enum: ["Paid", "Unpaid"],
+                enum: ["Paid", "Unpaid","Partially Paid"],
                 default: "Unpaid",
             },
             paymentDate: {
@@ -59,36 +59,56 @@ const studentFeeSchema = new mongoose.Schema({
             },
         },
     ],
+    dueAmount: {
+        type: Number,
+        required: true,
+    },
+    totalPaidAmount: {
+        type: Number,
+        required: false,
+        default: 0,
+    },
+
+    paymentHistory: [
+        {
+            paymentDate: {
+                type: Date,
+                required: true,
+            },
+            feeHeader: {
+                type: String,
+                required: true,
+            },
+            amount: {
+                type: Number,
+                required: true,
+            },
+            receiptNumber: {
+                type: String,
+                required: true,
+            },
+        },
+    ],
+    discountHistory: [
+        {
+            discountHeader: {
+                type: String,
+                required: true,
+            },
+            discountAmount: {
+                type: Number,
+                required: true,
+            },
+            discountGivenBy: {
+                type: String,
+                enum: ["Principal", "Management", "Other"],
+            },
+            date: {
+                type: Date,
+                required: true,
+            },
+        },
+    ],
 });
-
-feeGroupSchema.methods.assignFeesToStudents = async function () {
-    const students = await mongoose
-        .model("Student")
-        .find({ currentClass: this.class });
-    const feesData = this.fees;
-
-    for (const student of students) {
-        const installments = [];
-        for (let i = 0; i < 12; i++) {
-            const monthlyTuitionFee = feesData.tuitionFee / 12;
-            installments.push({
-                month: this.installmentDates[i].month,
-                dueDate: this.installmentDates[i].dueDate,
-                amount:
-                    monthlyTuitionFee +
-                    (i === 0 ? feesData.admissionFee + feesData.annualFee : 0),
-                status: "Unpaid",
-            });
-        }
-
-        const newStudentFee = new mongoose.model("StudentFee")({
-            student: student._id,
-            class: this.class,
-            feeGroup: this._id,
-            installments: installments,
-        });
-        await newStudentFee.save();
-    }
-};
 
 export const StudentFee = mongoose.model("StudentFee", studentFeeSchema);
