@@ -2,6 +2,7 @@ import { ApiResponse } from "../Utils/responseHandler.js";
 import { ApiError } from "../Utils/errorHandler.js";
 import wrapAsync from "../Utils/wrapAsync.js";
 import { FeeGroup } from "../Models/feeGroup.Model.js";
+import { Class } from "../Models/class.Model.js";
 import { feeGroupValidationSchema } from "../Validation/feeGroup.Validation.js";
 
 export const addFeeGroup = wrapAsync(async (req, res, next) => {
@@ -199,4 +200,158 @@ export const getFeeGroupById = wrapAsync(async (req, res, next) => {
         .json(new ApiResponse(200, "Fee group fetched.", feeGroup));
 });
 
+const manageInstallmentForClass = async (classId, installment, dueDate) => {
+    let feeGroup = await FeeGroup.findOne({ class: classId });
+    if (!feeGroup) {
+        throw new ApiError(404, "No fee group found for the specified class.");
+    }
 
+    const existingInstallment = feeGroup.installmentDates.find(
+        (inst) => inst.month === installment
+    );
+
+    if (existingInstallment) {
+        throw new ApiError(400, "Installment already exists for this class.");
+    } else {
+        feeGroup.installmentDates.push({ month: installment, dueDate });
+    }
+
+    feeGroup = await feeGroup.save();
+    return feeGroup;
+};
+
+export const addInstallmentToAllClasses = async (installment, dueDate) => {
+    const feeGroups = await FeeGroup.find();
+
+    const updatedFeeGroups = [];
+    for (const feeGroup of feeGroups) {
+        const existingInstallment = feeGroup.installmentDates.find(
+            (inst) => inst.month === installment
+        );
+
+        if (!existingInstallment) {
+            feeGroup.installmentDates.push({ month: installment, dueDate });
+            await feeGroup.save();
+            updatedFeeGroups.push(feeGroup);
+        }
+    }
+
+    return updatedFeeGroups;
+};
+
+export const manageInstallment = wrapAsync(async (req, res, next) => {
+    const { classId, installment, dueDate } = req.body;
+
+    if (!installment || !dueDate) {
+        return res
+            .status(400)
+            .json(
+                new ApiResponse(
+                    400,
+                    "Installment name and due date are required."
+                )
+            );
+    }
+
+    try {
+        let result;
+        if (classId) {
+            result = await manageInstallmentForClass(
+                classId,
+                installment,
+                dueDate
+            );
+            return res
+                .status(200)
+                .json(
+                    new ApiResponse(
+                        200,
+                        "Installment managed for the specified class.",
+                        result
+                    )
+                );
+        } else {
+            result = await addInstallmentToAllClasses(installment, dueDate);
+            return res
+                .status(200)
+                .json(
+                    new ApiResponse(
+                        200,
+                        "Installment added to all classes successfully.",
+                        result
+                    )
+                );
+        }
+    } catch (error) {
+        return res
+            .status(500)
+            .json(
+                new ApiResponse(
+                    500,
+                    error.message || "Failed to manage the installment."
+                )
+            );
+    }
+});
+
+export const deleteInstallment = wrapAsync(async (req, res, next) => {
+    const { classId, installmentId } = req.body;
+
+    if (!installmentId) {
+        return res
+            .status(400)
+            .json(new ApiResponse(400, "Installment ID is required."));
+    }
+
+    try {
+        let result;
+        if (classId) {
+            result = await deleteInstallmentForClass(classId, installmentId);
+            return res
+                .status(200)
+                .json(
+                    new ApiResponse(
+                        200,
+                        "Installment deleted for the specified class.",
+                        result
+                    )
+                );
+        } else {
+            result = await deleteInstallmentFromAllClasses(installmentId);
+            return res
+                .status(200)
+                .json(
+                    new ApiResponse(
+                        200,
+                        "Installment deleted from all classes successfully.",
+                        result
+                    )
+                );
+        }
+    } catch (error) {
+        return res
+            .status(500)
+            .json(
+                new ApiResponse(
+                    500,
+                    error.message || "Failed to delete the installment."
+                )
+            );
+    }
+});
+
+const deleteInstallmentForClass = async (classId, installmentId) => {
+    return await Class.findOneAndUpdate(
+        { _id: classId },
+        { $pull: { installments: { _id: installmentId } } },
+        { new: true }
+    );
+};
+
+const deleteInstallmentFromAllClasses = async (installmentId) => {
+    return await Class.updateMany(
+        {},
+        { $pull: { installments: { _id: installmentId } } },
+        { new: true }
+    );
+};
