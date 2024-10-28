@@ -199,9 +199,9 @@ export const addPaymentsAndDiscounts = wrapAsync(async (req, res) => {
     });
 
     // Update due amount based on discount and payment
-    studentFee.dueAmount -= totalDiscountAmount;
-    studentFee.dueAmount -= totalPayingAmount;
-    studentFee.totalPaidAmount += totalPayingAmount;
+    studentFee.dueAmount -= totalDiscountAmount*1;
+    studentFee.dueAmount -= totalPayingAmount*1;
+    studentFee.totalPaidAmount += totalPayingAmount*1;
 
     // Handle the case where no payment is made
     if (totalPayingAmount === 0 && totalDiscountAmount === 0) {

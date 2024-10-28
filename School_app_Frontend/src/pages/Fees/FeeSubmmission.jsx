@@ -22,7 +22,7 @@ const FeeSubmission = () => {
         `${import.meta.env.VITE_BACKEND_URL}/api/get-student-fee/${studentId}`
       );
       if (response.data && response.data.success) {
-        const data = response.data.statusCode;
+        const data = response.data.data; // Adjusted to match new API response structure
         setStudentDetails(data.student);
         initializeFeeDetails(data.feeDetails);
         setPaymentHistory(data.paymentHistory);
@@ -117,19 +117,21 @@ const FeeSubmission = () => {
 
   const handleInputChange = (index, field, value) => {
     const updatedFeeDetails = [...feeDetails];
-    updatedFeeDetails[index][field] = value;
+    updatedFeeDetails[index][field] = parseFloat(value) || 0;
 
-    let totalAmount = parseFloat(updatedFeeDetails[index]['totalAmount']) || 0;
-    let discount = parseFloat(updatedFeeDetails[index]['discount']) || 0;
-    let paidAmount = parseFloat(updatedFeeDetails[index]['paidAmount']) || 0;
+    if (field === 'discount' || field === 'payingAmount') {
+      let totalAmount = parseFloat(updatedFeeDetails[index]['totalAmount']) || 0;
+      let discount = parseFloat(updatedFeeDetails[index]['discount']) || 0;
+      let paidAmount = parseFloat(updatedFeeDetails[index]['paidAmount']) || 0;
 
-    let dueAmount = totalAmount - paidAmount - discount;
-    dueAmount = dueAmount > 0 ? dueAmount : 0;
-    updatedFeeDetails[index]['dueAmount'] = dueAmount.toFixed(2);
+      let dueAmount = totalAmount - paidAmount - discount;
+      dueAmount = dueAmount > 0 ? dueAmount : 0;
+      updatedFeeDetails[index]['dueAmount'] = dueAmount.toFixed(2);
 
-    // Auto-fill payingAmount when dueAmount changes, unless payingAmount was manually set
-    if (field !== 'payingAmount') {
-      updatedFeeDetails[index]['payingAmount'] = dueAmount.toFixed(2);
+      // Auto-fill payingAmount when dueAmount changes, unless payingAmount was manually set
+      if (field !== 'payingAmount') {
+        updatedFeeDetails[index]['payingAmount'] = dueAmount.toFixed(2);
+      }
     }
 
     setFeeDetails(updatedFeeDetails);
@@ -223,17 +225,12 @@ const FeeSubmission = () => {
         </select>
       </div>
 
-      <div className="mb-6 text-xl text-gray-300">
-        <p>Month Multiplier: {monthMultiplier}</p>
-      </div>
-
       <div className="overflow-x-auto">
         <table className="min-w-full bg-[#283046] text-gray-100 rounded-lg">
           <thead>
             <tr className="bg-[#65fa9e] text-gray-900">
               <th className="py-3 px-4 border border-[#39424E] text-left">Fee Header</th>
               <th className="py-3 px-4 border border-[#39424E] text-left">Total Amount</th>
-              <th className="py-3 px-4 border border-[#39424E] text-left">Calculation</th>
               <th className="py-3 px-4 border border-[#39424E] text-left">Paid Amount</th>
               <th className="py-3 px-4 border border-[#39424E] text-left">Due Amount</th>
               <th className="py-3 px-4 border border-[#39424E] text-left">Discount</th>
@@ -245,17 +242,7 @@ const FeeSubmission = () => {
               <tr key={index} className="hover:bg-[#39424E]">
                 <td className="py-3 px-4 border border-[#39424E]">{fee.header}</td>
                 <td className="py-3 px-4 border border-[#39424E]">
-                  {fee.header === 'Tuition Fee (Monthly)' ? fee.totalAmount : fee.totalAmount.toFixed(2)}
-                </td>
-                <td className="py-3 px-4 border border-[#39424E]">
-                  {fee.header === 'Tuition Fee (Monthly)' ? (
-                    <>
-                      {fee.annualAmount} / 12 * {monthMultiplier} ={' '}
-                      {(parseFloat(fee.annualAmount) / 12 * monthMultiplier).toFixed(2)}
-                    </>
-                  ) : (
-                    `${fee.totalAmount.toFixed(2)}`
-                  )}
+                  {fee.totalAmount ? fee.totalAmount : fee.annualAmount}
                 </td>
                 <td className="py-3 px-4 border border-[#39424E]">{fee.paidAmount.toFixed(2)}</td>
                 <td className="py-3 px-4 border border-[#39424E]">{fee.dueAmount}</td>
@@ -283,7 +270,6 @@ const FeeSubmission = () => {
         </table>
       </div>
 
-      {/* Optionally, display the payment history */}
       <div className="mt-8">
         <h3 className="text-2xl font-semibold text-[#65fa9e] mb-4">Payment History</h3>
         <div className="overflow-x-auto">
@@ -327,4 +313,3 @@ const FeeSubmission = () => {
 };
 
 export default FeeSubmission;
-// LLJLJ
