@@ -5,6 +5,7 @@ import {
     deleteInstallment,
     getFeeGroupById,
     getFeeGroups,
+    getInstallments,
     manageInstallment,
     updateFeeGroup,
     updateInstallment,
@@ -20,5 +21,6 @@ router.get("/get-fee-group/:feeGroupId", getFeeGroupById);
 router.post("/add-installment", manageInstallment);
 router.delete("/delete-installment", deleteInstallment);
 router.put("/update-installment", updateInstallment);
+router.get("/get-installment", getInstallments);
 
 export { router as feeGroupRouter };

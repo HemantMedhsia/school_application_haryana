@@ -463,3 +463,17 @@ const updateInstallmentForAllClasses = async (
         { new: true }
     );
 };
+
+export const getInstallments = wrapAsync(async (req, res, next) => {
+    const feeGroups = await FeeGroup.find().populate("class");
+    const installments = feeGroups.map((group) => {
+        return {
+            class: group.class,
+            installments: group.installmentDates,
+        };
+    });
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, "Installments fetched.", installments));
+});
