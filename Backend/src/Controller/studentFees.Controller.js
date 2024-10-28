@@ -113,6 +113,88 @@ export const addPaymentsAndDiscounts = wrapAsync(async (req, res) => {
         );
 });
 
+// export const getStudentFeeDetails = wrapAsync(async (req, res) => {
+//     const { studentId } = req.params;
+
+//     // Find the student's fee record and populate the required fields
+//     const studentFee = await StudentFee.findOne({ student: studentId })
+//         .populate("student", "firstName lastName")
+//         .populate("class", "name")
+//         .populate("feeGroup");
+
+//     if (!studentFee) {
+//         return res
+//             .status(404)
+//             .json({ error: "Student Fee record not found", success: false });
+//     }
+
+//     const feeGroup = studentFee.feeGroup;
+//     if (!feeGroup || !feeGroup.fees) {
+//         return res.status(404).json({
+//             error: "Fee group details are missing for this student",
+//             success: false,
+//         });
+//     }
+
+//     // Prepare fee details by calculating paid amounts and due amounts
+//     const feeDetails = Object.entries(feeGroup.fees).reduce(
+//         (acc, [key, feeAmount]) => {
+//             // Calculate total paid amount for the current fee header
+//             const totalPaidForFee = studentFee.paymentHistory
+//                 .filter((p) => p.feeHeader.toLowerCase() === key.toLowerCase())
+//                 .reduce((acc, p) => acc + p.amount, 0);
+
+//             // Calculate the due amount by subtracting the total paid amount from the fee amount
+//             const dueAmount = feeAmount - totalPaidForFee;
+
+//             // Add the fee details to the accumulator object
+//             acc[key] = {
+//                 totalAmount: feeAmount,
+//                 dueAmount: Math.max(dueAmount, 0), // Ensure due amount is not negative
+//                 paidAmount: totalPaidForFee,
+//             };
+//             return acc;
+//         },
+//         {}
+//     );
+
+//     // Calculate total fee amount and total due amount across all fee types
+//     const totalFeeAmount = Object.values(feeDetails).reduce(
+//         (acc, fee) => acc + fee.totalAmount,
+//         0
+//     );
+//     const totalDueAmount = Object.values(feeDetails).reduce(
+//         (acc, fee) => acc + fee.dueAmount,
+//         0
+//     );
+
+//     // Prepare the response with student details, fee details, and payment history
+//     const response = {
+//         student: {
+//             id: studentFee.student._id,
+//             name: `${studentFee.student.firstName} ${studentFee.student.lastName}`,
+//             className: studentFee.class.name,
+//         },
+//         feeDetails,
+//         totalFeeAmount,
+//         totalDueAmount,
+//         paymentHistory: studentFee.paymentHistory.map((payment) => ({
+//             paymentDate: payment.paymentDate,
+//             feeHeader: payment.feeHeader,
+//             amount: payment.amount,
+//             receiptNumber: payment.receiptNumber,
+//             _id: payment._id,
+//         })),
+//     };
+
+//     return res.status(200).json({
+//         statusCode: response,
+//         data: "Student fee details retrieved successfully",
+//         message: "Success",
+//         success: true,
+//     });
+// });
+
 export const getStudentFeeDetails = wrapAsync(async (req, res) => {
     const { studentId } = req.params;
 
@@ -130,33 +212,46 @@ export const getStudentFeeDetails = wrapAsync(async (req, res) => {
 
     const feeGroup = studentFee.feeGroup;
     if (!feeGroup || !feeGroup.fees) {
-        return res.status(404).json({
-            error: "Fee group details are missing for this student",
-            success: false,
-        });
+        return res
+            .status(404)
+            .json({
+                error: "Fee group details are missing for this student",
+                success: false,
+            });
     }
 
-    // Prepare fee details by calculating paid amounts and due amounts
-    const feeDetails = Object.entries(feeGroup.fees).reduce(
-        (acc, [key, feeAmount]) => {
-            // Calculate total paid amount for the current fee header
-            const totalPaidForFee = studentFee.paymentHistory
-                .filter((p) => p.feeHeader.toLowerCase() === key.toLowerCase())
-                .reduce((acc, p) => acc + p.amount, 0);
+    // Initialize fee details object with default values
+    let feeDetails = {};
+    Object.entries(feeGroup.fees).forEach(([key, feeAmount]) => {
+        feeDetails[key] = {
+            totalAmount: feeAmount,
+            dueAmount: feeAmount,
+            paidAmount: 0,
+        };
+    });
 
-            // Calculate the due amount by subtracting the total paid amount from the fee amount
-            const dueAmount = feeAmount - totalPaidForFee;
+    // Mapping between payment fee headers and feeDetails keys
+    const feeHeaderToKeyMap = {
+        "Admission Fee": "admissionFee",
+        "Annual Fee": "annualFee",
+        "Tuition Fee": "tuitionFee",
+        "Other Fee": "otherFee",
+    };
 
-            // Add the fee details to the accumulator object
-            acc[key] = {
-                totalAmount: feeAmount,
-                dueAmount: Math.max(dueAmount, 0), // Ensure due amount is not negative
-                paidAmount: totalPaidForFee,
-            };
-            return acc;
-        },
-        {}
-    );
+    // Update fee details based on payment history
+    studentFee.paymentHistory.forEach((payment) => {
+        const feeKey = feeHeaderToKeyMap[payment.feeHeader];
+        if (feeKey && feeDetails[feeKey]) {
+            // Update paid amount for the fee header
+            feeDetails[feeKey].paidAmount += payment.amount;
+
+            // Recalculate due amount
+            feeDetails[feeKey].dueAmount = Math.max(
+                feeDetails[feeKey].totalAmount - feeDetails[feeKey].paidAmount,
+                0
+            );
+        }
+    });
 
     // Calculate total fee amount and total due amount across all fee types
     const totalFeeAmount = Object.values(feeDetails).reduce(
@@ -194,6 +289,8 @@ export const getStudentFeeDetails = wrapAsync(async (req, res) => {
         success: true,
     });
 });
+
+
 
 const generateReceiptNumber = () => {
     return `REC-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
