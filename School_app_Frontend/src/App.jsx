@@ -64,6 +64,7 @@ import StudentFees from "./pages/Fees/StudentFees.jsx";
 import FeesDiscount from "./pages/Fees/FeesDiscount.jsx";
 import AssignDiscount from "./pages/Fees/AssignDiscount.jsx";
 import CreateFees_h from "./pages/Fees/CreateFees_h.jsx";
+import FeesInstallment from "./pages/Fees/FeesInstallment.jsx";
 
 const App = () => {
   const { userRole, authToken } = useAuth();
@@ -250,6 +251,7 @@ const App = () => {
           <Route path="/school/fees-discount" element={<FeesDiscount />} />
           <Route path="/school/assign-discount/:discount_id" element={<AssignDiscount />} />
           <Route path="/school/create-fees" element={<CreateFees_h />} />
+          <Route path="/school/fees-installment" element={<FeesInstallment />} />
         </Route>
       </>
     )
