@@ -94,7 +94,13 @@ export const addPaymentsAndDiscounts = wrapAsync(async (req, res) => {
     if (totalPayingAmount === 0 && totalDiscountAmount === 0) {
         return res
             .status(400)
-            .json({ error: "No payment or discount provided." });
+            .json(
+                new ApiResponse(
+                    400,
+                    "No payment or discount provided",
+                    "Failure"
+                )
+            );
     }
 
     // Optional: Add remarks if provided
@@ -207,17 +213,22 @@ export const getStudentFeeDetails = wrapAsync(async (req, res) => {
     if (!studentFee) {
         return res
             .status(404)
-            .json({ error: "Student Fee record not found", success: false });
+            .json(
+                new ApiResponse(404, "Student Fee record not found", "Failure")
+            );
     }
 
     const feeGroup = studentFee.feeGroup;
     if (!feeGroup || !feeGroup.fees) {
         return res
             .status(404)
-            .json({
-                error: "Fee group details are missing for this student",
-                success: false,
-            });
+            .json(
+                new ApiResponse(
+                    404,
+                    "Fee group details are missing for this student",
+                    "Failure"
+                )
+            );
     }
 
     // Initialize fee details object with default values
@@ -282,15 +293,15 @@ export const getStudentFeeDetails = wrapAsync(async (req, res) => {
         })),
     };
 
-    return res.status(200).json({
-        statusCode: response,
-        data: "Student fee details retrieved successfully",
-        message: "Success",
-        success: true,
-    });
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                response,
+                "Student fee details retrieved successfully"
+            )
+        );
 });
-
-
 
 const generateReceiptNumber = () => {
     return `REC-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
