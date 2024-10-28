@@ -345,3 +345,4 @@ export const getStudentFeeDetails = wrapAsync(async (req, res) => {
 const generateReceiptNumber = () => {
     return `REC-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 };
+// dfdd
