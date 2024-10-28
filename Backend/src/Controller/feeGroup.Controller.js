@@ -475,5 +475,5 @@ export const getInstallments = wrapAsync(async (req, res, next) => {
 
     return res
         .status(200)
-        .json(new ApiResponse(200, "Installments fetched.", installments));
+        .json(new ApiResponse(200,installments, "Installments fetched."));
 });
