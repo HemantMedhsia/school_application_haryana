@@ -288,7 +288,6 @@ export const getStudentFeeDetails = wrapAsync(async (req, res) => {
         "Other Fee": "otherFee",
     };
 
-    // Update fee details based on payment history
     studentFee.paymentHistory.forEach((payment) => {
         const feeKey = feeHeaderToKeyMap[payment.feeHeader];
         if (feeKey && feeDetails[feeKey]) {
@@ -331,15 +330,6 @@ export const getStudentFeeDetails = wrapAsync(async (req, res) => {
             _id: payment._id,
         })),
     };
-
-    // return res
-    //     .status(200)
-    //     .json(
-    //         new ApiResponse(
-    //             response,
-    //             "Student fee details retrieved successfully"
-    //         )
-    //     );
 
     return res
         .status(200)
