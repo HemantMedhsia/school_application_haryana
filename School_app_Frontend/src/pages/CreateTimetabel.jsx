@@ -408,7 +408,7 @@ const CreateTimetable = () => {
     {
       name: "periodStartTiming",
       type: "time",
-      placeholder: "Period Start Timing",
+      placeholder: "School / Period 1 Start Timing",
     },
     {
       name: "periodRunningTime",

@@ -7,6 +7,7 @@ import { getAPI } from "../utility/api/apiCall";
 import { toast, ToastContainer } from "react-toastify";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import axios from "axios";
+import ConfirmationModal from "../common/ConfirmationModal/ConfirmationModal"; // Import the ConfirmationModal
 
 const CreateSubjectGroup = () => {
   const [formData, setFormData] = useState({
@@ -21,6 +22,8 @@ const CreateSubjectGroup = () => {
   const [data, setData] = useState([]);
   const [editingGroup, setEditingGroup] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false); // Modal state for delete
+  const [groupToDelete, setGroupToDelete] = useState(null); // State for group to delete
 
   useEffect(() => {
     const fetchClassSectionData = async () => {
@@ -79,6 +82,7 @@ const CreateSubjectGroup = () => {
 
     fetchSujectGroup();
   }, []);
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -145,11 +149,8 @@ const CreateSubjectGroup = () => {
 
     try {
       if (editingGroup) {
-        console.log("subjectGroupData:", subjectGroupData);
         await axios.put(
-          `${
-            import.meta.env.VITE_BACKEND_URL
-          }/api/update-subject-group/${editingGroup}`,
+          `${import.meta.env.VITE_BACKEND_URL}/api/update-subject-group/${editingGroup}`,
           subjectGroupData
         );
         toast.success("Subject Group updated successfully!");
@@ -161,7 +162,7 @@ const CreateSubjectGroup = () => {
         toast.success("Subject Group added successfully!");
       }
 
-      const response = await getAPI("getSubjectGroup", {}, setData);
+      const response = await getAPI("getSubjectGroup", {});
       setData(response.data || []);
       setFormData({
         subjectGroupName: "",
@@ -170,10 +171,7 @@ const CreateSubjectGroup = () => {
         selectedSubjects: [],
       });
     } catch (error) {
-      console.error(
-        "Error adding subject group:",
-        error.response?.data || error.message
-      );
+      console.error("Error adding subject group:", error.response?.data || error.message);
       toast.error(
         "Error adding subject group: " +
           (error.response?.data?.message || error.message)
@@ -183,13 +181,10 @@ const CreateSubjectGroup = () => {
 
   const handleEdit = (group) => {
     setEditingGroup(group._id);
-    console.log("Editing group:", group);
 
-    console.log("classSectionOptions:", classSectionOptions);
     const selectedClass = classSectionOptions.find(
       (option) => option.id === group.classes[0]._id
     );
-    console.log("Selected class:", selectedClass);
 
     if (selectedClass && selectedClass.sections) {
       setSectionOptions(selectedClass.sections);
@@ -209,22 +204,32 @@ const CreateSubjectGroup = () => {
     });
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this subject group?")) {
-      try {
-        await axios.delete(
-          `${import.meta.env.VITE_BACKEND_URL}/api/delete-subject-group/${id}`
-        );
-        toast.success("Subject Group deleted successfully!");
+  const handleDeleteClick = (group) => {
+    setGroupToDelete(group);
+    setIsModalOpen(true);
+  };
 
-        setData((prevData) => prevData.filter((group) => group._id !== id));
-      } catch (error) {
-        console.error("Error deleting subject group:", error);
-        toast.error(
-          "Error deleting subject group: " +
-            (error.response?.data?.message || error.message)
-        );
-      }
+  const closeModal = () => {
+    setGroupToDelete(null);
+    setIsModalOpen(false);
+  };
+
+  const confirmDelete = async () => {
+    if (!groupToDelete) return;
+    try {
+      await axios.delete(
+        `${import.meta.env.VITE_BACKEND_URL}/api/delete-subject-group/${groupToDelete._id}`
+      );
+      toast.success("Subject Group deleted successfully!");
+      setData((prevData) => prevData.filter((group) => group._id !== groupToDelete._id));
+    } catch (error) {
+      console.error("Error deleting subject group:", error);
+      toast.error(
+        "Error deleting subject group: " +
+          (error.response?.data?.message || error.message)
+      );
+    } finally {
+      closeModal();
     }
   };
 
@@ -335,15 +340,12 @@ const CreateSubjectGroup = () => {
             <tbody>
               {data.map((group) => (
                 <tr key={group._id} className="hover:bg-gray-900 duration-300">
-                  {/* Name Column */}
                   <td className="border-t-0 px-6 align-middle text-md whitespace-nowrap p-4 text-left">
                     {group.name}
                   </td>
-
-                  {/* Class (Section) Column */}
                   <td className="border-t-0 px-6 align-middle text-md whitespace-nowrap p-4 text-left">
                     {group.classes && group.classes.length > 0 ? (
-                      group.classes.map((cls, index) => (
+                      group.classes.map((cls) => (
                         <div key={cls._id} className="my-2">
                           <span className="text-xl">{cls.name}</span>
                           {group.sections && group.sections.length > 0 ? (
@@ -368,8 +370,6 @@ const CreateSubjectGroup = () => {
                       <p className="text-sm text-gray-500">No Classes</p>
                     )}
                   </td>
-
-                  {/* Subject Column */}
                   <td className="border-t-0 px-6 align-middle text-md whitespace-nowrap p-4 text-left">
                     {group.subjects && group.subjects.length > 0 ? (
                       <div className="text-sm">
@@ -383,8 +383,6 @@ const CreateSubjectGroup = () => {
                       <p className="text-sm text-gray-500">No Subjects</p>
                     )}
                   </td>
-
-                  {/* Action Column */}
                   <td className="border-t-0 px-6 py-4 text-left">
                     <button
                       className="text-blue-500 hover:text-blue-700 transition-all mr-4"
@@ -394,7 +392,7 @@ const CreateSubjectGroup = () => {
                     </button>
                     <button
                       className="text-red-500 hover:text-red-700 transition-all"
-                      onClick={() => handleDelete(group._id)}
+                      onClick={() => handleDeleteClick(group)}
                     >
                       <FaTrash className="inline-block text-lg" />
                     </button>
@@ -405,6 +403,15 @@ const CreateSubjectGroup = () => {
           </table>
         </div>
       </div>
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        onConfirm={confirmDelete}
+        title="Delete Confirmation"
+        message={`Are you sure you want to delete the subject group "${groupToDelete?.name}"?`}
+      />
 
       <ToastContainer />
     </div>
