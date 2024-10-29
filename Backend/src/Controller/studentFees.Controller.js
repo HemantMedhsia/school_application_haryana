@@ -161,6 +161,7 @@ export const addPaymentsAndDiscounts = wrapAsync(async (req, res) => {
         .status(200)
         .json(
             new ApiResponse(
+                200,
                 studentFee,
                 "Payment and discounts updated successfully"
             )
@@ -173,7 +174,7 @@ export const getStudentFeeDetails = wrapAsync(async (req, res, next) => {
     if (!studentId) {
         return res
             .status(400)
-            .json(new ApiResponse(400, "Student ID is required."));
+            .json(new ApiResponse(400, null, "Student ID is required."));
     }
 
     const student = await Student.findById(studentId).populate(
@@ -181,7 +182,9 @@ export const getStudentFeeDetails = wrapAsync(async (req, res, next) => {
     );
 
     if (!student) {
-        return res.status(404).json(new ApiResponse(404, "Student not found."));
+        return res
+            .status(404)
+            .json(new ApiResponse(404, null, "Student not found."));
     }
 
     const studentFee = await StudentFee.findOne({
@@ -190,7 +193,7 @@ export const getStudentFeeDetails = wrapAsync(async (req, res, next) => {
     if (!studentFee) {
         return res
             .status(404)
-            .json(new ApiResponse(404, "Student fee record not found."));
+            .json(new ApiResponse(404, null, "Student fee record not found."));
     }
 
     if (!studentFee.originalDueAmount) {
@@ -269,33 +272,37 @@ export const getStudentFeeDetails = wrapAsync(async (req, res, next) => {
     }
 
     return res.status(200).json(
-        new ApiResponse(200, "Student fees retrieved successfully.", {
-            student: {
-                _id: student._id,
-                name: student.name,
-                rollNumber: student.rollNumber,
-                class: {
-                    _id: student.currentClass._id,
-                    name: student.currentClass.name,
+        new ApiResponse(
+            200,
+            {
+                student: {
+                    _id: student._id,
+                    name: student.name,
+                    rollNumber: student.rollNumber,
+                    class: {
+                        _id: student.currentClass._id,
+                        name: student.currentClass.name,
+                    },
+                    feeGroup: {
+                        _id: student.feeGroup._id,
+                        fees: student.feeGroup.fees,
+                        installmentDates: student.feeGroup.installmentDates,
+                    },
                 },
-                feeGroup: {
-                    _id: student.feeGroup._id,
-                    fees: student.feeGroup.fees,
-                    installmentDates: student.feeGroup.installmentDates,
+                studentFee: {
+                    _id: studentFee._id,
+                    originalDueAmount: studentFee.originalDueAmount,
+                    totalDiscount: totalDiscountAmount,
+                    totalPaidAmount: totalPaidAmount,
+                    dueAmount: overallDueAmount,
+                    paymentStatus: paymentStatus,
+                    feeDetails: feeDetails,
+                    paymentHistory: studentFee.paymentHistory || [],
+                    discountHistory: studentFee.discountHistory || [],
                 },
             },
-            studentFee: {
-                _id: studentFee._id,
-                originalDueAmount: studentFee.originalDueAmount,
-                totalDiscount: totalDiscountAmount,
-                totalPaidAmount: totalPaidAmount,
-                dueAmount: overallDueAmount,
-                paymentStatus: paymentStatus,
-                feeDetails: feeDetails,
-                paymentHistory: studentFee.paymentHistory || [],
-                discountHistory: studentFee.discountHistory || [],
-            },
-        })
+            "Student fees retrieved successfully."
+        )
     );
 });
 
@@ -309,14 +316,14 @@ export const getDueFeeListPerClassMonth = wrapAsync(async (req, res) => {
     if (!date || !classId) {
         return res
             .status(400)
-            .json(new ApiResponse(400, "Date and class are required."));
+            .json(new ApiResponse(400, null, "Date and class are required."));
     }
 
     const providedDate = new Date(date);
     if (isNaN(providedDate)) {
         return res
             .status(400)
-            .json(new ApiResponse(400, "Invalid date format."));
+            .json(new ApiResponse(400, null, "Invalid date format."));
     }
 
     const month = providedDate.getMonth();
@@ -335,7 +342,13 @@ export const getDueFeeListPerClassMonth = wrapAsync(async (req, res) => {
     if (!studentFees.length) {
         return res
             .status(404)
-            .json(new ApiResponse(404, "No fee records found for this class."));
+            .json(
+                new ApiResponse(
+                    404,
+                    null,
+                    "No fee records found for this class."
+                )
+            );
     }
 
     const dueFeesList = studentFees.filter((feeRecord) => {
@@ -366,6 +379,7 @@ export const getDueFeeListPerClassMonth = wrapAsync(async (req, res) => {
             .json(
                 new ApiResponse(
                     404,
+                    null,
                     "No due fees found for this class in the given month."
                 )
             );
@@ -399,8 +413,8 @@ export const getDueFeeListPerClassMonth = wrapAsync(async (req, res) => {
         .json(
             new ApiResponse(
                 200,
-                "Due fees list retrieved successfully.",
-                responseData
+                responseData,
+                "Due fees list retrieved successfully."
             )
         );
 });
@@ -414,7 +428,13 @@ export const getAllStudentFeeDetails = wrapAsync(async (req, res) => {
     if (!studentFees.length) {
         return res
             .status(404)
-            .json(new ApiResponse(404, "No fee records found for any class."));
+            .json(
+                new ApiResponse(
+                    404,
+                    null,
+                    "No fee records found for any class."
+                )
+            );
     }
 
     let totalFees = 0;
@@ -448,8 +468,18 @@ export const getAllStudentFeeDetails = wrapAsync(async (req, res) => {
         .json(
             new ApiResponse(
                 200,
-                "All student fee details retrieved successfully.",
-                responseData
+                responseData,
+                "All student fee details retrieved successfully."
             )
         );
+});
+
+export const getStudentBillPerMonth = wrapAsync(async (req, res) => {
+    const { date, class: classId } = req.body;
+
+    if (!date || !classId) {
+        return res
+            .status(400)
+            .json(new ApiResponse(400, "Date and class are required."));
+    }
 });
