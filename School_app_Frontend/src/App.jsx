@@ -67,6 +67,7 @@ import CreateFees_h from "./pages/Fees/CreateFees_h.jsx";
 import FeesInstallment from "./pages/Fees/FeesInstallment.jsx";
 import StudentsFeesPage from "./pages/Fees/StudentsFeesPage.jsx";
 import FeeSubmmission from "./pages/Fees/FeeSubmmission.jsx";
+import ClassFeesRecord from "./pages/Fees/ClassFeesRecord.jsx";
 
 const App = () => {
   const { userRole, authToken } = useAuth();
@@ -256,6 +257,7 @@ const App = () => {
           <Route path="/school/fees-installment" element={<FeesInstallment />} />
           <Route path="/school/student-fees-page" element={<StudentsFeesPage />} />
           <Route path="/school/fee-submission/:studentId" element={<FeeSubmmission />} />
+          <Route path="/school/class-fees-record" element={<ClassFeesRecord />} />
         </Route>
       </>
     )
