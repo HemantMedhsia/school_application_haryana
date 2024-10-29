@@ -5,6 +5,8 @@ import { StudentFee } from "../Models/studentFees.Model.js";
 import { Student } from "../Models/student.model.js";
 import { FeeGroup } from "../Models/feeGroup.Model.js";
 import { Class } from "../Models/class.Model.js";
+import QRCode from "qrcode";
+import path from "path";
 
 export const addPaymentsAndDiscounts = wrapAsync(async (req, res) => {
     const { studentId, feeDetails, paymentDate, paymentMode, remarks } =
@@ -477,14 +479,15 @@ export const getAllStudentFeeDetails = wrapAsync(async (req, res) => {
 export const getStudentBillPerMonth = wrapAsync(async (req, res) => {
     const { date, class: classId } = req.body;
 
-    // Validate date and class
+    const logoUrl =
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMzmcQPKs-mQ9YsDLBGutKI2ZmFaMqpiNidw&s";
+
     if (!date || !classId) {
         return res
             .status(400)
             .json(new ApiResponse(400, "Date and class are required."));
     }
 
-    // Parse the date
     const providedDate = new Date(date);
     if (isNaN(providedDate)) {
         return res
@@ -492,30 +495,27 @@ export const getStudentBillPerMonth = wrapAsync(async (req, res) => {
             .json(new ApiResponse(400, "Invalid date format."));
     }
 
-    // Extract month and year from date
     const month = providedDate.getMonth();
     const year = providedDate.getFullYear();
     const monthName = providedDate.toLocaleString("default", { month: "long" });
 
-    // Get class details
     const classDetails = await Class.findById(classId);
     if (!classDetails) {
         return res.status(404).json(new ApiResponse(404, "Class not found."));
     }
 
-    // Fetch all students for the class
-    const students = await Student.find({ currentClass: classId }).populate("parent");
+    const students = await Student.find({ currentClass: classId }).populate(
+        "parent"
+    );
     if (!students.length) {
         return res
             .status(404)
             .json(new ApiResponse(404, "No students found for this class."));
     }
 
-    // Prepare response data for each student
     const responseData = [];
 
     for (const student of students) {
-        // Find fee records for the student
         const feeRecord = await StudentFee.findOne({
             student: student._id,
         });
@@ -525,13 +525,11 @@ export const getStudentBillPerMonth = wrapAsync(async (req, res) => {
         let dueAmount = 0;
 
         if (feeRecord) {
-            // Calculate total discount amount
             totalDiscountAmount = feeRecord.discountHistory.reduce(
                 (sum, discount) => sum + discount.discountAmount,
                 0
             );
 
-            // Calculate total due amount including unpaid fees from previous months
             const unpaidFees = feeRecord.paymentHistory
                 .filter((payment) => {
                     const paymentDate = new Date(payment.paymentDate);
@@ -539,13 +537,11 @@ export const getStudentBillPerMonth = wrapAsync(async (req, res) => {
                 })
                 .reduce((sum, payment) => sum + payment.amount, 0);
 
-            // Calculate the installment amount based on the given month
-            const installmentFraction = (month + 1) / 12; // For example, April (3rd month) would be 4/12
+            const installmentFraction = (month + 1) / 12;
             const installmentAmount = feeRecord.dueAmount * installmentFraction;
 
             dueAmount = installmentAmount - unpaidFees;
 
-            // Calculate total fees for the given month
             const monthlyPayment = feeRecord.paymentHistory
                 .filter((payment) => {
                     const paymentDate = new Date(payment.paymentDate);
@@ -562,7 +558,6 @@ export const getStudentBillPerMonth = wrapAsync(async (req, res) => {
                 totalDiscountAmount -
                 monthlyPayment;
         } else {
-            // If no fee record exists, set due amount from fee group
             const feeGroup = await FeeGroup.findById(student.feeGroup);
             if (feeGroup) {
                 const installmentFraction = (month + 1) / 12;
@@ -571,9 +566,23 @@ export const getStudentBillPerMonth = wrapAsync(async (req, res) => {
             }
         }
 
+        // Generate QR code with student information
+        const qrCodeContent = {
+            studentName: student.firstName,
+            dueAmount: dueAmount,
+        };
+        let qrCode = "";
+        try {
+            qrCode = await QRCode.toDataURL(JSON.stringify(qrCodeContent));
+        } catch (error) {
+            console.error("QR Code Generation Error: ", error);
+            qrCode = "Error generating QR code";
+        }
+
         responseData.push({
             schoolName: "Vardhan International School",
             contactNumber: "+1-234-567-890",
+            logoUrl: logoUrl, // Use backend-provided logo URL
             month: monthName,
             studentName: student.firstName,
             fatherName: student.parent ? student.parent.fatherName : "N/A",
@@ -582,10 +591,10 @@ export const getStudentBillPerMonth = wrapAsync(async (req, res) => {
             admissionNumber: student.admissionNo,
             dueAmount: dueAmount,
             totalFees: totalFees,
+            qrCode: qrCode, // Generated QR code or error message
         });
     }
 
-    // Return the response
     return res
         .status(200)
         .json(
