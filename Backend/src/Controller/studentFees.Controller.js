@@ -4,6 +4,7 @@ import { ApiError } from "../Utils/errorHandler.js";
 import { StudentFee } from "../Models/studentFees.Model.js";
 import { Student } from "../Models/student.model.js";
 import { FeeGroup } from "../Models/feeGroup.Model.js";
+import { Class } from "../Models/class.Model.js";
 
 export const addPaymentsAndDiscounts = wrapAsync(async (req, res) => {
     const { studentId, feeDetails, paymentDate, paymentMode, remarks } =
@@ -301,3 +302,154 @@ export const getStudentFeeDetails = wrapAsync(async (req, res, next) => {
 const generateReceiptNumber = () => {
     return `REC-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 };
+
+export const getDueFeeListPerClassMonth = wrapAsync(async (req, res) => {
+    const { date, class: classId } = req.body;
+
+    if (!date || !classId) {
+        return res
+            .status(400)
+            .json(new ApiResponse(400, "Date and class are required."));
+    }
+
+    const providedDate = new Date(date);
+    if (isNaN(providedDate)) {
+        return res
+            .status(400)
+            .json(new ApiResponse(400, "Invalid date format."));
+    }
+
+    const month = providedDate.getMonth();
+    const year = providedDate.getFullYear();
+
+    const classDetails = await Class.findById(classId);
+    if (!classDetails) {
+        return res.status(404).json(new ApiResponse(404, "Class not found."));
+    }
+
+    const studentFees = await StudentFee.find({ class: classId }).populate({
+        path: "student",
+        populate: { path: "parent" },
+    });
+
+    if (!studentFees.length) {
+        return res
+            .status(404)
+            .json(new ApiResponse(404, "No fee records found for this class."));
+    }
+
+    const dueFeesList = studentFees.filter((feeRecord) => {
+        const lastPaymentDate =
+            feeRecord.paymentHistory.length > 0
+                ? new Date(
+                      Math.max(
+                          ...feeRecord.paymentHistory.map((p) =>
+                              new Date(p.paymentDate).getTime()
+                          )
+                      )
+                  )
+                : null;
+
+        if (lastPaymentDate) {
+            return (
+                lastPaymentDate.getMonth() === month &&
+                lastPaymentDate.getFullYear() === year
+            );
+        } else {
+            return true;
+        }
+    });
+
+    if (dueFeesList.length === 0) {
+        return res
+            .status(404)
+            .json(
+                new ApiResponse(
+                    404,
+                    "No due fees found for this class in the given month."
+                )
+            );
+    }
+
+    const responseData = dueFeesList.map((feeRecord) => {
+        const student = feeRecord.student;
+        const parent = student && student.parent ? student.parent : null;
+        const totalDiscountAmount = feeRecord.discountHistory.reduce(
+            (sum, discount) => sum + discount.discountAmount,
+            0
+        );
+        const totalFees =
+            feeRecord.totalPaidAmount +
+            feeRecord.dueAmount +
+            totalDiscountAmount;
+        return {
+            studentName: student ? student.firstName : "N/A",
+            fatherName: parent ? parent.fatherName : "N/A",
+            admissionNumber: student ? student.admissionNo : "N/A",
+            contact: student ? student.mobileNumber : "N/A",
+            currentYearFees: totalFees,
+            totalFees: totalFees,
+            totalPaidAmount: feeRecord.totalPaidAmount,
+            totalDiscountAmount: totalDiscountAmount,
+        };
+    });
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                "Due fees list retrieved successfully.",
+                responseData
+            )
+        );
+});
+
+export const getAllStudentFeeDetails = wrapAsync(async (req, res) => {
+    const studentFees = await StudentFee.find().populate({
+        path: "student",
+        populate: { path: "parent" },
+    });
+
+    if (!studentFees.length) {
+        return res
+            .status(404)
+            .json(new ApiResponse(404, "No fee records found for any class."));
+    }
+
+    let totalFees = 0;
+    let totalReceivedFee = 0;
+    let totalDiscount = 0;
+    let totalDue = 0;
+
+    studentFees.forEach((feeRecord) => {
+        const totalDiscountAmount = feeRecord.discountHistory.reduce(
+            (sum, discount) => sum + discount.discountAmount,
+            0
+        );
+        totalFees +=
+            feeRecord.totalPaidAmount +
+            feeRecord.dueAmount +
+            totalDiscountAmount;
+        totalReceivedFee += feeRecord.totalPaidAmount;
+        totalDiscount += totalDiscountAmount;
+        totalDue += feeRecord.dueAmount;
+    });
+
+    const responseData = {
+        totalFees,
+        totalReceivedFee,
+        totalDiscount,
+        totalDue,
+    };
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                "All student fee details retrieved successfully.",
+                responseData
+            )
+        );
+});
