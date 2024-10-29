@@ -90,6 +90,7 @@ export const addFeeGroup = wrapAsync(async (req, res, next) => {
             .json(
                 new ApiResponse(
                     400,
+                    null,
                     "Fee data is required and must be an array."
                 )
             );
@@ -104,6 +105,7 @@ export const addFeeGroup = wrapAsync(async (req, res, next) => {
                 .json(
                     new ApiResponse(
                         400,
+                        null,
                         `Validation error for fee group: ${error.details[0].message}`
                     )
                 );
@@ -123,6 +125,7 @@ export const addFeeGroup = wrapAsync(async (req, res, next) => {
             .json(
                 new ApiResponse(
                     400,
+                    null,
                     `Fee group already exists for the following class(es): ${existingClassNames}`
                 )
             );
@@ -189,8 +192,8 @@ export const addFeeGroup = wrapAsync(async (req, res, next) => {
         .json(
             new ApiResponse(
                 201,
-                "Fee groups created and assigned to students successfully.",
-                createdFeeGroups
+                createdFeeGroups,
+                "Fee groups created and assigned to students successfully."
             )
         );
 });
@@ -204,6 +207,7 @@ export const updateFeeGroup = wrapAsync(async (req, res, next) => {
             .json(
                 new ApiResponse(
                     400,
+                    null,
                     "Fee data is required and must be an array."
                 )
             );
@@ -218,6 +222,7 @@ export const updateFeeGroup = wrapAsync(async (req, res, next) => {
                 .json(
                     new ApiResponse(
                         400,
+                        null,
                         `Validation error for fee group: ${error.details[0].message}`
                     )
                 );
@@ -229,6 +234,7 @@ export const updateFeeGroup = wrapAsync(async (req, res, next) => {
                 .json(
                     new ApiResponse(
                         400,
+                        null,
                         "Fee group ID is required for updating."
                     )
                 );
@@ -265,7 +271,7 @@ export const updateFeeGroup = wrapAsync(async (req, res, next) => {
         if (!updatedFeeGroup) {
             return res
                 .status(404)
-                .json(new ApiResponse(404, "Fee group not found."));
+                .json(new ApiResponse(404, null, "Fee group not found."));
         }
 
         await Class.findByIdAndUpdate(
@@ -279,7 +285,7 @@ export const updateFeeGroup = wrapAsync(async (req, res, next) => {
 
     return res
         .status(200)
-        .json(new ApiResponse(200, "Fee groups updated.", updatedFeeGroups));
+        .json(new ApiResponse(200, updatedFeeGroups, "Fee groups updated."));
 });
 
 export const deleteFeeGroup = wrapAsync(async (req, res, next) => {
@@ -291,6 +297,7 @@ export const deleteFeeGroup = wrapAsync(async (req, res, next) => {
             .json(
                 new ApiResponse(
                     400,
+                    null,
                     "Fee group IDs are required and must be an array."
                 )
             );
@@ -306,7 +313,9 @@ export const deleteFeeGroup = wrapAsync(async (req, res, next) => {
             .json(new ApiResponse(404, "Fee groups not found."));
     }
 
-    return res.status(200).json(new ApiResponse(200, "Fee groups deleted."));
+    return res
+        .status(200)
+        .json(new ApiResponse(200, null, "Fee groups deleted."));
 });
 
 export const getFeeGroups = wrapAsync(async (req, res, next) => {
@@ -314,7 +323,7 @@ export const getFeeGroups = wrapAsync(async (req, res, next) => {
 
     return res
         .status(200)
-        .json(new ApiResponse(200, "Fee groups fetched.", feeGroups));
+        .json(new ApiResponse(200, feeGroups, "Fee groups fetched."));
 });
 
 export const getFeeGroupById = wrapAsync(async (req, res, next) => {
@@ -325,12 +334,12 @@ export const getFeeGroupById = wrapAsync(async (req, res, next) => {
     if (!feeGroup) {
         return res
             .status(404)
-            .json(new ApiResponse(404, "Fee group not found."));
+            .json(new ApiResponse(404, null, "Fee group not found."));
     }
 
     return res
         .status(200)
-        .json(new ApiResponse(200, "Fee group fetched.", feeGroup));
+        .json(new ApiResponse(200, null, "Fee group fetched.", feeGroup));
 });
 
 const manageInstallmentForClass = async (classId, installment, dueDate) => {
@@ -381,6 +390,7 @@ export const manageInstallment = wrapAsync(async (req, res, next) => {
             .json(
                 new ApiResponse(
                     400,
+                    null,
                     "Installment name and due date are required."
                 )
             );
@@ -399,8 +409,8 @@ export const manageInstallment = wrapAsync(async (req, res, next) => {
                 .json(
                     new ApiResponse(
                         200,
-                        "Installment managed for the specified class.",
-                        result
+                        result,
+                        "Installment managed for the specified class."
                     )
                 );
         } else {
@@ -410,8 +420,8 @@ export const manageInstallment = wrapAsync(async (req, res, next) => {
                 .json(
                     new ApiResponse(
                         200,
-                        "Installment added to all classes successfully.",
-                        result
+                        result,
+                        "Installment added to all classes successfully."
                     )
                 );
         }
@@ -421,6 +431,7 @@ export const manageInstallment = wrapAsync(async (req, res, next) => {
             .json(
                 new ApiResponse(
                     500,
+                    null,
                     error.message || "Failed to manage the installment."
                 )
             );
@@ -436,6 +447,7 @@ export const deleteInstallment = wrapAsync(async (req, res, next) => {
             .json(
                 new ApiResponse(
                     400,
+                    null,
                     "Either Installment ID or both month and due date are required."
                 )
             );
@@ -450,8 +462,8 @@ export const deleteInstallment = wrapAsync(async (req, res, next) => {
                 .json(
                     new ApiResponse(
                         200,
-                        "Installment deleted for the specified class.",
-                        result
+                        result,
+                        "Installment deleted for the specified class."
                     )
                 );
         } else {
@@ -461,8 +473,8 @@ export const deleteInstallment = wrapAsync(async (req, res, next) => {
                 .json(
                     new ApiResponse(
                         200,
-                        "Installment deleted from all classes successfully.",
-                        result
+                        result,
+                        "Installment deleted from all classes successfully."
                     )
                 );
         }
@@ -472,6 +484,7 @@ export const deleteInstallment = wrapAsync(async (req, res, next) => {
             .json(
                 new ApiResponse(
                     500,
+                    null,
                     error.message || "Failed to delete the installment."
                 )
             );
@@ -521,8 +534,8 @@ export const updateInstallment = wrapAsync(async (req, res, next) => {
                 .json(
                     new ApiResponse(
                         200,
-                        "Installment updated for the specified class.",
-                        result
+                        result,
+                        "Installment updated for the specified class."
                     )
                 );
         } else if (existingMonth) {
@@ -536,8 +549,8 @@ export const updateInstallment = wrapAsync(async (req, res, next) => {
                 .json(
                     new ApiResponse(
                         200,
-                        "Installment updated for all classes successfully.",
-                        result
+                        result,
+                        "Installment updated for all classes successfully."
                     )
                 );
         } else {
@@ -546,6 +559,7 @@ export const updateInstallment = wrapAsync(async (req, res, next) => {
                 .json(
                     new ApiResponse(
                         400,
+                        null,
                         "Either classId and installmentId, or existingMonth are required."
                     )
                 );
@@ -556,6 +570,7 @@ export const updateInstallment = wrapAsync(async (req, res, next) => {
             .json(
                 new ApiResponse(
                     500,
+                    null,
                     error.message || "Failed to update the installment."
                 )
             );
@@ -637,10 +652,10 @@ export const getInstallmentById = wrapAsync(async (req, res, next) => {
     if (!foundInstallment) {
         return res
             .status(404)
-            .json(new ApiResponse(404, "Installment not found."));
+            .json(new ApiResponse(404, null, "Installment not found."));
     }
 
     return res
         .status(200)
-        .json(new ApiResponse(200, "Installment fetched.", foundInstallment));
+        .json(new ApiResponse(200, foundInstallment, "Installment fetched."));
 });
