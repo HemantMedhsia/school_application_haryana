@@ -12,7 +12,7 @@ const FeeSubmission = () => {
 
   // Mapping between feeHeader identifiers and display names
   const feeHeaderMap = {
-    tuitionFee: 'Tuition Fee (Monthly)',
+    tuitionFee: 'Tuition Fee',
     admissionFee: 'Admission Fee',
     annualFee: 'Annual Fee',
     otherFee: 'Other Fee',
@@ -36,7 +36,7 @@ const FeeSubmission = () => {
         `${import.meta.env.VITE_BACKEND_URL}/api/get-student-fee/${studentId}`
       );
       if (response.data && response.data.success) {
-        const data = response.data.message; // Adjusted to match new API response structure
+        const data = response.data.data; // Adjusted to match new API response structure
         setStudentDetails(data.student);
         initializeFeeDetails(data.studentFee);
         setPaymentHistory(data.studentFee.paymentHistory);
@@ -102,7 +102,7 @@ const FeeSubmission = () => {
       'December',
       'January',
       'February',
-      'March',
+      'March', 
     ];
     return months.indexOf(month) + 1;
   };
@@ -186,7 +186,7 @@ const FeeSubmission = () => {
   };
 
   return (
-    <div className="p-8 bg-gray-900 text-gray-100 min-h-screen">
+    <div className=" bg-gray-900 text-gray-100 min-h-screen">
       <h2 className="text-3xl font-bold mb-6 text-[#65fa9e]">Fee Submission</h2>
       {studentDetails && (
         <div className="mb-6">

@@ -377,6 +377,12 @@ export const navigation = [
         icon: FaUser,
         roles: ["Admin"],
       },
+      {
+        name: "Class Fee Records",
+        to: "/school/class-fees-record",
+        icon: FaUser,
+        roles: ["Admin"],
+      },
     ],
   },
   {
