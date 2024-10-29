@@ -1,45 +1,40 @@
 import React, { useState } from "react";
+import { FaTimes } from "react-icons/fa"; // Import an icon for the close button
 
 // Helper function to get category styles
 const getCategoryStyles = (category) => {
   switch (category) {
     case "Event":
       return {
-        text: "text-blue-400",
-        bg: "bg-[#1E3A8A]",
-        shadow: "shadow-blue-400/50",
+        text: "text-indigo-400",
+        bg: "bg-indigo-800",
+        shadow: "shadow-indigo-500/50",
       };
     case "Holiday":
       return {
-        text: "text-green-400",
-        bg: "bg-[#064E3B]",
-        shadow: "shadow-green-400/50",
+        text: "text-emerald-400",
+        bg: "bg-emerald-800",
+        shadow: "shadow-emerald-500/50",
       };
     case "Announcement":
       return {
-        text: "text-yellow-400",
-        bg: "bg-[#B45309]",
-        shadow: "shadow-yellow-400/50",
+        text: "text-amber-400",
+        bg: "bg-amber-800",
+        shadow: "shadow-amber-500/50",
       };
     case "General":
       return {
         text: "text-gray-400",
-        bg: "bg-[#374151]",
-        shadow: "shadow-gray-400/50",
+        bg: "bg-gray-800",
+        shadow: "shadow-gray-500/50",
       };
     default:
       return {
         text: "text-gray-400",
-        bg: "bg-[#374151]",
-        shadow: "shadow-gray-400/50",
+        bg: "bg-gray-800",
+        shadow: "shadow-gray-500/50",
       };
   }
-};
-
-// Helper function to parse date from dd-mm-yyyy to yyyy-mm-dd
-const parseDate = (dateString) => {
-  const [day, month, year] = dateString.split("-");
-  return new Date(`${year}-${month}-${day}`);
 };
 
 // Helper function to sort notices by date
@@ -63,28 +58,28 @@ const NoticeShowingBlock = ({ notices }) => {
   };
 
   return (
-    <div className="">
+    <div>
       {recentNotices && recentNotices.length > 0 ? (
-        <ul className="space-y-4">
+        <ul className="space-y-6">
           {recentNotices.map((notice) => {
             const { text, bg, shadow } = getCategoryStyles(notice.category);
             return (
               <li
                 key={notice._id}
-                className={`p-4 rounded-lg shadow-lg cursor-pointer hover:shadow-xl transition-shadow duration-300 ${shadow}`}
+                className={`p-6 rounded-2xl bg-gradient-to-br from-gray-800 to-gray-900 cursor-pointer hover:shadow-2xl transition-shadow duration-300 ${shadow}`}
                 onClick={() => handleNoticeClick(notice)}
               >
                 <div className="flex justify-between items-center">
-                  <h1 className={`text-xl font-semibold ${text}`}>
+                  <h1 className={`text-2xl font-bold ${text}`}>
                     {notice.title}
                   </h1>
                   <span
-                    className={`px-2 py-1 text-sm font-bold rounded ${text} bg-opacity-20`}
+                    className={`px-3 py-1 text-sm font-semibold rounded-full ${text} bg-opacity-20 ${bg}`}
                   >
                     {notice.category}
                   </span>
                 </div>
-                <p className="mt-1 text-sm text-gray-400">
+                <p className="mt-2 text-sm text-gray-400">
                   {new Date(notice.date).toLocaleDateString()}
                 </p>
               </li>
@@ -93,28 +88,34 @@ const NoticeShowingBlock = ({ notices }) => {
         </ul>
       ) : (
         <div className="no-data-message text-xl flex mt-4 justify-center text-red-500">
-          No Notice Available !
+          No Notice Available!
         </div>
       )}
 
       {/* Modal for showing full notice details */}
       {selectedNotice && (
-        <div className="fixed z-50 inset-0 flex items-center justify-center bg-white bg-opacity-10">
-          <div
-            className={`p-6 rounded-lg shadow-lg w-11/12 max-w-md bg-gray-800 text-gray-200`}
-          >
-            <div className="flex justify-between items-center mb-2">
+        <div className="fixed z-50 inset-0 flex items-center justify-center bg-black bg-opacity-70">
+          <div className="relative p-8 rounded-2xl shadow-2xl w-11/12 max-w-2xl bg-gradient-to-br from-gray-900 to-gray-800 text-gray-200">
+            <button
+              onClick={closeModal}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-200 transition"
+            >
+              <FaTimes size={24} />
+            </button>
+            <div className="flex justify-between items-center mb-4">
               <h2
-                className={`text-2xl font-bold ${
+                className={`text-3xl font-extrabold ${
                   getCategoryStyles(selectedNotice.category).text
                 }`}
               >
                 {selectedNotice.title}
               </h2>
               <span
-                className={`px-2 py-1 text-sm font-bold rounded ${
+                className={`px-3 py-1 text-sm font-semibold rounded-full ${
                   getCategoryStyles(selectedNotice.category).text
-                } bg-opacity-20`}
+                } bg-opacity-20 ${
+                  getCategoryStyles(selectedNotice.category).bg
+                }`}
               >
                 {selectedNotice.category}
               </span>
@@ -122,13 +123,17 @@ const NoticeShowingBlock = ({ notices }) => {
             <p className="text-sm text-gray-400">
               {new Date(selectedNotice.date).toLocaleDateString()}
             </p>
-            <p className="mt-4 text-gray-300">{selectedNotice.description}</p>
-            <button
-              onClick={closeModal}
-              className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
-            >
-              Close
-            </button>
+            <div className="mt-6 text-gray-300 leading-relaxed">
+              {selectedNotice.description}
+            </div>
+            <div className="mt-8 flex justify-end">
+              <button
+                onClick={closeModal}
+                className="px-6 py-3 bg-gradient-to-r from-red-600 to-pink-600 text-white font-semibold rounded-full hover:from-red-700 hover:to-pink-700 transition-all duration-300 shadow-lg transform hover:scale-105"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}

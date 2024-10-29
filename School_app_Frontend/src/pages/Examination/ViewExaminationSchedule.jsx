@@ -5,10 +5,10 @@ import Modal from "react-modal";
 import axios from "axios";
 import { useReactToPrint } from "react-to-print";
 // import AdmitCardList from "../Print/StudentAdmitCard";
-import logo from '../../assets/logo.png';
+import logo from "../../assets/logo.png";
 import AdmitCardList from "../Print/StudentAdmitCard";
 
-Modal.setAppElement('#root'); // Set your app root element for accessibility
+Modal.setAppElement("#root"); // Set your app root element for accessibility
 
 const ViewExaminationSchedule = () => {
   const [examSubjects, setExamSubjects] = useState([]);
@@ -93,7 +93,7 @@ const ViewExaminationSchedule = () => {
     },
   ];
 
-  const handlePrint = useReactToPrint({contentRef: printRef});
+  const handlePrint = useReactToPrint({ contentRef: printRef });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -185,15 +185,22 @@ const ViewExaminationSchedule = () => {
 
   const handlePrintAdmitCards = async () => {
     // Debugging line
-    console.log("Request Payload:", { studentIds: selectedStudents, classId, examTypeId, termId });
-  
+    console.log("Request Payload:", {
+      studentIds: selectedStudents,
+      classId,
+      examTypeId,
+      termId,
+    });
+
     if (selectedStudents.length > 0) {
       try {
         const response = await axios.post(
-          `${import.meta.env.VITE_BACKEND_URL}/api/print-admit-card/${classId}/${examTypeId}/${termId}`,
+          `${
+            import.meta.env.VITE_BACKEND_URL
+          }/api/print-admit-card/${classId}/${examTypeId}/${termId}`,
           { studentIds: selectedStudents }
         );
-  
+
         console.log("Print Response:", response.data); // Debugging line
         if (response.data && response.data.success) {
           setPrintResponse(response.data.data);
@@ -202,18 +209,23 @@ const ViewExaminationSchedule = () => {
           }, 2000);
           setIsModalOpen(false);
         } else {
-          console.error("Printing failed:", response.data.message || "Unknown error");
+          console.error(
+            "Printing failed:",
+            response.data.message || "Unknown error"
+          );
           alert("No data available for printing");
         }
       } catch (error) {
-        console.error("Error printing admit cards", error.response?.data || error.message);
+        console.error(
+          "Error printing admit cards",
+          error.response?.data || error.message
+        );
         alert("Error printing admit cards");
       }
     } else {
       alert("Please select at least one student to print admit cards.");
     }
   };
-  
 
   return (
     <div className="rounded-md">
@@ -257,33 +269,37 @@ const ViewExaminationSchedule = () => {
             isOpen={isModalOpen}
             onRequestClose={() => setIsModalOpen(false)}
             contentLabel="Select Students Modal"
-            className="relative w-full max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-6"
-            overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+            className="relative w-full max-w-2xl mx-auto bg-gray-900 rounded-2xl shadow-2xl p-8"
+            overlayClassName="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center"
           >
-            <h2 className="text-xl mb-4">Select Students for Admit Card Printing</h2>
-            <div className="flex flex-col">
+            <h2 className="text-3xl mb-6 text-white font-extrabold">
+              Select Students for Admit Card Printing
+            </h2>
+            <div className="flex flex-col space-y-4">
               {students.map((student) => (
-                <div key={student.id} className="flex items-center mb-2">
+                <div key={student.id} className="flex items-center">
                   <input
                     type="checkbox"
                     checked={selectedStudents.includes(student.id)}
                     onChange={() => handleStudentCheckboxChange(student.id)}
-                    className="mr-2"
+                    className="mr-4 h-6 w-6 text-blue-500 bg-gray-800 border-gray-700 rounded focus:ring-blue-500"
                   />
-                  <label>{student.name}</label>
+                  <label className="text-lg text-gray-200">
+                    {student.name}
+                  </label>
                 </div>
               ))}
             </div>
-            <div className="flex justify-end mt-4">
+            <div className="flex justify-end mt-8 space-x-4">
               <button
                 onClick={handlePrintAdmitCards}
-                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 mr-2 transition-all"
+                className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-3 px-6 rounded-full hover:from-blue-700 hover:to-indigo-800 transition-all duration-300 shadow-lg transform hover:scale-105"
               >
                 Print Selected
               </button>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 transition-all"
+                className="bg-gradient-to-r from-red-600 to-pink-700 text-white py-3 px-6 rounded-full hover:from-red-700 hover:to-pink-800 transition-all duration-300 shadow-lg transform hover:scale-105"
               >
                 Close
               </button>
@@ -291,8 +307,11 @@ const ViewExaminationSchedule = () => {
           </Modal>
 
           {/* Component for printing the admit cards */}
-          <div ref={printRef} className="no-print" >
-            <AdmitCardList students={printResponse?.students} commonInfo={printResponse?.commonInfo} />
+          <div ref={printRef} className="no-print">
+            <AdmitCardList
+              students={printResponse?.students}
+              commonInfo={printResponse?.commonInfo}
+            />
           </div>
         </div>
       )}

@@ -359,27 +359,21 @@ export const navigation = [
     current: false,
     roles: ["Admin"],
     children: [
-      {
-        name: "Fees Discount",
-        to: "/school/fees-discount",
+        {
+        name: "Create Fees",
+        to: "/school/create-fees",
         icon: FaUser,
         roles: ["Admin"],
       },
       {
-        name: "Fees Payment",
-        to: "/school/fees-discount",
+        name: "Fees Installment",
+        to: "/school/fees-installment",
         icon: FaUser,
         roles: ["Admin"],
       },
       {
-        name: "Fees Group",
-        to: "/school/fees-group",
-        icon: FaUser,
-        roles: ["Admin"],
-      },
-      {
-        name: "Fees Type",
-        to: "/school/fees-type",
+        name: "Studnet Fees",
+        to: "/school/student-fees-page",
         icon: FaUser,
         roles: ["Admin"],
       },

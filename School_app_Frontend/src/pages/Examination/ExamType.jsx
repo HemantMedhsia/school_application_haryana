@@ -8,6 +8,7 @@ import FormButton from "../../components/Form/FormButton";
 import SearchableSelect from "../../components/Form/Select";
 import { getAPI } from "../../utility/api/apiCall";
 import axios from "axios";
+import ConfirmationModal from "../../common/ConfirmationModal/ConfirmationModal"; // Import the ConfirmationModal
 
 const ExamGroup = () => {
   const [examGroupName, setExamGroupName] = useState("");
@@ -18,6 +19,8 @@ const ExamGroup = () => {
   const [passingMarks, setPassingMarks] = useState("");
   const [examCategories, setExamCategories] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false); // State to control the confirmation modal
+  const [groupToDelete, setGroupToDelete] = useState(null); // Store the group that will be deleted
 
   const fetchExamCategories = async () => {
     setLoading(true);
@@ -26,9 +29,7 @@ const ExamGroup = () => {
   };
 
   const fetchExamTypes = async () => {
-    setLoading(true);
     await getAPI("getAllExamTypes", {}, setExamGroups);
-    setLoading(false);
   };
 
   useEffect(() => {
@@ -44,42 +45,23 @@ const ExamGroup = () => {
       passingMarks
     ) {
       if (editingGroupId) {
-        // Update existing exam group using API
         try {
           await axios.put(
-            `${
-              import.meta.env.VITE_BACKEND_URL
-            }/api/update-examtype/${editingGroupId}`, // Correctly appending the group ID
+            `${import.meta.env.VITE_BACKEND_URL}/api/update-examtype/${editingGroupId}`,
             {
               name: examGroupName,
-              termId: selectedCategory, // Correct term/category field
+              termId: selectedCategory,
               maxMarks: totalMarks,
               minMarks: passingMarks,
-            },
-            fetchExamTypes() // Refresh the list after updating
+            }
           );
-          // Update the local state after successful API update
-          setExamGroups(
-            examGroups.map((group) =>
-              group._id === editingGroupId
-                ? {
-                    ...group,
-                    name: examGroupName,
-                    termId: selectedCategory,
-                    maxMarks: totalMarks,
-                    minMarks: passingMarks,
-                  }
-                : group
-            )
-          );
-          setEditingGroupId(null); // Reset the edit mode
+          fetchExamTypes();
+          setEditingGroupId(null);
           toast.success("Exam group updated successfully!");
         } catch (error) {
-          // console.error("Error updating exam type:", error);
           toast.error("Failed to update exam type.");
         }
       } else {
-        // Create new exam group using API
         try {
           await axios.post(
             `${import.meta.env.VITE_BACKEND_URL}/api/create-examtype`,
@@ -90,14 +72,12 @@ const ExamGroup = () => {
               minMarks: passingMarks,
             }
           );
-          fetchExamTypes(); // Refresh the list after adding a new entry
+          fetchExamTypes();
           toast.success("Exam type saved successfully!");
         } catch (error) {
-          // console.error("Error:", error);
           toast.error("Failed to save exam type.");
         }
       }
-      // Clear form after saving/updating
       setExamGroupName("");
       setSelectedCategory(null);
       setTotalMarks("");
@@ -120,16 +100,25 @@ const ExamGroup = () => {
     }
   };
 
-  const handleDelete = (id) => {
-    try {
-      axios.delete(
-        `${import.meta.env.VITE_BACKEND_URL}/api/delete-examtype/${id}`
-      );
-      setExamGroups(examGroups.filter((group) => group._id !== id));
-      toast.success("Exam group deleted successfully!");
-    } catch (error) {
-      // console.error("Failed to delete exam type", error);
-      toast.error("Failed to delete exam type.");
+  const handleDeleteClick = (id) => {
+    setGroupToDelete(id);
+    setIsModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (groupToDelete) {
+      try {
+        await axios.delete(
+          `${import.meta.env.VITE_BACKEND_URL}/api/delete-examtype/${groupToDelete}`
+        );
+        setExamGroups(examGroups.filter((group) => group._id !== groupToDelete));
+        toast.success("Exam group deleted successfully!");
+      } catch (error) {
+        toast.error("Failed to delete exam type.");
+      } finally {
+        setIsModalOpen(false);
+        setGroupToDelete(null);
+      }
     }
   };
 
@@ -143,7 +132,7 @@ const ExamGroup = () => {
 
   return (
     <div className="flex flex-col md:flex-row md:space-y-0">
-      <ToastContainer /> {/* Add ToastContainer to display notifications */}
+      <ToastContainer />
       <div className="w-full md:w-2/3 rounded-lg shadow-md p-6">
         <FormSection title="Exam Type">
           <Input
@@ -209,7 +198,7 @@ const ExamGroup = () => {
                   </button>
                   <button
                     className="text-red-500"
-                    onClick={() => handleDelete(group._id)}
+                    onClick={() => handleDeleteClick(group._id)}
                   >
                     <FaTrash />
                   </button>
@@ -221,6 +210,15 @@ const ExamGroup = () => {
           <p className="text-gray-500 text-sm">No exam groups available</p>
         )}
       </div>
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Confirmation"
+        message="Are you sure you want to delete this exam group?"
+      />
     </div>
   );
 };

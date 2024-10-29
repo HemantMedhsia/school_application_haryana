@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import FormSection from "../components/Form/FormSection";
-import Select from "../components/Form/Select"; // Not used in your current code
 import Input from "../components/Form/Input";
 import FormButton from "../components/Form/FormButton";
 import { toast, ToastContainer } from "react-toastify";
 import ContactCard from "../components/Form/ContactCard";
+import ConfirmationModal from "../common/ConfirmationModal/ConfirmationModal";
 import axios from "axios";
 import { getAPI } from "../utility/api/apiCall";
 
@@ -19,13 +19,23 @@ const ContactDetails = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [deleteIndex, setDeleteIndex] = useState(null);
 
   useEffect(() => {
     fetchContacts();
   }, []);
 
   const fetchContacts = async () => {
-    await getAPI("getAllContactDetails", {}, setContacts);
+    setLoading(true);
+    try {
+      await getAPI("getAllContactDetails", {}, setContacts);
+    } catch (error) {
+      console.error("Error fetching contacts:", error);
+      toast.error("Failed to fetch contacts.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleChange = (e) => {
@@ -41,12 +51,11 @@ const ContactDetails = () => {
       return;
     }
 
+    setLoading(true);
     try {
       if (isEditing) {
         await axios.put(
-          `${import.meta.env.VITE_BACKEND_URL}/api/update-contact/${
-            contacts[editIndex]._id
-          }`,
+          `${import.meta.env.VITE_BACKEND_URL}/api/update-contact/${contacts[editIndex]._id}`,
           formData
         ); // Update endpoint
         const updatedContacts = [...contacts];
@@ -62,8 +71,6 @@ const ContactDetails = () => {
         toast.success("Contact information added successfully!");
       }
 
-      fetchContacts();
-
       setFormData({
         name: "",
         post: "",
@@ -75,6 +82,8 @@ const ContactDetails = () => {
     } catch (error) {
       console.error("Error saving contact:", error);
       toast.error("Failed to save contact.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -84,20 +93,29 @@ const ContactDetails = () => {
     setEditIndex(index);
   };
 
-  const handleDelete = async (index) => {
-    console.log(contacts[index]._id);
+  const handleDelete = (index) => {
+    setDeleteIndex(index);
+    setIsModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (deleteIndex === null) return;
+
+    setLoading(true);
     try {
       await axios.delete(
-        `${import.meta.env.VITE_BACKEND_URL}/api/delete-contact/${
-          contacts[index]._id
-        }`
+        `${import.meta.env.VITE_BACKEND_URL}/api/delete-contact/${contacts[deleteIndex]._id}`
       );
-      const updatedContacts = contacts.filter((_, i) => i !== index);
+      const updatedContacts = contacts.filter((_, i) => i !== deleteIndex);
       setContacts(updatedContacts);
       toast.success("Contact information deleted successfully!");
     } catch (error) {
       console.error("Error deleting contact:", error);
       toast.error("Failed to delete contact.");
+    } finally {
+      setLoading(false);
+      setIsModalOpen(false);
+      setDeleteIndex(null);
     }
   };
 
@@ -153,6 +171,7 @@ const ContactDetails = () => {
         {/* Submit Button */}
         <FormButton
           name={isEditing ? "Update Information" : "Add Information"}
+          disabled={loading}
         />
 
         <ToastContainer />
@@ -171,6 +190,15 @@ const ContactDetails = () => {
           ))}
         </div>
       )}
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={confirmDelete}
+        title="Delete Contact"
+        message="Are you sure you want to delete this contact?"
+      />
     </>
   );
 };
