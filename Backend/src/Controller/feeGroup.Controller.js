@@ -4,6 +4,82 @@ import wrapAsync from "../Utils/wrapAsync.js";
 import { FeeGroup } from "../Models/feeGroup.Model.js";
 import { Class } from "../Models/class.Model.js";
 import { feeGroupValidationSchema } from "../Validation/feeGroup.Validation.js";
+import { Student } from "../Models/student.model.js";
+import { StudentFee } from "../Models/studentFees.Model.js";
+
+// export const addFeeGroup = wrapAsync(async (req, res, next) => {
+//     const { feeData } = req.body;
+
+//     if (!feeData || !Array.isArray(feeData)) {
+//         return res
+//             .status(400)
+//             .json(
+//                 new ApiResponse(
+//                     400,
+//                     "Fee data is required and must be an array."
+//                 )
+//             );
+//     }
+
+//     for (let fee of feeData) {
+//         const { error } = feeGroupValidationSchema.validate(fee);
+//         if (error) {
+//             return res
+//                 .status(400)
+//                 .json(
+//                     new ApiResponse(
+//                         400,
+//                         `Validation error for fee group: ${error.details[0].message}`
+//                     )
+//                 );
+//         }
+//     }
+
+//     const existingClasses = await FeeGroup.find({
+//         class: { $in: feeData.map((fee) => fee.class) },
+//     });
+
+//     if (existingClasses.length > 0) {
+//         const existingClassNames = existingClasses
+//             .map((group) => group.class)
+//             .join(", ");
+//         return res
+//             .status(400)
+//             .json(
+//                 new ApiResponse(
+//                     400,
+//                     `Fee group already exists for the following class(es): ${existingClassNames}`
+//                 )
+//             );
+//     }
+
+//     const feeGroupData = feeData.map((fee) => ({
+//         class: fee.class,
+//         fees: {
+//             tuitionFee: fee.fees.tuitionFee || 0,
+//             admissionFee: fee.fees.admissionFee || 0,
+//             annualFee: fee.fees.annualFee || 0,
+//             otherFee: fee.fees.otherFee || 0,
+//         },
+//     }));
+
+//     const createdFeeGroups = await FeeGroup.insertMany(feeGroupData);
+//     for (let fee of feeData) {
+//         await Class.findByIdAndUpdate(
+//             fee.class,
+//             {
+//                 feeGroup: createdFeeGroups.find((group) =>
+//                     group.class.equals(fee.class)
+//                 )._id,
+//             },
+//             { new: true }
+//         );
+//     }
+
+//     return res
+//         .status(201)
+//         .json(new ApiResponse(201, "Fee groups created.", createdFeeGroups));
+// });
 
 export const addFeeGroup = wrapAsync(async (req, res, next) => {
     const { feeData } = req.body;
@@ -19,6 +95,7 @@ export const addFeeGroup = wrapAsync(async (req, res, next) => {
             );
     }
 
+    // Validate Fee Data
     for (let fee of feeData) {
         const { error } = feeGroupValidationSchema.validate(fee);
         if (error) {
@@ -33,9 +110,9 @@ export const addFeeGroup = wrapAsync(async (req, res, next) => {
         }
     }
 
-    const existingClasses = await FeeGroup.find({
-        class: { $in: feeData.map((fee) => fee.class) },
-    });
+    // Check for Existing Classes
+    const classIds = feeData.map((fee) => fee.class);
+    const existingClasses = await FeeGroup.find({ class: { $in: classIds } });
 
     if (existingClasses.length > 0) {
         const existingClassNames = existingClasses
@@ -51,6 +128,7 @@ export const addFeeGroup = wrapAsync(async (req, res, next) => {
             );
     }
 
+    // Create Fee Groups
     const feeGroupData = feeData.map((fee) => ({
         class: fee.class,
         fees: {
@@ -62,21 +140,59 @@ export const addFeeGroup = wrapAsync(async (req, res, next) => {
     }));
 
     const createdFeeGroups = await FeeGroup.insertMany(feeGroupData);
-    for (let fee of feeData) {
+
+    // Assign Fees to Students in Each Class
+    for (let feeGroup of createdFeeGroups) {
+        // Find All Students in the Class
+        const students = await Student.find({ currentClass: feeGroup.class });
+
+        if (students && students.length > 0) {
+            const studentFees = students.map((student) => ({
+                student: student._id,
+                class: feeGroup.class,
+                feeGroup: feeGroup._id,
+                dueAmount:
+                    feeGroup.fees.tuitionFee +
+                    feeGroup.fees.admissionFee +
+                    feeGroup.fees.annualFee +
+                    feeGroup.fees.otherFee,
+            }));
+
+            // Insert Student Fees
+            const insertedStudentFees = await StudentFee.insertMany(
+                studentFees
+            );
+
+            // Update Student Documents with the Newly Created Fee References
+            for (let studentFee of insertedStudentFees) {
+                await Student.findByIdAndUpdate(
+                    studentFee.student,
+                    {
+                        $push: { studentFees: studentFee._id },
+                        feeGroup: feeGroup._id,
+                    },
+                    { new: true }
+                );
+            }
+        }
+
+        // Assign Fee Group to Class (Optional)
         await Class.findByIdAndUpdate(
-            fee.class,
-            {
-                feeGroup: createdFeeGroups.find((group) =>
-                    group.class.equals(fee.class)
-                )._id,
-            },
+            feeGroup.class,
+            { feeGroup: feeGroup._id },
             { new: true }
         );
     }
 
     return res
         .status(201)
-        .json(new ApiResponse(201, "Fee groups created.", createdFeeGroups));
+        .json(
+            new ApiResponse(
+                201,
+                "Fee groups created and assigned to students successfully.",
+                createdFeeGroups
+            )
+        );
 });
 
 export const updateFeeGroup = wrapAsync(async (req, res, next) => {
@@ -492,7 +608,7 @@ export const getInstallments = wrapAsync(async (req, res, next) => {
 
     return res
         .status(200)
-        .json(new ApiResponse(200,installments, "Installments fetched."));
+        .json(new ApiResponse(200, installments, "Installments fetched."));
 });
 
 export const getInstallmentById = wrapAsync(async (req, res, next) => {
