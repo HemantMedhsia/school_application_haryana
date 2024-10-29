@@ -310,7 +310,7 @@ export const deleteFeeGroup = wrapAsync(async (req, res, next) => {
     if (!deletedFeeGroups.deletedCount) {
         return res
             .status(404)
-            .json(new ApiResponse(404, "Fee groups not found."));
+            .json(new ApiResponse(404,null, "Fee groups not found."));
     }
 
     return res
@@ -517,7 +517,7 @@ export const updateInstallment = wrapAsync(async (req, res, next) => {
     if (!month || !dueDate) {
         return res
             .status(400)
-            .json(new ApiResponse(400, "Month and due date are required."));
+            .json(new ApiResponse(400,null, "Month and due date are required."));
     }
 
     try {

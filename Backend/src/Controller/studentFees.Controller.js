@@ -477,9 +477,122 @@ export const getAllStudentFeeDetails = wrapAsync(async (req, res) => {
 export const getStudentBillPerMonth = wrapAsync(async (req, res) => {
     const { date, class: classId } = req.body;
 
+    // Validate date and class
     if (!date || !classId) {
         return res
             .status(400)
             .json(new ApiResponse(400, "Date and class are required."));
     }
+
+    // Parse the date
+    const providedDate = new Date(date);
+    if (isNaN(providedDate)) {
+        return res
+            .status(400)
+            .json(new ApiResponse(400, "Invalid date format."));
+    }
+
+    // Extract month and year from date
+    const month = providedDate.getMonth();
+    const year = providedDate.getFullYear();
+    const monthName = providedDate.toLocaleString("default", { month: "long" });
+
+    // Get class details
+    const classDetails = await Class.findById(classId);
+    if (!classDetails) {
+        return res.status(404).json(new ApiResponse(404, "Class not found."));
+    }
+
+    // Fetch all students for the class
+    const students = await Student.find({ currentClass: classId }).populate("parent");
+    if (!students.length) {
+        return res
+            .status(404)
+            .json(new ApiResponse(404, "No students found for this class."));
+    }
+
+    // Prepare response data for each student
+    const responseData = [];
+
+    for (const student of students) {
+        // Find fee records for the student
+        const feeRecord = await StudentFee.findOne({
+            student: student._id,
+        });
+
+        let totalDiscountAmount = 0;
+        let totalFees = 0;
+        let dueAmount = 0;
+
+        if (feeRecord) {
+            // Calculate total discount amount
+            totalDiscountAmount = feeRecord.discountHistory.reduce(
+                (sum, discount) => sum + discount.discountAmount,
+                0
+            );
+
+            // Calculate total due amount including unpaid fees from previous months
+            const unpaidFees = feeRecord.paymentHistory
+                .filter((payment) => {
+                    const paymentDate = new Date(payment.paymentDate);
+                    return paymentDate < new Date(year, month, 1);
+                })
+                .reduce((sum, payment) => sum + payment.amount, 0);
+
+            // Calculate the installment amount based on the given month
+            const installmentFraction = (month + 1) / 12; // For example, April (3rd month) would be 4/12
+            const installmentAmount = feeRecord.dueAmount * installmentFraction;
+
+            dueAmount = installmentAmount - unpaidFees;
+
+            // Calculate total fees for the given month
+            const monthlyPayment = feeRecord.paymentHistory
+                .filter((payment) => {
+                    const paymentDate = new Date(payment.paymentDate);
+                    return (
+                        paymentDate.getMonth() === month &&
+                        paymentDate.getFullYear() === year
+                    );
+                })
+                .reduce((sum, payment) => sum + payment.amount, 0);
+
+            totalFees =
+                feeRecord.totalPaidAmount +
+                dueAmount +
+                totalDiscountAmount -
+                monthlyPayment;
+        } else {
+            // If no fee record exists, set due amount from fee group
+            const feeGroup = await FeeGroup.findById(student.feeGroup);
+            if (feeGroup) {
+                const installmentFraction = (month + 1) / 12;
+                dueAmount = feeGroup.totalFeeAmount * installmentFraction;
+                totalFees = dueAmount;
+            }
+        }
+
+        responseData.push({
+            schoolName: "Vardhan International School",
+            contactNumber: "+1-234-567-890",
+            month: monthName,
+            studentName: student.firstName,
+            fatherName: student.parent ? student.parent.fatherName : "N/A",
+            phoneNumber: student.mobileNumber || "N/A",
+            className: classDetails.name,
+            admissionNumber: student.admissionNo,
+            dueAmount: dueAmount,
+            totalFees: totalFees,
+        });
+    }
+
+    // Return the response
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                "Student bill per month retrieved successfully.",
+                responseData
+            )
+        );
 });
