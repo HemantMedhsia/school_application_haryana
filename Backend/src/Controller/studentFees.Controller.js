@@ -5,330 +5,155 @@ import { StudentFee } from "../Models/studentFees.Model.js";
 import { Student } from "../Models/student.model.js";
 import { FeeGroup } from "../Models/feeGroup.Model.js";
 
-// export const addPaymentsAndDiscounts = wrapAsync(async (req, res) => {
-//     const {
-//         studentId,
-//         feeDetails,
-//         paymentDate,
-//         paymentMode,
-//         remarks,
-//         totalPayingAmount,
-//     } = req.body;
-
-//     // Find the student's fee record
-//     let studentFee = await StudentFee.findOne({ student: studentId });
-
-//     // If the student fee record does not exist, create a new one
-//     if (!studentFee) {
-//         // Find the student's class information
-//         const student = await Student.findById(studentId).populate(
-//             "currentClass"
-//         );
-//         if (!student) {
-//             return res.status(404).json({ error: "Student record not found" });
-//         }
-
-//         // Find the fee group related to the student's class
-//         const feeGroup = await FeeGroup.findOne({
-//             class: student.currentClass,
-//         });
-//         if (!feeGroup) {
-//             return res.status(404).json({
-//                 error: "FeeGroup record not found for the student's class",
-//             });
-//         }
-
-//         // Create a new StudentFee record with data from FeeGroup
-//         studentFee = new StudentFee({
-//             student: studentId,
-//             class: feeGroup.class,
-//             feeGroup: feeGroup._id,
-//             dueAmount: Object.values(feeGroup.fees).reduce(
-//                 (acc, fee) => acc + fee,
-//                 0
-//             ),
-//             totalPaidAmount: 0,
-//             paymentHistory: [],
-//             discountHistory: [],
-//         });
-//     }
-
-//     let totalDiscountAmount = 0;
-
-//     // Iterate through fee headers to manage payments and discounts
-//     feeDetails.forEach((fee) => {
-//         const { feeHeader, discountAmount, discountGivenBy, amountPaying } =
-//             fee;
-
-//         // Apply discount if provided
-//         if (discountAmount) {
-//             totalDiscountAmount += discountAmount;
-
-//             studentFee.discountHistory.push({
-//                 discountHeader: feeHeader,
-//                 discountAmount,
-//                 discountGivenBy,
-//                 date: new Date(),
-//             });
-//         }
-
-//         // Apply payment if provided
-//         if (amountPaying) {
-//             studentFee.paymentHistory.push({
-//                 paymentDate,
-//                 feeHeader,
-//                 amount: amountPaying,
-//                 receiptNumber: generateReceiptNumber(),
-//                 paymentMode,
-//             });
-//         }
-//     });
-
-//     // Update due amount based on discount and payment
-
-//     studentFee.dueAmount -= totalDiscountAmount;
-//     studentFee.dueAmount -= totalPayingAmount;
-//     studentFee.totalPaidAmount += totalPayingAmount;
-
-//     // Handle the case where no payment is made
-//     if (totalPayingAmount === 0 && totalDiscountAmount === 0) {
-//         return res
-//             .status(400)
-//             .json(
-//                 new ApiResponse(
-//                     400,
-//                     "No payment or discount provided",
-//                     "Failure"
-//                 )
-//             );
-//     }
-
-//     // Optional: Add remarks if provided
-//     if (remarks) {
-//         studentFee.remarks = remarks;
-//     }
-
-//     await studentFee.save();
-//     return res
-//         .status(200)
-//         .json(
-//             new ApiResponse(
-//                 studentFee,
-//                 "Payment and discounts updated successfully"
-//             )
-//         );
-// });
-
 export const addPaymentsAndDiscounts = wrapAsync(async (req, res) => {
-    const {
-        studentId,
-        feeDetails,
-        paymentDate,
-        paymentMode,
-        remarks,
-        totalPayingAmount,
-    } = req.body;
+    const { studentId, feeDetails, paymentDate, paymentMode, remarks } =
+        req.body;
 
-    // Find the student's fee record
     let studentFee = await StudentFee.findOne({ student: studentId });
 
-    // If the student fee record does not exist, create a new one
     if (!studentFee) {
-        // Find the student's class information
         const student = await Student.findById(studentId).populate(
-            "currentClass"
+            "currentClass feeGroup"
         );
         if (!student) {
             return res.status(404).json({ error: "Student record not found" });
         }
 
-        // Find the fee group related to the student's class
-        const feeGroup = await FeeGroup.findOne({
-            class: student.currentClass,
-        });
+        const feeGroup = student.feeGroup;
         if (!feeGroup) {
             return res.status(404).json({
-                error: "FeeGroup record not found for the student's class",
+                error: "FeeGroup record not found for the student",
             });
         }
 
-        // Create a new StudentFee record with data from FeeGroup
+        const totalFees = Object.values(feeGroup.fees).reduce(
+            (acc, fee) => acc + Number(fee),
+            0
+        );
+
         studentFee = new StudentFee({
             student: studentId,
-            class: feeGroup.class,
+            class: student.currentClass._id,
             feeGroup: feeGroup._id,
-            dueAmount: Object.values(feeGroup.fees).reduce(
-                (acc, fee) => acc + fee,
-                0
-            ),
+            originalDueAmount: totalFees,
+            dueAmount: totalFees,
             totalPaidAmount: 0,
+            balance: totalFees,
+            paymentStatus: "Unpaid",
             paymentHistory: [],
             discountHistory: [],
         });
+    } else if (
+        studentFee &&
+        (studentFee.originalDueAmount === undefined ||
+            studentFee.originalDueAmount === null)
+    ) {
+        const student = await Student.findById(studentId).populate("feeGroup");
+        if (!student) {
+            return res.status(404).json({ error: "Student record not found" });
+        }
+        const feeGroup = student.feeGroup;
+        if (!feeGroup) {
+            return res.status(404).json({
+                error: "FeeGroup record not found for the student",
+            });
+        }
+        const totalFees = Object.values(feeGroup.fees).reduce(
+            (acc, fee) => acc + Number(fee),
+            0
+        );
+        studentFee.originalDueAmount = totalFees;
     }
 
     let totalDiscountAmount = 0;
+    let totalPaymentAmount = 0;
 
-    // Iterate through fee headers to manage payments and discounts
-    feeDetails.forEach((fee) => {
+    const receiptNumber = generateReceiptNumber();
+
+    for (const fee of feeDetails) {
         const { feeHeader, discountAmount, discountGivenBy, amountPaying } =
             fee;
 
-        // Apply discount if provided
-        if (discountAmount) {
-            totalDiscountAmount += discountAmount;
+        const discountAmt = Number(discountAmount) || 0;
+        const amountPayingNum = Number(amountPaying) || 0;
+
+        if (discountAmt > 0) {
+            totalDiscountAmount += discountAmt;
 
             studentFee.discountHistory.push({
                 discountHeader: feeHeader,
-                discountAmount,
+                discountAmount: discountAmt,
                 discountGivenBy,
                 date: new Date(),
             });
         }
 
-        // Apply payment if provided
-        if (amountPaying) {
+        if (amountPayingNum > 0) {
+            totalPaymentAmount += amountPayingNum;
+
             studentFee.paymentHistory.push({
                 paymentDate,
                 feeHeader,
-                amount: amountPaying,
-                receiptNumber: generateReceiptNumber(),
+                amount: amountPayingNum,
+                receiptNumber,
                 paymentMode,
             });
         }
-    });
+    }
 
-    // Update due amount based on discount and payment
-    studentFee.dueAmount -= totalDiscountAmount*1;
-    studentFee.dueAmount -= totalPayingAmount*1;
-    studentFee.totalPaidAmount += totalPayingAmount*1;
-
-    // Handle the case where no payment is made
-    if (totalPayingAmount === 0 && totalDiscountAmount === 0) {
+    if (totalPaymentAmount === 0 && totalDiscountAmount === 0) {
         return res
             .status(400)
             .json({ error: "No payment or discount provided." });
     }
 
-    // Optional: Add remarks if provided
+    const totalDiscounts = studentFee.discountHistory.reduce(
+        (sum, discount) => sum + Number(discount.discountAmount),
+        0
+    );
+
+    const totalPaidAmount = studentFee.paymentHistory.reduce(
+        (sum, payment) => sum + Number(payment.amount),
+        0
+    );
+
+    const dueAmount =
+        Number(studentFee.originalDueAmount) - totalDiscounts - totalPaidAmount;
+
+    const adjustedDueAmount = dueAmount < 0 ? 0 : dueAmount;
+
+    studentFee.dueAmount = adjustedDueAmount;
+    studentFee.totalPaidAmount = totalPaidAmount;
+    studentFee.balance = adjustedDueAmount;
+
+    if (adjustedDueAmount <= 0) {
+        studentFee.paymentStatus = "Paid";
+    } else if (totalPaidAmount > 0) {
+        studentFee.paymentStatus = "Partially Paid";
+    } else {
+        studentFee.paymentStatus = "Unpaid";
+    }
+
     if (remarks) {
         studentFee.remarks = remarks;
     }
 
-    // Check if multiple payments are made at once to avoid generating multiple receipts
-    if (feeDetails.length > 1 && totalPayingAmount > 0) {
-        studentFee.paymentHistory = studentFee.paymentHistory.filter(
-            (payment, index, self) =>
-                index ===
-                self.findIndex(
-                    (t) =>
-                        t.paymentDate.getTime() ===
-                            payment.paymentDate.getTime() &&
-                        t.amount === payment.amount
-                )
-        );
-    }
-
     await studentFee.save();
-    return res
-        .status(200)
-        .json(
-            new ApiResponse(
-                studentFee,
-                "Payment and discounts updated successfully"
-            )
-        );
-});
 
-export const getStudentFeeDetails = wrapAsync(async (req, res) => {
-    const { studentId } = req.params;
-
-    // Find the student's fee record and populate the required fields
-    const studentFee = await StudentFee.findOne({ student: studentId })
-        .populate("student", "firstName lastName")
-        .populate("class", "name")
-        .populate("feeGroup");
-
-    if (!studentFee) {
-        return res
-            .status(404)
-            .json(
-                new ApiResponse(404, "Student Fee record not found", "Failure")
-            );
-    }
-
-    const feeGroup = studentFee.feeGroup;
-    if (!feeGroup || !feeGroup.fees) {
-        return res
-            .status(404)
-            .json(
-                new ApiResponse(
-                    404,
-                    "Fee group details are missing for this student",
-                    "Failure"
-                )
-            );
-    }
-
-    // Initialize fee details object with default values
-    let feeDetails = {};
-    Object.entries(feeGroup.fees).forEach(([key, feeAmount]) => {
-        feeDetails[key] = {
-            totalAmount: feeAmount,
-            dueAmount: feeAmount,
-            paidAmount: 0,
-        };
-    });
-
-    // Mapping between payment fee headers and feeDetails keys
-    const feeHeaderToKeyMap = {
-        "Admission Fee": "admissionFee",
-        "Annual Fee": "annualFee",
-        "Tuition Fee": "tuitionFee",
-        "Other Fee": "otherFee",
-    };
-
-    studentFee.paymentHistory.forEach((payment) => {
-        const feeKey = feeHeaderToKeyMap[payment.feeHeader];
-        if (feeKey && feeDetails[feeKey]) {
-            // Update paid amount for the fee header
-            feeDetails[feeKey].paidAmount += payment.amount;
-
-            // Recalculate due amount
-            feeDetails[feeKey].dueAmount = Math.max(
-                feeDetails[feeKey].totalAmount - feeDetails[feeKey].paidAmount,
-                0
-            );
-        }
-    });
-
-    // Calculate total fee amount and total due amount across all fee types
-    const totalFeeAmount = Object.values(feeDetails).reduce(
-        (acc, fee) => acc + fee.totalAmount,
-        0
-    );
-    const totalDueAmount = Object.values(feeDetails).reduce(
-        (acc, fee) => acc + fee.dueAmount,
-        0
-    );
-
-    // Prepare the response with student details, fee details, and payment history
-    const response = {
-        student: {
-            id: studentFee.student._id,
-            name: `${studentFee.student.firstName} ${studentFee.student.lastName}`,
-            className: studentFee.class.name,
-        },
-        feeDetails,
-        totalFeeAmount,
-        totalDueAmount,
-        paymentHistory: studentFee.paymentHistory.map((payment) => ({
-            paymentDate: payment.paymentDate,
-            feeHeader: payment.feeHeader,
-            amount: payment.amount,
-            receiptNumber: payment.receiptNumber,
-            _id: payment._id,
-        })),
+    const responseData = {
+        _id: studentFee._id,
+        student: studentFee.student,
+        class: studentFee.class,
+        feeGroup: studentFee.feeGroup,
+        originalDueAmount: studentFee.originalDueAmount,
+        totalDiscountAmount: totalDiscounts,
+        dueAmount: adjustedDueAmount,
+        totalPaidAmount: totalPaidAmount,
+        balance: adjustedDueAmount,
+        paymentStatus: studentFee.paymentStatus,
+        remarks: studentFee.remarks,
+        paymentHistory: studentFee.paymentHistory,
+        discountHistory: studentFee.discountHistory,
     };
 
     return res
@@ -336,10 +161,143 @@ export const getStudentFeeDetails = wrapAsync(async (req, res) => {
         .json(
             new ApiResponse(
                 200,
-                response,
-                "Student fee details retrieved successfully"
+                "Payment and discounts updated successfully",
+                responseData,
+                true
             )
         );
+});
+
+export const getStudentFeeDetails = wrapAsync(async (req, res, next) => {
+    const { studentId } = req.params;
+
+    if (!studentId) {
+        return res
+            .status(400)
+            .json(new ApiResponse(400, "Student ID is required."));
+    }
+
+    const student = await Student.findById(studentId).populate(
+        "currentClass feeGroup"
+    );
+
+    if (!student) {
+        return res.status(404).json(new ApiResponse(404, "Student not found."));
+    }
+
+    const studentFee = await StudentFee.findOne({
+        student: studentId,
+    });
+    if (!studentFee) {
+        return res
+            .status(404)
+            .json(new ApiResponse(404, "Student fee record not found."));
+    }
+
+    if (!studentFee.originalDueAmount) {
+        const fees = student.feeGroup.fees.toObject();
+        const totalFees = Object.values(fees).reduce(
+            (sum, fee) => sum + Number(fee),
+            0
+        );
+        studentFee.originalDueAmount = totalFees;
+    }
+
+    const feeHeaders = student.feeGroup.fees.toObject();
+
+    const feeDetails = [];
+
+    const discountsByFeeHeader = {};
+    const paymentsByFeeHeader = {};
+
+    studentFee.discountHistory.forEach((discount) => {
+        const feeHeader = discount.discountHeader;
+        const normalizedHeader = feeHeader.toLowerCase().replace(/\s+/g, "");
+        if (!discountsByFeeHeader[normalizedHeader]) {
+            discountsByFeeHeader[normalizedHeader] = 0;
+        }
+        discountsByFeeHeader[normalizedHeader] += Number(
+            discount.discountAmount
+        );
+    });
+
+    studentFee.paymentHistory.forEach((payment) => {
+        const feeHeader = payment.feeHeader;
+        const normalizedHeader = feeHeader.toLowerCase().replace(/\s+/g, "");
+        if (!paymentsByFeeHeader[normalizedHeader]) {
+            paymentsByFeeHeader[normalizedHeader] = 0;
+        }
+        paymentsByFeeHeader[normalizedHeader] += Number(payment.amount);
+    });
+
+    let totalDiscountAmount = 0;
+    let totalPaidAmount = 0;
+
+    for (const feeHeader of Object.keys(feeHeaders)) {
+        const originalAmount = Number(feeHeaders[feeHeader]);
+        const normalizedHeader = feeHeader.toLowerCase().replace(/\s+/g, "");
+
+        const discountAmount = discountsByFeeHeader[normalizedHeader] || 0;
+        const paymentAmount = paymentsByFeeHeader[normalizedHeader] || 0;
+
+        const dueAmount = originalAmount - discountAmount - paymentAmount;
+        const adjustedDueAmount = dueAmount < 0 ? 0 : dueAmount;
+
+        totalDiscountAmount += discountAmount;
+        totalPaidAmount += paymentAmount;
+
+        feeDetails.push({
+            feeHeader,
+            originalAmount: originalAmount,
+            discountAmount,
+            paymentAmount,
+            dueAmount: adjustedDueAmount,
+        });
+    }
+
+    const overallDueAmount = feeDetails.reduce(
+        (sum, fee) => sum + fee.dueAmount,
+        0
+    );
+
+    let paymentStatus = "";
+    if (overallDueAmount <= 0) {
+        paymentStatus = "Paid";
+    } else if (totalPaidAmount > 0) {
+        paymentStatus = "Partially Paid";
+    } else {
+        paymentStatus = "Unpaid";
+    }
+
+    return res.status(200).json(
+        new ApiResponse(200, "Student fees retrieved successfully.", {
+            student: {
+                _id: student._id,
+                name: student.name,
+                rollNumber: student.rollNumber,
+                class: {
+                    _id: student.currentClass._id,
+                    name: student.currentClass.name,
+                },
+                feeGroup: {
+                    _id: student.feeGroup._id,
+                    fees: student.feeGroup.fees,
+                    installmentDates: student.feeGroup.installmentDates,
+                },
+            },
+            studentFee: {
+                _id: studentFee._id,
+                originalDueAmount: studentFee.originalDueAmount,
+                totalDiscount: totalDiscountAmount,
+                totalPaidAmount: totalPaidAmount,
+                dueAmount: overallDueAmount,
+                paymentStatus: paymentStatus,
+                feeDetails: feeDetails,
+                paymentHistory: studentFee.paymentHistory || [],
+                discountHistory: studentFee.discountHistory || [],
+            },
+        })
+    );
 });
 
 const generateReceiptNumber = () => {

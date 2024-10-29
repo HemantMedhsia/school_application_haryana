@@ -137,6 +137,16 @@ const studentSchema = new mongoose.Schema({
         ref: "SiblingGroup",
         index: true,
     },
+    feeGroup: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "FeeGroup",
+    },
+    studentFees: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "StudentFee",
+        },
+    ],
 });
 
 studentSchema.pre("save", async function (next) {
