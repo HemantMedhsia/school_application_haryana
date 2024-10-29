@@ -117,20 +117,30 @@ const FeeSubmission = () => {
 
   const handleInputChange = (index, field, value) => {
     const updatedFeeDetails = [...feeDetails];
-    updatedFeeDetails[index][field] = parseFloat(value) || 0;
+    const parsedValue = parseFloat(value);
+    updatedFeeDetails[index][field] = !isNaN(parsedValue) ? parsedValue : 0;
 
     if (field === 'discount' || field === 'payingAmount') {
       let totalAmount = parseFloat(updatedFeeDetails[index]['totalAmount']) || 0;
       let discount = parseFloat(updatedFeeDetails[index]['discount']) || 0;
       let paidAmount = parseFloat(updatedFeeDetails[index]['paidAmount']) || 0;
 
+      // Ensure discount doesn't exceed the remaining amount after payments
+      if (discount > totalAmount - paidAmount) {
+        discount = totalAmount - paidAmount;
+        updatedFeeDetails[index]['discount'] = discount;
+      }
+
+      // Calculate due amount considering total amount, paid amount, and discount
       let dueAmount = totalAmount - paidAmount - discount;
+
+      // Ensure due amount is not negative
       dueAmount = dueAmount > 0 ? dueAmount : 0;
-      updatedFeeDetails[index]['dueAmount'] = dueAmount.toFixed(2);
+      updatedFeeDetails[index]['dueAmount'] = dueAmount;
 
       // Auto-fill payingAmount when dueAmount changes, unless payingAmount was manually set
       if (field !== 'payingAmount') {
-        updatedFeeDetails[index]['payingAmount'] = dueAmount.toFixed(2);
+        updatedFeeDetails[index]['payingAmount'] = dueAmount;
       }
     }
 
@@ -155,14 +165,14 @@ const FeeSubmission = () => {
       studentId,
       feeDetails: feeDetails.map((fee) => ({
         feeHeader: fee.header,
-        discountAmount: parseFloat(fee.discount) || 0,
+        discountAmount: Number(fee.discount) || 0,
         discountGivenBy: fee.discount > 0 ? 'Principal' : '', // Adjust as needed
-        amountPaying: parseFloat(fee.payingAmount) || 0,
+        amountPaying: Number(fee.payingAmount) || 0,
       })),
       paymentDate: new Date().toISOString().split('T')[0],
       paymentMode: 'Cash', // You can change this to get input from user
       remarks: 'Payment for multiple fee headers.',
-      totalPayingAmount: totalFees,
+      totalPayingAmount: Number(totalFees),
     };
 
     try {

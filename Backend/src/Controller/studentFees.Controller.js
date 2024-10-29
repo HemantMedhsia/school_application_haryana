@@ -234,6 +234,7 @@ export const addPaymentsAndDiscounts = wrapAsync(async (req, res) => {
         .status(200)
         .json(
             new ApiResponse(
+                200,
                 studentFee,
                 "Payment and discounts updated successfully"
             )
