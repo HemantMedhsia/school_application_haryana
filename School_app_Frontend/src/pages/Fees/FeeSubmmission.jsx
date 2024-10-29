@@ -8,8 +8,22 @@ const FeeSubmission = () => {
   const [feeDetails, setFeeDetails] = useState([]);
   const [studentDetails, setStudentDetails] = useState(null);
   const [totalFees, setTotalFees] = useState(0);
-  const [monthMultiplier, setMonthMultiplier] = useState(0);
   const [paymentHistory, setPaymentHistory] = useState([]);
+
+  // Mapping between feeHeader identifiers and display names
+  const feeHeaderMap = {
+    tuitionFee: 'Tuition Fee (Monthly)',
+    admissionFee: 'Admission Fee',
+    annualFee: 'Annual Fee',
+    otherFee: 'Other Fee',
+  };
+
+  const feeHeaderMapReverse = {
+    'Tuition Fee (Monthly)': 'tuitionFee',
+    'Admission Fee': 'admissionFee',
+    'Annual Fee': 'annualFee',
+    'Other Fee': 'otherFee',
+  };
 
   useEffect(() => {
     fetchStudentFeeDetails();
@@ -22,10 +36,10 @@ const FeeSubmission = () => {
         `${import.meta.env.VITE_BACKEND_URL}/api/get-student-fee/${studentId}`
       );
       if (response.data && response.data.success) {
-        const data = response.data.data; // Adjusted to match new API response structure
+        const data = response.data.message; // Adjusted to match new API response structure
         setStudentDetails(data.student);
-        initializeFeeDetails(data.feeDetails);
-        setPaymentHistory(data.paymentHistory);
+        initializeFeeDetails(data.studentFee);
+        setPaymentHistory(data.studentFee.paymentHistory);
       } else {
         console.error('Failed to fetch student fee details');
       }
@@ -35,54 +49,32 @@ const FeeSubmission = () => {
   };
 
   // Initialize fee details based on the API response
-  const initializeFeeDetails = (feeDetailsData) => {
-    const feeDetailsFormatted = [
-      {
-        header: 'Tuition Fee (Monthly)',
-        annualAmount: feeDetailsData.tuitionFee.totalAmount,
-        totalAmount: 0,
-        dueAmount: feeDetailsData.tuitionFee.dueAmount,
-        paidAmount: feeDetailsData.tuitionFee.paidAmount,
+  const initializeFeeDetails = (studentFeeData) => {
+    const feeDetailsFormatted = studentFeeData.feeDetails.map((feeDetail) => {
+      const header = feeHeaderMap[feeDetail.feeHeader] || feeDetail.feeHeader;
+      return {
+        feeHeader: feeDetail.feeHeader, // keep the feeHeader as is
+        header: header,
+        originalAmount: feeDetail.originalAmount,
+        totalAmount: feeDetail.originalAmount,
+        dueAmount: feeDetail.dueAmount,
+        paidAmount: feeDetail.paymentAmount,
+        discountAmount: feeDetail.discountAmount,
         discount: 0,
         payingAmount: 0,
-      },
-      {
-        header: 'Admission Fee',
-        totalAmount: feeDetailsData.admissionFee.totalAmount,
-        dueAmount: feeDetailsData.admissionFee.dueAmount,
-        paidAmount: feeDetailsData.admissionFee.paidAmount,
-        discount: 0,
-        payingAmount: 0,
-      },
-      {
-        header: 'Annual Fee',
-        totalAmount: feeDetailsData.annualFee.totalAmount,
-        dueAmount: feeDetailsData.annualFee.dueAmount,
-        paidAmount: feeDetailsData.annualFee.paidAmount,
-        discount: 0,
-        payingAmount: 0,
-      },
-      {
-        header: 'Other Fee',
-        totalAmount: feeDetailsData.otherFee.totalAmount,
-        dueAmount: feeDetailsData.otherFee.dueAmount,
-        paidAmount: feeDetailsData.otherFee.paidAmount,
-        discount: 0,
-        payingAmount: 0,
-      },
-    ];
+      };
+    });
     setFeeDetails(feeDetailsFormatted);
     calculateTotalFees(feeDetailsFormatted);
   };
 
   const handleMonthChange = (e) => {
-    const multiplier = getMonthMultiplier(e.target.value);
-    setMonthMultiplier(multiplier);
+    const month = e.target.value;
+    const multiplier = getMonthMultiplier(month);
     const updatedFeeDetails = feeDetails.map((fee) => {
-      if (fee.header === 'Tuition Fee (Monthly)') {
-        let totalAmount = (parseFloat(fee.annualAmount) / 12) * multiplier;
-        let dueAmount = totalAmount - fee.paidAmount - parseFloat(fee.discount || 0);
-        dueAmount = dueAmount > 0 ? dueAmount : 0;
+      if (fee.feeHeader === 'tuitionFee') {
+        const totalAmount = (parseFloat(fee.originalAmount) / 12) * multiplier;
+        const dueAmount = Math.max(totalAmount - fee.paidAmount - parseFloat(fee.discount || 0), 0);
         return {
           ...fee,
           totalAmount: totalAmount.toFixed(2),
@@ -92,7 +84,7 @@ const FeeSubmission = () => {
       }
       return fee;
     });
-    setSelectedMonth(e.target.value);
+    setSelectedMonth(month);
     setFeeDetails(updatedFeeDetails);
     calculateTotalFees(updatedFeeDetails);
   };
@@ -121,9 +113,9 @@ const FeeSubmission = () => {
     updatedFeeDetails[index][field] = !isNaN(parsedValue) ? parsedValue : 0;
 
     if (field === 'discount' || field === 'payingAmount') {
-      let totalAmount = parseFloat(updatedFeeDetails[index]['totalAmount']) || 0;
+      const totalAmount = parseFloat(updatedFeeDetails[index]['totalAmount']) || 0;
       let discount = parseFloat(updatedFeeDetails[index]['discount']) || 0;
-      let paidAmount = parseFloat(updatedFeeDetails[index]['paidAmount']) || 0;
+      const paidAmount = parseFloat(updatedFeeDetails[index]['paidAmount']) || 0;
 
       // Ensure discount doesn't exceed the remaining amount after payments
       if (discount > totalAmount - paidAmount) {
@@ -133,8 +125,6 @@ const FeeSubmission = () => {
 
       // Calculate due amount considering total amount, paid amount, and discount
       let dueAmount = totalAmount - paidAmount - discount;
-
-      // Ensure due amount is not negative
       dueAmount = dueAmount > 0 ? dueAmount : 0;
       updatedFeeDetails[index]['dueAmount'] = dueAmount;
 
@@ -170,9 +160,9 @@ const FeeSubmission = () => {
         amountPaying: Number(fee.payingAmount) || 0,
       })),
       paymentDate: new Date().toISOString().split('T')[0],
-      paymentMode: 'Cash', // You can change this to get input from user
+      paymentMode: 'Cash', // Can be changed to get input from user
       remarks: 'Payment for multiple fee headers.',
-      totalPayingAmount: Number(totalFees),
+      totalPayingAmount: totalFees,
     };
 
     try {
@@ -203,7 +193,7 @@ const FeeSubmission = () => {
           <h3 className="text-2xl font-semibold text-[#65fa9e]">
             Student Name: {studentDetails.name}
           </h3>
-          <p className="text-xl text-gray-300">Class: {studentDetails.className}</p>
+          <p className="text-xl text-gray-300">Class: {studentDetails.class.name}</p>
         </div>
       )}
       <div className="mb-6">
@@ -252,16 +242,18 @@ const FeeSubmission = () => {
               <tr key={index} className="hover:bg-[#39424E]">
                 <td className="py-3 px-4 border border-[#39424E]">{fee.header}</td>
                 <td className="py-3 px-4 border border-[#39424E]">
-                  {fee.totalAmount ? fee.totalAmount : fee.annualAmount}
+                  {fee.totalAmount ? fee.totalAmount : fee.originalAmount}
                 </td>
-                <td className="py-3 px-4 border border-[#39424E]">{fee.paidAmount.toFixed(2)}</td>
+                <td className="py-3 px-4 border border-[#39424E]">
+                  {fee.paidAmount.toFixed(2)}
+                </td>
                 <td className="py-3 px-4 border border-[#39424E]">{fee.dueAmount}</td>
                 <td className="py-3 px-4 border border-[#39424E]">
                   <input
                     type="number"
                     value={fee.discount}
                     onChange={(e) => handleInputChange(index, 'discount', e.target.value)}
-                    className="p-2 border border-[#39424E] rounded w-full bg-gray-800 text-gray-100 focus:border-[#65fa9e]"
+                    className="p-2 border border-[#39424E] rounded w-full bg-gray-100 text-gray-900 focus:border-[#65fa9e]"
                     placeholder="Discount Amount"
                   />
                 </td>
@@ -270,7 +262,7 @@ const FeeSubmission = () => {
                     type="number"
                     value={fee.payingAmount}
                     onChange={(e) => handleInputChange(index, 'payingAmount', e.target.value)}
-                    className="p-2 border border-[#39424E] rounded w-full bg-gray-800 text-gray-100 focus:border-[#65fa9e]"
+                    className="p-2 border border-[#39424E] rounded w-full bg-gray-100 text-gray-900 focus:border-[#65fa9e]"
                     placeholder="Paying Amount"
                   />
                 </td>
@@ -299,8 +291,12 @@ const FeeSubmission = () => {
                     {new Date(payment.paymentDate).toLocaleDateString()}
                   </td>
                   <td className="py-3 px-4 border border-[#39424E]">{payment.feeHeader}</td>
-                  <td className="py-3 px-4 border border-[#39424E]">{payment.amount.toFixed(2)}</td>
-                  <td className="py-3 px-4 border border-[#39424E]">{payment.receiptNumber}</td>
+                  <td className="py-3 px-4 border border-[#39424E]">
+                    {payment.amount.toFixed(2)}
+                  </td>
+                  <td className="py-3 px-4 border border-[#39424E]">
+                    {payment.receiptNumber}
+                  </td>
                 </tr>
               ))}
             </tbody>
