@@ -3,7 +3,14 @@ import IconInput from "./IconInput";
 import Dropdown from "./Dropdown";
 import Button from "./Button";
 
-const SearchBar = ({ classItems, sectionItems, sessionItems, onFilter, onSearch }) => {
+const SearchBar = ({
+  classItems,
+  sectionItems,
+  sessionItems,
+  onFilter,
+  onSearch,
+  onClearFilters,
+}) => {
   const [searchText, setSearchText] = useState("");
 
   const handleClassSelect = (selectedClass) => {
@@ -18,9 +25,9 @@ const SearchBar = ({ classItems, sectionItems, sessionItems, onFilter, onSearch 
     onFilter({ type: "session", value: selectedSession });
   };
 
-  const handleSearch = () => {
-    console.log("Search text:", searchText);
-    onSearch(searchText); // Pass the search text to the parent
+  const handleRemoveFilters = () => {
+    setSearchText("");
+    onClearFilters(); // Call parent function to clear all filters
   };
 
   return (
@@ -37,7 +44,10 @@ const SearchBar = ({ classItems, sectionItems, sessionItems, onFilter, onSearch 
           }
           placeholder="Article name or keyword..."
           value={searchText}
-          onChange={(e) => setSearchText(e.target.value)} // Update search text state
+          onChange={(e) => {
+            setSearchText(e.target.value);
+            onSearch(e.target.value);
+          }}
         />
       </div>
 
@@ -63,8 +73,8 @@ const SearchBar = ({ classItems, sectionItems, sessionItems, onFilter, onSearch 
               d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
             />
           }
-          label="Search"
-          onClick={handleSearch} // Trigger search on button click
+          label="Remove Filter"
+          onClick={handleRemoveFilters}
         />
       </div>
     </div>
