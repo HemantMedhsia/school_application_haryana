@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-// import StaffSearchBar from "../../common/SearchBar/StaffSearchBar";
 import Datatable from "../../common/Datatables/Datatable";
 import { getAPI, deleteAPI } from "../../utility/api/apiCall";
 import { useNavigate } from "react-router-dom";
@@ -39,19 +38,15 @@ const StaffInfo = () => {
     fetchData();
   }, []);
 
+  // Filter staff data based on search input
   useEffect(() => {
-    const filteredData = allStaffData.filter(
-      (staff) =>
-        staff.name.toLowerCase().includes(searchText.toLowerCase()) ||
-        staff.position.toLowerCase().includes(searchText.toLowerCase()) ||
-        staff.department.toLowerCase().includes(searchText.toLowerCase())
+    const filteredData = allStaffData.filter((staff) =>
+      ["name", "type", "department"].some((key) =>
+        staff[key]?.toLowerCase().includes(searchText.toLowerCase())
+      )
     );
     setFilteredStaffData(filteredData);
   }, [searchText, allStaffData]);
-
-  //   const handleView = (staffData) => {
-  //     navigate(`/school/staff-profile/${staffData._id}`);
-  //   };
 
   const handleEdit = (staffData) => {
     navigate(`/school/staff-update/${staffData._id}`);
@@ -61,7 +56,7 @@ const StaffInfo = () => {
     if (!staffToDelete) return;
 
     try {
-      const res = await deleteAPI(`delete-staff/${staffToDelete._id}`);
+      await deleteAPI(`delete-staff/${staffToDelete._id}`);
       setAllStaffData((prevData) =>
         prevData.filter((data) => data._id !== staffToDelete._id)
       );
@@ -96,7 +91,15 @@ const StaffInfo = () => {
   return (
     <div>
       <ToastContainer />
-      {/* <StaffSearchBar searchText={searchText} setSearchText={setSearchText} /> */}
+      <div className="flex items-center mb-4">
+        <input
+          type="text"
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          placeholder="Search by Name, Position, or Department"
+          className="w-full px-4 py-2 text-white rounded-md border bg-gray-900 border-[#283046] border-2 focus:outline-none focus:border-[#65fa9e]"
+        />
+      </div>
       {loading ? (
         <div className="loader-wrapper">
           <span className="loader"></span>
@@ -106,7 +109,6 @@ const StaffInfo = () => {
           columns={columns}
           data={formattedData}
           actions={{
-            // onView: handleView,
             onEdit: handleEdit,
             onDelete: openModal,
           }}

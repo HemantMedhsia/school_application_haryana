@@ -11,24 +11,25 @@ import { toast, ToastContainer } from "react-toastify";
 
 const StudentInfo = () => {
   const [allStudentData, setAllStudentData] = useState([]);
-  const [updatedAllStudentdata, setUpdatedAllStudentdata] = useState([]);
   const [filteredStudentData, setFilteredStudentData] = useState([]);
   const [classItems, setClassItems] = useState([]);
   const [sectionItems, setSectionItems] = useState([]);
   const [sessionItems, setSessionItems] = useState([]);
   const [selectedClass, setSelectedClass] = useState(null);
+  const [selectedSection, setSelectedSection] = useState(null); // Define selectedSection state
+  const [selectedSession, setSelectedSession] = useState(null); // Define selectedSession state
+  const [searchText, setSearchText] = useState("");
+  const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [studentToDelete, setStudentToDelete] = useState(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
-  const [searchText, setSearchText] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [isStudentSearchOpen, setIsStudentSearchOpen] = useState(false); // State for the popup
-  const [currentStudentId, setCurrentStudentId] = useState(null); // State for current student ID
-  const [currentParentId, setCurrentParentId] = useState(null); // State for current parent ID
-  const [siblingsData, setSiblingsData] = useState([]); // State for siblings data
+  const [isStudentSearchOpen, setIsStudentSearchOpen] = useState(false);
+  const [currentStudentId, setCurrentStudentId] = useState(null);
+  const [currentParentId, setCurrentParentId] = useState(null);
+  const [siblingsData, setSiblingsData] = useState([]);
   const [siblingGroupId, setSiblingGroupId] = useState([]);
-  const [isSiblingsModalOpen, setIsSiblingsModalOpen] = useState(false); // State for siblings modal
+  const [isSiblingsModalOpen, setIsSiblingsModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const fetchDropdownData = async () => {
@@ -74,8 +75,8 @@ const StudentInfo = () => {
               );
               return {
                 ...student,
-                attendancePercentage: 0, // Default in case of error
-                grade: "A", // Example grade
+                attendancePercentage: 0,
+                grade: "A",
               };
             }
           })
@@ -91,22 +92,33 @@ const StudentInfo = () => {
     }
   };
 
-  // Handle filter logic
-  const handleFilter = ({ type, value }) => {
+  const clearFilters = () => {
+    setSelectedClass(null);
+    setSelectedSection(null);
+    setSelectedSession(null);
+    setSearchText("");
+    setFilteredStudentData(allStudentData); // Reset the filtered data to all students
+    fetchDropdownData();
+  };
+
+  const handleFilter = () => {
     let filteredData = allStudentData;
 
-    if (type === "class" && value) {
-      setSelectedClass(value);
+    if (selectedClass) {
       filteredData = filteredData.filter(
-        (student) => student.currentClass._id === value._id
+        (student) => student.currentClass._id === selectedClass._id
       );
-    } else if (type === "section" && value && selectedClass) {
+    }
+
+    if (selectedSection) {
       filteredData = filteredData.filter(
-        (student) => student.currentSection._id === value._id
+        (student) => student.currentSection._id === selectedSection._id
       );
-    } else if (type === "session" && value) {
+    }
+
+    if (selectedSession) {
       filteredData = filteredData.filter(
-        (student) => student.currentSession._id === value._id
+        (student) => student.currentSession._id === selectedSession._id
       );
     }
 
@@ -124,6 +136,11 @@ const StudentInfo = () => {
     setFilteredStudentData(filteredData);
   };
 
+  const handleSearch = (text) => {
+    setSearchText(text);
+    handleFilter();
+  };
+
   const handleDetailsSelect = (type) => {
     if (type === "student") {
       navigate(`/school/student-admission/${selectedStudent._id}`);
@@ -135,15 +152,6 @@ const StudentInfo = () => {
   const closeDetailsModal = () => {
     setSelectedStudent(null);
     setIsDetailsModalOpen(false);
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const handleSearch = (searchText) => {
-    setSearchText(searchText);
-    handleFilter({});
   };
 
   const columns = [
@@ -215,9 +223,9 @@ const StudentInfo = () => {
   };
 
   const handleCustomAction = (studentData) => {
-    setCurrentStudentId(studentData._id); // Set the current student ID
-    setCurrentParentId(studentData.parent); // Set the current parent ID (assume parentId is available in studentData)
-    setIsStudentSearchOpen(true); // Open the popup for custom action
+    setCurrentStudentId(studentData._id);
+    setCurrentParentId(studentData.parent);
+    setIsStudentSearchOpen(true);
   };
 
   const confirmDelete = async () => {
@@ -248,7 +256,7 @@ const StudentInfo = () => {
   const handleAddStudent = (student) => {
     console.log("Student added:", student);
     toast.success(`Added successfully.`);
-    setIsStudentSearchOpen(false); // Close the popup after adding
+    setIsStudentSearchOpen(false);
   };
 
   const handleViewSiblings = async (studentData) => {
@@ -262,7 +270,7 @@ const StudentInfo = () => {
       console.log("this is response", response);
       if (response.status === 200) {
         setSiblingsData(response.data.data);
-        setIsSiblingsModalOpen(true); // Open the modal with siblings data
+        setIsSiblingsModalOpen(true);
       } else if (response.status === 404) {
         toast.error("No Siblings Available");
       }
@@ -285,9 +293,19 @@ const StudentInfo = () => {
         classItems={classItems}
         sectionItems={sectionItems}
         sessionItems={sessionItems}
-        onFilter={handleFilter}
-        onSearch={handleSearch}
+        onFilter={({ type, value }) => {
+          if (type === "class") setSelectedClass(value);
+          if (type === "section") setSelectedSection(value);
+          if (type === "session") setSelectedSession(value);
+          handleFilter();
+        }}
+        onSearch={(text) => {
+          setSearchText(text);
+          handleFilter();
+        }}
+        onClearFilters={clearFilters} // Pass clearFilters to SearchBar
       />
+
       {loading ? (
         <div className="loader-wrapper">
           <span className="loader"></span>

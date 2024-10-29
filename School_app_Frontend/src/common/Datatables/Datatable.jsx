@@ -37,6 +37,11 @@ const Datatable = ({
         <table className="items-center w-full border-collapse text-white">
           <thead>
             <tr>
+              {/* Serial Number Header */}
+              <th className="px-6 bg-[#2d3748] text-gray-300 align-middle border-b border-gray-700 py-3 text-s uppercase font-semibold text-left">
+                S.No
+              </th>
+
               {columns.map((column, index) => (
                 <th
                   key={index}
@@ -45,6 +50,7 @@ const Datatable = ({
                   {column.header}
                 </th>
               ))}
+
               {/* Action column */}
               {Object.keys(actions).length > 0 && (
                 <th className="px-6 bg-[#2d3748] text-gray-300 align-middle border-b border-gray-700 py-3 text-s uppercase font-semibold text-left">
@@ -56,6 +62,11 @@ const Datatable = ({
           <tbody>
             {currentPageData.map((item, rowIndex) => (
               <tr key={rowIndex} className="hover:bg-[#4a5568]">
+                {/* Serial Number Cell */}
+                <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-sm whitespace-nowrap p-4 text-left">
+                  {offset + rowIndex + 1}
+                </td>
+
                 {columns.map((column, colIndex) => (
                   <td
                     key={colIndex}
@@ -68,6 +79,7 @@ const Datatable = ({
                       : item[column.accessor] || "N/A"}
                   </td>
                 ))}
+
                 {/* Action buttons */}
                 {Object.keys(actions).length > 0 && (
                   <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xl whitespace-nowrap p-4 text-left">
