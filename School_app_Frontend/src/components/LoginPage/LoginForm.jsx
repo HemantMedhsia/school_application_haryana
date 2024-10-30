@@ -1,4 +1,7 @@
 import React from "react";
+import loginImg1 from "../../assets/loginImg1.jpg";
+import loginImg2 from "../../assets/loginImg2.jpg";
+import aradhyaFullLogo from "../../assets/aradhyaFullLogo.png";
 
 const LoginForm = ({
   email,
@@ -11,113 +14,125 @@ const LoginForm = ({
   setRole,
 }) => {
   return (
-    <div className="max-w-screen-xl m-0 sm:m-10 bg-white shadow sm:rounded-lg flex justify-center flex-1">
-      <div className="lg:w-1/2 xl:w-5/12 p-6 sm:p-12">
-        {/* Logo Section */}
-        <div className="flex justify-center">
-          <img
-            src="https://drive.google.com/uc?export=view&id=1MFiKAExRFF0-2YNpAZzIu1Sh52J8r16v"
-            className="w-32 h-auto"
-            alt="Logo"
-          />
-        </div>
-        <div className="mt-12 flex flex-col items-center">
-          <div className="w-full flex-1 mt-8">
-            <form className="mx-auto max-w-xs" onSubmit={handleLogin}>
-              {/* Email Input */}
-              <input
-                className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-              {/* Password Input */}
-              <input
-                className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+    <div className="relative flex items-center justify-center min-h-screen w-full bg-black">
+      {/* Full-Screen Background Image */}
+      <img
+        src={loginImg1}
+        alt="Background"
+        className="absolute inset-0 w-full h-screen object-cover opacity-50"
+      />
 
-              {/* Role Selection */}
-              <div className="mt-5">
-                <select
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
+      {/* Watermark Logo - Centered */}
+      <img
+        src={aradhyaFullLogo}
+        alt="Watermark Logo"
+        className="absolute inset-0 w-auto object-contain opacity-30 mx-auto my-auto pointer-events-none"
+        style={{
+          top: "100%",
+          left: "50%",
+          transform: "translate(-50%, -35%)", // Centering the watermark
+        }}
+      />
+
+      <div
+        className="w-1/2 h-auto m-0 sm:m-10 shadow sm:rounded-lg flex justify-center z-10"
+        style={{ backgroundColor: "rgba(0, 0, 0, 0.35)" }}
+      >
+        <div className="w-full sm:p-12">
+          {/* Logo Section - Top Left */}
+          <div className="absolute top-0 left-0 flex justify-start">
+            <img src={aradhyaFullLogo} className="w-40 h-auto" alt="Logo" />
+          </div>
+          <div className="flex flex-col items-center">
+            <div className="w-full flex-1 mt-8">
+              <form className="mx-auto max-w-xs" onSubmit={handleLogin}>
+                {/* Email Input */}
+                <input
                   className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
+                  type="email"
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
-                >
-                  <option value="" disabled>Select Role</option>
-                  <option value="Teacher">Teacher</option>
-                  <option value="Student">Student</option>
-                  <option value="Admin">Admin</option>
-                  <option value="Parent">Parent</option>
-                </select>
-              </div>
+                />
+                {/* Password Input */}
+                <input
+                  className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                  type="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
 
-              {/* Sign In Button */}
-              <button
-                type="submit"
-                className="mt-5 tracking-wide font-semibold bg-green-400 text-white w-full py-4 rounded-lg hover:bg-green-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
-              >
-                <svg
-                  className="w-6 h-6 -ml-2"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
-                  <circle cx="8.5" cy="7" r="4" />
-                  <path d="M20 8v6M23 11h-6" />
-                </svg>
-                <span className="ml-2">Sign In</span>
-              </button>
+                {/* Role Selection */}
+                <div className="mt-5">
+                  <select
+                    value={role}
+                    onChange={(e) => setRole(e.target.value)}
+                    className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
+                    required
+                  >
+                    <option value="" disabled>
+                      Select Role
+                    </option>
+                    <option value="Teacher">Teacher</option>
+                    <option value="Student">Student</option>
+                    <option value="Admin">Admin</option>
+                    <option value="Parent">Parent</option>
+                  </select>
+                </div>
 
-              {/* Error Message */}
-              {error && (
-                <p className="mt-6 text-xs text-red-600 text-center">
-                  {error}
+                {/* Sign In Button */}
+                <button
+                  type="submit"
+                  className="mt-5 tracking-wide font-semibold bg-green-400 text-white w-full py-4 rounded-lg hover:bg-green-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
+                >
+                  <svg
+                    className="w-6 h-6 -ml-2"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                    <circle cx="8.5" cy="7" r="4" />
+                    <path d="M20 8v6M23 11h-6" />
+                  </svg>
+                  <span className="ml-2">Sign In</span>
+                </button>
+
+                {/* Error Message */}
+                {error && (
+                  <p className="mt-6 text-xs text-red-600 text-center">
+                    {error}
+                  </p>
+                )}
+
+                {/* Terms of Service and Privacy Policy */}
+                <p className="mt-6 text-xs text-gray-100 text-center">
+                  I agree to abide by Cartesian Kinetics{" "}
+                  <a
+                    href="#"
+                    className="border-b border-gray-500 border-dotted"
+                  >
+                    Terms of Service
+                  </a>{" "}
+                  and its{" "}
+                  <a
+                    href="#"
+                    className="border-b border-gray-500 border-dotted"
+                  >
+                    Privacy Policy
+                  </a>
+                  .
                 </p>
-              )}
-
-              {/* Terms of Service and Privacy Policy */}
-              <p className="mt-6 text-xs text-gray-600 text-center">
-                I agree to abide by Cartesian Kinetics{" "}
-                <a
-                  href="#"
-                  className="border-b border-gray-500 border-dotted"
-                >
-                  Terms of Service
-                </a>{" "}
-                and its{" "}
-                <a
-                  href="#"
-                  className="border-b border-gray-500 border-dotted"
-                >
-                  Privacy Policy
-                </a>.
-              </p>
-            </form>
+              </form>
+            </div>
           </div>
         </div>
-      </div>
-
-      {/* Right Side Background Image Section */}
-      <div className="flex-1 bg-green-100 text-center hidden lg:flex">
-        <div
-          className="m-12 xl:m-16 w-full bg-contain bg-center bg-no-repeat"
-          style={{
-            backgroundImage:
-              "url('https://drive.google.com/uc?export=view&id=1KZ_Ub_2lZ0dHbKV0fAIhxVhiQA183RCz')",
-          }}
-        ></div>
       </div>
     </div>
   );
