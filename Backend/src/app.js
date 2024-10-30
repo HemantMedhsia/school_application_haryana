@@ -35,11 +35,13 @@ import { studentFeesRouter } from "./Routes/studentFees.Route.js";
 
 const app = express();
 
+// Whitelist of allowed origins
 const whitelist = [
-    "https:\/\/school-application-haryana.vercel.app/",
+    "https://school-application-haryana.vercel.app",
     /^http:\/\/192\.168\.\d{1,3}\.\d{1,3}:5174$/,
 ];
 
+// CORS configuration
 const corsOptions = {
     origin: function (origin, callback) {
         if (
@@ -59,22 +61,22 @@ const corsOptions = {
     allowedHeaders: "Content-Type,Authorization",
     credentials: true,
 };
+
+// Use CORS middleware
 app.use(cors(corsOptions));
 
 app.use(express.json({ limit: "16kb" }));
-
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
-
 app.use(express.static("public"));
-
 app.use(cookieParser());
-
 app.use(bodyParser.json());
 
+// Welcome route
 app.get("/", (req, res) => {
     res.send("Welcome to our School. Deployment is complete");
 });
 
+// API routes
 app.use("/api", noticeRoute);
 app.use("/api", subjectRoute);
 app.use("/api", schoolRoute);
@@ -92,7 +94,6 @@ app.use("/api", staffAttendanceRoute);
 app.use("/api", classRoute);
 app.use("/api", sectionRoute);
 app.use("/api", sessionRoute);
-app.use("/api", sectionRoute);
 app.use("/api", studentHistoryRoute);
 app.use("/api", loginUserRouter);
 app.use("/api", subjectGroupRoute);
@@ -109,8 +110,8 @@ app.use("/api", studentFeesRouter);
 
 // Global error handling middleware
 app.use((err, req, res, next) => {
-    let { statusCode, message } = err;
-    res.status(statusCode).json(message);
+    let { statusCode = 500, message = "Internal Server Error" } = err;
+    res.status(statusCode).json({ error: message });
 });
 
 export { app };
