@@ -26,7 +26,7 @@ const getHeaders = async (requestHeaders) => {
 };
 
 export async function getAPI(apiName, params = {}, setData) {
-  const BASE_URL = "https://school-application-three.vercel.app/api";
+  const BASE_URL = `${import.meta.env.VITE_BACKEND_URL}/api`;
   try {
     const config = {
       method: getApiConfig[apiName].method,
@@ -56,7 +56,7 @@ export const deleteAPI = async (endpoint) => {
     const config = {
         method: "DELETE",
         headers: await getHeaders(["access-token"]),
-        url: `https://school-application-three.vercel.app/api/${endpoint}`,
+        url: `${import.meta.env.VITE_BACKEND_URL}/api/${endpoint}`,
       };
     const response = await axios(config);
     console.log("API call successful:", response);
