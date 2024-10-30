@@ -40,11 +40,14 @@ const StudentsResults = () => {
         // getAPI("getAllSections", {}, setSection),
       ]);
     } catch (error) {
-      console.error("Error fetching data", error);
+      console.error("Error fetching data 1", error);
     }
   };
 
   const fetchResultData = async () => {
+    console.log("1",selectedClassId);
+    console.log("2",selectedStudents);
+    console.log("3",selectedTermId);
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/print-result-byclass`,
@@ -64,7 +67,7 @@ const StudentsResults = () => {
       console.log("Response", response.data.data);
       setResultPrintData(response.data.data);
     } catch (error) {
-      console.error("Error fetching data", error);
+      console.error("Error fetching data 2", error);
     }
   };
 
@@ -95,7 +98,7 @@ const StudentsResults = () => {
         toast.success("Data fetched successfully");
       }
     } catch (error) {
-      console.error("Error fetching data", error);
+      console.error("Error fetching data 3", error);
     }
   };
 
@@ -191,7 +194,6 @@ const StudentsResults = () => {
       setStudents(response.data.data || []);
       setSelectedStudents([]); // Clear previous selection
       fetchResultData();
-      handlePrint();
     } catch (error) {
       console.error("Error fetching students", error);
       toast.error("Error fetching students!");
@@ -206,6 +208,11 @@ const StudentsResults = () => {
         ? prevSelected.filter((id) => id !== studentId)
         : [...prevSelected, studentId]
     );
+  };
+
+  const handleFetchDataAndPrint = async () => {
+    await handlePrintPopup();
+    handlePrint();
   };
 
   useEffect(() => {
@@ -686,7 +693,10 @@ const StudentsResults = () => {
 
             {/* Action Buttons */}
             <div className="flex justify-end gap-3">
-              <FormButton name={"Print Results"} onClick={handlePrintPopup} />
+              <FormButton
+                name={"Print Results"}
+                onClick={handleFetchDataAndPrint}
+              />
             </div>
 
             {/* Close Icon */}

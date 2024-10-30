@@ -35,13 +35,12 @@ import { studentFeesRouter } from "./Routes/studentFees.Route.js";
 
 const app = express();
 
-// Whitelist localhost and local network IP addresses
 const whitelist = [
     "http://localhost:5174",
-    /^http:\/\/192\.168\.\d{1,3}\.\d{1,3}:5174$/, // This allows IPs like 192.168.x.x:5174
+    "https://school-application-haryana.vercel.app/",
+    /^http:\/\/192\.168\.\d{1,3}\.\d{1,3}:5174$/,
 ];
 
-// Dynamic CORS origin function to check if the request origin is in the whitelist
 const corsOptions = {
     origin: function (origin, callback) {
         if (
@@ -61,7 +60,6 @@ const corsOptions = {
     allowedHeaders: "Content-Type,Authorization",
     credentials: true,
 };
-
 app.use(cors(corsOptions));
 
 app.use(express.json({ limit: "16kb" }));
@@ -117,4 +115,3 @@ app.use((err, req, res, next) => {
 });
 
 export { app };
-// adding a comment for done
