@@ -1,35 +1,26 @@
 // MobileWarning.js
-import React from "react";
+import React from 'react';
+import ved from '../Mobile/mobilemsg.mp4'
 
 const MobileWarning = () => (
-  <div style={styles.overlay}>
-    <div style={styles.messageBox}>
-      <h2>Please Use Desktop Mode</h2>
-      <p>This application is best viewed on a desktop device. Please switch to a larger screen for the best experience.</p>
-    </div>
+  <div style={styles.container}>
+    <video style={styles.video} autoPlay loop muted>
+      <source src={ved} type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
   </div>
 );
 
 const styles = {
-  overlay: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.8)",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 1000,
+  container: {
+    width: '100vw',
+    height: '100vh',
+    overflow: 'hidden',
   },
-  messageBox: {
-    backgroundColor: "#fff",
-    padding: "20px",
-    borderRadius: "8px",
-    textAlign: "center",
-    maxWidth: "400px",
-    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+  video: {
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
   },
 };
 
