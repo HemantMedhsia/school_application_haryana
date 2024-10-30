@@ -96,12 +96,6 @@ const NoticeShowingBlock = ({ notices }) => {
       {selectedNotice && (
         <div className="fixed z-50 inset-0 flex items-center justify-center bg-black bg-opacity-70">
           <div className="relative p-8 rounded-2xl shadow-2xl w-11/12 max-w-2xl bg-gradient-to-br from-gray-900 to-gray-800 text-gray-200">
-            <button
-              onClick={closeModal}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-200 transition"
-            >
-              <FaTimes size={24} />
-            </button>
             <div className="flex justify-between items-center mb-4">
               <h2
                 className={`text-3xl font-extrabold ${
