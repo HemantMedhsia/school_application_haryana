@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Route,
   RouterProvider,
@@ -6,6 +6,7 @@ import {
   Navigate,
   createRoutesFromElements,
 } from "react-router-dom";
+import MobileWarning from "./MobileWarning"; // Import MobileWarning component
 import Layout from "./layouts/Layout.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import Testing from "./pages/Testing.jsx";
@@ -71,6 +72,25 @@ import ClassFeesRecord from "./pages/Fees/ClassFeesRecord.jsx";
 
 const App = () => {
   const { userRole, authToken } = useAuth();
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768); // Set threshold for mobile
+    };
+
+    handleResize(); // Initial check
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  // Display MobileWarning component if screen width is below threshold
+  if (isMobile) {
+    return <MobileWarning />;
+  }
 
   const data = {
     commonInfo: {
@@ -198,7 +218,6 @@ const App = () => {
             element={<SyallabusStatusStudent />}
           />
           <Route path="student-fees" element={<StudentFees />} />
-
           <Route
             path="class-timetable-user"
             element={<CommonClassTimeTable />}
@@ -252,11 +271,17 @@ const App = () => {
           />
           <Route path="/school/resultp" element={<ResultPrint />} />
           <Route path="/school/fees-discount" element={<FeesDiscount />} />
-          <Route path="/school/assign-discount/:discount_id" element={<AssignDiscount />} />
+          <Route
+            path="/school/assign-discount/:discount_id"
+            element={<AssignDiscount />}
+          />
           <Route path="/school/create-fees" element={<CreateFees_h />} />
           <Route path="/school/fees-installment" element={<FeesInstallment />} />
           <Route path="/school/student-fees-page" element={<StudentsFeesPage />} />
-          <Route path="/school/fee-submission/:studentId" element={<FeeSubmmission />} />
+          <Route
+            path="/school/fee-submission/:studentId"
+            element={<FeeSubmmission />}
+          />
           <Route path="/school/class-fees-record" element={<ClassFeesRecord />} />
         </Route>
       </>
