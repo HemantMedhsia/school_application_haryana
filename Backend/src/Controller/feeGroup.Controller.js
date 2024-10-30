@@ -7,80 +7,6 @@ import { feeGroupValidationSchema } from "../Validation/feeGroup.Validation.js";
 import { Student } from "../Models/student.model.js";
 import { StudentFee } from "../Models/studentFees.Model.js";
 
-// export const addFeeGroup = wrapAsync(async (req, res, next) => {
-//     const { feeData } = req.body;
-
-//     if (!feeData || !Array.isArray(feeData)) {
-//         return res
-//             .status(400)
-//             .json(
-//                 new ApiResponse(
-//                     400,
-//                     "Fee data is required and must be an array."
-//                 )
-//             );
-//     }
-
-//     for (let fee of feeData) {
-//         const { error } = feeGroupValidationSchema.validate(fee);
-//         if (error) {
-//             return res
-//                 .status(400)
-//                 .json(
-//                     new ApiResponse(
-//                         400,
-//                         `Validation error for fee group: ${error.details[0].message}`
-//                     )
-//                 );
-//         }
-//     }
-
-//     const existingClasses = await FeeGroup.find({
-//         class: { $in: feeData.map((fee) => fee.class) },
-//     });
-
-//     if (existingClasses.length > 0) {
-//         const existingClassNames = existingClasses
-//             .map((group) => group.class)
-//             .join(", ");
-//         return res
-//             .status(400)
-//             .json(
-//                 new ApiResponse(
-//                     400,
-//                     `Fee group already exists for the following class(es): ${existingClassNames}`
-//                 )
-//             );
-//     }
-
-//     const feeGroupData = feeData.map((fee) => ({
-//         class: fee.class,
-//         fees: {
-//             tuitionFee: fee.fees.tuitionFee || 0,
-//             admissionFee: fee.fees.admissionFee || 0,
-//             annualFee: fee.fees.annualFee || 0,
-//             otherFee: fee.fees.otherFee || 0,
-//         },
-//     }));
-
-//     const createdFeeGroups = await FeeGroup.insertMany(feeGroupData);
-//     for (let fee of feeData) {
-//         await Class.findByIdAndUpdate(
-//             fee.class,
-//             {
-//                 feeGroup: createdFeeGroups.find((group) =>
-//                     group.class.equals(fee.class)
-//                 )._id,
-//             },
-//             { new: true }
-//         );
-//     }
-
-//     return res
-//         .status(201)
-//         .json(new ApiResponse(201, "Fee groups created.", createdFeeGroups));
-// });
-
 export const addFeeGroup = wrapAsync(async (req, res, next) => {
     const { feeData } = req.body;
 
@@ -96,7 +22,6 @@ export const addFeeGroup = wrapAsync(async (req, res, next) => {
             );
     }
 
-    // Validate Fee Data
     for (let fee of feeData) {
         const { error } = feeGroupValidationSchema.validate(fee);
         if (error) {
@@ -112,7 +37,6 @@ export const addFeeGroup = wrapAsync(async (req, res, next) => {
         }
     }
 
-    // Check for Existing Classes
     const classIds = feeData.map((fee) => fee.class);
     const existingClasses = await FeeGroup.find({ class: { $in: classIds } });
 
@@ -131,7 +55,6 @@ export const addFeeGroup = wrapAsync(async (req, res, next) => {
             );
     }
 
-    // Create Fee Groups
     const feeGroupData = feeData.map((fee) => ({
         class: fee.class,
         fees: {
@@ -144,9 +67,7 @@ export const addFeeGroup = wrapAsync(async (req, res, next) => {
 
     const createdFeeGroups = await FeeGroup.insertMany(feeGroupData);
 
-    // Assign Fees to Students in Each Class
     for (let feeGroup of createdFeeGroups) {
-        // Find All Students in the Class
         const students = await Student.find({ currentClass: feeGroup.class });
 
         if (students && students.length > 0) {
@@ -161,12 +82,10 @@ export const addFeeGroup = wrapAsync(async (req, res, next) => {
                     feeGroup.fees.otherFee,
             }));
 
-            // Insert Student Fees
             const insertedStudentFees = await StudentFee.insertMany(
                 studentFees
             );
 
-            // Update Student Documents with the Newly Created Fee References
             for (let studentFee of insertedStudentFees) {
                 await Student.findByIdAndUpdate(
                     studentFee.student,
@@ -179,7 +98,6 @@ export const addFeeGroup = wrapAsync(async (req, res, next) => {
             }
         }
 
-        // Assign Fee Group to Class (Optional)
         await Class.findByIdAndUpdate(
             feeGroup.class,
             { feeGroup: feeGroup._id },
@@ -214,6 +132,7 @@ export const updateFeeGroup = wrapAsync(async (req, res, next) => {
     }
 
     const updatedFeeGroups = [];
+
     for (let fee of feeData) {
         const { error } = feeGroupValidationSchema.validate(fee);
         if (error) {
@@ -241,24 +160,24 @@ export const updateFeeGroup = wrapAsync(async (req, res, next) => {
         }
 
         const updateData = {
-            class: fee.class,
+            ...(fee.class && { class: fee.class }),
             fees: {
-                tuitionFee:
-                    fee.fees && fee.fees.tuitionFee !== undefined
-                        ? fee.fees.tuitionFee
-                        : 0,
-                admissionFee:
-                    fee.fees && fee.fees.admissionFee !== undefined
-                        ? fee.fees.admissionFee
-                        : 0,
-                annualFee:
-                    fee.fees && fee.fees.annualFee !== undefined
-                        ? fee.fees.annualFee
-                        : 0,
-                otherFee:
-                    fee.fees && fee.fees.otherFee !== undefined
-                        ? fee.fees.otherFee
-                        : 0,
+                ...(fee.fees &&
+                    fee.fees.tuitionFee !== undefined && {
+                        tuitionFee: fee.fees.tuitionFee,
+                    }),
+                ...(fee.fees &&
+                    fee.fees.admissionFee !== undefined && {
+                        admissionFee: fee.fees.admissionFee,
+                    }),
+                ...(fee.fees &&
+                    fee.fees.annualFee !== undefined && {
+                        annualFee: fee.fees.annualFee,
+                    }),
+                ...(fee.fees &&
+                    fee.fees.otherFee !== undefined && {
+                        otherFee: fee.fees.otherFee,
+                    }),
             },
         };
 
@@ -274,8 +193,8 @@ export const updateFeeGroup = wrapAsync(async (req, res, next) => {
                 .json(new ApiResponse(404, null, "Fee group not found."));
         }
 
-        await Class.findByIdAndUpdate(
-            updatedFeeGroup.class,
+        await Class.updateMany(
+            { _id: updatedFeeGroup.class },
             { feeGroup: updatedFeeGroup._id },
             { new: true }
         );
@@ -310,7 +229,7 @@ export const deleteFeeGroup = wrapAsync(async (req, res, next) => {
     if (!deletedFeeGroups.deletedCount) {
         return res
             .status(404)
-            .json(new ApiResponse(404,null, "Fee groups not found."));
+            .json(new ApiResponse(404, null, "Fee groups not found."));
     }
 
     return res
@@ -339,13 +258,15 @@ export const getFeeGroupById = wrapAsync(async (req, res, next) => {
 
     return res
         .status(200)
-        .json(new ApiResponse(200, null, "Fee group fetched.", feeGroup));
+        .json(new ApiResponse(200, feeGroup, "Fee group fetched."));
 });
 
 const manageInstallmentForClass = async (classId, installment, dueDate) => {
     let feeGroup = await FeeGroup.findOne({ class: classId });
     if (!feeGroup) {
-        throw new ApiError(404, "No fee group found for the specified class.");
+        res.status(404).json(
+            new ApiResponse(404, null, "Fee group not found.")
+        );
     }
 
     const existingInstallment = feeGroup.installmentDates.find(
@@ -353,7 +274,15 @@ const manageInstallmentForClass = async (classId, installment, dueDate) => {
     );
 
     if (existingInstallment) {
-        throw new ApiError(400, "Installment already exists for this class.");
+        return res
+            .status(400)
+            .json(
+                new ApiResponse(
+                    400,
+                    null,
+                    "Installment already exists for this class."
+                )
+            );
     } else {
         feeGroup.installmentDates.push({ month: installment, dueDate });
     }
@@ -517,7 +446,9 @@ export const updateInstallment = wrapAsync(async (req, res, next) => {
     if (!month || !dueDate) {
         return res
             .status(400)
-            .json(new ApiResponse(400,null, "Month and due date are required."));
+            .json(
+                new ApiResponse(400, null, "Month and due date are required.")
+            );
     }
 
     try {
@@ -629,12 +560,10 @@ export const getInstallments = wrapAsync(async (req, res, next) => {
 export const getInstallmentById = wrapAsync(async (req, res, next) => {
     const { installmentId } = req.params;
 
-    // Fetch all fee groups and populate the class
     const feeGroups = await FeeGroup.find().populate("class");
 
     let foundInstallment = null;
 
-    // Iterate through each fee group to find the installment
     for (const group of feeGroups) {
         const installment = group.installmentDates.find(
             (inst) => inst._id.toString() === installmentId
