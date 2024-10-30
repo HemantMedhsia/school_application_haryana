@@ -6,7 +6,7 @@ import {
   Navigate,
   createRoutesFromElements,
 } from "react-router-dom";
-import MobileWarning from "./MobileWarning"; // Import MobileWarning component
+import MobileWarning from "./pages/Mobile/MobileWarning.jsx"; // Import MobileWarning component
 import Layout from "./layouts/Layout.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import Testing from "./pages/Testing.jsx";
