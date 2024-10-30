@@ -113,7 +113,7 @@ const LoginForm = ({
 
                 {/* Terms of Service and Privacy Policy */}
                 <p className="mt-6 text-xs text-gray-100 text-center">
-                  I agree to abide by Cartesian Kinetics{" "}
+                  I agree to abide by Aradhya Technologies{" "}
                   <a
                     href="#"
                     className="border-b border-gray-500 border-dotted"
