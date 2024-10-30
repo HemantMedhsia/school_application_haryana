@@ -36,7 +36,7 @@ import { studentFeesRouter } from "./Routes/studentFees.Route.js";
 const app = express();
 
 const whitelist = [
-    "https://school-application-haryana.vercel.app/",
+    "https:\/\/school-application-haryana.vercel.app/",
     /^http:\/\/192\.168\.\d{1,3}\.\d{1,3}:5174$/,
 ];
 
