@@ -10,6 +10,7 @@ import { studentValidationSchema } from "../Validation/student.Validation.js";
 import { StudentHistory } from "../Models/studentHistory.Model.js";
 import jwt from "jsonwebtoken";
 import { StudentAttendance } from "../Models/studentAttendence.Model.js";
+import { assignFeeGroupToNewStudents } from "../Models/student.model.js";
 
 const generateAccessAndRefreshTokens = async (studentId, next) => {
     const student = await Student.findById(studentId);
@@ -61,6 +62,9 @@ export const createStudent = wrapAsync(async (req, res) => {
         { studentId: studentData._id },
         { new: true }
     );
+
+    await assignFeeGroupToNewStudents(student);
+
     return res
         .status(201)
         .json(new ApiResponse(201, student, "Student Created Successfully"));

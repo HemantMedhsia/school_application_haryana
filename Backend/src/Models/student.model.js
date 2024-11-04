@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import { StudentAttendance } from "./studentAttendence.Model.js";
+import { FeeGroup } from "./feeGroup.Model.js";
 
 const studentSchema = new mongoose.Schema({
     admissionNo: {
@@ -195,3 +196,25 @@ studentSchema.methods.getAttendanceStats = async function () {
 };
 
 export const Student = mongoose.model("Student", studentSchema);
+
+export const assignFeeGroupToNewStudents = async (newStudent) => {
+    const feeGroup = await FeeGroup.findOne({ class: newStudent.currentClass });
+    if (feeGroup) {
+        const dueAmount =
+            feeGroup.fees.tuitionFee +
+            feeGroup.fees.admissionFee +
+            feeGroup.fees.annualFee +
+            feeGroup.fees.otherFee;
+
+        const studentFee = await StudentFee.create({
+            student: newStudent._id,
+            class: newStudent.currentClass,
+            feeGroup: feeGroup._id,
+            dueAmount: dueAmount,
+        });
+
+        newStudent.studentFees.push(studentFee._id);
+        newStudent.feeGroup = feeGroup._id;
+        await newStudent.save();
+    }
+};

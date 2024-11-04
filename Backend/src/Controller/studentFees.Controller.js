@@ -479,10 +479,10 @@ export const getAllStudentFeeDetails = wrapAsync(async (req, res) => {
 
 export const getStudentBillPerMonth = wrapAsync(async (req, res) => {
     const { date, class: classId } = req.body;
-
     const logoUrl =
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMzmcQPKs-mQ9YsDLBGutKI2ZmFaMqpiNidw&s";
 
+    // Validate request body
     if (!date || !classId) {
         return res
             .status(400)
@@ -518,9 +518,7 @@ export const getStudentBillPerMonth = wrapAsync(async (req, res) => {
     const responseData = [];
 
     for (const student of students) {
-        const feeRecord = await StudentFee.findOne({
-            student: student._id,
-        });
+        const feeRecord = await StudentFee.findOne({ student: student._id });
 
         let totalDiscountAmount = 0;
         let tuitionFeeDueAmount = 0;
@@ -531,7 +529,9 @@ export const getStudentBillPerMonth = wrapAsync(async (req, res) => {
         let totalDueAmount = 0;
 
         const feeGroupId = feeRecord ? feeRecord.feeGroup : student.feeGroup;
-        const feeGroup = await FeeGroup.findById(feeGroupId);
+        const feeGroup = feeGroupId
+            ? await FeeGroup.findById(feeGroupId)
+            : null;
 
         if (feeGroup) {
             const fees = feeGroup.fees || {};
@@ -543,12 +543,10 @@ export const getStudentBillPerMonth = wrapAsync(async (req, res) => {
 
             const totalOtherFeesAmount =
                 admissionFeeAmount + annualFeeAmount + otherFeeAmount;
-
             const monthsPassed = month + 1;
             tuitionFeeDueAmount = (tuitionFeeAmount / 12) * monthsPassed;
 
             otherFeesDueAmount = totalOtherFeesAmount;
-
             totalFees = tuitionFeeAmount + totalOtherFeesAmount;
 
             if (feeRecord) {
@@ -604,7 +602,8 @@ export const getStudentBillPerMonth = wrapAsync(async (req, res) => {
 
             const qrCodeContent = {
                 studentName: student.firstName,
-                dueAmount: totalDueAmount,
+                amount: totalDueAmount > 0 ? totalDueAmount : advancePayment,
+                type: totalDueAmount > 0 ? "Due Amount" : "Advance Payment",
             };
             let qrCode = "";
             try {
@@ -614,35 +613,45 @@ export const getStudentBillPerMonth = wrapAsync(async (req, res) => {
                 qrCode = "Error generating QR code";
             }
 
-            responseData.push({
+            const studentBill = {
+                schoolLogo: logoUrl,
                 schoolName: "Vardhan International School",
                 contactNumber: "+1-234-567-890",
-                logoUrl: logoUrl,
                 month: monthName,
                 studentName: student.firstName,
                 fatherName: student.parent ? student.parent.fatherName : "N/A",
                 phoneNumber: student.mobileNumber || "N/A",
                 className: classDetails.name,
                 admissionNumber: student.admissionNo,
-                tuitionFeeDueAmount: tuitionFeeDueAmount.toFixed(2),
-                otherFeesDueAmount: otherFeesDueAmount.toFixed(2),
-                totalDueAmount: totalDueAmount.toFixed(2),
-                advancePayment: advancePayment.toFixed(2),
+                totalFees: totalFees.toFixed(2),
                 totalPaidAmount: totalPaidAmount.toFixed(2),
                 totalDiscountAmount: totalDiscountAmount.toFixed(2),
-                totalFees: totalFees.toFixed(2),
                 qrCode: qrCode,
-            });
+            };
+
+            if (totalDueAmount > 0) {
+                studentBill.dueAmount = totalDueAmount.toFixed(2);
+            } else if (advancePayment > 0) {
+                studentBill.advancePayment = advancePayment.toFixed(2);
+            } else {
+                studentBill.dueAmount = "0.00";
+            }
+
+            responseData.push(studentBill);
         } else {
-            return res
-                .status(404)
-                .json(
-                    new ApiResponse(
-                        404,
-                        null,
-                        "Fee group not found for student."
-                    )
-                );
+            console.log(`Fee group not found for student: ${student._id}`);
+            responseData.push({
+                schoolLogo: logoUrl,
+                schoolName: "Vardhan International School",
+                contactNumber: "+1-234-567-890",
+                month: monthName,
+                studentName: student.firstName,
+                fatherName: student.parent ? student.parent.fatherName : "N/A",
+                phoneNumber: student.mobileNumber || "N/A",
+                className: classDetails.name,
+                admissionNumber: student.admissionNo,
+                message: "Fee group not found for this student",
+            });
         }
     }
 
@@ -753,6 +762,7 @@ export const getStudentAndSiblingFeeSummary = wrapAsync(async (req, res) => {
     const feeAfterDiscount = totalFees - totalDiscount;
 
     const combinedSummary = {
+        siblingGroupId: siblingGroup ? siblingGroup._id : null,
         totalFees,
         totalPaid,
         dueFeesTillToday,
@@ -773,28 +783,77 @@ export const getStudentAndSiblingFeeSummary = wrapAsync(async (req, res) => {
     );
 });
 
+export const payAllSiblingStudentFees = wrapAsync(async (req, res) => {
+    const { siblingId, feeDetails, paymentDate, paymentMode, remarks } =
+        req.body;
+    let totalPayingAmount = 0;
 
-export const payAllSiblingFees = wrapAsync(async (req, res) => {
-    const { studentId } = req.body;
-
-    const siblingGroup = await SiblingGroup.findOne({   students: studentId }).populate("students");
-
-    if (!siblingGroup) {
-        return res.status(404).json(new ApiResponse(404, null, "No sibling group found for the student."));
+    const siblingGroup = await SiblingGroup.findById(siblingId).populate(
+        "students"
+    );
+    if (!siblingGroup || siblingGroup.students.length === 0) {
+        return res
+            .status(404)
+            .json({ message: "No students found for the given sibling ID" });
     }
 
-    const studentIds = siblingGroup.students.map((student) => student._id);
-
-    const fees = await StudentFee.find({ student: { $in: studentIds } });
-
-    const totalFees = fees.reduce((sum, fee) => sum + fee.dueAmount, 0);
-
-    if (totalFees <= 0) {
-        return res.status(400).json(new ApiResponse(400, null, "No fees due for the siblings."));
+    const studentFees = await StudentFee.find({
+        student: { $in: siblingGroup.students.map((s) => s._id) },
+    });
+    if (!studentFees || studentFees.length === 0) {
+        return res
+            .status(404)
+            .json({ message: "No fee records found for the given sibling ID" });
     }
-    
 
+    let totalOutstanding = 0;
+    studentFees.forEach((studentFee) => {
+        totalOutstanding += studentFee.dueAmount;
+    });
 
+    feeDetails.forEach((fee) => {
+        totalPayingAmount += fee.amountPaying - fee.discountAmount;
+    });
 
+    if (totalPayingAmount > totalOutstanding) {
+        return res.status(400).json({
+            message:
+                "Paying amount exceeds the total outstanding balance for all siblings",
+        });
+    }
 
+    let remainingPayment = totalPayingAmount;
+    for (const studentFee of studentFees) {
+        if (remainingPayment <= 0) break;
+
+        const payableAmount = Math.min(studentFee.dueAmount, remainingPayment);
+        studentFee.dueAmount -= payableAmount;
+        studentFee.totalPaidAmount += payableAmount;
+        remainingPayment -= payableAmount;
+
+        feeDetails.forEach((fee) => {
+            if (
+                [
+                    "Admission Fee",
+                    "Tuition Fee",
+                    "Other Fee",
+                    "Annual Fee",
+                ].includes(fee.feeHeader)
+            ) {
+                studentFee.paymentHistory.push({
+                    paymentDate,
+                    feeHeader: fee.feeHeader,
+                    amount: Math.min(fee.amountPaying, payableAmount),
+                    receiptNumber: generateReceiptNumber(),
+                    paymentMode,
+                });
+            }
+        });
+
+        await studentFee.save();
+    }
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, null, "Payment successful"));
 });
