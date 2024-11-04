@@ -119,9 +119,9 @@ const TopNavbar = ({ isCollapsed }) => {
 
             {/* User Section */}
             <div className="absolute w-full inset-y-0 right-0 flex justify-end items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-              <div className="mr-4">
+              {/* <div className="mr-4">
                 <DarkModeToggle />
-              </div>
+              </div> */}
               <div className="flex flex-col justify-end items-center">
                 <div className="w-full text-sm text-gray-400">
                   {name ? name : "You login as Guest"}

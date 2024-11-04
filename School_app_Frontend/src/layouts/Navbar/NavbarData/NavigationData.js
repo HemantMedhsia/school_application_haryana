@@ -383,6 +383,12 @@ export const navigation = [
         icon: FaUser,
         roles: ["Admin"],
       },
+      {
+        name: "Monthly Fees Payment",
+        to: "/school/monthly-fees-payment",
+        icon: FaUser,
+        roles: ["Admin"],
+      },
     ],
   },
   {
