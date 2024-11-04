@@ -477,12 +477,267 @@ export const getAllStudentFeeDetails = wrapAsync(async (req, res) => {
         );
 });
 
+// export const getStudentBillPerMonth = wrapAsync(async (req, res) => {
+//     const { date, class: classId } = req.body;
+//     const logoUrl =
+//         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSuOUJHCmNi_yfKjQhv0ZE5K8tCFuKuo-NS-A&s";
+
+//     if (!date || !classId) {
+//         return res
+//             .status(400)
+//             .json(new ApiResponse(400, "Date and class are required."));
+//     }
+
+//     const providedDate = new Date(date);
+
+//     if (isNaN(providedDate)) {
+//         return res
+//             .status(400)
+//             .json(new ApiResponse(400, "Invalid date format."));
+//     }
+
+//     // Define fiscal year start month (April)
+//     const fiscalYearStartMonth = 3; // 0-based index (0 = January, 3 = April)
+
+//     // Determine fiscal year based on providedDate
+//     let fiscalYear;
+//     if (providedDate.getMonth() >= fiscalYearStartMonth) {
+//         fiscalYear = providedDate.getFullYear();
+//     } else {
+//         fiscalYear = providedDate.getFullYear() - 1;
+//     }
+
+//     // Adjusted Month Numbering: April (3) = 1, May (4) = 2, ..., March (2) = 12
+//     const adjustedMonth = getAdjustedMonth(providedDate.getMonth());
+
+//     const year = providedDate.getFullYear();
+//     const monthName = providedDate.toLocaleString("default", { month: "long" });
+
+//     const classDetails = await Class.findById(classId);
+//     if (!classDetails) {
+//         return res.status(404).json(new ApiResponse(404, "Class not found."));
+//     }
+
+//     const students = await Student.find({ currentClass: classId }).populate(
+//         "parent"
+//     );
+//     if (!students.length) {
+//         return res
+//             .status(404)
+//             .json(new ApiResponse(404, "No students found for this class."));
+//     }
+
+//     // Pre-fetch all FeeGroups to optimize database queries
+//     const feeGroupIds = students
+//         .map((student) => student.feeGroup)
+//         .filter((id) => id);
+//     const uniqueFeeGroupIds = [
+//         ...new Set(feeGroupIds.map((id) => id.toString())),
+//     ];
+//     const feeGroups = await FeeGroup.find({ _id: { $in: uniqueFeeGroupIds } });
+//     const feeGroupMap = feeGroups.reduce((map, fg) => {
+//         map[fg._id.toString()] = fg;
+//         return map;
+//     }, {});
+
+//     const responseData = [];
+
+//     for (const student of students) {
+//         const feeRecord = await StudentFee.findOne({ student: student._id });
+
+//         let totalDiscountAmount = 0;
+//         let tuitionFeeDueAmount = 0;
+//         let otherFeesDueAmount = 0;
+//         let totalPaidAmount = 0;
+//         let advancePayment = 0;
+//         let totalFees = 0;
+//         let totalDueAmount = 0;
+
+//         const feeGroupId = feeRecord ? feeRecord.feeGroup : student.feeGroup;
+//         const feeGroup = feeGroupId ? feeGroupMap[feeGroupId.toString()] : null;
+
+//         if (feeGroup) {
+//             const fees = feeGroup.fees || {};
+
+//             const tuitionFeeAmount = fees.tuitionFee || 0;
+//             const admissionFeeAmount = fees.admissionFee || 0;
+//             const annualFeeAmount = fees.annualFee || 0;
+//             const otherFeeAmount = fees.otherFee || 0;
+
+//             const totalOtherFeesAmount =
+//                 admissionFeeAmount + annualFeeAmount + otherFeeAmount;
+//             const monthsPassed = adjustedMonth; // Using adjusted month numbering
+//             tuitionFeeDueAmount = (tuitionFeeAmount / 12) * monthsPassed;
+
+//             console.log("Tuition Fee Due Amount: ", tuitionFeeDueAmount);
+
+//             otherFeesDueAmount = totalOtherFeesAmount;
+//             totalFees = tuitionFeeAmount + totalOtherFeesAmount;
+
+//             console.log("Other Fees Due Amount: ", otherFeesDueAmount);
+
+//             if (feeRecord) {
+//                 // Calculate total discounts
+//                 totalDiscountAmount = feeRecord.discountHistory.reduce(
+//                     (sum, discount) => sum + discount.discountAmount,
+//                     0
+//                 );
+
+//                 console.log("Total Discount Amount: ", totalDiscountAmount);
+
+//                 // Calculate total paid amount up to the billing date
+//                 const paymentsUpToDate = feeRecord.paymentHistory.filter(
+//                     (payment) => {
+//                         const paymentDate = new Date(payment.paymentDate);
+//                         return paymentDate <= providedDate;
+//                     }
+//                 );
+
+//                 console.log("Payments Up To Date: ", paymentsUpToDate);
+
+//                 totalPaidAmount = paymentsUpToDate.reduce(
+//                     (sum, payment) => sum + payment.amount,
+//                     0
+//                 );
+
+//                 console.log("Total Paid Amount: ", totalPaidAmount);
+
+//                 // Calculate paid other fees up to the billing date
+//                 const paidOtherFeesAmount = paymentsUpToDate
+//                     .filter((payment) => payment.feeHeader !== "Tuition Fee")
+//                     .reduce((sum, payment) => sum + payment.amount, 0);
+
+//                 otherFeesDueAmount = Math.max(
+//                     0,
+//                     otherFeesDueAmount - paidOtherFeesAmount
+//                 );
+
+//                 console.log("paidOtherFeesAmount: ", paidOtherFeesAmount);
+
+//                 // Calculate paid tuition fees up to the billing date
+//                 const paidTuitionFeesAmount = paymentsUpToDate
+//                     .filter((payment) => payment.feeHeader === "Tuition Fee")
+//                     .reduce((sum, payment) => sum + payment.amount, 0);
+
+//                 tuitionFeeDueAmount = Math.max(
+//                     0,
+//                     tuitionFeeDueAmount - paidTuitionFeesAmount
+//                 );
+
+//                 console.log("paidTuitionFeesAmount: ", paidTuitionFeesAmount);
+
+//                 totalDueAmount =
+//                     tuitionFeeDueAmount +
+//                     otherFeesDueAmount -
+//                     totalDiscountAmount;
+
+//                     console.log("Total Due Amount: ", totalDueAmount);
+
+//                 if (totalDueAmount < 0) {
+//                     // Calculate advance payments only for amounts paid after the billing date
+//                     const paymentsAfterDate = feeRecord.paymentHistory.filter(
+//                         (payment) => {
+//                             const paymentDate = new Date(payment.paymentDate);
+//                             return paymentDate > providedDate;
+//                         }
+//                     );
+
+//                     const advanceFromFuturePayments = paymentsAfterDate.reduce(
+//                         (sum, payment) => sum + payment.amount,
+//                         0
+//                     );
+//                     advancePayment = Math.max(
+//                         0,
+//                         -totalDueAmount + advanceFromFuturePayments
+//                     );
+//                     totalDueAmount = 0;
+//                 }
+//             } else {
+//                 // No feeRecord, so total due is based on fees up to the billing date minus any discounts
+//                 totalDueAmount =
+//                     tuitionFeeDueAmount +
+//                     otherFeesDueAmount -
+//                     totalDiscountAmount;
+//             }
+
+//             // Prepare QR Code content
+//             const qrCodeContent = {
+//                 studentName: student.firstName,
+//                 amount: totalDueAmount > 0 ? totalDueAmount : advancePayment,
+//                 type: totalDueAmount > 0 ? "Due Amount" : "Advance Payment",
+//             };
+//             let qrCode = "";
+//             try {
+//                 qrCode = await QRCode.toDataURL(JSON.stringify(qrCodeContent));
+//             } catch (error) {
+//                 console.error("QR Code Generation Error: ", error);
+//                 qrCode = "Error generating QR code";
+//             }
+
+//             // Construct student bill data with dueAmount/advancePayment above QR code
+//             const studentBill = {
+//                 schoolLogo: logoUrl,
+//                 schoolName: "Vardhan International School",
+//                 contactNumber: "+1-234-567-890",
+//                 month: monthName,
+//                 studentName: student.firstName,
+//                 fatherName: student.parent ? student.parent.fatherName : "N/A",
+//                 phoneNumber: student.mobileNumber || "N/A",
+//                 className: classDetails.name,
+//                 admissionNumber: student.admissionNo,
+//                 totalFees: totalFees.toFixed(2),
+//                 totalPaidAmount: totalPaidAmount.toFixed(2),
+//                 totalDiscountAmount: totalDiscountAmount.toFixed(2),
+//             };
+
+//             // Add dueAmount or advancePayment before QR code
+//             if (totalDueAmount > 0) {
+//                 studentBill.dueAmount = totalDueAmount.toFixed(2);
+//             } else if (advancePayment > 0) {
+//                 studentBill.advancePayment = advancePayment.toFixed(2);
+//             }
+
+//             studentBill.qrCode = qrCode;
+
+//             responseData.push(studentBill);
+//         } else {
+//             console.log(`Fee group not found for student: ${student._id}`);
+//             responseData.push({
+//                 schoolLogo: logoUrl,
+//                 schoolName: "Vardhan International School",
+//                 contactNumber: "+1-234-567-890",
+//                 month: monthName,
+//                 studentName: student.firstName,
+//                 fatherName: student.parent ? student.parent.fatherName : "N/A",
+//                 phoneNumber: student.mobileNumber || "N/A",
+//                 className: classDetails.name,
+//                 admissionNumber: student.admissionNo,
+//                 message: "Fee group not found for this student",
+//             });
+//         }
+//     }
+
+//     return res
+//         .status(200)
+//         .json(
+//             new ApiResponse(
+//                 200,
+//                 responseData,
+//                 "Student bill per month retrieved successfully."
+//             )
+//         );
+// });
+
+// function getAdjustedMonth(month) {
+//     const adjusted = month - 3 + 1;
+//     return adjusted > 0 ? adjusted : adjusted + 12;
+// }
+
 export const getStudentBillPerMonth = wrapAsync(async (req, res) => {
     const { date, class: classId } = req.body;
     const logoUrl =
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMzmcQPKs-mQ9YsDLBGutKI2ZmFaMqpiNidw&s";
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSuOUJHCmNi_yfKjQhv0ZE5K8tCFuKuo-NS-A&s";
 
-    // Validate request body
     if (!date || !classId) {
         return res
             .status(400)
@@ -497,8 +752,20 @@ export const getStudentBillPerMonth = wrapAsync(async (req, res) => {
             .json(new ApiResponse(400, "Invalid date format."));
     }
 
-    const month = providedDate.getMonth();
-    const year = providedDate.getFullYear();
+    // Define fiscal year start month (April)
+    const fiscalYearStartMonth = 3; // 0-based index (0 = January, 3 = April)
+
+    // Determine fiscal year based on providedDate
+    let fiscalYear;
+    if (providedDate.getMonth() >= fiscalYearStartMonth) {
+        fiscalYear = providedDate.getFullYear();
+    } else {
+        fiscalYear = providedDate.getFullYear() - 1;
+    }
+
+    // Adjusted Month Numbering: April (3) = 1, May (4) = 2, ..., March (2) = 12
+    const adjustedMonth = getAdjustedMonth(providedDate.getMonth());
+
     const monthName = providedDate.toLocaleString("default", { month: "long" });
 
     const classDetails = await Class.findById(classId);
@@ -515,23 +782,32 @@ export const getStudentBillPerMonth = wrapAsync(async (req, res) => {
             .json(new ApiResponse(404, "No students found for this class."));
     }
 
+    // Pre-fetch all FeeGroups to optimize database queries
+    const feeGroupIds = students
+        .map((student) => student.feeGroup)
+        .filter((id) => id);
+    const uniqueFeeGroupIds = [
+        ...new Set(feeGroupIds.map((id) => id.toString())),
+    ];
+    const feeGroups = await FeeGroup.find({ _id: { $in: uniqueFeeGroupIds } });
+    const feeGroupMap = feeGroups.reduce((map, fg) => {
+        map[fg._id.toString()] = fg;
+        return map;
+    }, {});
+
     const responseData = [];
 
     for (const student of students) {
         const feeRecord = await StudentFee.findOne({ student: student._id });
 
         let totalDiscountAmount = 0;
-        let tuitionFeeDueAmount = 0;
-        let otherFeesDueAmount = 0;
+        let totalFees = 0;
         let totalPaidAmount = 0;
         let advancePayment = 0;
-        let totalFees = 0;
-        let totalDueAmount = 0;
+        let dueAmount = 0;
 
         const feeGroupId = feeRecord ? feeRecord.feeGroup : student.feeGroup;
-        const feeGroup = feeGroupId
-            ? await FeeGroup.findById(feeGroupId)
-            : null;
+        const feeGroup = feeGroupId ? feeGroupMap[feeGroupId.toString()] : null;
 
         if (feeGroup) {
             const fees = feeGroup.fees || {};
@@ -543,67 +819,103 @@ export const getStudentBillPerMonth = wrapAsync(async (req, res) => {
 
             const totalOtherFeesAmount =
                 admissionFeeAmount + annualFeeAmount + otherFeeAmount;
-            const monthsPassed = month + 1;
-            tuitionFeeDueAmount = (tuitionFeeAmount / 12) * monthsPassed;
 
-            otherFeesDueAmount = totalOtherFeesAmount;
+            const monthsPassed = adjustedMonth; // Using adjusted month numbering
+            const tuitionFeeDueAmount = (tuitionFeeAmount / 12) * monthsPassed;
+
+            // Calculate totalFeesDueUpToDate
+            // Include non-recurring fees only in the first month
+            const isFirstMonth = monthsPassed === 1;
+            const nonRecurringFeesDue = isFirstMonth ? totalOtherFeesAmount : 0;
+            const totalFeesDueUpToDate =
+                tuitionFeeDueAmount + nonRecurringFeesDue - totalDiscountAmount;
+
             totalFees = tuitionFeeAmount + totalOtherFeesAmount;
 
             if (feeRecord) {
-                totalDiscountAmount = feeRecord.discountHistory.reduce(
+                // Calculate total discounts up to the billing date
+                const discountsUpToDate = feeRecord.discountHistory.filter(
+                    (discount) => {
+                        const discountDate = new Date(discount.date);
+                        return discountDate.getTime() <= providedDate.getTime();
+                    }
+                );
+
+                totalDiscountAmount = discountsUpToDate.reduce(
                     (sum, discount) => sum + discount.discountAmount,
                     0
                 );
 
-                totalPaidAmount = feeRecord.paymentHistory.reduce(
-                    (sum, payment) => sum + payment.amount,
-                    0
-                );
-
-                const paidOtherFeesAmount = feeRecord.paymentHistory
-                    .filter((payment) => payment.feeHeader !== "Tuition Fee")
-                    .reduce((sum, payment) => sum + payment.amount, 0);
-
-                otherFeesDueAmount = Math.max(
-                    0,
-                    otherFeesDueAmount - paidOtherFeesAmount
-                );
-
-                const paidTuitionFeesAmount = feeRecord.paymentHistory
-                    .filter((payment) => {
+                // Calculate all payments made up to the billing date
+                const paymentsUpToDate = feeRecord.paymentHistory.filter(
+                    (payment) => {
                         const paymentDate = new Date(payment.paymentDate);
-                        return (
-                            payment.feeHeader === "Tuition Fee" &&
-                            paymentDate <= providedDate
-                        );
-                    })
-                    .reduce((sum, payment) => sum + payment.amount, 0);
-
-                tuitionFeeDueAmount = Math.max(
-                    0,
-                    tuitionFeeDueAmount - paidTuitionFeesAmount
+                        return paymentDate.getTime() <= providedDate.getTime();
+                    }
                 );
 
-                totalDueAmount =
-                    tuitionFeeDueAmount +
-                    otherFeesDueAmount -
-                    totalDiscountAmount;
+                // Sort payments by date ascending
+                paymentsUpToDate.sort(
+                    (a, b) => new Date(a.paymentDate) - new Date(b.paymentDate)
+                );
 
-                if (totalDueAmount < 0) {
-                    advancePayment = -totalDueAmount;
-                    totalDueAmount = 0;
+                // Initialize totalPaidAmount and remainingFees
+                totalPaidAmount = 0;
+                let remainingTuitionFee = tuitionFeeDueAmount;
+                let remainingOtherFees = nonRecurringFeesDue; // Adjusted here
+
+                // Allocate payments to fees
+                for (const payment of paymentsUpToDate) {
+                    let paymentAmount = payment.amount;
+
+                    // Allocate to tuition fee first
+                    if (remainingTuitionFee > 0) {
+                        const allocatedTuition = Math.min(
+                            paymentAmount,
+                            remainingTuitionFee
+                        );
+                        remainingTuitionFee -= allocatedTuition;
+                        paymentAmount -= allocatedTuition;
+                        totalPaidAmount += allocatedTuition;
+                    }
+
+                    // Allocate remaining to other fees
+                    if (paymentAmount > 0 && remainingOtherFees > 0) {
+                        const allocatedOther = Math.min(
+                            paymentAmount,
+                            remainingOtherFees
+                        );
+                        remainingOtherFees -= allocatedOther;
+                        paymentAmount -= allocatedOther;
+                        totalPaidAmount += allocatedOther;
+                    }
+
+                    // Any remaining paymentAmount is considered as advance
+                    if (paymentAmount > 0) {
+                        advancePayment += paymentAmount;
+                        totalPaidAmount += paymentAmount;
+                    }
                 }
+
+                // Calculate net balance
+                const netBalance = totalPaidAmount - totalFeesDueUpToDate;
+
+                if (netBalance < 0) {
+                    dueAmount = (-netBalance).toFixed(2);
+                } else if (netBalance > 0) {
+                    advancePayment = netBalance.toFixed(2);
+                }
+                // If netBalance == 0, no due or advance
             } else {
-                totalDueAmount =
-                    tuitionFeeDueAmount +
-                    otherFeesDueAmount -
-                    totalDiscountAmount;
+                // No feeRecord, so total due is based on fees up to the billing date minus any discounts
+                dueAmount = totalFeesDueUpToDate.toFixed(2);
             }
 
+            // Prepare QR Code content
             const qrCodeContent = {
                 studentName: student.firstName,
-                amount: totalDueAmount > 0 ? totalDueAmount : advancePayment,
-                type: totalDueAmount > 0 ? "Due Amount" : "Advance Payment",
+                amount: dueAmount > 0 ? dueAmount : advancePayment,
+                type: dueAmount > 0 ? "Due Amount" : "Advance Payment",
             };
             let qrCode = "";
             try {
@@ -613,6 +925,7 @@ export const getStudentBillPerMonth = wrapAsync(async (req, res) => {
                 qrCode = "Error generating QR code";
             }
 
+            // Construct student bill data with dueAmount/advancePayment above QR code
             const studentBill = {
                 schoolLogo: logoUrl,
                 schoolName: "Vardhan International School",
@@ -626,16 +939,16 @@ export const getStudentBillPerMonth = wrapAsync(async (req, res) => {
                 totalFees: totalFees.toFixed(2),
                 totalPaidAmount: totalPaidAmount.toFixed(2),
                 totalDiscountAmount: totalDiscountAmount.toFixed(2),
-                qrCode: qrCode,
             };
 
-            if (totalDueAmount > 0) {
-                studentBill.dueAmount = totalDueAmount.toFixed(2);
+            // Add dueAmount or advancePayment before QR code
+            if (dueAmount > 0) {
+                studentBill.dueAmount = dueAmount;
             } else if (advancePayment > 0) {
-                studentBill.advancePayment = advancePayment.toFixed(2);
-            } else {
-                studentBill.dueAmount = "0.00";
+                studentBill.advancePayment = advancePayment;
             }
+
+            studentBill.qrCode = qrCode;
 
             responseData.push(studentBill);
         } else {
@@ -665,6 +978,11 @@ export const getStudentBillPerMonth = wrapAsync(async (req, res) => {
             )
         );
 });
+
+function getAdjustedMonth(month) {
+    const adjusted = month - 3 + 1;
+    return adjusted > 0 ? adjusted : adjusted + 12;
+}
 
 export const getStudentAndSiblingFeeSummary = wrapAsync(async (req, res) => {
     const { studentId } = req.params;
