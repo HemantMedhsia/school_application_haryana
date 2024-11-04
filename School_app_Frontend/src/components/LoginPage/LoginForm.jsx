@@ -19,36 +19,36 @@ const LoginForm = ({
       <img
         src={loginImg1}
         alt="Background"
-        className="absolute inset-0 w-full h-screen object-cover opacity-50"
+        className="absolute inset-0 w-full h-full object-cover opacity-50"
       />
 
-      {/* Watermark Logo - Centered */}
+      {/* Watermark Logo - Full Screen */}
       <img
         src={aradhyaFullLogo}
         alt="Watermark Logo"
-        className="absolute inset-0 w-auto object-contain opacity-30 mx-auto my-auto pointer-events-none"
+        className="absolute w-full h-[150%] opacity-20 mx-auto pointer-events-none"
         style={{
-          top: "100%",
+          top: "50%",
           left: "50%",
-          transform: "translate(-50%, -35%)", // Centering the watermark
+          transform: "translate(-50%, -50%)", // Centering the watermark
         }}
       />
 
       <div
-        className="w-1/2 h-auto m-0 sm:m-10 shadow sm:rounded-lg flex justify-center z-10"
+        className="w-11/12 md:w-3/4 lg:w-1/2 h-auto m-5 md:m-10 shadow sm:rounded-lg flex justify-center z-10"
         style={{ backgroundColor: "rgba(0, 0, 0, 0.35)" }}
       >
-        <div className="w-full sm:p-12">
+        <div className="w-full p-6 sm:p-12">
           {/* Logo Section - Top Left */}
-          <div className="absolute top-0 left-0 flex justify-start">
-            <img src={aradhyaFullLogo} className="w-40 h-auto" alt="Logo" />
+          <div className="absolute top-4 left-4 flex justify-start">
+            <img src={aradhyaFullLogo} className="w-20 md:w-40 h-auto" alt="Logo" />
           </div>
           <div className="flex flex-col items-center">
             <div className="w-full flex-1 mt-8">
               <form className="mx-auto max-w-xs" onSubmit={handleLogin}>
                 {/* Email Input */}
                 <input
-                  className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
+                  className="w-full px-4 py-3 md:px-8 md:py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                   type="email"
                   placeholder="Email"
                   value={email}
@@ -57,7 +57,7 @@ const LoginForm = ({
                 />
                 {/* Password Input */}
                 <input
-                  className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                  className="w-full px-4 py-3 md:px-8 md:py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
                   type="password"
                   placeholder="Password"
                   value={password}
@@ -70,7 +70,7 @@ const LoginForm = ({
                   <select
                     value={role}
                     onChange={(e) => setRole(e.target.value)}
-                    className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
+                    className="w-full px-4 py-3 md:px-8 md:py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                     required
                   >
                     <option value="" disabled>
@@ -86,10 +86,10 @@ const LoginForm = ({
                 {/* Sign In Button */}
                 <button
                   type="submit"
-                  className="mt-5 tracking-wide font-semibold bg-green-400 text-white w-full py-4 rounded-lg hover:bg-green-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
+                  className="mt-5 tracking-wide font-semibold bg-green-400 text-white w-full py-3 md:py-4 rounded-lg hover:bg-green-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
                 >
                   <svg
-                    className="w-6 h-6 -ml-2"
+                    className="w-5 h-5 md:w-6 md:h-6 -ml-2"
                     fill="none"
                     stroke="currentColor"
                     strokeWidth="2"
@@ -113,7 +113,7 @@ const LoginForm = ({
 
                 {/* Terms of Service and Privacy Policy */}
                 <p className="mt-6 text-xs text-gray-100 text-center">
-                  I agree to abide by Cartesian Kinetics{" "}
+                  I agree to abide by Aradhya Technologies{" "}
                   <a
                     href="#"
                     className="border-b border-gray-500 border-dotted"
