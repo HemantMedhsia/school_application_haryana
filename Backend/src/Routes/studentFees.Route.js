@@ -6,7 +6,7 @@ import {
     getStudentAndSiblingFeeSummary,
     getStudentBillPerMonth,
     getStudentFeeDetails,
-    payAllSiblingFees,
+    payAllSiblingStudentFees,
 } from "../Controller/studentFees.Controller.js";
 
 const router = express.Router();
@@ -21,6 +21,6 @@ router.get(
     getStudentAndSiblingFeeSummary
 );
 
-router.post("/siblings-fees", payAllSiblingFees);
+router.post("/siblings-fees", payAllSiblingStudentFees);
 
 export { router as studentFeesRouter };
