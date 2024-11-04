@@ -773,28 +773,77 @@ export const getStudentAndSiblingFeeSummary = wrapAsync(async (req, res) => {
     );
 });
 
-
 export const payAllSiblingFees = wrapAsync(async (req, res) => {
-    const { studentId } = req.body;
+    const { siblingId, feeDetails, paymentDate, paymentMode, remarks } =
+        req.body;
+    let totalPayingAmount = 0;
 
-    const siblingGroup = await SiblingGroup.findOne({   students: studentId }).populate("students");
-
-    if (!siblingGroup) {
-        return res.status(404).json(new ApiResponse(404, null, "No sibling group found for the student."));
+    const siblingGroup = await SiblingGroup.findById(siblingId).populate(
+        "students"
+    );
+    if (!siblingGroup || siblingGroup.students.length === 0) {
+        return res
+            .status(404)
+            .json({ message: "No students found for the given sibling ID" });
     }
 
-    const studentIds = siblingGroup.students.map((student) => student._id);
-
-    const fees = await StudentFee.find({ student: { $in: studentIds } });
-
-    const totalFees = fees.reduce((sum, fee) => sum + fee.dueAmount, 0);
-
-    if (totalFees <= 0) {
-        return res.status(400).json(new ApiResponse(400, null, "No fees due for the siblings."));
+    const studentFees = await StudentFee.find({
+        student: { $in: siblingGroup.students.map((s) => s._id) },
+    });
+    if (!studentFees || studentFees.length === 0) {
+        return res
+            .status(404)
+            .json({ message: "No fee records found for the given sibling ID" });
     }
-    
 
+    let totalOutstanding = 0;
+    studentFees.forEach((studentFee) => {
+        totalOutstanding += studentFee.dueAmount;
+    });
 
+    feeDetails.forEach((fee) => {
+        totalPayingAmount += fee.amountPaying - fee.discountAmount;
+    });
 
+    if (totalPayingAmount > totalOutstanding) {
+        return res.status(400).json({
+            message:
+                "Paying amount exceeds the total outstanding balance for all siblings",
+        });
+    }
 
+    let remainingPayment = totalPayingAmount;
+    for (const studentFee of studentFees) {
+        if (remainingPayment <= 0) break;
+
+        const payableAmount = Math.min(studentFee.dueAmount, remainingPayment);
+        studentFee.dueAmount -= payableAmount;
+        studentFee.totalPaidAmount += payableAmount;
+        remainingPayment -= payableAmount;
+
+        feeDetails.forEach((fee) => {
+            if (
+                [
+                    "Admission Fee",
+                    "Tuition Fee",
+                    "Other Fee",
+                    "Annual Fee",
+                ].includes(fee.feeHeader)
+            ) {
+                studentFee.paymentHistory.push({
+                    paymentDate,
+                    feeHeader: fee.feeHeader,
+                    amount: Math.min(fee.amountPaying, payableAmount),
+                    receiptNumber: generateReceiptNumber(),
+                    paymentMode,
+                });
+            }
+        });
+
+        await studentFee.save();
+    }
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, null, "Payment successful"));
 });
