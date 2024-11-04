@@ -536,6 +536,8 @@ export const getClassResults = wrapAsync(async (req, res) => {
             profilePicture: student.studentPhoto,
         };
 
+        console.log("StudentProfile", studentProfile);
+
         if (!studentRecordsMap[studentProfile.admNo]) {
             studentRecordsMap[studentProfile.admNo] = {
                 studentProfile,
@@ -581,7 +583,8 @@ export const getClassResults = wrapAsync(async (req, res) => {
             subjectRecord.overallTotal = termIds.reduce(
                 (sum, termId) =>
                     sum +
-                    (subjectRecord[toCamelCase(termNames[termId.toString()])]?.total || 0),
+                    (subjectRecord[toCamelCase(termNames[termId.toString()])]
+                        ?.total || 0),
                 0
             );
 

@@ -372,7 +372,7 @@ export const navigation = [
         roles: ["Admin"],
       },
       {
-        name: "Studnet Fees",
+        name: "Student Fees",
         to: "/school/student-fees-page",
         icon: FaUser,
         roles: ["Admin"],
