@@ -11,12 +11,29 @@ import "chart.js/auto";
 const StudentsFeesPage = () => {
   const [students, setStudents] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [siblingFeeData, setSiblingFeeData] = useState(null);
+  const [paymentDetails, setPaymentDetails] = useState({
+    amountPaying: "",
+    paymentMode: "",
+    discount: "",
+    remarks: "",
+  });
+  const [totalAmount, setTotalAmount] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchStudents();
   }, []);
+
+  useEffect(() => {
+    if (siblingFeeData) {
+      const discountAmount = paymentDetails.discount
+        ? parseFloat(paymentDetails.discount)
+        : 0;
+      setTotalAmount(siblingFeeData.combinedSummary.totalDue - discountAmount);
+    }
+  }, [paymentDetails.discount, siblingFeeData]);
 
   // Fetch all students from the API
   const fetchStudents = async () => {
@@ -50,15 +67,30 @@ const StudentsFeesPage = () => {
   const handlePayAllSiblings = async (studentId) => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/api/get-student-sibling-fee/${studentId}`,
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/api/get-student-sibling-fee/${studentId}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
           },
         }
       );
+
+      // Log the entire response to check the structure
+      console.log("API Response:", response.data.data);
+
       if (response.data && response.data.statusCode === 200) {
-        setSiblingFeeData(response.data.data);
+        // Check if siblingGroupId exists and set siblingFeeData accordingly
+        if (
+          response.data.data &&
+          response.data.data.combinedSummary.siblingGroupId
+        ) {
+          setSiblingFeeData(response.data.data);
+        } else {
+          console.error("siblingGroupId is missing in the response data");
+          toast.error("Sibling Group ID is missing in the response data");
+        }
         setIsModalOpen(true);
       } else {
         toast.error("Failed to fetch sibling fee details");
@@ -71,18 +103,28 @@ const StudentsFeesPage = () => {
 
   // Handle payment for siblings
   const handlePayment = async () => {
+    console.log("siblingFeeData:", siblingFeeData);
+    if (!siblingFeeData || !siblingFeeData.combinedSummary.siblingGroupId) {
+      console.error("Sibling Group ID is undefined");
+      toast.error("Sibling Group ID is undefined");
+      return;
+    }
+
+    const discountAmount = paymentDetails.discount
+      ? parseFloat(paymentDetails.discount)
+      : 0;
+    const amountPaying = totalAmount;
+
     const payload = {
-      siblingId: "672084c8428260ce5adad08c",
-      feeDetails: [
-        {
-          feeHeader: "Tuition Fee",
-          discountAmount: 50,
-          amountPaying: 8982,
-        },
-      ],
-      paymentDate: "2024-11-04",
-      paymentMode: "Cash",
-      remarks: "Partial payment for siblings.",
+      siblingId: siblingFeeData.combinedSummary.siblingGroupId,
+      feeDetails: [{
+        feeHeader:"Tuition Fee",
+        discountAmount: discountAmount,
+        amountPaying: amountPaying,
+      }],
+      paymentDate: new Date().toISOString().split("T")[0],
+      paymentMode: paymentDetails.paymentMode,
+      remarks: paymentDetails.remarks,
     };
 
     try {
@@ -97,6 +139,7 @@ const StudentsFeesPage = () => {
       );
       if (response.data && response.data.statusCode === 200) {
         toast.success("Payment successful");
+        closePaymentModal();
         closeModal();
       } else {
         toast.error("Failed to make payment");
@@ -113,18 +156,40 @@ const StudentsFeesPage = () => {
     setSiblingFeeData(null);
   };
 
+  // Close payment modal
+  const closePaymentModal = () => {
+    setIsPaymentModalOpen(false);
+    setPaymentDetails({
+      amountPaying: "",
+      paymentMode: "",
+      discount: "",
+      remarks: "",
+    });
+  };
+
+  // Open payment modal
+  const openPaymentModal = () => {
+    setIsPaymentModalOpen(true);
+  };
+
   // Prepare chart data
   const chartData = siblingFeeData && {
-    labels: siblingFeeData.studentFeesDetails.map((feeDetail) => feeDetail.studentName),
+    labels: siblingFeeData.studentFeesDetails.map(
+      (feeDetail) => feeDetail.studentName
+    ),
     datasets: [
       {
         label: "Total Fees",
-        data: siblingFeeData.studentFeesDetails.map((feeDetail) => feeDetail.totalFees),
+        data: siblingFeeData.studentFeesDetails.map(
+          (feeDetail) => feeDetail.totalFees
+        ),
         backgroundColor: "#3b82f6",
       },
       {
         label: "Due Amount",
-        data: siblingFeeData.studentFeesDetails.map((feeDetail) => feeDetail.dueAmount),
+        data: siblingFeeData.studentFeesDetails.map(
+          (feeDetail) => feeDetail.dueAmount
+        ),
         backgroundColor: "#f87171",
       },
     ],
@@ -274,23 +339,44 @@ const StudentsFeesPage = () => {
                 </tbody>
               </table>
               <div className="mb-8">
-                <h3 className="text-2xl font-bold text-indigo-400 mb-4">Combined Summary</h3>
+                <h3 className="text-2xl font-bold text-indigo-400 mb-4">
+                  Combined Summary
+                </h3>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                   <div className="bg-gray-700 p-6 rounded-lg shadow-md">
-                    <p className="text-gray-400 mb-2">Total Fees: {siblingFeeData.combinedSummary.totalFees}</p>
-                    <p className="text-gray-400 mb-2">Total Paid: {siblingFeeData.combinedSummary.totalPaid}</p>
-                    <p className="text-gray-400 mb-2">Due Fees Till Today: {siblingFeeData.combinedSummary.dueFeesTillToday}</p>
-                    <p className="text-gray-400 mb-2">Total Discount: {siblingFeeData.combinedSummary.totalDiscount}</p>
-                    <p className="text-gray-400 mb-2">Fee After Discount: {siblingFeeData.combinedSummary.feeAfterDiscount}</p>
-                    <p className="text-gray-400">Total Due: {siblingFeeData.combinedSummary.totalDue}</p>
+                    <p className="text-gray-400 mb-2">
+                      Total Fees: {siblingFeeData.combinedSummary.totalFees}
+                    </p>
+                    <p className="text-gray-400 mb-2">
+                      Total Paid: {siblingFeeData.combinedSummary.totalPaid}
+                    </p>
+                    <p className="text-gray-400 mb-2">
+                      Due Fees Till Today:{" "}
+                      {siblingFeeData.combinedSummary.dueFeesTillToday}
+                    </p>
+                    <p className="text-gray-400 mb-2">
+                      Total Discount:{" "}
+                      {siblingFeeData.combinedSummary.totalDiscount}
+                    </p>
+                    <p className="text-gray-400 mb-2">
+                      Fee After Discount:{" "}
+                      {siblingFeeData.combinedSummary.feeAfterDiscount}
+                    </p>
+                    <p className="text-gray-400">
+                      Total Due: {siblingFeeData.combinedSummary.totalDue}
+                    </p>
                   </div>
                   <div className="bg-gray-700 p-6 rounded-lg shadow-md">
-                    <Bar data={chartData} options={{ maintainAspectRatio: false }} height={200} />
+                    <Bar
+                      data={chartData}
+                      options={{ maintainAspectRatio: false }}
+                      height={200}
+                    />
                   </div>
                 </div>
               </div>
               <button
-                onClick={handlePayment}
+                onClick={openPaymentModal}
                 className="mt-6 bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-full shadow-lg transform transition-transform duration-300 hover:scale-105"
               >
                 Pay Now
@@ -306,6 +392,81 @@ const StudentsFeesPage = () => {
             Close
           </button>
         </div>
+      </Modal>
+
+      {/* Payment Modal */}
+      <Modal
+        isOpen={isPaymentModalOpen}
+        onRequestClose={closePaymentModal}
+        contentLabel="Payment Details"
+        className="bg-gray-800 p-8 rounded-lg shadow-lg max-w-lg mx-auto mt-20"
+        overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
+      >
+        <h2 className="text-2xl font-bold text-indigo-400 mb-4 text-center">
+          Payment Details
+        </h2>
+        <div className="mb-4">
+          <label className="block text-gray-400 mb-2">Discount</label>
+          <input
+            type="number"
+            value={paymentDetails.discount}
+            onChange={(e) =>
+              setPaymentDetails({ ...paymentDetails, discount: e.target.value })
+            }
+            className="w-full p-2 rounded-md bg-gray-700 text-gray-200"
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block text-gray-400 mb-2">Total Amount</label>
+          <input
+            type="number"
+            value={totalAmount}
+            onChange={(e) => setTotalAmount(e.target.value)} // Make totalAmount editable
+            className="w-full p-2 rounded-md bg-gray-700 text-gray-200"
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-gray-400 mb-2">Payment Mode</label>
+          <select
+            value={paymentDetails.paymentMode}
+            onChange={(e) =>
+              setPaymentDetails({
+                ...paymentDetails,
+                paymentMode: e.target.value,
+              })
+            }
+            className="w-full p-2 rounded-md bg-gray-700 text-gray-200"
+          >
+            <option value="">Select Payment Mode</option>
+            <option value="Cash">Cash</option>
+            <option value="Card">Card</option>
+            <option value="Bank Transfer">Bank Transfer</option>
+          </select>
+        </div>
+        <div className="mb-4">
+          <label className="block text-gray-400 mb-2">Remarks</label>
+          <input
+            type="text"
+            value={paymentDetails.remarks}
+            onChange={(e) =>
+              setPaymentDetails({ ...paymentDetails, remarks: e.target.value })
+            }
+            className="w-full p-2 rounded-md bg-gray-700 text-gray-200"
+          />
+        </div>
+        <button
+          onClick={handlePayment}
+          className="mt-6 bg-green-600 hover:bg-green-700 mr-4 text-white px-5 py-2 rounded-full shadow-lg transform transition-transform duration-300 hover:scale-105"
+        >
+          Confirm Payment
+        </button>
+        <button
+          onClick={closePaymentModal}
+          className="mt-4 bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-full shadow-lg transform transition-transform duration-300 hover:scale-105"
+        >
+          Cancel
+        </button>
       </Modal>
       <ToastContainer />
     </div>
