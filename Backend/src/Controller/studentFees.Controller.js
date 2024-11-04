@@ -496,10 +496,8 @@ export const getStudentBillPerMonth = wrapAsync(async (req, res) => {
             .json(new ApiResponse(400, "Invalid date format."));
     }
 
-    // Define fiscal year start month (April)
-    const fiscalYearStartMonth = 3; // 0-based index (0 = January, 3 = April)
+    const fiscalYearStartMonth = 3;
 
-    // Determine fiscal year based on providedDate
     let fiscalYear;
     if (providedDate.getMonth() >= fiscalYearStartMonth) {
         fiscalYear = providedDate.getFullYear();
@@ -507,7 +505,6 @@ export const getStudentBillPerMonth = wrapAsync(async (req, res) => {
         fiscalYear = providedDate.getFullYear() - 1;
     }
 
-    // Adjusted Month Numbering: April (3) = 1, May (4) = 2, ..., March (2) = 12
     const adjustedMonth = getAdjustedMonth(providedDate.getMonth());
 
     const monthName = providedDate.toLocaleString("default", { month: "long" });
@@ -526,7 +523,6 @@ export const getStudentBillPerMonth = wrapAsync(async (req, res) => {
             .json(new ApiResponse(404, "No students found for this class."));
     }
 
-    // Pre-fetch all FeeGroups to optimize database queries
     const feeGroupIds = students
         .map((student) => student.feeGroup)
         .filter((id) => id);
@@ -564,11 +560,9 @@ export const getStudentBillPerMonth = wrapAsync(async (req, res) => {
             const totalOtherFeesAmount =
                 admissionFeeAmount + annualFeeAmount + otherFeeAmount;
 
-            const monthsPassed = adjustedMonth; // Using adjusted month numbering
+            const monthsPassed = adjustedMonth;
             const tuitionFeeDueAmount = (tuitionFeeAmount / 12) * monthsPassed;
 
-            // Calculate totalFeesDueUpToDate
-            // Include non-recurring fees only in the first month
             const isFirstMonth = monthsPassed === 1;
             const nonRecurringFeesDue = isFirstMonth ? totalOtherFeesAmount : 0;
             const totalFeesDueUpToDate =
@@ -577,7 +571,6 @@ export const getStudentBillPerMonth = wrapAsync(async (req, res) => {
             totalFees = tuitionFeeAmount + totalOtherFeesAmount;
 
             if (feeRecord) {
-                // Calculate total discounts up to the billing date
                 const discountsUpToDate = feeRecord.discountHistory.filter(
                     (discount) => {
                         const discountDate = new Date(discount.date);
@@ -590,7 +583,6 @@ export const getStudentBillPerMonth = wrapAsync(async (req, res) => {
                     0
                 );
 
-                // Calculate all payments made up to the billing date
                 const paymentsUpToDate = feeRecord.paymentHistory.filter(
                     (payment) => {
                         const paymentDate = new Date(payment.paymentDate);
@@ -598,21 +590,17 @@ export const getStudentBillPerMonth = wrapAsync(async (req, res) => {
                     }
                 );
 
-                // Sort payments by date ascending
                 paymentsUpToDate.sort(
                     (a, b) => new Date(a.paymentDate) - new Date(b.paymentDate)
                 );
 
-                // Initialize totalPaidAmount and remainingFees
                 totalPaidAmount = 0;
                 let remainingTuitionFee = tuitionFeeDueAmount;
-                let remainingOtherFees = nonRecurringFeesDue; // Adjusted here
+                let remainingOtherFees = nonRecurringFeesDue;
 
-                // Allocate payments to fees
                 for (const payment of paymentsUpToDate) {
                     let paymentAmount = payment.amount;
 
-                    // Allocate to tuition fee first
                     if (remainingTuitionFee > 0) {
                         const allocatedTuition = Math.min(
                             paymentAmount,
@@ -623,7 +611,6 @@ export const getStudentBillPerMonth = wrapAsync(async (req, res) => {
                         totalPaidAmount += allocatedTuition;
                     }
 
-                    // Allocate remaining to other fees
                     if (paymentAmount > 0 && remainingOtherFees > 0) {
                         const allocatedOther = Math.min(
                             paymentAmount,
@@ -634,14 +621,12 @@ export const getStudentBillPerMonth = wrapAsync(async (req, res) => {
                         totalPaidAmount += allocatedOther;
                     }
 
-                    // Any remaining paymentAmount is considered as advance
                     if (paymentAmount > 0) {
                         advancePayment += paymentAmount;
                         totalPaidAmount += paymentAmount;
                     }
                 }
 
-                // Calculate net balance
                 const netBalance = totalPaidAmount - totalFeesDueUpToDate;
 
                 if (netBalance < 0) {
@@ -649,13 +634,10 @@ export const getStudentBillPerMonth = wrapAsync(async (req, res) => {
                 } else if (netBalance > 0) {
                     advancePayment = netBalance.toFixed(2);
                 }
-                // If netBalance == 0, no due or advance
             } else {
-                // No feeRecord, so total due is based on fees up to the billing date minus any discounts
                 dueAmount = totalFeesDueUpToDate.toFixed(2);
             }
 
-            // Prepare QR Code content
             const qrCodeContent = {
                 studentName: student.firstName,
                 amount: dueAmount > 0 ? dueAmount : advancePayment,
@@ -669,7 +651,6 @@ export const getStudentBillPerMonth = wrapAsync(async (req, res) => {
                 qrCode = "Error generating QR code";
             }
 
-            // Construct student bill data with dueAmount/advancePayment above QR code
             const studentBill = {
                 schoolLogo: logoUrl,
                 schoolName: "Vardhan International School",
@@ -685,7 +666,6 @@ export const getStudentBillPerMonth = wrapAsync(async (req, res) => {
                 totalDiscountAmount: totalDiscountAmount.toFixed(2),
             };
 
-            // Add dueAmount or advancePayment before QR code
             if (dueAmount > 0) {
                 studentBill.dueAmount = dueAmount;
             } else if (advancePayment > 0) {
@@ -973,7 +953,7 @@ export const payAllSiblingStudentFees = wrapAsync(async (req, res) => {
             200,
             {
                 schoolDetails: {
-                    logo: "path/to/school_logo.png",
+                    logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSuOUJHCmNi_yfKjQhv0ZE5K8tCFuKuo-NS-A&s",
                     name: "Vardhan International School",
                     contact: "123-456-7890",
                     email: "info@vardhanschool.com",
