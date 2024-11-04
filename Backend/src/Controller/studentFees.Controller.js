@@ -7,6 +7,7 @@ import { FeeGroup } from "../Models/feeGroup.Model.js";
 import { Class } from "../Models/class.Model.js";
 import QRCode from "qrcode";
 import path from "path";
+import { SiblingGroup } from "../Models/SiblingGroup.Model.js";
 
 export const addPaymentsAndDiscounts = wrapAsync(async (req, res) => {
     const { studentId, feeDetails, paymentDate, paymentMode, remarks } =
@@ -489,6 +490,7 @@ export const getStudentBillPerMonth = wrapAsync(async (req, res) => {
     }
 
     const providedDate = new Date(date);
+
     if (isNaN(providedDate)) {
         return res
             .status(400)
@@ -521,78 +523,127 @@ export const getStudentBillPerMonth = wrapAsync(async (req, res) => {
         });
 
         let totalDiscountAmount = 0;
+        let tuitionFeeDueAmount = 0;
+        let otherFeesDueAmount = 0;
+        let totalPaidAmount = 0;
+        let advancePayment = 0;
         let totalFees = 0;
-        let dueAmount = 0;
+        let totalDueAmount = 0;
 
-        if (feeRecord) {
-            totalDiscountAmount = feeRecord.discountHistory.reduce(
-                (sum, discount) => sum + discount.discountAmount,
-                0
-            );
+        const feeGroupId = feeRecord ? feeRecord.feeGroup : student.feeGroup;
+        const feeGroup = await FeeGroup.findById(feeGroupId);
 
-            const unpaidFees = feeRecord.paymentHistory
-                .filter((payment) => {
-                    const paymentDate = new Date(payment.paymentDate);
-                    return paymentDate < new Date(year, month, 1);
-                })
-                .reduce((sum, payment) => sum + payment.amount, 0);
+        if (feeGroup) {
+            const fees = feeGroup.fees || {};
 
-            const installmentFraction = (month + 1) / 12;
-            const installmentAmount = feeRecord.dueAmount * installmentFraction;
+            const tuitionFeeAmount = fees.tuitionFee || 0;
+            const admissionFeeAmount = fees.admissionFee || 0;
+            const annualFeeAmount = fees.annualFee || 0;
+            const otherFeeAmount = fees.otherFee || 0;
 
-            dueAmount = installmentAmount - unpaidFees;
+            const totalOtherFeesAmount =
+                admissionFeeAmount + annualFeeAmount + otherFeeAmount;
 
-            const monthlyPayment = feeRecord.paymentHistory
-                .filter((payment) => {
-                    const paymentDate = new Date(payment.paymentDate);
-                    return (
-                        paymentDate.getMonth() === month &&
-                        paymentDate.getFullYear() === year
-                    );
-                })
-                .reduce((sum, payment) => sum + payment.amount, 0);
+            const monthsPassed = month + 1;
+            tuitionFeeDueAmount = (tuitionFeeAmount / 12) * monthsPassed;
 
-            totalFees =
-                feeRecord.totalPaidAmount +
-                dueAmount +
-                totalDiscountAmount -
-                monthlyPayment;
-        } else {
-            const feeGroup = await FeeGroup.findById(student.feeGroup);
-            if (feeGroup) {
-                const installmentFraction = (month + 1) / 12;
-                dueAmount = feeGroup.totalFeeAmount * installmentFraction;
-                totalFees = dueAmount;
+            otherFeesDueAmount = totalOtherFeesAmount;
+
+            totalFees = tuitionFeeAmount + totalOtherFeesAmount;
+
+            if (feeRecord) {
+                totalDiscountAmount = feeRecord.discountHistory.reduce(
+                    (sum, discount) => sum + discount.discountAmount,
+                    0
+                );
+
+                totalPaidAmount = feeRecord.paymentHistory.reduce(
+                    (sum, payment) => sum + payment.amount,
+                    0
+                );
+
+                const paidOtherFeesAmount = feeRecord.paymentHistory
+                    .filter((payment) => payment.feeHeader !== "Tuition Fee")
+                    .reduce((sum, payment) => sum + payment.amount, 0);
+
+                otherFeesDueAmount = Math.max(
+                    0,
+                    otherFeesDueAmount - paidOtherFeesAmount
+                );
+
+                const paidTuitionFeesAmount = feeRecord.paymentHistory
+                    .filter((payment) => {
+                        const paymentDate = new Date(payment.paymentDate);
+                        return (
+                            payment.feeHeader === "Tuition Fee" &&
+                            paymentDate <= providedDate
+                        );
+                    })
+                    .reduce((sum, payment) => sum + payment.amount, 0);
+
+                tuitionFeeDueAmount = Math.max(
+                    0,
+                    tuitionFeeDueAmount - paidTuitionFeesAmount
+                );
+
+                totalDueAmount =
+                    tuitionFeeDueAmount +
+                    otherFeesDueAmount -
+                    totalDiscountAmount;
+
+                if (totalDueAmount < 0) {
+                    advancePayment = -totalDueAmount;
+                    totalDueAmount = 0;
+                }
+            } else {
+                totalDueAmount =
+                    tuitionFeeDueAmount +
+                    otherFeesDueAmount -
+                    totalDiscountAmount;
             }
-        }
 
-        // Generate QR code with student information
-        const qrCodeContent = {
-            studentName: student.firstName,
-            dueAmount: dueAmount,
-        };
-        let qrCode = "";
-        try {
-            qrCode = await QRCode.toDataURL(JSON.stringify(qrCodeContent));
-        } catch (error) {
-            console.error("QR Code Generation Error: ", error);
-            qrCode = "Error generating QR code";
-        }
+            const qrCodeContent = {
+                studentName: student.firstName,
+                dueAmount: totalDueAmount,
+            };
+            let qrCode = "";
+            try {
+                qrCode = await QRCode.toDataURL(JSON.stringify(qrCodeContent));
+            } catch (error) {
+                console.error("QR Code Generation Error: ", error);
+                qrCode = "Error generating QR code";
+            }
 
-        responseData.push({
-            schoolName: "Vardhan International School",
-            contactNumber: "+1-234-567-890",
-            logoUrl: logoUrl, // Use backend-provided logo URL
-            month: monthName,
-            studentName: student.firstName,
-            fatherName: student.parent ? student.parent.fatherName : "N/A",
-            phoneNumber: student.mobileNumber || "N/A",
-            className: classDetails.name,
-            admissionNumber: student.admissionNo,
-            dueAmount: dueAmount,
-            totalFees: totalFees,
-            qrCode: qrCode, // Generated QR code or error message
-        });
+            responseData.push({
+                schoolName: "Vardhan International School",
+                contactNumber: "+1-234-567-890",
+                logoUrl: logoUrl,
+                month: monthName,
+                studentName: student.firstName,
+                fatherName: student.parent ? student.parent.fatherName : "N/A",
+                phoneNumber: student.mobileNumber || "N/A",
+                className: classDetails.name,
+                admissionNumber: student.admissionNo,
+                tuitionFeeDueAmount: tuitionFeeDueAmount.toFixed(2),
+                otherFeesDueAmount: otherFeesDueAmount.toFixed(2),
+                totalDueAmount: totalDueAmount.toFixed(2),
+                advancePayment: advancePayment.toFixed(2),
+                totalPaidAmount: totalPaidAmount.toFixed(2),
+                totalDiscountAmount: totalDiscountAmount.toFixed(2),
+                totalFees: totalFees.toFixed(2),
+                qrCode: qrCode,
+            });
+        } else {
+            return res
+                .status(404)
+                .json(
+                    new ApiResponse(
+                        404,
+                        null,
+                        "Fee group not found for student."
+                    )
+                );
+        }
     }
 
     return res
@@ -600,8 +651,150 @@ export const getStudentBillPerMonth = wrapAsync(async (req, res) => {
         .json(
             new ApiResponse(
                 200,
-                "Student bill per month retrieved successfully.",
-                responseData
+                responseData,
+                "Student bill per month retrieved successfully."
             )
         );
+});
+
+export const getStudentAndSiblingFeeSummary = wrapAsync(async (req, res) => {
+    const { studentId } = req.params;
+
+    const siblingGroup = await SiblingGroup.findOne({
+        students: studentId,
+    }).populate("students");
+
+    let studentIds = [studentId];
+
+    if (siblingGroup) {
+        studentIds = siblingGroup.students.map((student) => student._id);
+    }
+
+    const fees = await StudentFee.find({
+        student: { $in: studentIds },
+    }).populate({
+        path: "student",
+        select: "firstName lastName mobileNumber currentClass parent",
+        populate: [
+            {
+                path: "currentClass",
+                select: "name",
+            },
+            {
+                path: "parent",
+                select: "fatherName",
+            },
+        ],
+    });
+
+    let totalFees = 0;
+    let totalPaid = 0;
+    let totalDue = 0;
+    let totalDiscount = 0;
+    let totalAdvance = 0;
+
+    const studentFeesDetails = await Promise.all(
+        fees.map(async (fee) => {
+            const student = fee.student;
+
+            const feeGroup = await FeeGroup.findById(fee.feeGroup);
+
+            const actualFees =
+                (feeGroup.fees.tuitionFee || 0) +
+                (feeGroup.fees.admissionFee || 0) +
+                (feeGroup.fees.annualFee || 0) +
+                (feeGroup.fees.otherFee || 0);
+
+            const totalPaidAmount = fee.paymentHistory.reduce(
+                (sum, payment) => sum + payment.amount,
+                0
+            );
+
+            const studentTotalDiscount = fee.discountHistory.reduce(
+                (sum, discount) => sum + discount.discountAmount,
+                0
+            );
+
+            let dueAmount = actualFees - totalPaidAmount - studentTotalDiscount;
+
+            let advanceAmount = 0;
+            if (dueAmount < 0) {
+                advanceAmount = Math.abs(dueAmount);
+                dueAmount = 0;
+            }
+
+            totalFees += actualFees;
+            totalPaid += totalPaidAmount;
+            totalDiscount += studentTotalDiscount;
+            totalDue += dueAmount;
+            totalAdvance += advanceAmount;
+
+            return {
+                studentId: student._id,
+                studentName: `${student.firstName} ${
+                    student.lastName || ""
+                }`.trim(),
+                class: student.currentClass?.name || "N/A",
+                fatherName: student.parent?.fatherName || "N/A",
+                mobileNumber: student.mobileNumber || "N/A",
+                totalFees: actualFees,
+                dueAmount,
+                discount: studentTotalDiscount,
+                ...(advanceAmount > 0 && { advanceAmount }),
+            };
+        })
+    );
+
+    let dueFeesTillToday = totalDue - totalAdvance;
+    if (dueFeesTillToday < 0) {
+        dueFeesTillToday = 0;
+    }
+
+    const feeAfterDiscount = totalFees - totalDiscount;
+
+    const combinedSummary = {
+        totalFees,
+        totalPaid,
+        dueFeesTillToday,
+        totalDiscount,
+        feeAfterDiscount,
+        totalDue: dueFeesTillToday,
+    };
+
+    return res.status(200).json(
+        new ApiResponse(
+            200,
+            {
+                studentFeesDetails,
+                combinedSummary,
+            },
+            "Student and sibling fee summary retrieved successfully."
+        )
+    );
+});
+
+
+export const payAllSiblingFees = wrapAsync(async (req, res) => {
+    const { studentId } = req.body;
+
+    const siblingGroup = await SiblingGroup.findOne({   students: studentId }).populate("students");
+
+    if (!siblingGroup) {
+        return res.status(404).json(new ApiResponse(404, null, "No sibling group found for the student."));
+    }
+
+    const studentIds = siblingGroup.students.map((student) => student._id);
+
+    const fees = await StudentFee.find({ student: { $in: studentIds } });
+
+    const totalFees = fees.reduce((sum, fee) => sum + fee.dueAmount, 0);
+
+    if (totalFees <= 0) {
+        return res.status(400).json(new ApiResponse(400, null, "No fees due for the siblings."));
+    }
+    
+
+
+
+
 });

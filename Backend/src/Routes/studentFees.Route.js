@@ -3,6 +3,7 @@ import {
     addPaymentsAndDiscounts,
     getAllStudentFeeDetails,
     getDueFeeListPerClassMonth,
+    getStudentAndSiblingFeeSummary,
     getStudentBillPerMonth,
     getStudentFeeDetails,
 } from "../Controller/studentFees.Controller.js";
@@ -14,5 +15,9 @@ router.get("/get-student-fee/:studentId", getStudentFeeDetails);
 router.post("/student-due-fee-per-class", getDueFeeListPerClassMonth);
 router.get("/get-all-student-fee", getAllStudentFeeDetails);
 router.post("/get-student-bill-month", getStudentBillPerMonth);
+router.get(
+    "/get-student-sibling-fee/:studentId",
+    getStudentAndSiblingFeeSummary
+);
 
 export { router as studentFeesRouter };
