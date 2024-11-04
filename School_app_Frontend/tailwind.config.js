@@ -7,6 +7,11 @@ module.exports = {
         customBackground: "#283046", // Custom background color
         customText: "#FFFFFF", // Custom text color
         placeholder: "#A0AEC0", // Placeholder text color
+        gold: {
+          500: '#d4af37',
+          600: '#b7950b',
+          700: '#a17c00',
+        },
       },
       container: {
         center: true,
