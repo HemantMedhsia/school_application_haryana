@@ -69,6 +69,8 @@ import FeesInstallment from "./pages/Fees/FeesInstallment.jsx";
 import StudentsFeesPage from "./pages/Fees/StudentsFeesPage.jsx";
 import FeeSubmmission from "./pages/Fees/FeeSubmmission.jsx";
 import ClassFeesRecord from "./pages/Fees/ClassFeesRecord.jsx";
+import PaymentRecept from "./pages/Fees/PaymentRecept.jsx";
+import MonthlyFessPaymentQrRecept from "./pages/Fees/MonthlyFessPaymentQrRecept.jsx";
 
 const App = () => {
   const { userRole, authToken } = useAuth();
@@ -276,13 +278,30 @@ const App = () => {
             element={<AssignDiscount />}
           />
           <Route path="/school/create-fees" element={<CreateFees_h />} />
-          <Route path="/school/fees-installment" element={<FeesInstallment />} />
-          <Route path="/school/student-fees-page" element={<StudentsFeesPage />} />
+          <Route
+            path="/school/fees-installment"
+            element={<FeesInstallment />}
+          />
+          <Route
+            path="/school/student-fees-page"
+            element={<StudentsFeesPage />}
+          />
           <Route
             path="/school/fee-submission/:studentId"
             element={<FeeSubmmission />}
           />
-          <Route path="/school/class-fees-record" element={<ClassFeesRecord />} />
+          <Route
+            path="/school/class-fees-record"
+            element={<ClassFeesRecord />}
+          />
+          <Route
+            path="/school/payment-recept-siblings"
+            element={<PaymentRecept />}
+          />
+          <Route
+            path="/school/monthly-fees-payment"
+            element={<MonthlyFessPaymentQrRecept />}
+          />
         </Route>
       </>
     )

@@ -141,6 +141,7 @@ const StudentsFeesPage = () => {
         toast.success("Payment successful");
         closePaymentModal();
         closeModal();
+        navigate(`/school/payment-recept-siblings`, {state: {paymentData: response.data.data}});
       } else {
         toast.error("Failed to make payment");
       }
@@ -474,4 +475,3 @@ const StudentsFeesPage = () => {
 };
 
 export default StudentsFeesPage;
-// 
