@@ -865,12 +865,7 @@ export const payAllSiblingStudentFees = wrapAsync(async (req, res) => {
             select: "fatherName",
         });
 
-    console.log("Sibling Group", siblingGroup);
-
-    console.log("siblings", siblingGroup.parentId); 
-
     const fatherName = siblingGroup.parentId?.fatherName || "N/A";
-    console.log("Father Name:", fatherName);
 
     if (!siblingGroup || siblingGroup.students.length === 0) {
         return res

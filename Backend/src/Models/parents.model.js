@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 
 const parentSchema = new mongoose.Schema({
-    s: {
+    fatherName: {
         type: String,
         required: true,
     },
