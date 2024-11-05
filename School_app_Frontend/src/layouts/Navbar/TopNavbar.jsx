@@ -131,7 +131,7 @@ const TopNavbar = ({ isCollapsed }) => {
                 </div>
               </div>
 
-              <Menu as="div" className="relative ml-3">
+              <Menu as="div" className="relative z-50 ml-3">
                 <Menu.Button className="flex rounded-full bg-[#283046] text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                   <span className="sr-only">Open user menu</span>
                   <img
@@ -146,8 +146,8 @@ const TopNavbar = ({ isCollapsed }) => {
                       <button
                         onClick={handleProfileClick}
                         className={classNames(
-                          active ? "bg-gray-100" : "",
-                          "block px-4 py-2 text-sm text-gray-700"
+                          active ? "bg-gray-300" : "",
+                          "block px-4 py-2 text-sm text-gray-700 w-full text-left"
                         )}
                       >
                         Your Profile
@@ -159,8 +159,8 @@ const TopNavbar = ({ isCollapsed }) => {
                       <button
                         onClick={() => alert("Settings clicked")}
                         className={classNames(
-                          active ? "bg-gray-100" : "",
-                          "block px-4 py-2 text-sm text-gray-700"
+                          active ? "bg-gray-300" : "",
+                          "block px-4 py-2 text-sm text-gray-700 w-full text-left"
                         )}
                       >
                         Settings
@@ -173,8 +173,8 @@ const TopNavbar = ({ isCollapsed }) => {
                         onClick={logout}
                         href="#"
                         className={classNames(
-                          active ? "bg-gray-100" : "",
-                          "block px-4 py-2 text-sm text-gray-700"
+                          active ? "bg-gray-300" : "",
+                          "block px-4 py-2 text-sm text-gray-700 w-full text-left"
                         )}
                       >
                         Sign out

@@ -475,4 +475,8 @@ body {
   display: none; /* Hide in regular view */
 }
 
+.dropdown-menu {
+  z-index: 9999 !important;
+}
+
 
