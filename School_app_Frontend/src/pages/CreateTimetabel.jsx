@@ -6,7 +6,8 @@ import FormButton from "../components/Form/FormButton";
 import DynamicFilterBar2 from "../common/FilterBar/SelectDropDownFilterTimeTable";
 import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
-import { FaEdit } from "react-icons/fa";
+import { FaEdit, FaTrash } from "react-icons/fa";
+import { FaDeleteLeft, FaTrashArrowUp } from "react-icons/fa6";
 
 const CreateTimetable = () => {
   const [classId, setClassId] = useState("");
@@ -508,8 +509,14 @@ const CreateTimetable = () => {
       {entries.map((entry, index) => (
         <div
           key={index}
-          className="p-4 rounded-lg border border-[#7367F0] mb-4"
+          className="p-4 relative rounded-lg border border-[#7367F0] mb-4"
         >
+          <button
+            className=" absolute top-2 right-2 text-white p-2 rounded-lg"
+            onClick={() => handleDeletePeriod(index)}
+          >
+            <FaTrashArrowUp size={18} color="red" />
+          </button>
           <h4 className="text-md text-left font-bold mb-2">
             {entry.period === "Lunch Break"
               ? "Lunch Break"
@@ -553,13 +560,6 @@ const CreateTimetable = () => {
               placeholder="Start Time"
             />
             <TimeInput value={entry.endTime} readOnly placeholder="End Time" />
-
-            <button
-              className="bg-red-500 text-white p-2 rounded-lg"
-              onClick={() => handleDeletePeriod(index)}
-            >
-              <FaEdit size={18} color="black" />
-            </button>
           </FormSection>
         </div>
       ))}
