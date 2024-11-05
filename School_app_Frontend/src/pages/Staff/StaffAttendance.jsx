@@ -177,8 +177,12 @@ const StaffAttendance = () => {
       toast.success("Attendance data saved successfully!");
       fetchStaffData();
     } catch (error) {
+      if (error.response && error.response.data && error.response.data.data) {
+        toast.error(error.response.data.data);
+      } else {
+        toast.error("Error saving data!");
+      }
       console.error("Error saving attendance data:", error);
-      toast.error("Error saving data!");
     }
   };
 

@@ -348,8 +348,8 @@ export const getAttendanceAndStudentCount = wrapAsync(async (req, res) => {
     const femaleAttendance = Array(7).fill(0);
 
     attendanceRecords.forEach((record) => {
-        const dayOfWeek = record.date.getDay();
-        if (record.status === "Present") {
+        if (record.studentId && record.status === "Present") {
+            const dayOfWeek = record.date.getDay();
             if (record.studentId.gender === "Male") {
                 maleAttendance[dayOfWeek]++;
             } else if (record.studentId.gender === "Female") {

@@ -55,7 +55,7 @@ export const createMultipleStaffAttendenceInBulk = wrapAsync(
         const attendenceData = req.body;
 
         if (!Array.isArray(attendenceData) || attendenceData.length === 0) {
-            return res  
+            return res
                 .status(400)
                 .json(new ApiResponse(400, "Invalid data provided."));
         }
@@ -74,12 +74,13 @@ export const createMultipleStaffAttendenceInBulk = wrapAsync(
             });
 
             if (existingAttendance) {
+                const staff = await Staff.findById(attendance.staffId);
                 return res
                     .status(400)
                     .json(
                         new ApiResponse(
                             400,
-                            `Attendance for staff ${attendance.staffId} on date ${attendance.date} already exists.`
+                            `Attendance for staff ${staff.name} on date ${attendance.date} already exists.`
                         )
                     );
             }
