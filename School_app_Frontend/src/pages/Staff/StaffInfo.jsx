@@ -97,7 +97,7 @@ const StaffInfo = () => {
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
           placeholder="Search by Name, Position, or Department"
-          className="w-full px-4 py-2 text-white rounded-md border bg-gray-900 border-[#283046] border-2 focus:outline-none focus:border-[#65fa9e]"
+          className="w-full px-4 py-2 text-white rounded-md  bg-gray-900 border-[#283046] border-2 focus:outline-none focus:border-[#65fa9e]"
         />
       </div>
       {loading ? (

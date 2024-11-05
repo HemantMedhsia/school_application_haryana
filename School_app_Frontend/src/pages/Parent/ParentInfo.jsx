@@ -9,7 +9,9 @@ import { useNavigate } from "react-router-dom";
 
 const ParentInfo = () => {
   const [allParentData, setAllParentData] = useState([]);
+  const [searchText, setSearchText] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [filteredParentData, setFilteredParentData] = useState([]);
   const [parentToDelete, setparentToDelete] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -44,6 +46,7 @@ const ParentInfo = () => {
       const [AllParentResponse] = await Promise.all([
         getAPI("getAllParents", {}, setAllParentData),
       ]);
+      setFilteredParentData(AllParentResponse.data);
       console.log(AllParentResponse);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -55,6 +58,19 @@ const ParentInfo = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    const filteredData = allParentData.filter((parent) =>
+      ["fatherName", "email", "fatherPhone"].some((key) => {
+        const value = parent[key];
+        return (
+          value &&
+          value.toString().toLowerCase().includes(searchText.toLowerCase())
+        );
+      })
+    );
+    setFilteredParentData(filteredData);
+  }, [searchText, allParentData]);
 
   const handleView = (parentData) => {
     navigate(`/school/parent-profile/${parentData._id}`);
@@ -92,7 +108,15 @@ const ParentInfo = () => {
   };
   return (
     <div className="">
-      <SearchBar />
+      <div className="flex items-center mb-4">
+        <input
+          type="text"
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          placeholder="Search by Father name, Email, or Mobile Number"
+          className="w-full px-4 py-2 text-white rounded-md  bg-gray-900 border-[#283046] border-2 focus:outline-none focus:border-[#65fa9e]"
+        />
+      </div>
       {loading ? (
         <div className="loader-wrapper">
           <span className="loader"></span>
@@ -103,7 +127,7 @@ const ParentInfo = () => {
         </div>
       ) : (
         <Datatable
-          data={allParentData}
+          data={filteredParentData}
           columns={columns}
           actions={{
             onView: handleView,
