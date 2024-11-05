@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import { StudentAttendance } from "./studentAttendence.Model.js";
 import { FeeGroup } from "./feeGroup.Model.js";
+import { StudentFee } from "./studentFees.Model.js";
 
 const studentSchema = new mongoose.Schema({
     admissionNo: {
@@ -26,11 +27,13 @@ const studentSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Section",
         required: true,
+        index: true,
     },
     currentSession: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Session",
         required: true,
+        index: true,
     },
     firstName: {
         type: String,
@@ -45,7 +48,6 @@ const studentSchema = new mongoose.Schema({
     },
     dateOfBirth: {
         type: Date,
-        required: true,
     },
     category: {
         type: String,
@@ -58,11 +60,9 @@ const studentSchema = new mongoose.Schema({
     },
     age: {
         type: Number,
-        required: true,
     },
     address: {
         type: String,
-        required: true,
     },
     mobileNumber: {
         type: Number,
@@ -71,6 +71,7 @@ const studentSchema = new mongoose.Schema({
     email: {
         type: String,
         index: true,
+        required: true,
     },
     admissionDate: {
         type: Date,
@@ -155,7 +156,6 @@ studentSchema.pre("save", async function (next) {
         // Hash the password only if it has been modified or is new
         if (!this.isModified("password")) return next();
 
-        // Generate a salt and hash the password
         const salt = await bcrypt.genSalt(10);
         this.password = await bcrypt.hash(this.password, salt);
         next();
@@ -164,7 +164,6 @@ studentSchema.pre("save", async function (next) {
     }
 });
 
-// Method to validate the password
 studentSchema.methods.isValidPassword = async function (password) {
     try {
         return await bcrypt.compare(password, this.password);

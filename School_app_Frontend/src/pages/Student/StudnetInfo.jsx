@@ -5,7 +5,7 @@ import { deleteAPI, getAPI } from "../../utility/api/apiCall";
 import { useNavigate } from "react-router-dom";
 import ConfirmationModal from "../../common/ConfirmationModal/ConfirmationModal";
 import DetailsSelectionModal from "../../common/ConfirmationModal/DetailsSelectionModal";
-import StudentSearchPopup from "./StudentPopup"; // Import the new popup component
+import StudentSearchPopup from "./StudentPopup";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 
