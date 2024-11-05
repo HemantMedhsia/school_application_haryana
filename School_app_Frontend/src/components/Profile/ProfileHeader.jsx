@@ -1,6 +1,6 @@
 import React from "react";
 import FormButton from "../Form/FormButton";
-
+import coverImage from "../../assets/coverImage.jpg";
 const ProfileHeader = ({ userData }) => {
   console.log("userData", userData.studentPhoto);
   const displayName = userData.name
@@ -13,7 +13,7 @@ const ProfileHeader = ({ userData }) => {
   return (
     <div className="relative mb-6">
       <img
-        src="http://www.localplaner.de/img/timeline.aa03c008.jpg"
+        src={coverImage}
         className="w-full h-56 object-cover rounded-lg"
         alt="Cover"
       />

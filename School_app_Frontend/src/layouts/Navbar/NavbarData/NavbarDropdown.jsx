@@ -13,7 +13,7 @@
           } group flex items-center justify-center py-2 px-2 text-md font-medium rounded-md w-full`}
           onClick={onClick}
         >
-          <item.icon className=" flex justify-center items-center gap-2 h-6 w-6" aria-hidden="true" />
+          <item.icon className=" flex justify-center text-[#65fa9e] items-center gap-2 h-6 w-6" aria-hidden="true" />
           {!isCollapsed && <span className="ml-3">{item.name}</span>} {/* Conditionally render text */}
           {isCollapsed ? null : <span className="ml-auto">
             {isOpen ? (
