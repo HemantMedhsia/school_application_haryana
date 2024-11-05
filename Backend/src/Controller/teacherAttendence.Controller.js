@@ -71,12 +71,18 @@ export const createMultipleTeacherAttendenceInBulk = wrapAsync(
             });
 
             if (existingAttendance) {
+                // Fetch the teacher's name to provide a clearer error message
+                const teacher = await Teacher.findById(attendance.teacherId);
+                const teacherName = teacher
+                    ? teacher.name
+                    : attendance.teacherId;
+
                 return res
                     .status(400)
                     .json(
                         new ApiResponse(
                             400,
-                            `Attendance for teacher ${attendance.teacherId} on date ${attendance.date} already exists.`
+                            `Attendance for teacher ${teacherName} on date ${attendance.date} already exists.`
                         )
                     );
             }
