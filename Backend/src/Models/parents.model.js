@@ -8,45 +8,37 @@ const parentSchema = new mongoose.Schema({
     },
     fatherPhone: {
         type: Number,
-        required: true,
     },
     fatherOccupation: {
         type: String,
-        required: true,
     },
     fatherPhoto: {
         type: String,
     },
     motherName: {
         type: String,
-        required: true,
     },
 
     motherPhone: {
         type: Number,
-        required: true,
     },
     motherOccupation: {
         type: String,
-        required: true,
     },
     motherPhoto: {
         type: String,
     },
     guardianIs: {
         type: String,
-        required: true,
     },
     guardianName: {
         type: String,
-        required: true,
     },
     guardianRelation: {
         type: String,
     },
     guardianPhone: {
         type: Number,
-        required: true,
     },
     guardianOccupation: {
         type: String,
@@ -77,8 +69,6 @@ const parentSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Student",
     },
-
-    
 });
 
 parentSchema.pre("save", async function (next) {
