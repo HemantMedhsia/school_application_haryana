@@ -8,7 +8,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthProvider";
 import { jwtDecode } from "jwt-decode";
 import DarkModeToggle from "../../common/DarkModeToggle/DarkModeToggle";
-import logo from "../../assets/logo.png";
+import logo from "../../assets/titleLogo.png";
 
 const navigation = [
   { name: "Demo School Name", href: "#", current: false },
