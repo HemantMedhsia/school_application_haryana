@@ -14,10 +14,10 @@ const PaymentReceipt = () => {
   });
 
   return (
-    <div className="p-4 bg-gray-100 min-h-screen">
+    <div className="p-4 min-h-screen">
       <button
         onClick={handlePrint}
-        className="mb-4 px-6 py-3 bg-gradient-to-r from-gold-600 to-gold-500 text-white rounded-full shadow-lg hover:from-gold-700 hover:to-gold-600 transition duration-300 ease-in-out print:hidden"
+        className="mb-4 px-6 py-3 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-full shadow-lg hover:from-green-700 hover:to-green-600 transition duration-300 ease-in-out print:hidden"
       >
         Print Receipts
       </button>

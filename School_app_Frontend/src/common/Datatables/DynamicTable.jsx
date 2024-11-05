@@ -1,14 +1,20 @@
 import React from 'react';
 import { MdDeleteOutline } from "react-icons/md";
+import { toast, ToastContainer } from "react-toastify";
 
 // Generic Table Component
 const DynamicTable = ({ columns, data, handleInputChange, handleDelete }) => {
 
     // Helper function to format dates to ISO 8601
-    const formatToISODate = (date) => {
-        const d = new Date(date);
-        return d.toISOString().split('T')[0]; // Converts to 'YYYY-MM-DD'
-    };
+    const formatToISODate = (value) => {
+        const date = new Date(value);
+        if (isNaN(date.getTime())) {
+          // Show a warning toast
+          toast.warning("Invalid date provided in the table!");
+          return ""; // Return an empty string for invalid dates
+        }
+        return date.toISOString().substring(0, 10);
+      };
 
     return (
         <div className="overflow-x-auto">
