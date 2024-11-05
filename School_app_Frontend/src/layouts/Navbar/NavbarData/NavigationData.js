@@ -24,7 +24,6 @@ export const navigation = [
     icon: FaHome,
     current: true,
     roles: ["Admin", "Teacher", "Student", "Parent"],
-    children: [],
   },
   {
     name: "Student",

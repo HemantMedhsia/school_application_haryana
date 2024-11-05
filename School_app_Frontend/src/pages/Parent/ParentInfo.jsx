@@ -6,6 +6,7 @@ import ConfirmationModal from "../../common/ConfirmationModal/ConfirmationModal"
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
+import ErrorBoundary from "../../components/ErrorBoundry/ErrorBoundary";
 
 const ParentInfo = () => {
   const [allParentData, setAllParentData] = useState([]);
@@ -126,15 +127,18 @@ const ParentInfo = () => {
           Oops! No Parents Records Found.
         </div>
       ) : (
-        <Datatable
-          data={filteredParentData}
-          columns={columns}
-          actions={{
-            onView: handleView,
-            onEdit: handleEdit,
-            onDelete: openModal,
-          }}
-        />
+        <ErrorBoundary>
+          <Datatable
+            data={filteredParentData}
+            // data={null}
+            columns={columns}
+            actions={{
+              onView: handleView,
+              onEdit: handleEdit,
+              onDelete: openModal,
+            }}
+          />
+        </ErrorBoundary>
       )}
       <ConfirmationModal
         isOpen={isModalOpen}

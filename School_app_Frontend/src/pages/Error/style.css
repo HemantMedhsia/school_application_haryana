@@ -1,0 +1,85 @@
+.animate-pulse {
+    animation: pulse 2s infinite;
+  }
+  
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.05);
+      opacity: 0.7;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  /* Tailwind CSS directives (if using Tailwind CSS) */
+/* @tailwind base; */
+/* @tailwind components; */
+/* @tailwind utilities; */
+
+.error-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .error-emoji {
+    font-size: 6rem;
+    margin-bottom: 20px;
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  .error-title {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px #ff6f61;
+  }
+  
+  .error-message {
+    font-size: 1.25rem;
+    margin-bottom: 30px;
+    max-width: 600px;
+  }
+  
+  .error-button {
+    background-color: #ff6f61;
+    color: #fff;
+    font-size: 1.25rem;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+  }
+  
+  .error-button:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 20px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Floating animation for the emoji */
+  @keyframes float {
+    0% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+  

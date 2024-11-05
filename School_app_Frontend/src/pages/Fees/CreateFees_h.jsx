@@ -66,23 +66,59 @@ const FeeManagement = () => {
 
   const columns = [
     { header: "Class", accessor: "className", type: "text", disabled: true },
-    { header: "Tuition Fee", accessor: "tuitionFee", type: "number", inputType: "number" },
-    { header: "Admission Fee", accessor: "admissionFee", type: "number", inputType: "number" },
-    { header: "Annual Fee", accessor: "annualFee", type: "number", inputType: "number" },
-    { header: "Other Fee", accessor: "otherFee", type: "number", inputType: "number" },
+    {
+      header: "Tuition Fee",
+      accessor: "tuitionFee",
+      type: "number",
+      inputType: "number",
+    },
+    {
+      header: "Admission Fee",
+      accessor: "admissionFee",
+      type: "number",
+      inputType: "number",
+    },
+    {
+      header: "Annual Fee",
+      accessor: "annualFee",
+      type: "number",
+      inputType: "number",
+    },
+    {
+      header: "Other Fee",
+      accessor: "otherFee",
+      type: "number",
+      inputType: "number",
+    },
   ];
 
   const handleInputChange = (e, rowIndex, accessor) => {
-    const updatedFeeData = [...feeData];
-    updatedFeeData[rowIndex][accessor] = e.target.value;
-    setFeeData(updatedFeeData);
+    const value = e.target.value;
+
+    // Check if the value is negative
+    if (value !== "" && Number(value) < 0) {
+      toast.warning("Negative values are not allowed.");
+      // Reset the input value to the previous value
+      e.target.value = feeData[rowIndex][accessor] || "";
+    } else {
+      const updatedFeeData = [...feeData];
+      updatedFeeData[rowIndex][accessor] = value;
+      setFeeData(updatedFeeData);
+    }
   };
 
   const handleSubmit = async () => {
     toast.info("Submitting data, please wait...");
 
     const formattedFeeData = feeData.map(
-      ({ feeGroupId, classId, tuitionFee, admissionFee, annualFee, otherFee }) => ({
+      ({
+        feeGroupId,
+        classId,
+        tuitionFee,
+        admissionFee,
+        annualFee,
+        otherFee,
+      }) => ({
         feeGroupId,
         class: classId,
         fees: {
@@ -101,10 +137,14 @@ const FeeManagement = () => {
 
       const method = isUpdateMode ? "put" : "post";
 
-      const response = await axios[method](endpoint, { feeData: formattedFeeData });
+      const response = await axios[method](endpoint, {
+        feeData: formattedFeeData,
+      });
 
       if (response.data && response.data.success) {
-        toast.success(isUpdateMode ? "Fees updated successfully!" : "Fees created successfully!");
+        toast.success(
+          isUpdateMode ? "Fees updated successfully!" : "Fees created successfully!"
+        );
         setIsUpdateMode(false);
       } else {
         toast.error("Failed to submit fees.");
@@ -117,7 +157,7 @@ const FeeManagement = () => {
 
   return (
     <div className="p-6">
-    <ToastContainer />
+      <ToastContainer />
       <h1 className="text-3xl font-bold mb-4">
         {isUpdateMode ? "Update Fee Structure" : "Create Fee Structure"}
       </h1>
