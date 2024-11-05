@@ -9,7 +9,7 @@ const ProfileHeader = ({ userData }) => {
     ? userData.fatherName
     : `${userData.firstName || ""} ${userData.lastName || ""}`.trim() ||
       "No Name Provided";
-      
+
   return (
     <div className="relative mb-6">
       <img
@@ -20,8 +20,9 @@ const ProfileHeader = ({ userData }) => {
       <div className="absolute bottom-0 left-0 flex items-center p-4 bg-gradient-to-t from-gray-900 to-transparent w-full">
         <img
           src={
-            userData.studentPhoto || userData.profileImage || userData.fatherPhoto 
-              ||
+            userData.studentPhoto ||
+            userData.profileImage ||
+            userData.fatherPhoto ||
             "https://www.shutterstock.com/image-photo/portrait-attractive-young-asian-woman-260nw-2411114955.jpg"
           }
           alt="Profile"
@@ -32,9 +33,6 @@ const ProfileHeader = ({ userData }) => {
             <h2 className="text-2xl font-semibold">{displayName}</h2>
           </h2>
           <p className="text-gray-400">Role: {userData.role}</p>
-        </div>
-        <div className="ml-auto">
-          <FormButton name={"Edit"} />
         </div>
       </div>
     </div>
