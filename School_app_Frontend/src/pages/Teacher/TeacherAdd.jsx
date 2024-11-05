@@ -51,6 +51,24 @@ const TeacherAdd = () => {
   useEffect(() => {
     if (teacherId) {
       fetchTeacherDataById();
+    } else {
+      // Clear the form when teacherId is not provided (i.e., on /school/teacher-add)
+      setFormData({
+        name: "",
+        age: "",
+        gender: "",
+        subject: "",
+        email: "",
+        password: "",
+        contact: "",
+        profile: "",
+        profileImage: "",
+        qualification: "",
+        experience: "",
+        adharNo: "",
+        panNo: "",
+        address: "",
+      });
     }
   }, [teacherId]);
 
@@ -61,6 +79,18 @@ const TeacherAdd = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const schoolId = import.meta.env.VITE_SchoolId;
+
+    const phoneRegex = /^\d{10}$/;
+    if (!phoneRegex.test(formData.contact)) {
+      toast.error("Phone number must be exactly 10 digits.");
+      return;
+    }
+
+    const phoneRegex1 = /^\d{12}$/;
+    if (!phoneRegex1.test(formData.adharNo)) {
+      toast.error("Adhar number must be exactly 12 digits.");
+      return;
+    }
 
     try {
       const url = teacherId
@@ -217,14 +247,17 @@ const TeacherAdd = () => {
 
       {/* Password Section */}
       <FormSection title="Account Details">
-        <Input
-          labelName="Password"
-          type="password"
-          name="password"
-          value={formData.password}
-          onChange={handleChange}
-          placeholder="Enter Password"
-        />
+        {!teacherId ? (
+          <Input
+            labelName="Password"
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            placeholder="Enter Password"
+          />
+        ) : null}
+
         <Input
           labelName="Email"
           name="email"

@@ -154,7 +154,7 @@ export const refreshAccessTokenParent = wrapAsync(async (req, res, next) => {
 });
 
 export const getParents = wrapAsync(async (req, res) => {
-    const parents = await Parent.find();
+    const parents = await Parent.find().populate("studentId");
     return res.status(200).json(new ApiResponse(200, parents));
 });
 
