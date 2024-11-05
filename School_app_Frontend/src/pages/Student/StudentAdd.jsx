@@ -189,11 +189,28 @@ const StudentAdd = () => {
         console.log("Student updated successfully.");
       }
     } catch (error) {
-      const errorMessage = error.response ? error.response.data : error.message;
+      let errorMessage = "An error occurred. Please try again later.";
+
+      if (error.response) {
+        if (
+          error.response.data.message.includes("E11000 duplicate key error")
+        ) {
+          if (error.response.data.message.includes("rollNumber")) {
+            errorMessage =
+              "A student with this roll number already exists. Please use a different roll number.";
+          } else {
+            errorMessage =
+              "Duplicate key error. Please make sure all unique fields are different.";
+          }
+        } else {
+          errorMessage = error.response.data.message || errorMessage;
+        }
+      } else {
+        errorMessage = error.message || errorMessage;
+      }
+
       console.error("Error adding/updating student:", errorMessage);
-      toast.error(
-        "Error adding/updating student: " + errorMessage.message.split(".")[0]
-      );
+      toast.error(errorMessage);
     }
   };
 
@@ -267,14 +284,14 @@ const StudentAdd = () => {
           name={"height"}
           value={formData.height}
           onChange={handleChange}
-          placeholder={"Enter Height"}
+          placeholder={"Enter Height in Feet"}
         />
         <Input
           labelName="Weight"
           name={"weight"}
           value={formData.weight}
           onChange={handleChange}
-          placeholder={"Enter Weight"}
+          placeholder={"Enter Weight in Kg"}
         />
         <Input
           labelName="Blood Group"

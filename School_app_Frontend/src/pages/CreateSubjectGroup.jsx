@@ -83,7 +83,6 @@ const CreateSubjectGroup = () => {
     fetchSujectGroup();
   }, []);
 
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
@@ -150,7 +149,9 @@ const CreateSubjectGroup = () => {
     try {
       if (editingGroup) {
         await axios.put(
-          `${import.meta.env.VITE_BACKEND_URL}/api/update-subject-group/${editingGroup}`,
+          `${
+            import.meta.env.VITE_BACKEND_URL
+          }/api/update-subject-group/${editingGroup}`,
           subjectGroupData
         );
         toast.success("Subject Group updated successfully!");
@@ -162,8 +163,9 @@ const CreateSubjectGroup = () => {
         toast.success("Subject Group added successfully!");
       }
 
-      const response = await getAPI("getSubjectGroup", {});
-      setData(response.data || []);
+      const response = await getAPI("getSubjectGroup", {}, setData);
+      console.log("Subject group is this :", response.data);
+      
       setFormData({
         subjectGroupName: "",
         selectedClass: "",
@@ -171,7 +173,11 @@ const CreateSubjectGroup = () => {
         selectedSubjects: [],
       });
     } catch (error) {
-      console.error("Error adding subject group:", error.response?.data || error.message);
+      console.log("error", error);
+      console.error(
+        "Error adding subject group:",
+        error.response?.data || error.message
+      );
       toast.error(
         "Error adding subject group: " +
           (error.response?.data?.message || error.message)
@@ -218,10 +224,14 @@ const CreateSubjectGroup = () => {
     if (!groupToDelete) return;
     try {
       await axios.delete(
-        `${import.meta.env.VITE_BACKEND_URL}/api/delete-subject-group/${groupToDelete._id}`
+        `${import.meta.env.VITE_BACKEND_URL}/api/delete-subject-group/${
+          groupToDelete._id
+        }`
       );
       toast.success("Subject Group deleted successfully!");
-      setData((prevData) => prevData.filter((group) => group._id !== groupToDelete._id));
+      setData((prevData) =>
+        prevData.filter((group) => group._id !== groupToDelete._id)
+      );
     } catch (error) {
       console.error("Error deleting subject group:", error);
       toast.error(

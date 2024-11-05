@@ -13,6 +13,8 @@ const CreateSection = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editingIndex, setEditingIndex] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [sectionToDelete, setSectionToDelete] = useState(null);
 
   useEffect(() => {
     fetchSections();
@@ -74,15 +76,29 @@ const CreateSection = () => {
     setEditingIndex(index);
   };
 
-  const handleDeleteSection = async (index) => {
+  const handleDeleteSection = async () => {
     try {
-      await deleteAPI(`delete-single-section/${sections[index]._id}`);
-      setSections(sections.filter((_, i) => i !== index));
+      await deleteAPI(`delete-single-section/${sectionToDelete._id}`);
+      setSections(
+        sections.filter((section) => section._id !== sectionToDelete._id)
+      );
       toast.success("Section deleted successfully!");
+      setIsModalOpen(false);
+      setSectionToDelete(null);
     } catch (error) {
       console.error("Error deleting section", error);
       toast.error("Error deleting section");
     }
+  };
+
+  const openDeleteModal = (index) => {
+    setSectionToDelete(sections[index]);
+    setIsModalOpen(true);
+  };
+
+  const closeDeleteModal = () => {
+    setIsModalOpen(false);
+    setSectionToDelete(null);
   };
 
   return (
@@ -143,7 +159,7 @@ const CreateSection = () => {
                   </button>
                   <button
                     className="ml-2 text-red-700"
-                    onClick={() => handleDeleteSection(index)}
+                    onClick={() => openDeleteModal(index)}
                   >
                     <FaTrash />
                   </button>
@@ -158,6 +174,29 @@ const CreateSection = () => {
         autoClose={3000}
         hideProgressBar={false}
       />
+      {isModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h3 className="text-xl font-semibold mb-4">
+              Are you sure you want to delete this section?
+            </h3>
+            <div className="flex justify-end">
+              <button
+                className="bg-red-600 text-white px-4 py-2 rounded mr-2"
+                onClick={handleDeleteSection}
+              >
+                Yes, Delete
+              </button>
+              <button
+                className="bg-gray-300 text-black px-4 py-2 rounded"
+                onClick={closeDeleteModal}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
