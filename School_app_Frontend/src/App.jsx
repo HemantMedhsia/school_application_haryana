@@ -71,6 +71,9 @@ import FeeSubmmission from "./pages/Fees/FeeSubmmission.jsx";
 import ClassFeesRecord from "./pages/Fees/ClassFeesRecord.jsx";
 import PaymentRecept from "./pages/Fees/PaymentRecept.jsx";
 import MonthlyFessPaymentQrRecept from "./pages/Fees/MonthlyFessPaymentQrRecept.jsx";
+import ErrorPage from "./pages/Error/ErrorPage.jsx";
+import ErrorBoundary from "./components/ErrorBoundry/ErrorBoundary.jsx";
+import AnimatedErrorPage from "./pages/Error/AnimatedErrorPage.jsx";
 
 const App = () => {
   const { userRole, authToken } = useAuth();
@@ -302,7 +305,11 @@ const App = () => {
             path="/school/monthly-fees-payment"
             element={<MonthlyFessPaymentQrRecept />}
           />
+          
         </Route>
+        <Route path="*" element={<ErrorPage />} />
+        <Route path="/error" element={<AnimatedErrorPage />} />
+
       </>
     )
   );
