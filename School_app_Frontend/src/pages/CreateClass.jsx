@@ -8,7 +8,7 @@ import { getAPI } from "../utility/api/apiCall";
 import axios from "axios";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
-
+import ConfirmationModal from "../common/ConfirmationModal/ConfirmationModal";
 const CreateClass = ({ onCreate }) => {
   const [selectedCheckboxes, setSelectedCheckboxes] = useState([]);
   const [className, setClassName] = useState("");
@@ -16,6 +16,8 @@ const CreateClass = ({ onCreate }) => {
   const [options, setOptions] = useState([]);
   const [editingClassId, setEditingClassId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [classToDelete, setClassToDelete] = useState(null);
 
   const fetchClasses = async () => {
     setLoading(true);
@@ -49,7 +51,7 @@ const CreateClass = ({ onCreate }) => {
     } catch (error) {
       console.error("Error fetching sections:", error);
     } finally {
-      SetLoading(false);
+      setLoading(false);
     }
   };
 
@@ -116,19 +118,25 @@ const CreateClass = ({ onCreate }) => {
     setSelectedCheckboxes(classItem.sections);
   };
 
-  const handleDelete = async (classId) => {
-    console.log("Deleting class:", classId);
-    if (window.confirm("Are you sure you want to delete this class?")) {
-      try {
-        await axios.delete(
-          `${import.meta.env.VITE_BACKEND_URL}/api/delete-class/${classId}`
-        );
-        toast.success("Class deleted successfully!");
-        setClasses(classes.filter((cls) => cls.id !== classId));
-      } catch (error) {
-        console.error("Error deleting class:", error);
-        toast.error("Failed to delete class.");
-      }
+  const openDeleteModal = (classId) => {
+    setIsModalOpen(true);
+    setClassToDelete(classId);
+  };
+
+  const handleDelete = async () => {
+    console.log("Deleting class:", classToDelete);
+    try {
+      await axios.delete(
+        `${import.meta.env.VITE_BACKEND_URL}/api/delete-class/${classToDelete}`
+      );
+      toast.success("Class deleted successfully!");
+      setClasses(classes.filter((cls) => cls.id !== classToDelete));
+    } catch (error) {
+      console.error("Error deleting class:", error);
+      toast.error("Failed to delete class.");
+    } finally {
+      setIsModalOpen(false);
+      setClassToDelete(null);
     }
   };
 
@@ -216,7 +224,7 @@ const CreateClass = ({ onCreate }) => {
                         />
                         <FaTrash
                           className="text-red-500 cursor-pointer"
-                          onClick={() => handleDelete(classItem.id)}
+                          onClick={() => openDeleteModal(classItem.id)}
                         />
                       </div>
                     </div>
@@ -230,6 +238,13 @@ const CreateClass = ({ onCreate }) => {
         </div>
       </div>
       <ToastContainer />
+      <ConfirmationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={handleDelete}
+        title="Delete Class"
+        message="Are you sure you want to delete this class? This action cannot be undone."
+      />
     </div>
   );
 };
