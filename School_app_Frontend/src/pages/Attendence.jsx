@@ -10,6 +10,24 @@ import { Navigate, useNavigate } from "react-router-dom";
 const columns = [
   { header: "First Name", accessor: "firstName" },
   { header: "Last Name", accessor: "lastName" },
+  {
+    header: "Class",
+    accessor: "currentClass.name",
+    render: (rowData) => {
+      return rowData.currentClass && rowData.currentClass.name
+        ? rowData.currentClass.name
+        : "NA";
+    },
+  },
+  {
+    header: "Section",
+    accessor: "currentSection.name",
+    render: (rowData) => {
+      return rowData.currentSection && rowData.currentSection.name
+        ? rowData.currentSection.name
+        : "NA";
+    },
+  },
   { header: "Roll Number", accessor: "rollNumber" },
   { header: "Total Classes", accessor: "total" },
   { header: "Total Present", accessor: "present" },
@@ -79,15 +97,25 @@ const Attendence = () => {
     let filteredData = studentData;
 
     if (type === "class" && value) {
-      setSelectedClass(value); // Store selected class
+      // Apply class filter and update selectedClass
+      setSelectedClass(value);
       filteredData = filteredData.filter(
         (student) => student.currentClass._id === value._id
       );
-    } else if (type === "section" && value && selectedClass) {
-      // Check if a class is selected
-      filteredData = filteredData.filter(
-        (student) => student.currentSection._id === value._id
-      );
+    } else if (type === "section" && value) {
+      // Apply both class and section filter if a class is selected
+      if (selectedClass) {
+        filteredData = filteredData.filter(
+          (student) =>
+            student.currentClass._id === selectedClass._id && // Keep the class filter active
+            student.currentSection._id === value._id // Apply section filter
+        );
+      } else {
+        // Apply only section filter if no class is selected
+        filteredData = filteredData.filter(
+          (student) => student.currentSection._id === value._id
+        );
+      }
     }
 
     if (searchText) {
@@ -267,9 +295,9 @@ const Attendence = () => {
           <span className="loader"></span>
         </div>
       ) : filteredStudentData.length === 0 ? (
-          <div className="no-data-message text-xl flex justify-center text-red-500">
-            Oops! No Student Attendance Records Found.
-          </div>
+        <div className="no-data-message text-xl flex justify-center text-red-500">
+          Oops! No Student Attendance Records Found.
+        </div>
       ) : (
         <Datatable
           columns={columns}

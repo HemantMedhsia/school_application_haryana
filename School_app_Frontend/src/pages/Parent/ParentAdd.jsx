@@ -3,14 +3,15 @@ import { getAPI } from "../../utility/api/apiCall";
 import Input from "../../components/Form/Input";
 import FormSection from "../../components/Form/FormSection";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import FormButton from "../../components/Form/FormButton";
 
 const ParentAdd = () => {
   const { studentId, parentId, Id } = useParams();
-  console.log("1", studentId, "2", parentId, Id);
+
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     fatherName: "",
@@ -144,9 +145,17 @@ const ParentAdd = () => {
         parentId || existingParentId
           ? "Parent updated successfully!"
           : "Parent added successfully!";
+
       toast.success(successMessage);
 
-      // Clear form data after submission
+      setTimeout(() => {
+        if (successMessage === "Parent added successfully!") {
+          navigate("/school/student-admission");
+        } else if (successMessage === "Parent updated successfully!") {
+          navigate("/school/parent-information");
+        }
+      }, 1000);
+
       setFormData({
         fatherName: "",
         fatherPhone: "",

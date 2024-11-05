@@ -8,7 +8,7 @@ import { useAuth } from "../../context/AuthProvider";
 import { useParams } from "react-router-dom";
 import { FaTimes, FaSave } from "react-icons/fa"; // Icons for close and save
 import { ToastContainer, toast } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css'; // Import toastify CSS
+import "react-toastify/dist/ReactToastify.css"; // Import toastify CSS
 
 const StudentAttendance = () => {
   const [attendance, setAttendance] = useState({});
@@ -87,7 +87,7 @@ const StudentAttendance = () => {
     fetchData();
   }, [id, endpoint, userRole]);
 
-  const [date, setDate] = useState(new Date(Date.UTC(2024, 9, 2)));
+  const [date, setDate] = useState(new Date());
 
   const handleDateChange = (newDate) => {
     setDate(newDate);
@@ -208,9 +208,19 @@ const StudentAttendance = () => {
       )}
 
       {/* Toast notification container */}
-      <ToastContainer position="top-right" autoClose={2000} hideProgressBar={false} newestOnTop={true} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
+      <ToastContainer
+        position="top-right"
+        autoClose={2000}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>
   );
 };
 
-export default StudentAttendance
+export default StudentAttendance;

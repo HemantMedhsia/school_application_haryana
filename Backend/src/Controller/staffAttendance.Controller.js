@@ -29,12 +29,60 @@ export const createStaffAttendance = wrapAsync(async (req, res) => {
         );
 });
 
+// export const createMultipleStaffAttendenceInBulk = wrapAsync(
+//     async (req, res) => {
+//         const attendenceData = req.body;
+
+//         if (!Array.isArray(attendenceData) || attendenceData.length === 0) {
+//             return res.status(400).json({ message: "Invalid data provided." });
+//         }
+
+//         const savedAttendence = await StaffAttendance.insertMany(
+//             attendenceData
+//         );
+
+//         for (const attendance of savedAttendence) {
+//             await Staff.findByIdAndUpdate(attendance.staffId, {
+//                 $push: { staffAttendance: attendance._id },
+//             });
+//         }
+//         res.status(201).json(new ApiResponse(201, savedAttendence));
+//     }
+// );
+
 export const createMultipleStaffAttendenceInBulk = wrapAsync(
     async (req, res) => {
         const attendenceData = req.body;
 
         if (!Array.isArray(attendenceData) || attendenceData.length === 0) {
-            return res.status(400).json({ message: "Invalid data provided." });
+            return res  
+                .status(400)
+                .json(new ApiResponse(400, "Invalid data provided."));
+        }
+
+        for (const attendance of attendenceData) {
+            const attendanceDate = new Date(attendance.date);
+            const startOfDay = new Date(attendanceDate.setHours(0, 0, 0, 0));
+            const endOfDay = new Date(attendanceDate.setHours(23, 59, 59, 999));
+
+            const existingAttendance = await StaffAttendance.findOne({
+                staffId: attendance.staffId,
+                date: {
+                    $gte: startOfDay,
+                    $lt: endOfDay,
+                },
+            });
+
+            if (existingAttendance) {
+                return res
+                    .status(400)
+                    .json(
+                        new ApiResponse(
+                            400,
+                            `Attendance for staff ${attendance.staffId} on date ${attendance.date} already exists.`
+                        )
+                    );
+            }
         }
 
         const savedAttendence = await StaffAttendance.insertMany(
@@ -117,43 +165,41 @@ export const updateStaffAttendance = wrapAsync(async (req, res) => {
         );
 });
 
-export const updateStaffAttendanceByStaffId = wrapAsync(
-    async (req, res) => {
-        const { staffId } = req.params;
-        const { date, status } = req.body;
-        const startOfDay = new Date(date);
-        startOfDay.setUTCHours(0, 0, 0, 0); // Start of the day (00:00:00)
+export const updateStaffAttendanceByStaffId = wrapAsync(async (req, res) => {
+    const { staffId } = req.params;
+    const { date, status } = req.body;
+    const startOfDay = new Date(date);
+    startOfDay.setUTCHours(0, 0, 0, 0); // Start of the day (00:00:00)
 
-        const endOfDay = new Date(date);
-        endOfDay.setUTCHours(23, 59, 59, 999); // End of the day (23:59:59)
+    const endOfDay = new Date(date);
+    endOfDay.setUTCHours(23, 59, 59, 999); // End of the day (23:59:59)
 
-        const staff = await Staff.findById(staffId);
+    const staff = await Staff.findById(staffId);
 
-        if (!staff) {
-            return res.status(404).json({ message: "staff not found 404" });
-        }
-
-        // Find the attendance record between the start and end of the given day
-        const attendanceRecord = await StaffAttendance.findOne({
-            staffId: staffId,
-            date: {
-                $gte: startOfDay,
-                $lte: endOfDay,
-            },
-        });
-
-        if (attendanceRecord) {
-            attendanceRecord.status = status;
-            await attendanceRecord.save();
-            return res
-                .status(200)
-                .json(new ApiResponse(200, "Attendance updated successfully"));
-        }
-        return res
-            .status(404)
-            .json(new ApiResponse(404, "Attendance record not found"));
+    if (!staff) {
+        return res.status(404).json({ message: "staff not found 404" });
     }
-);
+
+    // Find the attendance record between the start and end of the given day
+    const attendanceRecord = await StaffAttendance.findOne({
+        staffId: staffId,
+        date: {
+            $gte: startOfDay,
+            $lte: endOfDay,
+        },
+    });
+
+    if (attendanceRecord) {
+        attendanceRecord.status = status;
+        await attendanceRecord.save();
+        return res
+            .status(200)
+            .json(new ApiResponse(200, "Attendance updated successfully"));
+    }
+    return res
+        .status(404)
+        .json(new ApiResponse(404, "Attendance record not found"));
+});
 
 export const deleteStaffAttendance = wrapAsync(async (req, res) => {
     const staffAttendance = await StaffAttendance.findByIdAndDelete(
@@ -192,4 +238,3 @@ export const getStaffAttendanceByAdmin = wrapAsync(async (req, res) => {
 
     res.status(200).json(new ApiResponse(200, attendanceResponse));
 });
-

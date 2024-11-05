@@ -26,12 +26,60 @@ export const createTeacherAttendance = wrapAsync(async (req, res) => {
     return res.status(201).json(new ApiResponse(201, teacherAttendance));
 });
 
+// export const createMultipleTeacherAttendenceInBulk = wrapAsync(
+//     async (req, res) => {
+//         const attendenceData = req.body;
+
+//         if (!Array.isArray(attendenceData) || attendenceData.length === 0) {
+//             return res.status(400).json({ message: "Invalid data provided." });
+//         }
+
+//         const savedAttendence = await TeacherAttendance.insertMany(
+//             attendenceData
+//         );
+
+//         for (const attendance of savedAttendence) {
+//             await Teacher.findByIdAndUpdate(attendance.teacherId, {
+//                 $push: { TeacherAttendance: attendance._id },
+//             });
+//         }
+//         res.status(201).json(new ApiResponse(201, savedAttendence));
+//     }
+// );
+
 export const createMultipleTeacherAttendenceInBulk = wrapAsync(
     async (req, res) => {
         const attendenceData = req.body;
 
         if (!Array.isArray(attendenceData) || attendenceData.length === 0) {
-            return res.status(400).json({ message: "Invalid data provided." });
+            return res
+                .status(400)
+                .json(new ApiResponse(400, "Invalid data provided."));
+        }
+
+        for (const attendance of attendenceData) {
+            const attendanceDate = new Date(attendance.date);
+            const startOfDay = new Date(attendanceDate.setHours(0, 0, 0, 0));
+            const endOfDay = new Date(attendanceDate.setHours(23, 59, 59, 999));
+
+            const existingAttendance = await TeacherAttendance.findOne({
+                teacherId: attendance.teacherId,
+                date: {
+                    $gte: startOfDay,
+                    $lt: endOfDay,
+                },
+            });
+
+            if (existingAttendance) {
+                return res
+                    .status(400)
+                    .json(
+                        new ApiResponse(
+                            400,
+                            `Attendance for teacher ${attendance.teacherId} on date ${attendance.date} already exists.`
+                        )
+                    );
+            }
         }
 
         const savedAttendence = await TeacherAttendance.insertMany(
