@@ -11,7 +11,7 @@ import DarkModeToggle from "../../common/DarkModeToggle/DarkModeToggle";
 import logo from "../../assets/logo.png";
 
 const navigation = [
-  { name: "Vardhan International School", href: "#", current: false },
+  { name: "Demo School Name", href: "#", current: false },
 ];
 
 function classNames(...classes) {

@@ -33,11 +33,11 @@ const LeftNavbar = ({ role, onToggle }) => {
       }`}
     >
       <div className="flex flex-col h-full text-white">
-        <div className="flex items-center justify-between h-16 p-2 bg-[#283046]">
+        <div className="flex items-center justify-between h-16 w-auto p-2 bg-[#283046]">
           <img
             src={aradhyaTechLogo}
             alt="Logo"
-            className={`h-16 mt-2 transition-all duration-300 ${
+            className={`h-12 w-52 mt-2 transition-all duration-300 ${
               isCollapsed ? "hidden" : "block"
             }`}
           />
