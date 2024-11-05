@@ -174,7 +174,7 @@ const TeacherAttendance = () => {
         }
       );
       toast.success("Attendance data saved successfully!");
-      fetchTeacherData();
+      await fetchTeacherData();
     } catch (error) {
       console.error("Error saving attendance data:", error);
       toast.error("Error saving data!");
