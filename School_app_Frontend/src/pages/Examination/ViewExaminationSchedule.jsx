@@ -7,7 +7,7 @@ import { useReactToPrint } from "react-to-print";
 // import AdmitCardList from "../Print/StudentAdmitCard";
 import logo from "../../assets/logo.png";
 import AdmitCardList from "../Print/StudentAdmitCard";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 
 Modal.setAppElement("#root"); // Set your app root element for accessibility
 
@@ -176,10 +176,11 @@ const ViewExaminationSchedule = () => {
     }
   };
 
-  const handleDelete = () => {
+  const handleDelete = (index) => {
+    console.log(index);
     toast.warning("Delete functionality is not available in this view");
     console.log("Delete functionality is not available in this view");
-  }
+  };
 
   const handleStudentCheckboxChange = (studentId) => {
     setSelectedStudents((prevSelected) =>
@@ -257,8 +258,11 @@ const ViewExaminationSchedule = () => {
 
           {/* Printable Section */}
           <div>
-            <DynamicTable columns={columns} data={examSubjects} />
-            handleDelete={handleDelete}
+            <DynamicTable
+              columns={columns}
+              data={examSubjects}
+              handleDelete={handleDelete}
+            />
           </div>
 
           {/* Open Modal Button */}
@@ -322,8 +326,10 @@ const ViewExaminationSchedule = () => {
           </div>
         </div>
       )}
+      <ToastContainer/>
     </div>
   );
 };
 
 export default ViewExaminationSchedule;
+// 
