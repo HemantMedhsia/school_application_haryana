@@ -248,12 +248,25 @@ export const deleteStudent = wrapAsync(async (req, res) => {
             message: "Student not found",
         });
     }
-    const parent = await Parent.findOneAndDelete({ studentId: req.params.id }); // Delete parent if studen
+    const parent = await Parent.findOneAndDelete({ studentId: req.params.id }); // Delete parent if student
     console.log("Parent", parent);
     if (!parent) {
         return res.status(404).json({
             success: false,
             message: "Parent not found",
+        });
+    }
+
+    const school = await School.findOneAndUpdate(
+        { students: req.params.id },
+        { $pull: { students: req.params.id } }
+    );
+
+    if (!school) {
+        return res.status(404).json({
+            success: false,
+            message:
+                "School not found or student ID not associated with any school",
         });
     }
 
