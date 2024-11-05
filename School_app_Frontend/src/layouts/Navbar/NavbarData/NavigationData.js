@@ -11,7 +11,16 @@ import {
   FaUserFriends,
   FaUsers,
   FaUserTie,
+  FaUserCheck,
+  FaChalkboardTeacher,
+  FaGraduationCap,
+  FaBookOpen,
+  FaChartBar,
+  FaDollarSign,
+  FaCogs,
 } from "react-icons/fa";
+import { FaIdCard, FaRegCircle } from "react-icons/fa6";
+import { MdAssignment, MdAssignmentAdd } from "react-icons/md";
 import { Navigate } from "react-router-dom";
 
 export const navigation = [
@@ -39,13 +48,13 @@ export const navigation = [
       {
         name: "Student Information",
         to: "/school/student-information",
-        icon: FaUser,
+        icon: FaRegCircle,
         roles: ["Admin", "Teacher", "Student"],
       },
       {
         name: "Student Admission",
         to: "/school/student-admission",
-        icon: FaUser,
+        icon: FaRegCircle,
         roles: ["Admin", "Teacher", "Student"],
       },
     ],
@@ -53,26 +62,26 @@ export const navigation = [
   {
     name: "Attendance",
     to: "#",
-    icon: FaProjectDiagram,
+    icon: FaUserCheck,
     current: false,
     roles: ["Teacher", "Admin"],
     children: [
       {
         name: "Student Attendance",
         to: "/school/attendance",
-        icon: FaUser,
+        icon: FaRegCircle,
         roles: ["Teacher", "Admin"],
       },
       {
         name: "Teacher Attendance",
         to: "/school/teacher-attendance",
-        icon: FaUser,
+        icon: FaRegCircle,
         roles: ["Admin"],
       },
       {
         name: "Staff Attendance",
         to: "/school/staff-attendance",
-        icon: FaUser,
+        icon: FaRegCircle,
         roles: ["Admin"],
       },
     ],
@@ -80,20 +89,20 @@ export const navigation = [
   {
     name: "Teacher",
     to: "#",
-    icon: FaProjectDiagram,
+    icon: FaChalkboardTeacher,
     current: false,
     roles: ["Admin"],
     children: [
       {
         name: "Teacher Information",
         to: "/school/all-teachers",
-        icon: FaUser,
+        icon: FaRegCircle,
         roles: ["Admin"],
       },
       {
         name: "Add Teacher",
         to: "/school/teacher-add",
-        icon: FaBook,
+        icon: FaRegCircle,
         roles: ["Admin"],
       },
     ],
@@ -108,7 +117,7 @@ export const navigation = [
       {
         name: "Parent Information",
         to: "/school/parent-information",
-        icon: FaUser,
+        icon: FaRegCircle,
         roles: ["Admin"],
       },
     ],
@@ -117,20 +126,20 @@ export const navigation = [
   {
     name: "Staff",
     to: "/staff",
-    icon: FaUserTie,
+    icon: FaIdCard,
     current: false,
     roles: ["Admin"],
     children: [
       {
         name: "Staff Information",
         to: "/school/all-staffs",
-        icon: FaUser,
+        icon: FaRegCircle,
         roles: ["Admin"],
       },
       {
         name: "Add Staff",
         to: "/school/staff-add",
-        icon: FaBook,
+        icon: FaRegCircle,
         roles: ["Admin"],
       },
     ],
@@ -138,33 +147,33 @@ export const navigation = [
   {
     name: "Academic",
     to: "#",
-    icon: FaClock,
+    icon: FaGraduationCap,
     current: false,
     roles: ["Admin", "Teacher", "Parent", "Student"],
     children: [
       {
         name: "Class TimeTable",
         to: "/school/class-timetable",
-        icon: FaUser,
+        icon: FaRegCircle,
         roles: ["Admin"],
       },
       {
         name: "Class TimeTable",
         to: "/school/class-timetable-user",
-        icon: FaUser,
+        icon: FaRegCircle,
         roles: ["Student", "Teacher", "Parent"],
       },
 
       {
         name: "Teacher Timetable",
         to: "/school/teacher-timetable",
-        icon: FaBook,
+        icon: FaRegCircle,
         roles: ["Admin"],
       },
       {
         name: "Create TimeTable",
         to: "/school/create-timetable",
-        icon: FaCheckCircle,
+        icon: FaRegCircle,
         roles: ["Admin"],
       },
       // {
@@ -176,25 +185,25 @@ export const navigation = [
       {
         name: "Create Section",
         to: "/school/create-section",
-        icon: FaCheckCircle,
+        icon: FaRegCircle,
         roles: ["Admin"],
       },
       {
         name: "Create Class",
         to: "/school/create-class",
-        icon: FaCheckCircle,
+        icon: FaRegCircle,
         roles: ["Admin"],
       },
       {
         name: "Add Subjects",
         to: "/school/add-subjects",
-        icon: FaCheckCircle,
+        icon: FaRegCircle,
         roles: ["Admin"],
       },
       {
         name: "Create Subject Group",
         to: "/school/create-subject-group",
-        icon: FaCheckCircle,
+        icon: FaRegCircle,
         roles: ["Admin"],
       },
     ],
@@ -231,7 +240,7 @@ export const navigation = [
   {
     name: "Homework",
     to: "/school/student-homework",
-    icon: FaUserFriends,
+    icon: MdAssignmentAdd,
     current: false,
     roles: ["Student", "Parent"],
   },
@@ -239,57 +248,57 @@ export const navigation = [
   {
     name: "Examination",
     to: "#",
-    icon: FaChartLine,
+    icon: FaPen,
     current: false,
     roles: ["Admin", "Teacher", "Student", "Parent"],
     children: [
       {
         name: "Exam Group",
         to: "/school/exam-group",
-        icon: FaUser,
+        icon: FaRegCircle,
         roles: ["Admin"],
       },
       {
         name: "Exam Type",
         to: "/school/exam-type",
-        icon: FaBook,
+        icon: FaRegCircle,
         roles: ["Admin"],
       },
       {
         name: "Add Marks",
         to: "/school/add-marks",
-        icon: FaCheckCircle,
+        icon: FaRegCircle,
         roles: ["Admin", "Teacher"],
       },
       {
         name: "Exam Schedule",
         to: "/school/exam-schedule",
-        icon: FaCheckCircle,
+        icon: FaRegCircle,
         roles: ["Admin"],
       },
       {
         name: "View Exam Schedule",
         to: "/school/view-exam-schedule",
-        icon: FaCheckCircle,
+        icon: FaRegCircle,
         roles: ["Admin", "Teacher"],
       },
       {
         name: "View Exam Schedule",
         to: "/school/view-exam-schedule-student-and-parent",
-        icon: FaCheckCircle,
+        icon: FaRegCircle,
         roles: ["Student", "Parent"],
       },
       {
         name: "View Result",
         to: "/school/view-result",
-        icon: FaCheckCircle,
+        icon: FaRegCircle,
         roles: ["Student", "Parent"],
       },
 
       {
         name: "View Marks",
         to: "/school/view-marks",
-        icon: FaCheckCircle,
+        icon: FaRegCircle,
         roles: ["Admin", "Teacher"],
       },
     ],
@@ -297,20 +306,20 @@ export const navigation = [
   {
     name: "Home Work",
     to: "#",
-    icon: FaChartLine,
+    icon: MdAssignment,
     current: false,
     roles: ["Admin", "Teacher"],
     children: [
       {
         name: "Add Home Work",
         to: "/school/add-home-work",
-        icon: FaUser,
+        icon: FaRegCircle,
         roles: ["Admin", "Teacher"],
       },
       {
         name: "View Home Work",
         to: "/school/view-home-work",
-        icon: FaBook,
+        icon: FaRegCircle,
         roles: ["Admin", "Teacher"],
       },
     ],
@@ -319,20 +328,20 @@ export const navigation = [
   {
     name: "Lesson Plan",
     to: "#",
-    icon: FaChartLine,
+    icon: FaBookOpen,
     current: false,
     roles: ["Admin", "Teacher"],
     children: [
       {
         name: "Manage Lesson Plan",
         to: "/school/manage-lesson-Plan",
-        icon: FaUser,
+        icon: FaRegCircle,
         roles: ["Admin", "Teacher"],
       },
       {
         name: "Syllabus Status",
         to: "/school/syallabus-status",
-        icon: FaBook,
+        icon: FaRegCircle,
         roles: ["Admin", "Teacher"],
       },
     ],
@@ -340,14 +349,14 @@ export const navigation = [
   {
     name: "Results",
     to: "/results",
-    icon: FaBell,
+    icon: FaChartBar,
     current: false,
     roles: ["Admin"],
     children: [
       {
         name: "All Students Result",
         to: "/school/students-results",
-        icon: FaUser,
+        icon: FaRegCircle,
         roles: ["Admin"],
       },
     ],
@@ -355,38 +364,38 @@ export const navigation = [
   {
     name: "Fees Management",
     to: "/fees",
-    icon: FaBell,
+    icon: FaDollarSign,
     current: false,
     roles: ["Admin"],
     children: [
-        {
+      {
         name: "Create Fees",
         to: "/school/create-fees",
-        icon: FaUser,
+        icon: FaRegCircle,
         roles: ["Admin"],
       },
       {
         name: "Fees Installment",
         to: "/school/fees-installment",
-        icon: FaUser,
+        icon: FaRegCircle,
         roles: ["Admin"],
       },
       {
         name: "Student Fees",
         to: "/school/student-fees-page",
-        icon: FaUser,
+        icon: FaRegCircle,
         roles: ["Admin"],
       },
       {
         name: "Class Fee Records",
         to: "/school/class-fees-record",
-        icon: FaUser,
+        icon: FaRegCircle,
         roles: ["Admin"],
       },
       {
         name: "Monthly Fees Payment",
         to: "/school/monthly-fees-payment",
-        icon: FaUser,
+        icon: FaRegCircle,
         roles: ["Admin"],
       },
     ],
@@ -422,13 +431,13 @@ export const navigation = [
       {
         name: "Create Notice",
         to: "/school/create-notice",
-        icon: FaUser,
+        icon: FaRegCircle,
         roles: ["Admin"],
       },
       {
         name: "View All Notices",
         to: "/school/view-notice",
-        icon: FaBook,
+        icon: FaRegCircle,
         roles: ["Student", "Teacher", "Admin", "Parent"],
       },
     ],
@@ -436,7 +445,7 @@ export const navigation = [
   {
     name: "Setting",
     to: "/setting",
-    icon: FaBell,
+    icon: FaCogs,
     current: false,
     roles: ["Admin"],
     children: [
