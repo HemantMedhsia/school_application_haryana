@@ -62,6 +62,12 @@ const StaffAdd = () => {
       return;
     }
 
+    // Age validation: show a warning if age is less than 0
+    if (name === "age" && value < 0) {
+      toast.warning("Age cannot be less than 0.");
+      return;
+    }
+
     setFormData({ ...formData, [name]: value });
   };
 
@@ -83,6 +89,12 @@ const StaffAdd = () => {
 
     if (isEmpty) {
       toast.error("All fields are required.");
+      return;
+    }
+
+    // Age validation: prevent form submission if age is less than 0
+    if (formData.age < 0) {
+      toast.error("Age cannot be less than 0.");
       return;
     }
 
@@ -155,6 +167,7 @@ const StaffAdd = () => {
           onChange={handleChange}
           placeholder="Enter Age"
           type="number"
+          min="0" // This prevents entering negative numbers
         />
 
         <Input
