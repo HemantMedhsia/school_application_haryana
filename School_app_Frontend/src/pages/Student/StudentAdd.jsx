@@ -332,14 +332,18 @@ const StudentAdd = () => {
           onChange={handleChange}
           placeholder="Enter Roll Number"
         />
-        <Input
-          labelName="Password"
-          type="password"
-          name="password"
-          value={formData.password}
-          onChange={handleChange}
-          placeholder="Enter  Password"
-        />
+
+        {!studentId ? (
+          <Input
+            labelName="Password"
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            placeholder="Enter  Password"
+          />
+        ) : null}
+
         <Input
           labelName="Admission Date"
           name="admissionDate"

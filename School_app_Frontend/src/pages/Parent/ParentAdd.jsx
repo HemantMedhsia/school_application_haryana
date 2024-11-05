@@ -23,8 +23,8 @@ const ParentAdd = () => {
     // motherPhoto: "",
     guardianIs: "",
     guardianName: "",
-    guardianRelation: "",
-    guardianPhone: "",
+    // guardianRelation: "",
+    // guardianPhone: "",
     guardianOccupation: "",
     email: "",
     // guardianPhoto: "",
@@ -78,9 +78,8 @@ const ParentAdd = () => {
         motherOccupation: parentData.motherOccupation || "",
         guardianIs: parentData.guardianIs || "",
         guardianName: parentData.guardianName || "",
-        guardianRelation: parentData.guardianRelation || "",
         guardianPhone: parentData.guardianPhone || "",
-        guardianOccupation: parentData.guardianOccupation || "",
+        // guardianOccupation: parentData.guardianOccupation || "",
         guardianAddress: parentData.guardianAddress || "",
         email: parentData.email || "",
         password: parentData.password || "",
@@ -106,6 +105,17 @@ const ParentAdd = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const phoneRegex = /^\d{10}$/;
+    if (!phoneRegex.test(formData.fatherPhone)) {
+      toast.error("Phone number must be exactly 10 digits.");
+      return;
+    }
+
+    if (!phoneRegex.test(formData.motherPhone)) {
+      toast.error("Phone number must be exactly 10 digits.");
+      return;
+    }
+
     try {
       let url, method;
 
@@ -117,9 +127,7 @@ const ParentAdd = () => {
         method = "put";
       } else {
         // If no parentId exists, create a new parent
-        url = `${
-          import.meta.env.VITE_BACKEND_URL
-        }/api/create-parent/${Id}`;
+        url = `${import.meta.env.VITE_BACKEND_URL}/api/create-parent/${Id}`;
         method = "post";
       }
 
@@ -148,9 +156,8 @@ const ParentAdd = () => {
         motherOccupation: "",
         guardianIs: "",
         guardianName: "",
-        guardianRelation: "",
-        guardianPhone: "",
-        guardianOccupation: "",
+        // guardianPhone: "",
+        // guardianOccupation: "",
         email: "",
         guardianAddress: "",
         password: "",
@@ -238,27 +245,27 @@ const ParentAdd = () => {
           onChange={handleChange}
           placeholder="Enter Guardian's Name"
         />
-        <Input
+        {/* <Input
           labelName="Guardian's Relation"
           name="guardianRelation"
           value={formData.guardianRelation}
           onChange={handleChange}
           placeholder="Enter Guardian's Relation"
-        />
-        <Input
+        /> */}
+        {/* <Input
           labelName="Guardian's Phone"
           name="guardianPhone"
           value={formData.guardianPhone}
           onChange={handleChange}
           placeholder="Enter Guardian's Phone"
-        />
-        <Input
+        /> */}
+        {/* <Input
           labelName="Guardian's Occupation"
           name="guardianOccupation"
           value={formData.guardianOccupation}
           onChange={handleChange}
           placeholder="Enter Guardian's Occupation"
-        />
+        /> */}
         <Input
           labelName="Guardian's Address"
           name="guardianAddress"
@@ -277,17 +284,16 @@ const ParentAdd = () => {
           onChange={handleChange}
           placeholder="Enter Email"
         />
-        { Id ?
-        <Input
-          labelName="Password"
-          type="password"
-          name="password"
-          value={formData.password}
-          onChange={handleChange}
-          placeholder="Enter Password"
-        />
-        : null
-        }
+        {Id ? (
+          <Input
+            labelName="Password"
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            placeholder="Enter Password"
+          />
+        ) : null}
       </FormSection>
 
       {/* Submit Button */}
