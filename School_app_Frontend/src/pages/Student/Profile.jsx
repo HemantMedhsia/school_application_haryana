@@ -106,7 +106,7 @@ const Profile = () => {
                   },
                   { label: "Blood Group", value: studentData.bloodGroup },
                   { label: "House", value: studentData.house },
-                  { label: "Height", value: `${studentData.height} cm` },
+                  { label: "Height", value: `${studentData.height} feet` },
                   { label: "Weight", value: `${studentData.weight} kg` },
                   {
                     label: "Measurement Date",
