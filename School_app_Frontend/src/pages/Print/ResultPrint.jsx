@@ -6,7 +6,7 @@ const ResultPrint = ({ data2 }) => {
   // Hard-coded data (replace with your API response data)
   const { studentProfile, subjects } = data2;
 
-  console.log(subjects);
+  console.log("subject rec " ,subjects);
   const data = {
     commonData: {
       schoolName: "Vardhan International School",
@@ -327,3 +327,4 @@ const ResultPrint = ({ data2 }) => {
 };
 
 export default ResultPrint;
+// 
