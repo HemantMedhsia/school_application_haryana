@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import * as XLSX from 'xlsx';
 
 const StudentAndParentExcelUpload = () => {
   const [file, setFile] = useState(null);
@@ -15,37 +14,27 @@ const StudentAndParentExcelUpload = () => {
       return;
     }
 
-    // Step 1: Read the Excel file
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      const data = new Uint8Array(e.target.result);
-      const workbook = XLSX.read(data, { type: 'array' });
+    // Step 1: Create FormData to send the file
+    const formData = new FormData();
+    formData.append('file', file);
 
-      // Step 2: Convert the workbook to CSV
-      const csvData = XLSX.utils.sheet_to_csv(workbook.Sheets[workbook.SheetNames[0]]);
+    // Step 2: Send FormData to API
+    try {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/upload-bulk-students`, {
+        method: 'POST',
+        body: formData,
+      });
 
-      // Step 3: Send CSV data to API
-      try {
-        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/upload-bulk-students`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'text/csv',
-          },
-          body: csvData,
-        });
-
-        if (response.ok) {
-          alert("File uploaded successfully!");
-        } else {
-          alert("Failed to upload file.");
-        }
-      } catch (error) {
-        console.error("Error uploading file:", error);
-        alert("An error occurred during upload.");
+      if (response.ok) {
+        alert("File uploaded successfully!");
+      } else {
+        const errorData = await response.json();
+        alert(`Failed to upload file: ${errorData.message || "Unknown error"}`);
       }
-    };
-
-    reader.readAsArrayBuffer(file);
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      alert("An error occurred during upload.");
+    }
   };
 
   return (
