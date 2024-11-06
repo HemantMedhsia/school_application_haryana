@@ -8,10 +8,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthProvider";
 import { jwtDecode } from "jwt-decode";
 import DarkModeToggle from "../../common/DarkModeToggle/DarkModeToggle";
-import logo from "../../assets/logo.png";
+import logo from "../../assets/titleLogo.png";
 
 const navigation = [
-  { name: "Vardhan International School", href: "#", current: false },
+  { name: "Demo School Name", href: "#", current: false },
 ];
 
 function classNames(...classes) {
