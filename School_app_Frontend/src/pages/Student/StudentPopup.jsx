@@ -1,8 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { getAPI } from "../../utility/api/apiCall";
 import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
 
-const StudentSearchPopup = ({ isOpen, onClose, onAddStudent, studentId, parent }) => {
+
+const StudentSearchPopup = ({
+  isOpen,
+  onClose,
+  onAddStudent,
+  studentId,
+  parent,
+}) => {
   const [searchText, setSearchText] = useState("");
   const [students, setStudents] = useState([]);
   const [filteredStudents, setFilteredStudents] = useState([]);
@@ -15,7 +23,12 @@ const StudentSearchPopup = ({ isOpen, onClose, onAddStudent, studentId, parent }
 
   const fetchStudents = async () => {
     try {
-      console.log("Fetching siblings for student:", studentId, "and parent:", parent);
+      console.log(
+        "Fetching siblings for student:",
+        studentId,
+        "and parent:",
+        parent
+      );
       const response = await getAPI("getAllStudents", {}, setStudents);
       if (response.data && Array.isArray(response.data)) {
         setStudents(response.data);
@@ -44,7 +57,7 @@ const StudentSearchPopup = ({ isOpen, onClose, onAddStudent, studentId, parent }
 
   const handleAddSibling = async (selectedStudentId) => {
     if (!studentId || !parent) {
-        console.log(parent._id)
+      console.log(parent._id);
       console.error("Student ID or Parent ID is missing!");
       return;
     }
@@ -66,9 +79,14 @@ const StudentSearchPopup = ({ isOpen, onClose, onAddStudent, studentId, parent }
         onAddStudent(response.data); // Callback to notify the parent component
       } else {
         console.error("Failed to add sibling:", response.data);
+        toast.error("Failed to add sibling.");
       }
     } catch (error) {
       console.error("Error adding sibling:", error);
+      const errorMessage =
+        error.response?.data?.data ||
+        "An error occurred while adding the sibling.";
+      toast.error(errorMessage);
     }
   };
 
@@ -81,7 +99,9 @@ const StudentSearchPopup = ({ isOpen, onClose, onAddStudent, studentId, parent }
     >
       <div className="bg-white p-8 rounded-lg w-4/5 max-h-[85%] overflow-y-auto shadow-xl">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold text-gray-800">Search and Add Siblings</h2>
+          <h2 className="text-2xl font-semibold text-gray-800">
+            Search and Add Siblings
+          </h2>
           <button onClick={onClose} className="text-red-500 text-xl font-bold">
             &times;
           </button>
@@ -94,7 +114,9 @@ const StudentSearchPopup = ({ isOpen, onClose, onAddStudent, studentId, parent }
           className="w-full p-3 border border-gray-300 rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
         {filteredStudents.length === 0 ? (
-          <div className="text-center text-gray-500 text-lg">No students found.</div>
+          <div className="text-center text-gray-500 text-lg">
+            No students found.
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredStudents.map((student) => (
@@ -104,7 +126,9 @@ const StudentSearchPopup = ({ isOpen, onClose, onAddStudent, studentId, parent }
               >
                 <div className="flex items-center mb-4">
                   <img
-                    src={student.studentPhoto || "https://via.placeholder.com/50"}
+                    src={
+                      student.studentPhoto || "https://via.placeholder.com/50"
+                    }
                     alt={`${student.firstName} ${student.lastName}`}
                     className="w-16 h-16 rounded-full border border-gray-300 object-cover mr-4"
                   />
@@ -112,11 +136,14 @@ const StudentSearchPopup = ({ isOpen, onClose, onAddStudent, studentId, parent }
                     <h3 className="text-xl font-semibold text-gray-700">
                       {`${student.firstName} ${student.lastName}`}
                     </h3>
-                    <p className="text-gray-500 text-sm">Roll No: {student.rollNumber}</p>
+                    <p className="text-gray-500 text-sm">
+                      Roll No: {student.rollNumber}
+                    </p>
                   </div>
                 </div>
                 <p className="text-gray-600 mb-4">
-                  <strong>Father's Name:</strong> {student.parent?.fatherName || "N/A"}
+                  <strong>Father's Name:</strong>{" "}
+                  {student.parent?.fatherName || "N/A"}
                 </p>
                 <button
                   onClick={() => handleAddSibling(student._id)}
@@ -129,8 +156,9 @@ const StudentSearchPopup = ({ isOpen, onClose, onAddStudent, studentId, parent }
           </div>
         )}
       </div>
+      <ToastContainer />
     </div>
   );
 };
 
-export default StudentSearchPopup; 
+export default StudentSearchPopup;
