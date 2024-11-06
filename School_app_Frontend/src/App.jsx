@@ -74,6 +74,8 @@ import MonthlyFessPaymentQrRecept from "./pages/Fees/MonthlyFessPaymentQrRecept.
 import ErrorPage from "./pages/Error/ErrorPage.jsx";
 import ErrorBoundary from "./components/ErrorBoundry/ErrorBoundary.jsx";
 import AnimatedErrorPage from "./pages/Error/AnimatedErrorPage.jsx";
+import StudentAndParentExcelUpload from "./pages/UploadFiles/StudentAndParentExcelUpload.jsx";
+import WorkInProgress from "./pages/WorkInProgress/WorkInProgress.jsx";
 
 const App = () => {
   const { userRole, authToken } = useAuth();
@@ -683,6 +685,46 @@ const App = () => {
             element={
               <RoleBasedAccess allowedRoles={["Admin"]}>
                 <MonthlyFessPaymentQrRecept />
+              </RoleBasedAccess>
+            }
+          />
+          <Route
+            path="/school/upload-student-records"
+            element={
+              <RoleBasedAccess allowedRoles={["Admin"]}>
+                <StudentAndParentExcelUpload />
+              </RoleBasedAccess>
+            }
+          />
+          <Route
+            path="/school/upload-student-attendance-records"
+            element={
+              <RoleBasedAccess allowedRoles={["Admin"]}>
+                <WorkInProgress />
+              </RoleBasedAccess>
+            }
+          />
+          <Route
+            path="/school/upload-teacher-records"
+            element={
+              <RoleBasedAccess allowedRoles={["Admin"]}>
+                <WorkInProgress />
+              </RoleBasedAccess>
+            }
+          />
+          <Route
+            path="/school/upload-teacher-attendance-records"
+            element={
+              <RoleBasedAccess allowedRoles={["Admin"]}>
+                <WorkInProgress />
+              </RoleBasedAccess>
+            }
+          />
+          <Route
+            path="/school/upload-staff-records"
+            element={
+              <RoleBasedAccess allowedRoles={["Admin"]}>
+                <WorkInProgress />
               </RoleBasedAccess>
             }
           />
