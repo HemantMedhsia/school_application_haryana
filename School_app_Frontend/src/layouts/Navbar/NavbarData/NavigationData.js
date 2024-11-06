@@ -12,7 +12,9 @@ import {
   FaChartBar,
   FaDollarSign,
   FaCogs,
+  FaFileUpload,
 } from "react-icons/fa";
+import { BsDatabaseFillUp } from "react-icons/bs";
 import { FaIdCard, FaRegCircle } from "react-icons/fa6";
 import { MdAssignment, MdAssignmentAdd } from "react-icons/md";
 import { Navigate } from "react-router-dom";
@@ -439,9 +441,49 @@ export const navigation = [
       {
         name: "Contact Information",
         to: "/school/add-conatct-information",
-        icon: FaBook,
+        icon: FaRegCircle,
         roles: ["Admin"],
       },
     ],
   },
+  {
+    name: "Upload Records",
+    to: "/upload",
+    icon: BsDatabaseFillUp,
+    current: false,
+    roles: ["Admin"],
+    children: [
+      {
+        name: "Students Records",
+        to: "/school/upload-student-records",
+        icon: FaRegCircle,
+        roles: ["Admin"],
+      },
+      {
+        name: "Student Attendance",
+        to: "/school/upload-student-attendance-records",
+        icon: FaRegCircle,
+        roles: ["Admin"],
+      },
+      {
+        name: "Teachers Records",
+        to: "/school/upload-teacher-records",
+        icon: FaRegCircle,
+        roles: ["Admin"],
+      },
+      {
+        name: "Teachers Attendance",
+        to: "/school/upload-teacher-attendance-records",
+        icon: FaRegCircle,
+        roles: ["Admin"],
+      },
+      {
+        name: "Staff Records",
+        to: "/school/upload-staff-records",
+        icon: FaRegCircle,
+        roles: ["Admin"],
+      },
+    ],
+  },
+  
 ];
