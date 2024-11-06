@@ -403,6 +403,207 @@ export const getAttendanceAndStudentCount = wrapAsync(async (req, res) => {
 });
 
 // Controller Function for Bulk Uploading Students without validation schemas
+// export const UploadBulkStudents = wrapAsync(async (req, res) => {
+//     const studentsData = [];
+//     const parentsData = [];
+
+//     fs.createReadStream(req.file.path)
+//         .pipe(csv())
+//         .on("data", (row) => {
+//             studentsData.push(row);
+//             parentsData.push(row);
+//         })
+//         .on("end", async () => {
+//             try {
+//                 const processedStudents = [];
+
+//                 for (let studentData of studentsData) {
+//                     const {
+//                         currentClass,
+//                         currentSection,
+//                         currentSession,
+//                         ...restStudentData
+//                     } = studentData;
+
+//                     const classDoc = await Class.findOne({
+//                         name: currentClass,
+//                     });
+//                     const sectionDoc = await Section.findOne({
+//                         name: currentSection,
+//                     });
+//                     const sessionDoc = await Session.findOne({
+//                         sessionYear: currentSession,
+//                     });
+
+//                     if (!classDoc || !sectionDoc || !sessionDoc) {
+//                         return res
+//                             .status(404)
+//                             .json(
+//                                 new ApiResponse(
+//                                     404,
+//                                     null,
+//                                     `Class, Section, or Session not found for record with admissionNo: ${studentData.admissionNo}`
+//                                 )
+//                             );
+//                     }
+
+//                     const requiredFields = [
+//                         "admissionNo",
+//                         "rollNumber",
+//                         "password",
+//                         "firstName",
+//                         "gender",
+//                         "mobileNumber",
+//                         "email",
+//                     ];
+
+//                     for (let field of requiredFields) {
+//                         if (
+//                             !studentData[field] ||
+//                             studentData[field].trim() === ""
+//                         ) {
+//                             return res
+//                                 .status(400)
+//                                 .json(
+//                                     new ApiResponse(
+//                                         400,
+//                                         null,
+//                                         `Field "${field}" is required for student with admissionNo: ${studentData.admissionNo}`
+//                                     )
+//                                 );
+//                         }
+//                     }
+
+//                     const existingStudent = await Student.findOne({
+//                         rollNumber: studentData.rollNumber,
+//                     });
+//                     if (existingStudent) {
+//                         return res
+//                             .status(400)
+//                             .json(
+//                                 new ApiResponse(
+//                                     400,
+//                                     null,
+//                                     `Duplicate roll number found: ${studentData.rollNumber} for student with admissionNo: ${studentData.admissionNo}`
+//                                 )
+//                             );
+//                     }
+
+//                     const dateOfBirth = parseDate(studentData.dateOfBirth);
+//                     const admissionDate = parseDate(studentData.admissionDate);
+//                     const measurementDate = parseDate(
+//                         studentData.measurementDate
+//                     );
+
+//                     const newStudent = new Student({
+//                         ...restStudentData,
+//                         currentClass: classDoc._id,
+//                         currentSection: sectionDoc._id,
+//                         currentSession: sessionDoc._id,
+//                         password: studentData.password,
+//                         dateOfBirth,
+//                         admissionDate,
+//                         measurementDate,
+//                     });
+
+//                     const savedStudent = await newStudent.save();
+
+//                     const studentHistory = {
+//                         session: sessionDoc._id,
+//                         class: classDoc._id,
+//                         classSection: sectionDoc._id,
+//                     };
+//                     const studentHistoryData = await StudentHistory.create(
+//                         studentHistory
+//                     );
+//                     savedStudent.studentHistory.push(studentHistoryData._id);
+//                     await savedStudent.save();
+
+//                     processedStudents.push(savedStudent);
+//                 }
+
+//                 const parentDocs = [];
+
+//                 for (let i = 0; i < processedStudents.length; i++) {
+//                     const student = processedStudents[i];
+//                     const parentData = {
+//                         fatherName: parentsData[i].fatherName,
+//                         motherName: parentsData[i].motherName,
+//                         fatherPhone: parentsData[i].fatherPhone,
+//                         motherPhone: parentsData[i].motherPhone,
+//                         email: parentsData[i].parentEmail,
+//                         password: parentsData[i].parentPassword,
+//                         studentId: student._id,
+//                     };
+
+//                     if (
+//                         !parentData.fatherName ||
+//                         parentData.fatherName.trim() === ""
+//                     ) {
+//                         return res
+//                             .status(400)
+//                             .json(
+//                                 new ApiResponse(
+//                                     400,
+//                                     null,
+//                                     `Father's name is required for student with admissionNo: ${student.admissionNo}`
+//                                 )
+//                             );
+//                     }
+//                     if (
+//                         !parentData.password ||
+//                         parentData.password.trim() === ""
+//                     ) {
+//                         return res
+//                             .status(400)
+//                             .json(
+//                                 new ApiResponse(
+//                                     400,
+//                                     null,
+//                                     `Parent password is required for student with admissionNo: ${student.admissionNo}`
+//                                 )
+//                             );
+//                     }
+
+//                     const newParent = new Parent(parentData);
+//                     const savedParent = await newParent.save();
+
+//                     student.parent = savedParent._id;
+//                     await student.save();
+
+//                     await assignFeeGroupToNewStudents(student);
+
+//                     parentDocs.push(savedParent);
+//                 }
+
+//                 fs.unlinkSync(req.file.path);
+
+//                 return res.status(201).json(
+//                     new ApiResponse(
+//                         201,
+//                         {
+//                             students: processedStudents,
+//                             parents: parentDocs,
+//                         },
+//                         "Bulk upload successful, students and parents linked."
+//                     )
+//                 );
+//             } catch (err) {
+//                 console.error(err);
+//                 fs.unlinkSync(req.file.path);
+//                 return res
+//                     .status(500)
+//                     .json(
+//                         new ApiResponse(
+//                             500,
+//                             null,
+//                             "An error occurred during bulk upload."
+//                         )
+//                     );
+//             }
+//         });
+// });
+
 export const UploadBulkStudents = wrapAsync(async (req, res) => {
     const studentsData = [];
     const parentsData = [];
@@ -414,10 +615,14 @@ export const UploadBulkStudents = wrapAsync(async (req, res) => {
             parentsData.push(row);
         })
         .on("end", async () => {
-            try {
-                const processedStudents = [];
+            const processedStudents = [];
+            const parentDocs = [];
+            const errors = [];
 
-                for (let studentData of studentsData) {
+            try {
+                for (let i = 0; i < studentsData.length; i++) {
+                    const studentData = studentsData[i];
+
                     const {
                         currentClass,
                         currentSection,
@@ -425,7 +630,6 @@ export const UploadBulkStudents = wrapAsync(async (req, res) => {
                         ...restStudentData
                     } = studentData;
 
-                    // Lookup class, section, and session by name
                     const classDoc = await Class.findOne({
                         name: currentClass,
                     });
@@ -437,18 +641,13 @@ export const UploadBulkStudents = wrapAsync(async (req, res) => {
                     });
 
                     if (!classDoc || !sectionDoc || !sessionDoc) {
-                        return res
-                            .status(404)
-                            .json(
-                                new ApiResponse(
-                                    404,
-                                    null,
-                                    `Class, Section, or Session not found for record with admissionNo: ${studentData.admissionNo}`
-                                )
-                            );
+                        errors.push({
+                            admissionNo: studentData.admissionNo,
+                            message: `Class, Section, or Session not found.`,
+                        });
+                        continue;
                     }
 
-                    // Ensure required fields are present
                     const requiredFields = [
                         "admissionNo",
                         "rollNumber",
@@ -459,37 +658,34 @@ export const UploadBulkStudents = wrapAsync(async (req, res) => {
                         "email",
                     ];
 
+                    let missingField = null;
                     for (let field of requiredFields) {
                         if (
                             !studentData[field] ||
                             studentData[field].trim() === ""
                         ) {
-                            return res
-                                .status(400)
-                                .json(
-                                    new ApiResponse(
-                                        400,
-                                        null,
-                                        `Field "${field}" is required for student with admissionNo: ${studentData.admissionNo}`
-                                    )
-                                );
+                            missingField = field;
+                            break;
                         }
                     }
 
-                    // Ensure rollNumber is unique
+                    if (missingField) {
+                        errors.push({
+                            admissionNo: studentData.admissionNo,
+                            message: `Field "${missingField}" is required.`,
+                        });
+                        continue;
+                    }
+
                     const existingStudent = await Student.findOne({
                         rollNumber: studentData.rollNumber,
                     });
                     if (existingStudent) {
-                        return res
-                            .status(400)
-                            .json(
-                                new ApiResponse(
-                                    400,
-                                    null,
-                                    `Duplicate roll number found: ${studentData.rollNumber} for student with admissionNo: ${studentData.admissionNo}`
-                                )
-                            );
+                        errors.push({
+                            admissionNo: studentData.admissionNo,
+                            message: `Duplicate roll number found: ${studentData.rollNumber}.`,
+                        });
+                        continue;
                     }
 
                     const dateOfBirth = parseDate(studentData.dateOfBirth);
@@ -523,12 +719,7 @@ export const UploadBulkStudents = wrapAsync(async (req, res) => {
                     await savedStudent.save();
 
                     processedStudents.push(savedStudent);
-                }
 
-                const parentDocs = [];
-
-                for (let i = 0; i < processedStudents.length; i++) {
-                    const student = processedStudents[i];
                     const parentData = {
                         fatherName: parentsData[i].fatherName,
                         motherName: parentsData[i].motherName,
@@ -536,59 +727,52 @@ export const UploadBulkStudents = wrapAsync(async (req, res) => {
                         motherPhone: parentsData[i].motherPhone,
                         email: parentsData[i].parentEmail,
                         password: parentsData[i].parentPassword,
-                        studentId: student._id,
+                        studentId: savedStudent._id,
                     };
 
                     if (
                         !parentData.fatherName ||
                         parentData.fatherName.trim() === ""
                     ) {
-                        return res
-                            .status(400)
-                            .json(
-                                new ApiResponse(
-                                    400,
-                                    null,
-                                    `Father's name is required for student with admissionNo: ${student.admissionNo}`
-                                )
-                            );
+                        errors.push({
+                            admissionNo: studentData.admissionNo,
+                            message: `Father's name is required for parent.`,
+                        });
+                        continue;
                     }
                     if (
                         !parentData.password ||
                         parentData.password.trim() === ""
                     ) {
-                        return res
-                            .status(400)
-                            .json(
-                                new ApiResponse(
-                                    400,
-                                    null,
-                                    `Parent password is required for student with admissionNo: ${student.admissionNo}`
-                                )
-                            );
+                        errors.push({
+                            admissionNo: studentData.admissionNo,
+                            message: `Parent password is required.`,
+                        });
+                        continue;
                     }
 
                     const newParent = new Parent(parentData);
                     const savedParent = await newParent.save();
 
-                    student.parent = savedParent._id;
-                    await student.save();
+                    savedStudent.parent = savedParent._id;
+                    await savedStudent.save();
 
-                    await assignFeeGroupToNewStudents(student);
+                    await assignFeeGroupToNewStudents(savedStudent);
 
                     parentDocs.push(savedParent);
                 }
 
                 fs.unlinkSync(req.file.path);
 
-                return res.status(201).json(
+                return res.status(207).json(
                     new ApiResponse(
-                        201,
+                        207,
                         {
-                            students: processedStudents,
-                            parents: parentDocs,
+                            successfulStudents: processedStudents,
+                            successfulParents: parentDocs,
+                            errors: errors,
                         },
-                        "Bulk upload successful, students and parents linked."
+                        "Bulk upload processed with some errors."
                     )
                 );
             } catch (err) {
