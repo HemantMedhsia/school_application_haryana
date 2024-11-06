@@ -393,7 +393,6 @@ export const navigation = [
     icon: FaBell,
     current: false,
     roles: ["Student", "Parent"],
-    children: [],
   },
   {
     name: "My Attendance",
@@ -401,7 +400,6 @@ export const navigation = [
     icon: FaBell,
     current: false,
     roles: ["Teacher"],
-    children: [],
   },
   {
     name: "My Attendance",
@@ -409,7 +407,6 @@ export const navigation = [
     icon: FaBell,
     current: false,
     roles: ["Staff"],
-    children: [],
   },
   {
     name: "Notice",

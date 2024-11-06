@@ -6,12 +6,15 @@ import "react-toastify/dist/ReactToastify.css";
 import FormSection from "../../components/Form/FormSection";
 import Input from "../../components/Form/Input";
 import FormButton from "../../components/Form/FormButton";
+import ConfirmationModal from "../../common/ConfirmationModal/ConfirmationModal";
 
 const ExamGroup = () => {
   const [examGroupName, setExamGroupName] = useState("");
   const [examGroups, setExamGroups] = useState([]);
   const [editingGroupId, setEditingGroupId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [groupToDelete, setGroupToDelete] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleSave = async () => {
     if (examGroupName.trim()) {
@@ -100,6 +103,35 @@ const ExamGroup = () => {
     setEditingGroupId(id);
   };
 
+  const handleDeleteClick = (group) => {
+    setGroupToDelete(group);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setGroupToDelete(null);
+    setIsModalOpen(false);
+  };
+
+  const confirmDelete = async () => {
+    if (!groupToDelete) return;
+    try {
+      await axios.delete(
+        `${import.meta.env.VITE_BACKEND_URL}/api/delete-examgroup/${
+          groupToDelete._id
+        }`
+      );
+      setExamGroups(
+        examGroups.filter((group) => group._id !== groupToDelete._id)
+      );
+      toast.success("Exam group deleted successfully!");
+    } catch (error) {
+      toast.error("Error deleting exam group.");
+    } finally {
+      closeModal();
+    }
+  };
+
   if (loading) {
     return (
       <div className="loader-wrapper">
@@ -151,7 +183,7 @@ const ExamGroup = () => {
                   </button>
                   <button
                     className="text-red-500"
-                    onClick={() => handleDelete(group._id)}
+                    onClick={() => handleDeleteClick(group)}
                   >
                     <FaTrash />
                   </button>
@@ -163,6 +195,15 @@ const ExamGroup = () => {
           <p className="text-gray-500 text-sm">No exam groups available</p>
         )}
       </div>
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        onConfirm={confirmDelete}
+        title="Delete Confirmation"
+        message={`Are you sure you want to delete the exam group "${groupToDelete?.name}"?`}
+      />
     </div>
   );
 };

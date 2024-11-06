@@ -47,7 +47,9 @@ const ExamGroup = () => {
       if (editingGroupId) {
         try {
           await axios.put(
-            `${import.meta.env.VITE_BACKEND_URL}/api/update-examtype/${editingGroupId}`,
+            `${
+              import.meta.env.VITE_BACKEND_URL
+            }/api/update-examtype/${editingGroupId}`,
             {
               name: examGroupName,
               termId: selectedCategory,
@@ -109,9 +111,13 @@ const ExamGroup = () => {
     if (groupToDelete) {
       try {
         await axios.delete(
-          `${import.meta.env.VITE_BACKEND_URL}/api/delete-examtype/${groupToDelete}`
+          `${
+            import.meta.env.VITE_BACKEND_URL
+          }/api/delete-examtype/${groupToDelete}`
         );
-        setExamGroups(examGroups.filter((group) => group._id !== groupToDelete));
+        setExamGroups(
+          examGroups.filter((group) => group._id !== groupToDelete)
+        );
         toast.success("Exam group deleted successfully!");
       } catch (error) {
         toast.error("Failed to delete exam type.");

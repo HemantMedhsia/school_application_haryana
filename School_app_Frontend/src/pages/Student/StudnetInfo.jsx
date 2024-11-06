@@ -8,7 +8,7 @@ import DetailsSelectionModal from "../../common/ConfirmationModal/DetailsSelecti
 import StudentSearchPopup from "./StudentPopup";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
-
+  
 const StudentInfo = () => {
   const [allStudentData, setAllStudentData] = useState([]);
   const [filteredStudentData, setFilteredStudentData] = useState([]);
