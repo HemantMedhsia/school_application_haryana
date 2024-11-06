@@ -24,7 +24,7 @@ function Layout() {
 
       {/* Adjust the margin based on whether the navbar is collapsed or not */}
       <div
-        className={`flex-1 flex flex-col transition-all duration-300 relative z-40`}
+        className={`flex-1 flex flex-col transition-all duration-300 relative`}
         style={{
           marginLeft: isCollapsed ? "80px" : "256px",
           width: isCollapsed ? "calc(100% - 80px)" : "calc(100% - 256px)",

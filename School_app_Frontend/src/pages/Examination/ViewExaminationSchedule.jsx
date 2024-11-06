@@ -280,7 +280,7 @@ const ViewExaminationSchedule = () => {
             isOpen={isModalOpen}
             onRequestClose={() => setIsModalOpen(false)}
             contentLabel="Select Students Modal"
-            className="relative w-full max-w-2xl mx-auto bg-gray-900 rounded-2xl shadow-2xl p-8"
+            className="relative w-full max-w-2xl z-auto mx-auto bg-gray-900 rounded-2xl shadow-2xl p-8"
             overlayClassName="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center"
           >
             <h2 className="text-3xl mb-6 text-white font-extrabold">

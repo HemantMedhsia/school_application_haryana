@@ -11,6 +11,11 @@ import { StudentHistory } from "../Models/studentHistory.Model.js";
 import jwt from "jsonwebtoken";
 import { StudentAttendance } from "../Models/studentAttendence.Model.js";
 import { assignFeeGroupToNewStudents } from "../Models/student.model.js";
+import { Class } from "../Models/class.Model.js";
+import { Section } from "../Models/section.Model.js";
+import { Session } from "../Models/session.Model.js";
+import fs from "fs";
+import csv from "csv-parser";
 
 const generateAccessAndRefreshTokens = async (studentId, next) => {
     const student = await Student.findById(studentId);
@@ -396,3 +401,219 @@ export const getAttendanceAndStudentCount = wrapAsync(async (req, res) => {
 
     return res.status(200).json(new ApiResponse(200, response));
 });
+
+// Controller Function for Bulk Uploading Students without validation schemas
+export const UploadBulkStudents = wrapAsync(async (req, res) => {
+    const studentsData = [];
+    const parentsData = [];
+
+    fs.createReadStream(req.file.path)
+        .pipe(csv())
+        .on("data", (row) => {
+            studentsData.push(row);
+            parentsData.push(row);
+        })
+        .on("end", async () => {
+            try {
+                const processedStudents = [];
+
+                for (let studentData of studentsData) {
+                    const {
+                        currentClass,
+                        currentSection,
+                        currentSession,
+                        ...restStudentData
+                    } = studentData;
+
+                    // Lookup class, section, and session by name
+                    const classDoc = await Class.findOne({
+                        name: currentClass,
+                    });
+                    const sectionDoc = await Section.findOne({
+                        name: currentSection,
+                    });
+                    const sessionDoc = await Session.findOne({
+                        sessionYear: currentSession,
+                    });
+
+                    if (!classDoc || !sectionDoc || !sessionDoc) {
+                        return res
+                            .status(404)
+                            .json(
+                                new ApiResponse(
+                                    404,
+                                    null,
+                                    `Class, Section, or Session not found for record with admissionNo: ${studentData.admissionNo}`
+                                )
+                            );
+                    }
+
+                    // Ensure required fields are present
+                    const requiredFields = [
+                        "admissionNo",
+                        "rollNumber",
+                        "password",
+                        "firstName",
+                        "gender",
+                        "mobileNumber",
+                        "email",
+                    ];
+
+                    for (let field of requiredFields) {
+                        if (
+                            !studentData[field] ||
+                            studentData[field].trim() === ""
+                        ) {
+                            return res
+                                .status(400)
+                                .json(
+                                    new ApiResponse(
+                                        400,
+                                        null,
+                                        `Field "${field}" is required for student with admissionNo: ${studentData.admissionNo}`
+                                    )
+                                );
+                        }
+                    }
+
+                    // Ensure rollNumber is unique
+                    const existingStudent = await Student.findOne({
+                        rollNumber: studentData.rollNumber,
+                    });
+                    if (existingStudent) {
+                        return res
+                            .status(400)
+                            .json(
+                                new ApiResponse(
+                                    400,
+                                    null,
+                                    `Duplicate roll number found: ${studentData.rollNumber} for student with admissionNo: ${studentData.admissionNo}`
+                                )
+                            );
+                    }
+
+                    const dateOfBirth = parseDate(studentData.dateOfBirth);
+                    const admissionDate = parseDate(studentData.admissionDate);
+                    const measurementDate = parseDate(
+                        studentData.measurementDate
+                    );
+
+                    const newStudent = new Student({
+                        ...restStudentData,
+                        currentClass: classDoc._id,
+                        currentSection: sectionDoc._id,
+                        currentSession: sessionDoc._id,
+                        password: studentData.password,
+                        dateOfBirth,
+                        admissionDate,
+                        measurementDate,
+                    });
+
+                    const savedStudent = await newStudent.save();
+
+                    const studentHistory = {
+                        session: sessionDoc._id,
+                        class: classDoc._id,
+                        classSection: sectionDoc._id,
+                    };
+                    const studentHistoryData = await StudentHistory.create(
+                        studentHistory
+                    );
+                    savedStudent.studentHistory.push(studentHistoryData._id);
+                    await savedStudent.save();
+
+                    processedStudents.push(savedStudent);
+                }
+
+                const parentDocs = [];
+
+                for (let i = 0; i < processedStudents.length; i++) {
+                    const student = processedStudents[i];
+                    const parentData = {
+                        fatherName: parentsData[i].fatherName,
+                        motherName: parentsData[i].motherName,
+                        fatherPhone: parentsData[i].fatherPhone,
+                        motherPhone: parentsData[i].motherPhone,
+                        email: parentsData[i].parentEmail,
+                        password: parentsData[i].parentPassword,
+                        studentId: student._id,
+                    };
+
+                    if (
+                        !parentData.fatherName ||
+                        parentData.fatherName.trim() === ""
+                    ) {
+                        return res
+                            .status(400)
+                            .json(
+                                new ApiResponse(
+                                    400,
+                                    null,
+                                    `Father's name is required for student with admissionNo: ${student.admissionNo}`
+                                )
+                            );
+                    }
+                    if (
+                        !parentData.password ||
+                        parentData.password.trim() === ""
+                    ) {
+                        return res
+                            .status(400)
+                            .json(
+                                new ApiResponse(
+                                    400,
+                                    null,
+                                    `Parent password is required for student with admissionNo: ${student.admissionNo}`
+                                )
+                            );
+                    }
+
+                    const newParent = new Parent(parentData);
+                    const savedParent = await newParent.save();
+
+                    student.parent = savedParent._id;
+                    await student.save();
+
+                    await assignFeeGroupToNewStudents(student);
+
+                    parentDocs.push(savedParent);
+                }
+
+                fs.unlinkSync(req.file.path);
+
+                return res.status(201).json(
+                    new ApiResponse(
+                        201,
+                        {
+                            students: processedStudents,
+                            parents: parentDocs,
+                        },
+                        "Bulk upload successful, students and parents linked."
+                    )
+                );
+            } catch (err) {
+                console.error(err);
+                fs.unlinkSync(req.file.path);
+                return res
+                    .status(500)
+                    .json(
+                        new ApiResponse(
+                            500,
+                            null,
+                            "An error occurred during bulk upload."
+                        )
+                    );
+            }
+        });
+});
+
+function parseDate(dateString) {
+    if (!dateString) return null;
+    const parts = dateString.split("-");
+    if (parts.length !== 3) return null;
+    const day = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1;
+    const year = parseInt(parts[2], 10);
+    const date = new Date(year, month, day);
+    return isNaN(date.getTime()) ? null : date;
+}

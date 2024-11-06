@@ -11,9 +11,11 @@ import {
     loginStudent,
     refreshAccessTokenStudent,
     updateStudent,
+    UploadBulkStudents,
 } from "../Controller/student.Controller.js";
 import { authenticateToken } from "../Middlewares/authenticateToken.js";
 import { authorizeRoles } from "../Middlewares/authorizeRoles.js";
+import { uploadMiddleware } from "../Middlewares/uploadMiddleware.js";
 
 const router = express.Router();
 
@@ -43,5 +45,6 @@ router.get(
 );
 
 router.get("/student-weekly-attendance", getAttendanceAndStudentCount);
+router.post("/upload-bulk-students", uploadMiddleware, UploadBulkStudents);
 
 export { router as studentRoute };
