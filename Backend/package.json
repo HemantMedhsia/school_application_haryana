@@ -29,6 +29,7 @@
         "mongoose": "^8.5.2",
         "multer": "^1.4.5-lts.1",
         "nodemailer": "^6.9.14",
-        "qrcode": "^1.5.4"
+        "qrcode": "^1.5.4",
+        "xlsx": "^0.18.5"
     }
 }
