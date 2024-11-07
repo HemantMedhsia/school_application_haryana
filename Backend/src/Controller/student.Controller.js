@@ -487,7 +487,6 @@ export const UploadBulkStudents = wrapAsync(async (req, res) => {
         });
 
         const schoolDoc = await School.findById(schoolId);
-
         if (!schoolDoc) {
             return res
                 .status(404)
@@ -496,6 +495,7 @@ export const UploadBulkStudents = wrapAsync(async (req, res) => {
 
         for (let i = 0; i < studentsData.length; i++) {
             const studentData = studentsData[i];
+            const parentData = parentsData[i];
 
             const {
                 currentClass,
@@ -518,7 +518,7 @@ export const UploadBulkStudents = wrapAsync(async (req, res) => {
                 continue;
             }
 
-            const requiredFields = [
+            const requiredStudentFields = [
                 "admissionNo",
                 "rollNumber",
                 "password",
@@ -528,35 +528,24 @@ export const UploadBulkStudents = wrapAsync(async (req, res) => {
                 "email",
             ];
 
-            let missingField = null;
-            for (let field of requiredFields) {
+            let missingStudentField = null;
+            for (let field of requiredStudentFields) {
                 if (
                     !studentData[field] ||
                     studentData[field].toString().trim() === ""
                 ) {
-                    missingField = field;
+                    missingStudentField = field;
                     break;
                 }
             }
 
-            if (missingField) {
+            if (missingStudentField) {
                 errors.push({
                     admissionNo: studentData.admissionNo,
-                    message: `Field "${missingField}" is required.`,
+                    message: `Field "${missingStudentField}" is required for student.`,
                 });
                 continue;
             }
-
-            // const existingStudent = await Student.findOne({
-            //     rollNumber: studentData.rollNumber,
-            // });
-            // if (existingStudent) {
-            //     errors.push({
-            //         admissionNo: studentData.admissionNo,
-            //         message: `Duplicate roll number found: ${studentData.rollNumber}.`,
-            //     });
-            //     continue;
-            // }
 
             const dateOfBirth = parseDate(studentData.dateOfBirth);
             const admissionDate = parseDate(studentData.admissionDate);
@@ -587,8 +576,62 @@ export const UploadBulkStudents = wrapAsync(async (req, res) => {
             await savedStudent.save();
 
             processedStudents.push(savedStudent);
+            if (!schoolDoc.students.includes(savedStudent._id)) {
+                schoolDoc.students.push(savedStudent._id);
+            }
 
-            schoolDoc.students.push(savedStudent._id);
+            await schoolDoc.save();
+
+            const parentRequiredFields = [
+                "fatherName",
+                "motherName",
+                "fatherPhone",
+                "motherPhone",
+                "parentEmail",
+                "parentPassword",
+            ];
+
+            let missingParentField = null;
+            for (let field of parentRequiredFields) {
+                if (
+                    !parentData[field] ||
+                    parentData[field].toString().trim() === ""
+                ) {
+                    missingParentField = field;
+                    break;
+                }
+            }
+
+            if (missingParentField) {
+                errors.push({
+                    admissionNo: studentData.admissionNo,
+                    message: `Field "${missingParentField}" is required for parent.`,
+                });
+                continue;
+            }
+
+            const newParent = new Parent({
+                fatherName: parentData.fatherName,
+                motherName: parentData.motherName,
+                fatherPhone: parentData.fatherPhone,
+                motherPhone: parentData.motherPhone,
+                email: parentData.parentEmail,
+                password: parentData.parentPassword,
+                studentId: savedStudent._id,
+                guardianIs: parentData.guardianIs || null,
+                guardianName: parentData.guardianName || null,
+                guardianPhone: parentData.guardianPhone || null,
+                guardianOccupation: parentData.guardianOccupation || null,
+                guardianPhoto: parentData.guardianPhoto || null,
+                guardianRelation: parentData.guardianRelation || null,
+                guardianAddress: parentData.guardianAddress || null,
+            });
+
+            const savedParent = await newParent.save();
+            parentDocs.push(savedParent);
+
+            savedStudent.parent = savedParent._id;
+            await savedStudent.save();
         }
 
         await schoolDoc.save();
@@ -600,6 +643,7 @@ export const UploadBulkStudents = wrapAsync(async (req, res) => {
                 207,
                 {
                     successfulStudents: processedStudents,
+                    successfulParents: parentDocs,
                     errors: errors,
                 },
                 "Bulk upload processed with some errors."
@@ -607,7 +651,10 @@ export const UploadBulkStudents = wrapAsync(async (req, res) => {
         );
     } catch (err) {
         console.error(err);
-        fs.unlinkSync(filePath);
+
+        if (fs.existsSync(req.file.path)) {
+            fs.unlinkSync(req.file.path);
+        }
         return res
             .status(500)
             .json(
