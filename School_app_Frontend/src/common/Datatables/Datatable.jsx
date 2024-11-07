@@ -16,7 +16,7 @@ const Datatable = ({
   attendanceStatus,
 }) => {
   const [currentPage, setCurrentPage] = useState(0);
-  const itemsPerPage = 8; // Number of rows per page
+  const itemsPerPage = 20; // Number of rows per page
 
   // Calculate the displayed items for the current page
   const offset = currentPage * itemsPerPage;
