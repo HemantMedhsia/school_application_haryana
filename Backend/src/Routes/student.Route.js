@@ -45,6 +45,6 @@ router.get(
 );
 
 router.get("/student-weekly-attendance", getAttendanceAndStudentCount);
-router.post("/upload-bulk-students", uploadMiddleware, UploadBulkStudents);
+router.post("/upload-bulk-students/:schoolId", uploadMiddleware, UploadBulkStudents);
 
 export { router as studentRoute };

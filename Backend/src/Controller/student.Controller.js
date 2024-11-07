@@ -16,8 +16,8 @@ import { Section } from "../Models/section.Model.js";
 import { Session } from "../Models/session.Model.js";
 import fs from "fs";
 import csv from "csv-parser";
-import { Readable } from 'stream';
-import * as XLSX from "xlsx";
+import path from "path";
+import XLSX from "xlsx";
 
 const generateAccessAndRefreshTokens = async (studentId, next) => {
     const student = await Student.findById(studentId);
@@ -404,233 +404,95 @@ export const getAttendanceAndStudentCount = wrapAsync(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, response));
 });
 
-// Controller Function for Bulk Uploading Students without validation schemas
-// export const UploadBulkStudents = wrapAsync(async (req, res) => {
-//     const studentsData = [];
-//     const parentsData = [];
+function parseDate(dateValue) {
+    if (!dateValue) return null;
 
-//     fs.createReadStream(req.file.path)
-//         .pipe(csv())
-//         .on("data", (row) => {
-//             studentsData.push(row);
-//             parentsData.push(row);
-//         })
-//         .on("end", async () => {
-//             try {
-//                 const processedStudents = [];
+    if (typeof dateValue === "string") {
+        // Handle both 'dd-mm-yyyy' and 'dd/mm/yyyy' formats
+        const parts = dateValue.split(/[-\/]/);
+        if (parts.length === 3) {
+            const day = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10) - 1; // JavaScript months are zero-based
+            const year = parseInt(parts[2], 10);
+            // Create a Date object with UTC to prevent timezone differences
+            const date = new Date(Date.UTC(year, month, day));
+            return isNaN(date.getTime()) ? null : date;
+        }
+    } else if (typeof dateValue === "number") {
+        const epoch = new Date(Date.UTC(1899, 11, 30));
+        const excelDays = dateValue - (dateValue < 60 ? 0 : 1);
+        epoch.setDate(epoch.getDate() + excelDays);
+        return new Date(
+            Date.UTC(
+                epoch.getUTCFullYear(),
+                epoch.getUTCMonth(),
+                epoch.getUTCDate()
+            )
+        );
+    } else if (dateValue instanceof Date) {
+        return new Date(
+            Date.UTC(
+                dateValue.getUTCFullYear(),
+                dateValue.getUTCMonth(),
+                dateValue.getUTCDate()
+            )
+        );
+    }
 
-//                 for (let studentData of studentsData) {
-//                     const {
-//                         currentClass,
-//                         currentSection,
-//                         currentSession,
-//                         ...restStudentData
-//                     } = studentData;
-
-//                     const classDoc = await Class.findOne({
-//                         name: currentClass,
-//                     });
-//                     const sectionDoc = await Section.findOne({
-//                         name: currentSection,
-//                     });
-//                     const sessionDoc = await Session.findOne({
-//                         sessionYear: currentSession,
-//                     });
-
-//                     if (!classDoc || !sectionDoc || !sessionDoc) {
-//                         return res
-//                             .status(404)
-//                             .json(
-//                                 new ApiResponse(
-//                                     404,
-//                                     null,
-//                                     `Class, Section, or Session not found for record with admissionNo: ${studentData.admissionNo}`
-//                                 )
-//                             );
-//                     }
-
-//                     const requiredFields = [
-//                         "admissionNo",
-//                         "rollNumber",
-//                         "password",
-//                         "firstName",
-//                         "gender",
-//                         "mobileNumber",
-//                         "email",
-//                     ];
-
-//                     for (let field of requiredFields) {
-//                         if (
-//                             !studentData[field] ||
-//                             studentData[field].trim() === ""
-//                         ) {
-//                             return res
-//                                 .status(400)
-//                                 .json(
-//                                     new ApiResponse(
-//                                         400,
-//                                         null,
-//                                         `Field "${field}" is required for student with admissionNo: ${studentData.admissionNo}`
-//                                     )
-//                                 );
-//                         }
-//                     }
-
-//                     const existingStudent = await Student.findOne({
-//                         rollNumber: studentData.rollNumber,
-//                     });
-//                     if (existingStudent) {
-//                         return res
-//                             .status(400)
-//                             .json(
-//                                 new ApiResponse(
-//                                     400,
-//                                     null,
-//                                     `Duplicate roll number found: ${studentData.rollNumber} for student with admissionNo: ${studentData.admissionNo}`
-//                                 )
-//                             );
-//                     }
-
-//                     const dateOfBirth = parseDate(studentData.dateOfBirth);
-//                     const admissionDate = parseDate(studentData.admissionDate);
-//                     const measurementDate = parseDate(
-//                         studentData.measurementDate
-//                     );
-
-//                     const newStudent = new Student({
-//                         ...restStudentData,
-//                         currentClass: classDoc._id,
-//                         currentSection: sectionDoc._id,
-//                         currentSession: sessionDoc._id,
-//                         password: studentData.password,
-//                         dateOfBirth,
-//                         admissionDate,
-//                         measurementDate,
-//                     });
-
-//                     const savedStudent = await newStudent.save();
-
-//                     const studentHistory = {
-//                         session: sessionDoc._id,
-//                         class: classDoc._id,
-//                         classSection: sectionDoc._id,
-//                     };
-//                     const studentHistoryData = await StudentHistory.create(
-//                         studentHistory
-//                     );
-//                     savedStudent.studentHistory.push(studentHistoryData._id);
-//                     await savedStudent.save();
-
-//                     processedStudents.push(savedStudent);
-//                 }
-
-//                 const parentDocs = [];
-
-//                 for (let i = 0; i < processedStudents.length; i++) {
-//                     const student = processedStudents[i];
-//                     const parentData = {
-//                         fatherName: parentsData[i].fatherName,
-//                         motherName: parentsData[i].motherName,
-//                         fatherPhone: parentsData[i].fatherPhone,
-//                         motherPhone: parentsData[i].motherPhone,
-//                         email: parentsData[i].parentEmail,
-//                         password: parentsData[i].parentPassword,
-//                         studentId: student._id,
-//                     };
-
-//                     if (
-//                         !parentData.fatherName ||
-//                         parentData.fatherName.trim() === ""
-//                     ) {
-//                         return res
-//                             .status(400)
-//                             .json(
-//                                 new ApiResponse(
-//                                     400,
-//                                     null,
-//                                     `Father's name is required for student with admissionNo: ${student.admissionNo}`
-//                                 )
-//                             );
-//                     }
-//                     if (
-//                         !parentData.password ||
-//                         parentData.password.trim() === ""
-//                     ) {
-//                         return res
-//                             .status(400)
-//                             .json(
-//                                 new ApiResponse(
-//                                     400,
-//                                     null,
-//                                     `Parent password is required for student with admissionNo: ${student.admissionNo}`
-//                                 )
-//                             );
-//                     }
-
-//                     const newParent = new Parent(parentData);
-//                     const savedParent = await newParent.save();
-
-//                     student.parent = savedParent._id;
-//                     await student.save();
-
-//                     await assignFeeGroupToNewStudents(student);
-
-//                     parentDocs.push(savedParent);
-//                 }
-
-//                 fs.unlinkSync(req.file.path);
-
-//                 return res.status(201).json(
-//                     new ApiResponse(
-//                         201,
-//                         {
-//                             students: processedStudents,
-//                             parents: parentDocs,
-//                         },
-//                         "Bulk upload successful, students and parents linked."
-//                     )
-//                 );
-//             } catch (err) {
-//                 console.error(err);
-//                 fs.unlinkSync(req.file.path);
-//                 return res
-//                     .status(500)
-//                     .json(
-//                         new ApiResponse(
-//                             500,
-//                             null,
-//                             "An error occurred during bulk upload."
-//                         )
-//                     );
-//             }
-//         });
-// });
+    return null;
+}
 
 export const UploadBulkStudents = wrapAsync(async (req, res) => {
-    try {
-        console.log('Uploaded File:', req.file);
+    if (!req.file) {
+        return res.status(400).json({
+            error: "No file uploaded.",
+        });
+    }
 
-        if (!req.file) {
-            return res.status(400).json(
-                new ApiResponse(
-                    400,
-                    null,
-                    "No file uploaded or file upload failed."
-                )
-            );
+    const schoolId = req.params.schoolId;
+
+    const filePath = req.file.path;
+    const studentsData = [];
+    const parentsData = [];
+    const errors = [];
+    const processedStudents = [];
+    const parentDocs = [];
+
+    try {
+        const fileExtension = path.extname(req.file.originalname).toLowerCase();
+        let parsedData = [];
+
+        if (fileExtension === ".csv") {
+            await new Promise((resolve, reject) => {
+                fs.createReadStream(filePath)
+                    .pipe(csv())
+                    .on("data", (row) => {
+                        parsedData.push(row);
+                    })
+                    .on("end", resolve)
+                    .on("error", reject);
+            });
+        } else if (fileExtension === ".xls" || fileExtension === ".xlsx") {
+            const workbook = XLSX.readFile(filePath);
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+            parsedData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+        } else {
+            throw new Error("Unsupported file format.");
         }
 
-        // Read the workbook from the buffer
-        const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
-        const sheet_name_list = workbook.SheetNames;
-        const xlData = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+        parsedData.forEach((row) => {
+            studentsData.push(row);
+            parentsData.push(row);
+        });
 
-        const studentsData = xlData;
-        const parentsData = xlData;
+        const schoolDoc = await School.findById(schoolId);
 
-        const processedStudents = [];
-        const parentDocs = [];
-        const errors = [];
+        if (!schoolDoc) {
+            return res
+                .status(404)
+                .json(new ApiResponse(404, null, "School not found."));
+        }
 
         for (let i = 0; i < studentsData.length; i++) {
             const studentData = studentsData[i];
@@ -642,12 +504,8 @@ export const UploadBulkStudents = wrapAsync(async (req, res) => {
                 ...restStudentData
             } = studentData;
 
-            const classDoc = await Class.findOne({
-                name: currentClass,
-            });
-            const sectionDoc = await Section.findOne({
-                name: currentSection,
-            });
+            const classDoc = await Class.findOne({ name: currentClass });
+            const sectionDoc = await Section.findOne({ name: currentSection });
             const sessionDoc = await Session.findOne({
                 sessionYear: currentSession,
             });
@@ -655,7 +513,7 @@ export const UploadBulkStudents = wrapAsync(async (req, res) => {
             if (!classDoc || !sectionDoc || !sessionDoc) {
                 errors.push({
                     admissionNo: studentData.admissionNo,
-                    message: "Class, Section, or Session not found.",
+                    message: `Class, Section, or Session not found.`,
                 });
                 continue;
             }
@@ -689,22 +547,20 @@ export const UploadBulkStudents = wrapAsync(async (req, res) => {
                 continue;
             }
 
-            const existingStudent = await Student.findOne({
-                rollNumber: studentData.rollNumber,
-            });
-            if (existingStudent) {
-                errors.push({
-                    admissionNo: studentData.admissionNo,
-                    message: `Duplicate roll number found: ${studentData.rollNumber}.`,
-                });
-                continue;
-            }
+            // const existingStudent = await Student.findOne({
+            //     rollNumber: studentData.rollNumber,
+            // });
+            // if (existingStudent) {
+            //     errors.push({
+            //         admissionNo: studentData.admissionNo,
+            //         message: `Duplicate roll number found: ${studentData.rollNumber}.`,
+            //     });
+            //     continue;
+            // }
 
             const dateOfBirth = parseDate(studentData.dateOfBirth);
             const admissionDate = parseDate(studentData.admissionDate);
-            const measurementDate = parseDate(
-                studentData.measurementDate
-            );
+            const measurementDate = parseDate(studentData.measurementDate);
 
             const newStudent = new Student({
                 ...restStudentData,
@@ -732,76 +588,26 @@ export const UploadBulkStudents = wrapAsync(async (req, res) => {
 
             processedStudents.push(savedStudent);
 
-            const parentData = {
-                fatherName: parentsData[i].fatherName,
-                motherName: parentsData[i].motherName,
-                fatherPhone: parentsData[i].fatherPhone,
-                motherPhone: parentsData[i].motherPhone,
-                email: parentsData[i].parentEmail,
-                password: parentsData[i].parentPassword,
-                studentId: savedStudent._id,
-            };
-
-            if (
-                !parentData.fatherName ||
-                parentData.fatherName.toString().trim() === ""
-            ) {
-                errors.push({
-                    admissionNo: studentData.admissionNo,
-                    message: "Father's name is required for parent.",
-                });
-                continue;
-            }
-            if (
-                !parentData.password ||
-                parentData.password.toString().trim() === ""
-            ) {
-                errors.push({
-                    admissionNo: studentData.admissionNo,
-                    message: "Parent password is required.",
-                });
-                continue;
-            }
-
-            const newParent = new Parent(parentData);
-            const savedParent = await newParent.save();
-
-            savedStudent.parent = savedParent._id;
-            await savedStudent.save();
-
-            await assignFeeGroupToNewStudents(savedStudent);
-
-            parentDocs.push(savedParent);
+            schoolDoc.students.push(savedStudent._id);
         }
 
-        // No need to delete the file since it's stored in memory
+        await schoolDoc.save();
 
-        if (errors.length > 0) {
-            return res.status(207).json(
-                new ApiResponse(
-                    207,
-                    {
-                        successfulStudents: processedStudents,
-                        successfulParents: parentDocs,
-                        errors: errors,
-                    },
-                    "Bulk upload processed with some errors."
-                )
-            );
-        } else {
-            return res.status(200).json(
-                new ApiResponse(
-                    200,
-                    {
-                        successfulStudents: processedStudents,
-                        successfulParents: parentDocs,
-                    },
-                    "Bulk upload processed successfully."
-                )
-            );
-        }
+        fs.unlinkSync(filePath);
+
+        return res.status(207).json(
+            new ApiResponse(
+                207,
+                {
+                    successfulStudents: processedStudents,
+                    errors: errors,
+                },
+                "Bulk upload processed with some errors."
+            )
+        );
     } catch (err) {
         console.error(err);
+        fs.unlinkSync(filePath);
         return res
             .status(500)
             .json(
@@ -813,9 +619,3 @@ export const UploadBulkStudents = wrapAsync(async (req, res) => {
             );
     }
 });
-
-function parseDate(dateString) {
-    if (!dateString) return null;
-    const date = moment(dateString, ['DD-MM-YYYY', 'YYYY-MM-DD', moment.ISO_8601], true);
-    return date.isValid() ? date.toDate() : null;
-}
