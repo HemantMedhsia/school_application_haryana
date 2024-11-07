@@ -16,7 +16,8 @@ import { Section } from "../Models/section.Model.js";
 import { Session } from "../Models/session.Model.js";
 import fs from "fs";
 import csv from "csv-parser";
-import * as XLSX from 'xlsx';
+import { Readable } from 'stream';
+import * as XLSX from "xlsx";
 
 const generateAccessAndRefreshTokens = async (studentId, next) => {
     const student = await Student.findById(studentId);
@@ -606,139 +607,215 @@ export const getAttendanceAndStudentCount = wrapAsync(async (req, res) => {
 // });
 
 export const UploadBulkStudents = wrapAsync(async (req, res) => {
-    const studentsData = [];
-    const parentsData = [];
-
     try {
-        // Convert Excel file to CSV
-        const workbook = XLSX.readFile(req.file.path);
-        const csvSheet = XLSX.utils.sheet_to_csv(workbook.Sheets[workbook.SheetNames[0]]);
+        console.log('Uploaded File:', req.file);
 
-        // Write the CSV data to a temporary file
-        const tempCsvPath = `${req.file.path}.csv`;
-        fs.writeFileSync(tempCsvPath, csvSheet);
+        if (!req.file) {
+            return res.status(400).json(
+                new ApiResponse(
+                    400,
+                    null,
+                    "No file uploaded or file upload failed."
+                )
+            );
+        }
 
-        // Process the CSV data
-        fs.createReadStream(tempCsvPath)
-            .pipe(csv())
-            .on("data", (row) => {
-                studentsData.push(row);
-                parentsData.push(row);
-            })
-            .on("end", async () => {
-                const processedStudents = [];
-                const parentDocs = [];
-                const errors = [];
+        // Read the workbook from the buffer
+        const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
+        const sheet_name_list = workbook.SheetNames;
+        const xlData = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
 
-                try {
-                    for (let i = 0; i < studentsData.length; i++) {
-                        const studentData = studentsData[i];
-                        const { currentClass, currentSection, currentSession, ...restStudentData } = studentData;
+        const studentsData = xlData;
+        const parentsData = xlData;
 
-                        // Find class, section, and session documents
-                        const classDoc = await Class.findOne({ name: currentClass });
-                        const sectionDoc = await Section.findOne({ name: currentSection });
-                        const sessionDoc = await Session.findOne({ sessionYear: currentSession });
+        const processedStudents = [];
+        const parentDocs = [];
+        const errors = [];
 
-                        if (!classDoc || !sectionDoc || !sessionDoc) {
-                            errors.push({ admissionNo: studentData.admissionNo, message: `Class, Section, or Session not found.` });
-                            continue;
-                        }
+        for (let i = 0; i < studentsData.length; i++) {
+            const studentData = studentsData[i];
 
-                        // Check for required fields
-                        const requiredFields = ["admissionNo", "rollNumber", "password", "firstName", "gender", "mobileNumber", "email"];
-                        let missingField = requiredFields.find(field => !studentData[field] || studentData[field].trim() === "");
+            const {
+                currentClass,
+                currentSection,
+                currentSession,
+                ...restStudentData
+            } = studentData;
 
-                        if (missingField) {
-                            errors.push({ admissionNo: studentData.admissionNo, message: `Field "${missingField}" is required.` });
-                            continue;
-                        }
-
-                        // Check for duplicate roll number
-                        const existingStudent = await Student.findOne({ rollNumber: studentData.rollNumber });
-                        if (existingStudent) {
-                            errors.push({ admissionNo: studentData.admissionNo, message: `Duplicate roll number found: ${studentData.rollNumber}.` });
-                            continue;
-                        }
-
-                        // Parse dates
-                        const dateOfBirth = parseDate(studentData.dateOfBirth);
-                        const admissionDate = parseDate(studentData.admissionDate);
-                        const measurementDate = parseDate(studentData.measurementDate);
-
-                        // Save student
-                        const newStudent = new Student({
-                            ...restStudentData,
-                            currentClass: classDoc._id,
-                            currentSection: sectionDoc._id,
-                            currentSession: sessionDoc._id,
-                            password: studentData.password,
-                            dateOfBirth,
-                            admissionDate,
-                            measurementDate,
-                        });
-
-                        const savedStudent = await newStudent.save();
-
-                        // Save student history
-                        const studentHistory = { session: sessionDoc._id, class: classDoc._id, classSection: sectionDoc._id };
-                        const studentHistoryData = await StudentHistory.create(studentHistory);
-                        savedStudent.studentHistory.push(studentHistoryData._id);
-                        await savedStudent.save();
-
-                        processedStudents.push(savedStudent);
-
-                        // Process parent data
-                        const parentData = {
-                            fatherName: parentsData[i].fatherName,
-                            motherName: parentsData[i].motherName,
-                            fatherPhone: parentsData[i].fatherPhone,
-                            motherPhone: parentsData[i].motherPhone,
-                            email: parentsData[i].parentEmail,
-                            password: parentsData[i].parentPassword,
-                            studentId: savedStudent._id,
-                        };
-
-                        if (!parentData.fatherName || parentData.fatherName.trim() === "" || !parentData.password || parentData.password.trim() === "") {
-                            errors.push({ admissionNo: studentData.admissionNo, message: `Parent data is incomplete.` });
-                            continue;
-                        }
-
-                        const newParent = new Parent(parentData);
-                        const savedParent = await newParent.save();
-
-                        savedStudent.parent = savedParent._id;
-                        await savedStudent.save();
-
-                        parentDocs.push(savedParent);
-                    }
-
-                    // Clean up files
-                    fs.unlinkSync(req.file.path);
-                    fs.unlinkSync(tempCsvPath);
-
-                    return res.status(207).json(new ApiResponse(207, { successfulStudents: processedStudents, successfulParents: parentDocs, errors }, "Bulk upload processed with some errors."));
-                } catch (err) {
-                    console.error(err);
-                    fs.unlinkSync(req.file.path);
-                    fs.unlinkSync(tempCsvPath);
-                    return res.status(500).json(new ApiResponse(500, null, "An error occurred during bulk upload."));
-                }
+            const classDoc = await Class.findOne({
+                name: currentClass,
             });
-    } catch (error) {
-        console.error("Error processing file:", error);
-        fs.unlinkSync(req.file.path);
-        return res.status(500).json(new ApiResponse(500, null, "Failed to process Excel file."));
+            const sectionDoc = await Section.findOne({
+                name: currentSection,
+            });
+            const sessionDoc = await Session.findOne({
+                sessionYear: currentSession,
+            });
+
+            if (!classDoc || !sectionDoc || !sessionDoc) {
+                errors.push({
+                    admissionNo: studentData.admissionNo,
+                    message: "Class, Section, or Session not found.",
+                });
+                continue;
+            }
+
+            const requiredFields = [
+                "admissionNo",
+                "rollNumber",
+                "password",
+                "firstName",
+                "gender",
+                "mobileNumber",
+                "email",
+            ];
+
+            let missingField = null;
+            for (let field of requiredFields) {
+                if (
+                    !studentData[field] ||
+                    studentData[field].toString().trim() === ""
+                ) {
+                    missingField = field;
+                    break;
+                }
+            }
+
+            if (missingField) {
+                errors.push({
+                    admissionNo: studentData.admissionNo,
+                    message: `Field "${missingField}" is required.`,
+                });
+                continue;
+            }
+
+            const existingStudent = await Student.findOne({
+                rollNumber: studentData.rollNumber,
+            });
+            if (existingStudent) {
+                errors.push({
+                    admissionNo: studentData.admissionNo,
+                    message: `Duplicate roll number found: ${studentData.rollNumber}.`,
+                });
+                continue;
+            }
+
+            const dateOfBirth = parseDate(studentData.dateOfBirth);
+            const admissionDate = parseDate(studentData.admissionDate);
+            const measurementDate = parseDate(
+                studentData.measurementDate
+            );
+
+            const newStudent = new Student({
+                ...restStudentData,
+                currentClass: classDoc._id,
+                currentSection: sectionDoc._id,
+                currentSession: sessionDoc._id,
+                password: studentData.password,
+                dateOfBirth,
+                admissionDate,
+                measurementDate,
+            });
+
+            const savedStudent = await newStudent.save();
+
+            const studentHistory = {
+                session: sessionDoc._id,
+                class: classDoc._id,
+                classSection: sectionDoc._id,
+            };
+            const studentHistoryData = await StudentHistory.create(
+                studentHistory
+            );
+            savedStudent.studentHistory.push(studentHistoryData._id);
+            await savedStudent.save();
+
+            processedStudents.push(savedStudent);
+
+            const parentData = {
+                fatherName: parentsData[i].fatherName,
+                motherName: parentsData[i].motherName,
+                fatherPhone: parentsData[i].fatherPhone,
+                motherPhone: parentsData[i].motherPhone,
+                email: parentsData[i].parentEmail,
+                password: parentsData[i].parentPassword,
+                studentId: savedStudent._id,
+            };
+
+            if (
+                !parentData.fatherName ||
+                parentData.fatherName.toString().trim() === ""
+            ) {
+                errors.push({
+                    admissionNo: studentData.admissionNo,
+                    message: "Father's name is required for parent.",
+                });
+                continue;
+            }
+            if (
+                !parentData.password ||
+                parentData.password.toString().trim() === ""
+            ) {
+                errors.push({
+                    admissionNo: studentData.admissionNo,
+                    message: "Parent password is required.",
+                });
+                continue;
+            }
+
+            const newParent = new Parent(parentData);
+            const savedParent = await newParent.save();
+
+            savedStudent.parent = savedParent._id;
+            await savedStudent.save();
+
+            await assignFeeGroupToNewStudents(savedStudent);
+
+            parentDocs.push(savedParent);
+        }
+
+        // No need to delete the file since it's stored in memory
+
+        if (errors.length > 0) {
+            return res.status(207).json(
+                new ApiResponse(
+                    207,
+                    {
+                        successfulStudents: processedStudents,
+                        successfulParents: parentDocs,
+                        errors: errors,
+                    },
+                    "Bulk upload processed with some errors."
+                )
+            );
+        } else {
+            return res.status(200).json(
+                new ApiResponse(
+                    200,
+                    {
+                        successfulStudents: processedStudents,
+                        successfulParents: parentDocs,
+                    },
+                    "Bulk upload processed successfully."
+                )
+            );
+        }
+    } catch (err) {
+        console.error(err);
+        return res
+            .status(500)
+            .json(
+                new ApiResponse(
+                    500,
+                    null,
+                    "An error occurred during bulk upload."
+                )
+            );
     }
 });
 
 function parseDate(dateString) {
     if (!dateString) return null;
-    const parts = dateString.split("-");
-    if (parts.length !== 3) return null;
-    const day = parseInt(parts[0], 10);
-    const month = parseInt(parts[1], 10) - 1;
-    const year = parseInt(parts[2], 10);
-    const date = new Date(year, month, day);
-    return isNaN(date.getTime()) ? null : date;
+    const date = moment(dateString, ['DD-MM-YYYY', 'YYYY-MM-DD', moment.ISO_8601], true);
+    return date.isValid() ? date.toDate() : null;
 }

@@ -1,3 +1,0 @@
-fatherName,fatherPhone,email,parentPassword,currentClass,currentSection,currentSession,admissionNo,studentPassword,firstName,gender,mobileNumber,studentEmail
-Richard Doe,1234567890,parent1@example.com,securePassword1,10,A,2024-2025,A1001,studentPass1,John,Male,9876543210,john.doe@example.com
-William Smith,1234567891,parent2@example.com,securePassword2,9,B,2024-2025,A1002,studentPass2,Mary,Female,8765432109,mary.smith@example.com
