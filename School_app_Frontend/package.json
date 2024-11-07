@@ -41,7 +41,8 @@
     "react-router-dom": "^6.26.1",
     "react-select": "^5.8.0",
     "react-to-print": "^3.0.1",
-    "react-toastify": "^10.0.5"
+    "react-toastify": "^10.0.5",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.8.0",
