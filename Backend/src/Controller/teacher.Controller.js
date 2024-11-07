@@ -231,7 +231,7 @@ export const getAttendanceAndTeacherCount = wrapAsync(async (req, res) => {
         },
     }).populate({
         path: "teacherId",
-        select: "gender", 
+        select: "gender",
     });
 
     const maleAttendance = Array(7).fill(0);
@@ -268,10 +268,7 @@ export const getAttendanceAndTeacherCount = wrapAsync(async (req, res) => {
         },
     ]);
 
-    const totalTeacher = totalCounts.reduce(
-        (acc, curr) => acc + curr.count,
-        0
-    );
+    const totalTeacher = totalCounts.reduce((acc, curr) => acc + curr.count, 0);
     const totalMaleTeachers =
         totalCounts.find((g) => g._id === "Male")?.count || 0;
     const totalFemaleTeachers =
@@ -285,4 +282,8 @@ export const getAttendanceAndTeacherCount = wrapAsync(async (req, res) => {
     };
 
     return res.status(200).json(new ApiResponse(200, response));
+});
+
+export const uploadBulkTeacherData = wrapAsync(async (req, res) => {
+    
 });
