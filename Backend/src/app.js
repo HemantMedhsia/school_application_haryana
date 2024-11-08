@@ -32,6 +32,7 @@ import { ContactRoute } from "./Routes/Contact.Route.js";
 import { siblingRouter } from "./Routes/sibling.Route.js";
 import { feeGroupRouter } from "./Routes/feeGroup.Route.js";
 import { studentFeesRouter } from "./Routes/studentFees.Route.js";
+import schoolDbMiddleware from "./Middlewares/schoolDbMiddleware.js";
 
 const app = express();
 
@@ -77,37 +78,71 @@ app.get("/", (req, res) => {
     res.send("Welcome to our School. Deployment is complete");
 });
 
+app.use("/:schoolId", schoolDbMiddleware);
+app.use("/:schoolId/api", [
+    noticeRoute,
+    subjectRoute,
+    schoolRoute,
+    studentRoute,
+    parentRoute,
+    adminRoute,
+    teacherRoute,
+    teacherAttendenceRoute,
+    complaintRoute,
+    marksRoute,
+    singleSubjectMarkRoute,
+    staffRoute,
+    studentAttendenceRoute,
+    staffAttendanceRoute,
+    classRoute,
+    sectionRoute,
+    sessionRoute,
+    studentHistoryRoute,
+    loginUserRouter,
+    subjectGroupRoute,
+    termRoute,
+    examTypeRoute,
+    examScheduleRoute,
+    markRoute,
+    classTimeTableRoute,
+    resultRoute,
+    ContactRoute,
+    siblingRouter,
+    feeGroupRouter,
+    studentFeesRouter,
+]);
+
 // API routes
-app.use("/api", noticeRoute);
-app.use("/api", subjectRoute);
-app.use("/api", schoolRoute);
-app.use("/api", studentRoute);
-app.use("/api", parentRoute);
-app.use("/api", adminRoute);
-app.use("/api", teacherRoute);
-app.use("/api", teacherAttendenceRoute);
-app.use("/api", complaintRoute);
-app.use("/api", marksRoute);
-app.use("/api", singleSubjectMarkRoute);
-app.use("/api", staffRoute);
-app.use("/api", studentAttendenceRoute);
-app.use("/api", staffAttendanceRoute);
-app.use("/api", classRoute);
-app.use("/api", sectionRoute);
-app.use("/api", sessionRoute);
-app.use("/api", studentHistoryRoute);
-app.use("/api", loginUserRouter);
-app.use("/api", subjectGroupRoute);
-app.use("/api", termRoute);
-app.use("/api", examTypeRoute);
-app.use("/api", examScheduleRoute);
-app.use("/api", markRoute);
-app.use("/api", classTimeTableRoute);
-app.use("/api", resultRoute);
-app.use("/api", ContactRoute);
-app.use("/api", siblingRouter);
-app.use("/api", feeGroupRouter);
-app.use("/api", studentFeesRouter);
+// app.use("/api", noticeRoute);
+// app.use("/api", subjectRoute);
+// app.use("/api", schoolRoute);
+// app.use("/api", studentRoute);
+// app.use("/api", parentRoute);
+// app.use("/api", adminRoute);
+// app.use("/api", teacherRoute);
+// app.use("/api", teacherAttendenceRoute);
+// app.use("/api", complaintRoute);
+// app.use("/api", marksRoute);
+// app.use("/api", singleSubjectMarkRoute);
+// app.use("/api", staffRoute);
+// app.use("/api", studentAttendenceRoute);
+// app.use("/api", staffAttendanceRoute);
+// app.use("/api", classRoute);
+// app.use("/api", sectionRoute);
+// app.use("/api", sessionRoute);
+// app.use("/api", studentHistoryRoute);
+// app.use("/api", loginUserRouter);
+// app.use("/api", subjectGroupRoute);
+// app.use("/api", termRoute);
+// app.use("/api", examTypeRoute);
+// app.use("/api", examScheduleRoute);
+// app.use("/api", markRoute);
+// app.use("/api", classTimeTableRoute);
+// app.use("/api", resultRoute);
+// app.use("/api", ContactRoute);
+// app.use("/api", siblingRouter);
+// app.use("/api", feeGroupRouter);
+// app.use("/api", studentFeesRouter);
 
 // Global error handling middleware
 app.use((err, req, res, next) => {

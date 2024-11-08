@@ -8,18 +8,31 @@ dotenv.config({
 
 const port = process.env.PORT;
 
-connectDB()
+// connectDB()
+//     .then(() => {
+//         console.log("DB connected Sucessfully");
+//         app.listen(port, () => {
+//             console.log(`Server is running on port ${port}`);
+//         });
+
+//         app.on("error", (error) => {
+//             console.log("Error is here: ", error);
+//             throw error;
+//         });
+//     })
+//     .catch((err) => {
+//         console.log(err);
+//     });
+
+connectDB("default")
     .then(() => {
-        console.log("DB connected Sucessfully");
+        console.log("Default DB connected successfully");
         app.listen(port, () => {
             console.log(`Server is running on port ${port}`);
-        });
-
-        app.on("error", (error) => {
-            console.log("Error is here: ", error);
-            throw error;
         });
     })
     .catch((err) => {
         console.log(err);
     });
+
+

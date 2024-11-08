@@ -17,6 +17,9 @@ const adminSchema = new mongoose.Schema({
         type: String,
         default: "Admin",
     },
+    frontendUrl: {
+        type: String,
+    },
 });
 
 adminSchema.pre("save", async function (next) {
