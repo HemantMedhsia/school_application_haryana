@@ -121,7 +121,12 @@ const StudentAdd = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const schoolId = import.meta.env.VITE_SchoolId;
+    // const schoolId = import.meta.env.VITE_SchoolId;
+    const schoolId = localStorage.getItem("schoolId");
+    if (!schoolId) {
+      toast.error("School ID not found. Please login again.");
+      return;
+    }
 
     const phoneRegex = /^\d{10}$/;
     if (!phoneRegex.test(formData.mobileNumber)) {

@@ -45,7 +45,7 @@ export const AuthProvider = ({ children }) => {
   });
   const [loading, setLoading] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-
+  const [schoolId, setSchoolId] = useState();
   useEffect(() => {
     const handleTokenRefresh = async () => {
       if (authToken) {
@@ -103,9 +103,10 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const login = async (authToken, refreshToken, user) => {
+  const login = async (authToken, refreshToken, user, schoolId) => {
     setAuthToken(authToken);
     setRefreshToken(refreshToken);
+    setSchoolId(schoolId);
     let userName;
     if (user.role === "Student") {
       userName = user.firstName;
@@ -126,6 +127,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem("authToken", authToken);
     localStorage.setItem("refreshToken", refreshToken);
     localStorage.setItem("name", userName);
+    localStorage.setItem("schoolId", schoolId);
   };
 
   const logout = (showToast = true) => {
@@ -135,6 +137,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("authToken");
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("name");
+    localStorage.removeItem("schoolId");
 
     if (showToast) {
       console.log("Logged out successfully!");
@@ -155,6 +158,7 @@ export const AuthProvider = ({ children }) => {
           login,
           logout,
           loading,
+          schoolId,
         }}
       >
         {!loading ? children : <PyramidLoader desc={""} />}

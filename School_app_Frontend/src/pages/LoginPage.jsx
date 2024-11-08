@@ -52,8 +52,9 @@ const LoginPage = () => {
           headers: { "Content-Type": "application/json" },
         }
       );
-      const { accessToken, refreshToken, user } = response.data.data;
-      login(accessToken, refreshToken, user);
+      const { accessToken, refreshToken, user, } = response.data.data;
+      const schoolId = user.school;
+      login(accessToken, refreshToken, user, schoolId);
 
       navigate("/school/dashboard");
     } catch (err) {

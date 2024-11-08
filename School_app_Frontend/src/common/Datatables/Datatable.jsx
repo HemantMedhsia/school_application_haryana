@@ -30,7 +30,7 @@ const Datatable = ({
   return (
     <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded bg-[#283046] pb-6">
       <div className="rounded-t mb-0 px-4 py-3 border-b border-gray-700">
-        {/* Additional header content can go here */}
+        {/*  Additional header content can go here */}
       </div>
 
       <div className="block w-full overflow-x-auto">

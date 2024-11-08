@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Disclosure, Menu } from "@headlessui/react";
 import { IoCalendarOutline, IoLocationSharp } from "react-icons/io5";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
@@ -9,18 +9,36 @@ import { useAuth } from "../../context/AuthProvider";
 import { jwtDecode } from "jwt-decode";
 import DarkModeToggle from "../../common/DarkModeToggle/DarkModeToggle";
 import logo from "../../assets/titleLogo.png";
-
-const navigation = [
-  { name: "Demo School Name", href: "#", current: false },
-];
+import { toast, ToastContainer } from "react-toastify";
+import axios from "axios";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
 const TopNavbar = ({ isCollapsed }) => {
-  const { logout, name, userRole, authToken } = useAuth();
+  const { logout, name, userRole, authToken, schoolId } = useAuth();
   const navigate = useNavigate();
+  const [schoolName, setSchoolName] = useState("Demo School Name");
+  useEffect(() => {
+    const fetchSchoolName = async () => {
+      if (schoolId) {
+        try {
+          const response = await axios.get(
+            `${import.meta.env.VITE_BACKEND_URL}/api/get-school/${schoolId}`
+          );
+          setSchoolName(response.data.data.name);
+        } catch (error) {
+          console.error("Error fetching school name:", error);
+          toast.error("Error fetching school name.");
+        }
+      }
+    };
+
+    fetchSchoolName();
+  }, [schoolId]);
+
+  const navigation = [{ name: schoolName, href: "#", current: false }];
 
   const handleProfileClick = () => {
     if (authToken) {
@@ -55,6 +73,7 @@ const TopNavbar = ({ isCollapsed }) => {
     >
       {({ open }) => (
         <>
+          <ToastContainer />
           <div className="flex h-full items-center justify-between px-4">
             <div className="flex h-16 items-center w-full justify-between">
               <div className="flex gap-2">
