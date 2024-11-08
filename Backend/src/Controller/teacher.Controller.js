@@ -8,6 +8,10 @@ import { ApiResponse } from "../Utils/responseHandler.js";
 import { ApiError } from "../Utils/errorHandler.js";
 import jwt from "jsonwebtoken";
 import { TeacherAttendance } from "../Models/teacherAttendence.model.js";
+import fs from "fs";
+import csv from "csv-parser";
+import path from "path";
+import xlsx from "xlsx";
 
 const generateAccessAndRefreshTokens = async (teacherId, next) => {
     const teacher = await Teacher.findById(teacherId);
@@ -285,5 +289,119 @@ export const getAttendanceAndTeacherCount = wrapAsync(async (req, res) => {
 });
 
 export const uploadBulkTeacherData = wrapAsync(async (req, res) => {
-    
+    if (!req.file) {
+        return res.status(400).json({
+            error: "No file uploaded.",
+        });
+    }
+
+    const schoolId = req.params.schoolId;
+    const filePath = req.file.path;
+    const teacherData = [];
+    const errors = [];
+    const processedTeachers = [];
+
+    try {
+        const fileExtension = path.extname(req.file.originalname).toLowerCase();
+        let parsedData = [];
+
+        if (fileExtension === ".csv") {
+            await new Promise((resolve, reject) => {
+                fs.createReadStream(filePath)
+                    .pipe(csv())
+                    .on("data", (row) => {
+                        parsedData.push(row);
+                    })
+                    .on("end", resolve)
+                    .on("error", reject);
+            });
+        } else if (fileExtension === ".xls" || fileExtension === ".xlsx") {
+            const workbook = xlsx.readFile(filePath);
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+            parsedData = xlsx.utils.sheet_to_json(worksheet, { defval: null });
+        } else {
+            throw new Error("Unsupported file format.");
+        }
+
+        parsedData.forEach((row) => {
+            teacherData.push(row);
+        });
+
+        const schoolDoc = await School.findById(schoolId);
+        if (!schoolDoc) {
+            return res
+                .status(404)
+                .json(new ApiResponse(404, null, "School not found."));
+        }
+
+        for (let i = 0; i < teacherData.length; i++) {
+            const data = teacherData[i];
+
+            const { error } = teacherValidationSchema.validate(data);
+            if (error) {
+                console.error(
+                    `Validation error for record #${i + 1}:`,
+                    error.details
+                );
+                errors.push({
+                    email: data.email || "undefined",
+                    message: `Validation error for teacher ${
+                        data.name || "undefined"
+                    }: ${error.message}`,
+                });
+                continue;
+            }
+
+            const existingTeacher = await Teacher.findOne({
+                email: data.email,
+            });
+            if (existingTeacher) {
+                errors.push({
+                    email: data.email,
+                    message: `Teacher with email ${data.email} already exists. Skipping this record.`,
+                });
+                continue;
+            }
+
+            const newTeacher = new Teacher({
+                ...data,
+                school: schoolId,
+            });
+
+            const savedTeacher = await newTeacher.save();
+            processedTeachers.push(savedTeacher);
+
+            schoolDoc.teachers.addToSet(savedTeacher._id);
+        }
+
+        await schoolDoc.save();
+        fs.unlinkSync(filePath);
+
+        return res.status(207).json(
+            new ApiResponse(
+                207,
+                {
+                    successfulTeachers: processedTeachers,
+                    errors: errors,
+                },
+                "Bulk upload processed with some errors."
+            )
+        );
+    } catch (err) {
+        console.error(err);
+
+        if (fs.existsSync(req.file.path)) {
+            fs.unlinkSync(req.file.path);
+        }
+        return res
+            .status(500)
+            .json(
+                new ApiResponse(
+                    500,
+                    null,
+                    "An error occurred during bulk upload."
+                )
+            );
+    }
 });
