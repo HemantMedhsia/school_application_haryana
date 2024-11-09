@@ -12,4 +12,5 @@ export const adminValidationSchema = Joi.object({
             return value;
         })
         .required(),
+    schoolCode: Joi.string().required(),
 });

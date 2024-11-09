@@ -20,6 +20,10 @@ const adminSchema = new mongoose.Schema({
     frontendUrl: {
         type: String,
     },
+    schoolCode: {
+        type: String,
+        required: true,
+    },
 });
 
 adminSchema.pre("save", async function (next) {

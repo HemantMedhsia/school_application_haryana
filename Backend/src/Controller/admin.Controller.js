@@ -150,6 +150,7 @@ export const loginAdmin = wrapAsync(async (req, res, next) => {
         );
     }
 
+    console.log("Admin", email, password, role);
     const masterData = await Master.findOne({
         admin: { $exists: true },
     }).populate("admin");
@@ -164,8 +165,6 @@ export const loginAdmin = wrapAsync(async (req, res, next) => {
         console.log("Admin not found");
         return next(new ApiError(404, "Admin does not exist"));
     }
-
-    console.log("Admin found:", admin.email);
 
     const isPasswordValid = await admin.isValidPassword(password);
     console.log("Is password valid:", isPasswordValid);

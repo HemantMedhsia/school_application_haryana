@@ -78,14 +78,15 @@ app.get("/", (req, res) => {
     res.send("Welcome to our School. Deployment is complete");
 });
 
-app.use("/:schoolId", schoolDbMiddleware);
-app.use("/:schoolId/api", [
+app.use("/api/login", adminRoute);
+app.use("/api/school", schoolRoute);
+app.use("/:schoolCode", schoolDbMiddleware);
+app.use("/:schoolCode/api", [
     noticeRoute,
     subjectRoute,
-    schoolRoute,
+
     studentRoute,
     parentRoute,
-    adminRoute,
     teacherRoute,
     teacherAttendenceRoute,
     complaintRoute,

@@ -6,6 +6,7 @@ export const generateAccessTokenAdmin = (user) => {
             role: user.role,
             schoolId: user.school,
             frontendUrl: user.frontendUrl,
+            schoolCode: user.schoolCode,
         },
         process.env.ACCESS_TOKEN_SECRET,
         { expiresIn: "15m" }
